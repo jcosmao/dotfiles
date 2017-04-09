@@ -1,0 +1,65 @@
+# If not running interactively, don't do anything
+[ -z "$PS1" ] && return
+
+# source bashrc extend
+[ -f ~/.bash_aliases ] && . ~/.bash_aliases
+[ -d ~/.bash_custom ] && for source in $(find ~/.bash_custom -type f -name '*.source' ); do source $source; done
+[ -d ~/.bash ] && for source in $(find ~/.bash -type f -name '*.source' ); do source $source; done
+
+# Set prompt
+PS1='# '
+PROMPT_COLOR=$b_blue
+PROMPT_COMMAND=prompt
+
+function prompt
+{
+    history -a
+    triangle=$'\342\226\266' #\u25b6 to octal
+    PS1=$(printf "%s %s\n${triangle} " "$(prompt_left)" "$(prompt_add)")
+}
+
+function prompt_add ()
+{
+    add=''
+    if git branch > /dev/null 2>&1 ; then
+        add=$(set_git)
+    fi
+
+    if test -n "$VIRTUAL_ENV" ; then
+        add="$(set_virtualenv) ${add}"
+    fi
+
+    echo $add
+}
+
+function prompt_left
+{
+    LEFT_COLOR=$PROMPT_COLOR
+    PROMPT_LEFT=''
+
+    [[ "`id -u`" -eq 0 ]] && LEFT_COLOR=${red}
+
+    if [[ -n $SSH_TTY ]]; then
+        PROMPT_LEFT="${LEFT_COLOR}\u@\H${normal}"
+    else
+        PROMPT_LEFT="${LEFT_COLOR}\u:${normal}"
+    fi
+
+    echo "${PROMPT_LEFT} ${grey}\w${normal}"
+}
+
+function set_git
+{
+    branch=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
+    modified=$( git status --porcelain | grep -c '^ M')
+    removed=$( git status --porcelain | grep -c '^ D')
+    commit=''
+    [[ $removed -ne 0 || $modified -ne 0 ]] && commit=${yellow}$'\342\234\230'${normal}
+
+    echo "${mkbold}git(${magenta}${branch}${normal}${mkbold})${normal}${commit}"
+}
+
+function set_virtualenv
+{
+    echo "${mkbold}venv(${b_yellow}$(basename $VIRTUAL_ENV)${normal})"
+}

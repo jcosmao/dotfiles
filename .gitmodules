@@ -1,0 +1,48 @@
+[submodule "vim/bundle/YouCompleteMe"]
+	path = vim/bundle/YouCompleteMe
+	url = /home/ju/dotfiles/vim/bundle/YouCompleteMe
+[submodule "vim/bundle/nginx-vim-syntax"]
+	path = vim/bundle/nginx-vim-syntax
+	url = /home/ju/dotfiles/vim/bundle/nginx-vim-syntax
+[submodule "vim/bundle/vim-paste-easy"]
+	path = vim/bundle/vim-paste-easy
+	url = /home/ju/dotfiles/vim/bundle/vim-paste-easy
+[submodule "vim/bundle/lightline.vim"]
+	path = vim/bundle/lightline.vim
+	url = /home/ju/dotfiles/vim/bundle/lightline.vim
+[submodule "vim/bundle/nerdtree"]
+	path = vim/bundle/nerdtree
+	url = /home/ju/dotfiles/vim/bundle/nerdtree
+[submodule "vim/bundle/supertab"]
+	path = vim/bundle/supertab
+	url = /home/ju/dotfiles/vim/bundle/supertab
+[submodule "vim/bundle/syntastic"]
+	path = vim/bundle/syntastic
+	url = /home/ju/dotfiles/vim/bundle/syntastic
+[submodule "vim/bundle/tagbar"]
+	path = vim/bundle/tagbar
+	url = /home/ju/dotfiles/vim/bundle/tagbar
+[submodule "vim/bundle/ultisnips"]
+	path = vim/bundle/ultisnips
+	url = /home/ju/dotfiles/vim/bundle/ultisnips
+[submodule "vim/bundle/vim-flake8"]
+	path = vim/bundle/vim-flake8
+	url = /home/ju/dotfiles/vim/bundle/vim-flake8
+[submodule "vim/bundle/vim-json"]
+	path = vim/bundle/vim-json
+	url = /home/ju/dotfiles/vim/bundle/vim-json
+[submodule "vim/bundle/vim-nerdtree-tabs"]
+	path = vim/bundle/vim-nerdtree-tabs
+	url = /home/ju/dotfiles/vim/bundle/vim-nerdtree-tabs
+[submodule "vim/bundle/vim-perl"]
+	path = vim/bundle/vim-perl
+	url = /home/ju/dotfiles/vim/bundle/vim-perl
+[submodule "vim/bundle/vim-puppet"]
+	path = vim/bundle/vim-puppet
+	url = /home/ju/dotfiles/vim/bundle/vim-puppet
+[submodule "vim/bundle/vim-snippets"]
+	path = vim/bundle/vim-snippets
+	url = /home/ju/dotfiles/vim/bundle/vim-snippets
+[submodule "vim/bundle/vim-yaml"]
+	path = vim/bundle/vim-yaml
+	url = /home/ju/dotfiles/vim/bundle/vim-yaml

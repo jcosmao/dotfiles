@@ -1,0 +1,42 @@
+#!/bin/bash
+
+alias venv='[[ -f ./bin/activate ]] && source ./bin/activate'
+
+function display_256_colors ()
+{
+    for i in `seq 1 256`
+    do
+        tput setaf $i
+        echo -n "$i "
+    done
+}
+
+function up ()
+{
+    cd $(eval printf '../'%.0s {1..$1})
+}
+
+function json ()
+{
+    jq=$(which jq)
+    if [[ -n $jq ]]; then
+        $jq .
+    else
+        python -mjson.tool
+    fi
+}
+
+function json2yaml ()
+{
+    python -c 'import sys, yaml, json; yaml.safe_dump(json.load(sys.stdin), sys.stdout, default_flow_style=False)'
+}
+
+function uuid ()
+{
+    grep -Po '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+}
+
+function open
+{
+    nohup xdg-open $* </dev/null >/tmp/open.log 2>&1 &
+}

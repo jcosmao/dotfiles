@@ -1,0 +1,109 @@
+#!/bin/bash
+
+TMUX_CONF="$HOME/.tmux.conf"
+TMUX="$( which tmux ) -2 -L $USER -f $TMUX_CONF"
+
+function tmux_ls ()
+{
+    $TMUX ls -F "#{session_name}" 2> /dev/null
+}
+
+function tmux_attach_or_new ()
+{
+    session_name=$1
+
+    if [[ $session_name == 'ls' ]]; then
+        tmux_ls
+        exit
+    fi
+
+    if [[ $( tmux_ls | grep -Ec "^$session_name$") == 1 ]]; then
+        my_session=$(tmux display-message -p '#S' 2> /dev/null)
+        [[ "$my_session" != "$session_name" ]] && $TMUX attach-session -t "$session_name"
+    else
+        $TMUX new -s "$session_name"
+    fi
+    exit
+}
+
+function tmux_exec ()
+{
+    session=$1; shift
+    cmd="$*"
+
+    [[ $( tmux_ls | grep -Ec "^$session$" ) -eq 0 ]] && echo "No tmux session $session" && exit 1
+    echo "Exec '$cmd' on all windows for tmux session '$session'"
+    read -r -p "Sure ? [y/N] " response
+    response=${response,,}    # tolower
+    if [[ $response =~ ^(yes|y)$ ]]; then
+        for window in $( $TMUX list-windows -F "#{window_id}" -t "$session" ); do
+            echo "$session":"$window" "$cmd"
+            $TMUX send-keys -t "$session":"$window" "$cmd" C-m
+        done
+    fi
+    exit
+}
+
+function tmux_kill ()
+{
+    [[ $1 == "all" ]] && $TMUX kill-server || $TMUX kill-session -t $1
+
+    exit
+}
+
+function print_help ()
+{
+    echo "Tmux wrapper"
+    echo
+    echo "$0 [--exec|--kill] <session_name>"
+    echo
+    echo "    --exec <cmd>          exec cmd on all toto windows"
+    echo "    --kill                kill session toto"
+    echo "    --help                help"
+
+    exit
+}
+
+function main ()
+{
+    # Transform long options to short ones
+    for arg in "$@"; do
+        shift
+        case "$arg" in
+            "--exec")   	set -- "$@" "-x" ;;
+            "--kill")  		set -- "$@" "-k" ;;
+            "--help")  		set -- "$@" "-h" ;;
+            *)              set -- "$@" "$arg"
+        esac
+    done
+
+    # Parse short options
+    OPTIND=1
+    while getopts "sx:kh" opt
+    do
+        case "$opt" in
+            "x") CMD="$OPTARG" ;;
+            "k") KILL=1 ;;
+            "h") print_help ;;
+        esac
+    done
+	shift $(expr $OPTIND - 1) # remove options from positional parameters
+
+    [[ $# -eq 0 ]] && tmux_ls && exit
+    [[ $# -ne 1 ]] && echo "Fail: Need 1 argument ($@)" &&  print_help
+
+    # All arg are removed
+    SESSION=$1
+
+    if [[ -n $CMD ]]
+    then
+        tmux_exec "$SESSION" "$CMD"
+    elif [[ $KILL -eq 1 ]]
+    then
+        tmux_kill $SESSION
+    else
+        tmux_attach_or_new "$1"
+    fi
+}
+
+main "$@"
