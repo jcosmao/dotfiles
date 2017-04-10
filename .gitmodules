@@ -1,48 +1,48 @@
 [submodule "vim/bundle/YouCompleteMe"]
 	path = vim/bundle/YouCompleteMe
-	url = /home/ju/dotfiles/vim/bundle/YouCompleteMe
+	url = https://github.com/Valloric/YouCompleteMe.git
 [submodule "vim/bundle/nginx-vim-syntax"]
 	path = vim/bundle/nginx-vim-syntax
-	url = /home/ju/dotfiles/vim/bundle/nginx-vim-syntax
+	url = https://github.com/evanmiller/nginx-vim-syntax.git
 [submodule "vim/bundle/vim-paste-easy"]
 	path = vim/bundle/vim-paste-easy
-	url = /home/ju/dotfiles/vim/bundle/vim-paste-easy
+	url = https://github.com/roxma/vim-paste-easy.git
 [submodule "vim/bundle/lightline.vim"]
 	path = vim/bundle/lightline.vim
-	url = /home/ju/dotfiles/vim/bundle/lightline.vim
+	url = https://github.com/itchyny/lightline.vim.git
 [submodule "vim/bundle/nerdtree"]
 	path = vim/bundle/nerdtree
-	url = /home/ju/dotfiles/vim/bundle/nerdtree
+	url = https://github.com/scrooloose/nerdtree.git
 [submodule "vim/bundle/supertab"]
 	path = vim/bundle/supertab
-	url = /home/ju/dotfiles/vim/bundle/supertab
+	url = https://github.com/ervandew/supertab.git
 [submodule "vim/bundle/syntastic"]
 	path = vim/bundle/syntastic
-	url = /home/ju/dotfiles/vim/bundle/syntastic
+	url = https://github.com/vim-syntastic/syntastic.git
 [submodule "vim/bundle/tagbar"]
 	path = vim/bundle/tagbar
-	url = /home/ju/dotfiles/vim/bundle/tagbar
+	url = https://github.com/majutsushi/tagbar.git
 [submodule "vim/bundle/ultisnips"]
 	path = vim/bundle/ultisnips
-	url = /home/ju/dotfiles/vim/bundle/ultisnips
+	url = https://github.com/SirVer/ultisnips.git
 [submodule "vim/bundle/vim-flake8"]
 	path = vim/bundle/vim-flake8
-	url = /home/ju/dotfiles/vim/bundle/vim-flake8
+	url = https://github.com/nvie/vim-flake8.git
 [submodule "vim/bundle/vim-json"]
 	path = vim/bundle/vim-json
-	url = /home/ju/dotfiles/vim/bundle/vim-json
+	url = https://github.com/elzr/vim-json.git
 [submodule "vim/bundle/vim-nerdtree-tabs"]
 	path = vim/bundle/vim-nerdtree-tabs
-	url = /home/ju/dotfiles/vim/bundle/vim-nerdtree-tabs
+	url = https://github.com/jistr/vim-nerdtree-tabs.git
 [submodule "vim/bundle/vim-perl"]
 	path = vim/bundle/vim-perl
-	url = /home/ju/dotfiles/vim/bundle/vim-perl
+	url = https://github.com/vim-perl/vim-perl.git
 [submodule "vim/bundle/vim-puppet"]
 	path = vim/bundle/vim-puppet
-	url = /home/ju/dotfiles/vim/bundle/vim-puppet
+	url = https://github.com/rodjek/vim-puppet.git
 [submodule "vim/bundle/vim-snippets"]
 	path = vim/bundle/vim-snippets
-	url = /home/ju/dotfiles/vim/bundle/vim-snippets
+	url = https://github.com/honza/vim-snippets.git
 [submodule "vim/bundle/vim-yaml"]
 	path = vim/bundle/vim-yaml
-	url = /home/ju/dotfiles/vim/bundle/vim-yaml
+	url = https://github.com/stephpy/vim-yaml.git
