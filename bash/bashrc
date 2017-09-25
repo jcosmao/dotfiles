@@ -6,6 +6,9 @@
 [ -d ~/.bash_custom ] && for source in $(find ~/.bash_custom -type f -name '*.source' ); do source $source; done
 [ -d ~/.bash ] && for source in $(find ~/.bash -type f -name '*.source' ); do source $source; done
 
+# ssh-agent ~/.bash/functions
+launch_ssh_agent
+
 # Set prompt
 PS1='# '
 PROMPT_COLOR=$b_blue

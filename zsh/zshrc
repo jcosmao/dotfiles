@@ -24,6 +24,9 @@ source ~/.zsh/plugins/*.zsh
 # Not versionned
 [ -e ~/.bash_custom ] && for source in $(find ~/.bash_custom -type f -name '*.source' ); do source $source; done
 
+# ssh-agent ~/.bash/functions
+launch_ssh_agent
+
 # enable color support
 autoload -Uz colors && colors
 if [ -x /usr/bin/dircolors ]; then
