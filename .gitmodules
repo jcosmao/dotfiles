@@ -1,9 +1,6 @@
 [submodule "vim/bundle/YouCompleteMe"]
 	path = vim/bundle/YouCompleteMe
 	url = https://github.com/Valloric/YouCompleteMe.git
-[submodule "vim/bundle/nginx-vim-syntax"]
-	path = vim/bundle/nginx-vim-syntax
-	url = https://github.com/evanmiller/nginx-vim-syntax.git
 [submodule "vim/bundle/vim-paste-easy"]
 	path = vim/bundle/vim-paste-easy
 	url = https://github.com/roxma/vim-paste-easy.git
@@ -46,3 +43,6 @@
 [submodule "vim/bundle/vim-yaml"]
 	path = vim/bundle/vim-yaml
 	url = https://github.com/stephpy/vim-yaml.git
+[submodule "vim/bundle/nginx.vim"]
+	path = vim/bundle/nginx.vim
+	url = https://github.com/chr4/nginx.vim.git
