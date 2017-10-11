@@ -22,6 +22,14 @@ source() {
   builtin source "$@"
 }
 
+fg() {
+    if [[ $# -eq 1 && $1 = - ]]; then
+        builtin fg %-
+    else
+        builtin fg %"$@"
+    fi
+}
+
 alias .='source'
 
 # allow regex
