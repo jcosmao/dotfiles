@@ -98,6 +98,18 @@ function install_poezio ()
     cp -r poezio ~/.config
 }
 
+function antigen_update()
+{
+    #http://antigen.sharats.me/
+    curl -L git.io/antigen > zsh/antigen.zsh
+
+    # cleanup old antigin install
+    rm -rf $HOME/.antigen
+    # then reinstall zsh dotfiles
+    install_zsh
+}
+
+
 
 function print_help ()
 {
@@ -122,15 +134,16 @@ function main ()
     while [[ $# -ne 0 ]]; do
         arg="$1"; shift
         case "$arg" in
-            --bash)   install_bash ;;
-            --zsh)    install_zsh ;;
-            --vim)    install_vim ;;
-            --tmux)   install_tmux ;;
-            --git)    install_git ;;
-            --i3)     install_i3 ;;
-            --poezio) install_poezio ;;
-            --term)   install_terminal ;;
-            --help)   print_help ;;
+            --bash)     install_bash ;;
+            --zsh)      install_zsh ;;
+            --vim)      install_vim ;;
+            --tmux)     install_tmux ;;
+            --git)      install_git ;;
+            --i3)       install_i3 ;;
+            --poezio)   install_poezio ;;
+            --term)     install_terminal ;;
+            --antigen)  antigen_update ;;
+            --help)     print_help ;;
             * ) [[ $arg =~ \-+.* ]] && print_help "$arg unknown"
         esac
     done
