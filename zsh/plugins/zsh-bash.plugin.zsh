@@ -12,7 +12,7 @@ caller() {
 }
 
 # rewrite 'source' to be more bash friendly
-source() {
+source_bash() {
   alias shopt=':'
   alias _expand=_bash_expand
   alias _complete=_bash_comp
