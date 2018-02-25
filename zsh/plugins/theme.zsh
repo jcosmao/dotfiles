@@ -1,8 +1,15 @@
 # theme
 
+# enable color support
+autoload -Uz colors && colors
+if [ -x /usr/bin/dircolors ]; then
+    alias ls='ls --color=auto'
+    eval "`dircolors -b`"
+fi
+
 function __get_host_color
 {
-  HOST_COLOR_ARRAY=(4 5 6 11 12 14 40 46 200 204 215 226 191 119 74 129)
+  HOST_COLOR_ARRAY=(5 12 13 14 32 45 74 121 135 159 201 206 215 229)
   fixed_nb=$(awk '{print $1}' <(md5sum <(hostname)) | sed -re 's/[^0-9]//g' | cut -c 1-10)
   array_size=${#HOST_COLOR_ARRAY[@]}
   color_index=$((fixed_nb%array_size - 1))
@@ -14,7 +21,6 @@ BLOX_SEG__UPPER_LEFT=(blox_block__openstack blox_block__host blox_block__cwd blo
 BLOX_SEG__UPPER_RIGHT=(blox_block__virtualenv blox_block__git_repo_name blox_block__nodejs)
 BLOX_SEG__LOWER_LEFT=(blox_block__symbol)
 BLOX_SEG__LOWER_RIGHT=(blox_block__bgjobs)
-
 
 BLOX_CONF__ONELINE=false
 BLOX_CONF__NEWLINE=false

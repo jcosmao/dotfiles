@@ -15,33 +15,10 @@ antigen bundle zsh-users/zsh-syntax-highlighting
 antigen bundle jcosmao/blox-zsh-theme
 antigen apply
 
-source ~/.zsh/plugins/zsh-bash.plugin.zsh
-source ~/.zsh/plugins/blox_theme.zsh
-
-# enable color support
-autoload -Uz colors && colors
-if [ -x /usr/bin/dircolors ]; then
-    alias ls='ls --color=auto'
-    eval "`dircolors -b`"
-fi
-
-# source bash aliases/functions
-[[ -e ~/.bash_aliases ]] && source ~/.bash_aliases
-
-if [[ -e ~/.bash ]]; then
-    for source in $(find ~/.bash -type f -name '*.source' )
-    do
-        . $source
-    done
-fi
-
-# Not versionned
-if [[ -e ~/.bash_custom ]]; then
-    for source in $(find ~/.bash_custom -type f -name '*.source' )
-    do
-        . $source
-    done
-fi
+source ~/.zsh/plugins/zsh-bash.zsh
+source ~/.zsh/plugins/theme.zsh
 
 # ssh-agent ~/.bash/functions
-launch_ssh_agent
+if declare -f launch_ssh_agent &> /dev/null; then
+    launch_ssh_agent
+fi

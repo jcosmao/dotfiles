@@ -18,10 +18,20 @@ function install_bash ()
 
 function install_zsh ()
 {
+    _antigen_update
     echo "- Install zsh"
     rm -rf ~/.zsh
     cp -r zsh ~/.zsh
     ln -sf ~/.zsh/zshrc ~/.zshrc
+}
+
+function _antigen_update()
+{
+    #http://antigen.sharats.me/
+    echo '- Get last antigen from git.io/antigen'
+    curl -sL git.io/antigen > zsh/antigen.zsh
+    # cleanup old antigen install
+    rm -rf $HOME/.antigen
 }
 
 function install_vim ()
@@ -98,18 +108,6 @@ function install_poezio ()
     cp -r poezio ~/.config
 }
 
-function antigen_update()
-{
-    #http://antigen.sharats.me/
-    echo '- Get last antigen from git.io/antigen'
-    curl -sL git.io/antigen > zsh/antigen.zsh
-    # cleanup old antigen install
-    rm -rf $HOME/.antigen
-    # then reinstall zsh dotfiles
-    install_zsh
-}
-
-
 
 function print_help ()
 {
@@ -127,7 +125,7 @@ function print_help ()
 
 function main ()
 {
-    echo "- Install dotfiles for user $USER"
+    echo "Install dotfiles for user $USER"
 
     [[ $# -eq 0 ]] && print_help
 
@@ -142,7 +140,6 @@ function main ()
             --i3)       install_i3 ;;
             --poezio)   install_poezio ;;
             --term)     install_terminal ;;
-            --antigen)  antigen_update ;;
             --help)     print_help ;;
             * ) [[ $arg =~ \-+.* ]] && print_help "$arg unknown"
         esac
