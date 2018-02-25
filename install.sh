@@ -101,9 +101,9 @@ function install_poezio ()
 function antigen_update()
 {
     #http://antigen.sharats.me/
-    curl -L git.io/antigen > zsh/antigen.zsh
-
-    # cleanup old antigin install
+    echo '- Get last antigen from git.io/antigen'
+    curl -sL git.io/antigen > zsh/antigen.zsh
+    # cleanup old antigen install
     rm -rf $HOME/.antigen
     # then reinstall zsh dotfiles
     install_zsh

@@ -35,5 +35,5 @@ alias .='source'
 # allow regex
 setopt NO_NOMATCH
 
-autoload -Uz bashcompinit
-bashcompinit -i
+autoload -U +X compinit && compinit
+autoload -U +X bashcompinit && bashcompinit

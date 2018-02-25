@@ -15,17 +15,8 @@ antigen bundle zsh-users/zsh-syntax-highlighting
 antigen bundle jcosmao/blox-zsh-theme
 antigen apply
 
-# customs
-source ~/.zsh/plugins/*.zsh
-
-# source bash aliases/functions
-[ -e ~/.bash_aliases ] && source ~/.bash_aliases
-[ -e ~/.bash ] && for source in $(find ~/.bash -type f -name '*.source' ); do source $source; done
-# Not versionned
-[ -e ~/.bash_custom ] && for source in $(find ~/.bash_custom -type f -name '*.source' ); do source $source; done
-
-# ssh-agent ~/.bash/functions
-launch_ssh_agent
+source ~/.zsh/plugins/zsh-bash.plugin.zsh
+source ~/.zsh/plugins/blox_theme.zsh
 
 # enable color support
 autoload -Uz colors && colors
@@ -34,22 +25,23 @@ if [ -x /usr/bin/dircolors ]; then
     eval "`dircolors -b`"
 fi
 
-# theme
-HOST_COLOR_ARRAY=( 2 3 4 5 6 10 11 12 13 14 )
+# source bash aliases/functions
+[[ -e ~/.bash_aliases ]] && source ~/.bash_aliases
 
-function get_host_color
-{
-    hostname=$(hostname -s)
-    size=${#hostname}
-    array_size=${#HOST_COLOR_ARRAY[@]}
-    color_index=$((size%array_size - 1))
-    echo $HOST_COLOR_ARRAY[$color_index]
-}
+if [[ -e ~/.bash ]]; then
+    for source in $(find ~/.bash -type f -name '*.source' )
+    do
+        . $source
+    done
+fi
 
-BLOX_BLOCK__HOST_MACHINE_SHOW_ALWAYS=false
-BLOX_BLOCK__HOST_MACHINE_COLOR=$(get_host_color)
-BLOX_BLOCK__HOST_USER_COLOR='magenta'
-BLOX_BLOCK__HOST_USER_ROOT_COLOR='9'
-BLOX_BLOCK__CWD_COLOR='242'
-BLOX_BLOCK__GIT_BRANCH_COLOR='245'
-BLOX_BLOCK__CWD_TRUNC='4'
+# Not versionned
+if [[ -e ~/.bash_custom ]]; then
+    for source in $(find ~/.bash_custom -type f -name '*.source' )
+    do
+        . $source
+    done
+fi
+
+# ssh-agent ~/.bash/functions
+launch_ssh_agent
