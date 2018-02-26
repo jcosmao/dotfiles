@@ -46,6 +46,3 @@ if [[ -e ~/.bash_custom ]]; then
         source $src
     done
 fi
-
-# Auto reload completion
-zstyle ":completion:*:commands" rehash 1
