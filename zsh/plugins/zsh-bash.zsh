@@ -3,7 +3,7 @@
 #
 
 # rewrite 'source' to be more bash friendly
-source_bash() {
+function source_bash() {
   alias shopt=':'
   alias _expand=_bash_expand
   alias _complete=_bash_comp
@@ -13,7 +13,7 @@ source_bash() {
   builtin source "$@"
 }
 
-fg() {
+function fg() {
     if [[ $# -eq 1 && $1 = - ]]; then
         builtin fg %-
     else
@@ -46,3 +46,6 @@ if [[ -e ~/.bash_custom ]]; then
         source $src
     done
 fi
+
+# Auto reload completion
+zstyle ":completion:*:commands" rehash 1
