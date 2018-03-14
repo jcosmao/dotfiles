@@ -7,18 +7,17 @@
 [ -d ~/.bash ] && for source in $(find ~/.bash -type f -name '*.source' ); do source $source; done
 
 # ssh-agent ~/.bash/functions
-launch_ssh_agent
+launch_ssh_agent 2> /dev/null
 
 # Set prompt
 PS1='# '
-PROMPT_COLOR=$b_blue
 PROMPT_COMMAND=prompt
 
 function prompt
 {
     history -a
-    triangle=$'\342\226\266' #\u25b6 to octal
-    PS1=$(printf "%s %s\n${triangle} " "$(prompt_left)" "$(prompt_add)")
+    triangle='❯'
+    PS1=$(printf " %s %s\n ${triangle} " "$(prompt_left)" "$(prompt_add)")
 }
 
 function prompt_add ()
@@ -37,15 +36,16 @@ function prompt_add ()
 
 function prompt_left
 {
-    LEFT_COLOR=$PROMPT_COLOR
     PROMPT_LEFT=''
+    PROMPT_COLOR=$b_blue
+    left_color=$PROMPT_COLOR
 
-    [[ "`id -u`" -eq 0 ]] && LEFT_COLOR=${red}
+    [[ "`id -u`" -eq 0 ]] && left_color=${b_red}
 
     if [[ -n $SSH_TTY ]]; then
-        PROMPT_LEFT="${LEFT_COLOR}\u@\H${normal}"
+        PROMPT_LEFT="${yellow}\u${grey}@${left_color}\H${normal}"
     else
-        PROMPT_LEFT="${LEFT_COLOR}\u:${normal}"
+        PROMPT_LEFT="${left_color}\u:${normal}"
     fi
 
     echo "${PROMPT_LEFT} ${grey}\w${normal}"
