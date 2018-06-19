@@ -4,6 +4,16 @@ SCRIPT=$(readlink -f $0)
 SCRIPTPATH=$(dirname $SCRIPT)
 cd $SCRIPTPATH
 
+function update ()
+{
+    echo "- Update all submodules"
+    git pull --recurse-submodules
+
+    echo "- Update antigen"
+    _antigen_update
+}
+
+
 function install_bash ()
 {
     echo "- Install bash files"
@@ -112,7 +122,7 @@ function install_poezio ()
 function print_help ()
 {
     echo "
-    $0 [--bash|--zsh|--vim|--tmux|--git|--term|--i3|--poezio]
+    $0 [--update|--bash|--zsh|--vim|--tmux|--git|--term|--i3|--poezio]
 
     # Require:
      - bash: python-yaml, python-json, jq
@@ -132,6 +142,7 @@ function main ()
     while [[ $# -ne 0 ]]; do
         arg="$1"; shift
         case "$arg" in
+            --update)   update ;;
             --bash)     install_bash ;;
             --zsh)      install_zsh ;;
             --vim)      install_vim ;;
