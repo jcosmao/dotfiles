@@ -71,6 +71,7 @@ let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 let g:syntastic_python_checkers = ['flake8']
 let g:syntastic_python_flake8_args='--ignore=E501,F821'
+let g:syntastic_go_checkers = ['go', 'golint', 'gofmt']
 
 " Nerdtree + Nerdtree tabs
 let g:nerdtree_tabs_open_on_console_startup=0
@@ -102,6 +103,20 @@ let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
 let g:indent_guides_auto_colors = 0
 autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  ctermbg=234
 autocmd VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=236
+
+" vim-go
+" do not override ctrl-c
+let g:go_def_mapping_enabled = 0
+let g:go_highlight_build_constraints = 1
+let g:go_highlight_extra_types = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_structs = 1
+let g:go_highlight_types = 1
+" Auto :GoImports
+let g:go_fmt_command = "goimports"
 
 " Mapping
 let mapleader=","
