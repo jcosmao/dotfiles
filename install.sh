@@ -7,6 +7,7 @@ cd $SCRIPTPATH
 function update ()
 {
     echo "- Update all submodules"
+    git submodule update --init --recursive
     git pull --recurse-submodules
 
     echo "- Update antigen"
