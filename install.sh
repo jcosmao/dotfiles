@@ -9,6 +9,10 @@ function update ()
     echo "- Update all submodules"
     git submodule update --init --recursive
     git pull --recurse-submodules
+    (
+        cd vim/bundle/YouCompleteMe
+        git submodule update --init --recursive
+    )
 
     echo "- Update antigen"
     _antigen_update
