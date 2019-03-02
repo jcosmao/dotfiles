@@ -55,6 +55,13 @@ function install_vim ()
     rm -rf ~/.vim
     cp -r vim ~/.vim
     ln -sf ~/.vim/vimrc ~/.vimrc
+    # compile ycm
+    (
+        cd ~/.vim/bundle/YouCompleteMe
+        ./install.sh
+    )
+
+
 }
 
 function install_tmux ()
