@@ -60,8 +60,10 @@ function install_vim ()
         cd ~/.vim/bundle/YouCompleteMe
         ./install.sh
     )
-
-
+    (
+        cd ~/.vim/bundle/fzf
+        ./install --all
+    )
 }
 
 function install_tmux ()
