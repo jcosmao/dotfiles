@@ -79,7 +79,8 @@ let NERDTreeShowBookmarks=1
 let g:NERDTreeWinSize = 40
 
 " Tagbar
-let g:tagbar_ctags_bin = '$HOME/.vim/bundle/tagbar/bin/ctags'
+" need exhuberant-ctags packages
+let g:tagbar_ctags_bin = '/usr/bin/ctags'
 
 " Supertab
 let g:SuperTabDefaultCompletionType = 'context'
