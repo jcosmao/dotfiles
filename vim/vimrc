@@ -156,6 +156,9 @@ let g:fzf_colors =
 " explicitly bind the keys to down and up in your $FZF_DEFAULT_OPTS.
 let g:fzf_history_dir = '~/.local/share/fzf-history'
 
+" Autoclose
+let g:AutoClosePreserveDotReg = 0
+
 " Mapping
 let mapleader=","
 map <silent> <F1> :set paste! <cr>
