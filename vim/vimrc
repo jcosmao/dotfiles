@@ -175,6 +175,8 @@ map <silent> <S-tab> :tabprevious<cr>
 map <silent> <C-a> ggvG$
 map <silent> <M-Up> 10k
 map <silent> <M-Down> 10j
+map <silent> <C-Right> w
+map <silent> <C-Left> b
 map <silent> <bar> :vsplit<cr>
 map <silent> <Bslash> :split <cr>
 map <silent> <C-S-Up> :wincmd k<cr>
