@@ -21,13 +21,10 @@ URxvt.cursorUnderline:      false
 URxvt.pointerBlank:         true
 ! Fonts
 URxvt.allow_bold:           false
-!URxvt*font:                 xft:DejaVu Sans Mono for Powerline:pixelsize=13:antialias=true:hinting=true
-!URxvt*boldFont:             xft:DejaVu Sans Mono for Powerline:pixelsize=13:antialias=true:hinting=true
 !URxvt*font:                 xft:Inconsolata:pixelsize=17:antialias=true:hinting=true
 !URxvt*boldFont:             xft:Inconsolata:pixelsize=17:antialias=true:hinting=true
-URxvt*font:                 xft:FiraCode-Regular:pixelsize=13:antialias=true:hinting=true
-URxvt*boldFont:             xft:FiraCode-Regular:pixelsize=13:antialias=true:hinting=true
-
+URxvt*font:                 xft:FiraCode-Regular:pixelsize=13:antialias=true:hinting=true:minspace=False, xft:DejaVu Sans Mono:pixelsize=13
+URxvt*boldFont:             xft:FiraCode-Regular:pixelsize=13:antialias=true:hinting=true:minspace=False, xft:DejaVu Sans Mono:pixelsize=13
 
 ! Fix font space
 URxvt*letterSpace:          0
