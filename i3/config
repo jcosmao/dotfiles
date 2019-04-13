@@ -177,7 +177,7 @@ exec --no-startup-id "/usr/bin/feh --randomize --bg-scale ~/Wallpapers/*"
 exec --no-startup-id "/usr/bin/dunst"
 exec --no-startup-id "/usr/bin/enpass"
 exec --no-startup-id "/usr/bin/nm-applet"
-exec --no-startup-id "redshift -l 48.00:-4.00 -m randr -t 5700:4500 -g 0.9:0.9:0.9"
+exec --no-startup-id "pidof redshift || redshift -l 48.00:-4.00 -m randr -t 5700:4500 -g 0.9:0.9:0.9"
 bindsym Ctrl+Shift+l exec --no-startup-id ~/.i3/scripts/i3lock_blur.sh
 bindsym XF86AudioLowerVolume exec amixer -D pulse sset Master 2%-
 bindsym XF86AudioRaiseVolume exec amixer -D pulse sset Master 2%+
