@@ -153,7 +153,7 @@ bindsym $mod+d mode "resize"
 # Start i3bar to display a workspace bar (plus the system information i3status
 bar {
     position top
-    status_command i3status
+    status_command i3status  | ~/.i3/scripts/i3status.spotify.py
     colors {
         separator #969896
         background #1d1f21
