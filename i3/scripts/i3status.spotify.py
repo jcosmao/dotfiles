@@ -13,6 +13,7 @@ LOG = logging.getLogger(__name__)
 # pip3 install spotify-cli-linux
 def get_spotify_status():
     artist_song = None
+    status = None
     try:
         output = subprocess.check_output(
             "~/.local/bin/spotifycli --status 2> /dev/null",
@@ -76,7 +77,8 @@ if __name__ == '__main__':
             line, prefix = line[1:], ','
 
         spotify_status, status = get_spotify_status()
-        LOG.debug("status: {}".format(status))
+        LOG.debug("spotify: {}, status: {}".format(spotify_status, status))
+
         if spotify_status:
             artist = spotify_status[0]
             song = spotify_status[1]
