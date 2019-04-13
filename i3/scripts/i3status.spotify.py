@@ -21,11 +21,24 @@ def get_spotify_status():
         parse = re.findall(r"^(.*) - (.*)", output.decode('utf-8'))
         LOG.debug(parse)
         artist_song = parse[0]
+
+        output = subprocess.check_output(
+            "~/.local/bin/spotifycli --playbackstatus 2> /dev/null",
+            shell=True
+        ).decode('utf-8').strip()
+
+        if output == u"▮▮":
+            status = 'pause'
+        elif output == u"▶":
+            status = 'play'
+        else:
+            status = None
+
     except Exception as e:
         LOG.exception(e)
         LOG.info("Spotify is not running")
 
-    return artist_song
+    return artist_song, status
 
 
 def read_line():
@@ -49,7 +62,7 @@ def print_line(message):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.ERROR)
+    logging.basicConfig(level=logging.DEBUG)
 
     # Skip the first line which contains the version header.
     print_line(read_line())
@@ -62,14 +75,18 @@ if __name__ == '__main__':
         if line.startswith(','):
             line, prefix = line[1:], ','
 
-        spotify_status = get_spotify_status()
+        spotify_status, status = get_spotify_status()
+        LOG.debug("status: {}".format(status))
         if spotify_status:
             artist = spotify_status[0]
             song = spotify_status[1]
             j = json.loads(line)
             # insert information into the start of the json, but could be anywhere
             # CHANGE THIS LINE TO INSERT SOMETHING ELSE
-            j.insert(0, {'color': '#9ec600', 'full_text': ' %s - %s ' % (artist, song), 'name': 'spotify'})
+            color = '#9ec600'
+            if status == 'pause':
+                color = '#676767'
+            j.insert(0, {'color': color, 'full_text': ' %s - %s ' % (artist, song), 'name': 'spotify'})
             # and echo back new encoded json
             print_line(prefix + json.dumps(j))
         else:
