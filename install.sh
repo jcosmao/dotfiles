@@ -27,7 +27,7 @@ function install_bash ()
     ln -sf ~/.bash/bashrc ~/.bashrc
     ln -sf ~/.bash/dir_colors ~/.dir_colors
     echo "source ~/.bashrc" > ~/.bash_profile
-    mkdir -p ~/bin
+    mkdir -p ~/.bin
     mkdir -p ~/.bash_custom
 }
 
@@ -60,6 +60,7 @@ function install_vim ()
         cd ~/.vim/bundle/YouCompleteMe
         ./install.sh
     )
+    # fuzzysearch
     (
         cd ~/.vim/bundle/fzf
         ./install --all
@@ -72,6 +73,8 @@ function install_tmux ()
     rm -rf ~/.tmux
     cp -r tmux ~/.tmux
     ln -sf ~/.tmux/tmux.conf ~/.tmux.conf
+    ln -sf ~/.tmux/tm.completion.source ~/.bash/completions/tm.completion.source
+    ln -sf ~/.tmux/tm ~/.bin/tm
 }
 
 function install_git ()

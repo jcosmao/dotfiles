@@ -1,9 +1,9 @@
 # tmux functions
-function _complete_tmux_session
+function _complete_tm_session
 {
     COMPREPLY=()
     local session_name="${COMP_WORDS[COMP_CWORD]}"
     COMPREPLY=( ls $(compgen -W "$(tm)" -- "$session_name") $( tm --help | grep -Eo '\-\-\w+' | sort -u | xargs))
 }
 
-complete -F _complete_tmux_session tm
+complete -F _complete_tm_session tm
