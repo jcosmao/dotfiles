@@ -181,7 +181,7 @@ exec --no-startup-id "pidof redshift || redshift -l 48.00:-4.00 -m randr -t 5700
 bindsym Ctrl+Shift+l exec --no-startup-id ~/.i3/scripts/i3lock_blur.sh
 bindsym XF86AudioLowerVolume exec amixer -D pulse sset Master 2%-
 bindsym XF86AudioRaiseVolume exec amixer -D pulse sset Master 2%+
-bindsym XF86AudioMute exec amixer -D pulse sset Master 0%
+bindsym XF86AudioMute exec amixer -D pulse sset Master toggle
 bindsym XF86MonBrightnessUp exec /usr/bin/xbacklight -inc 5
 bindsym XF86MonBrightnessDown exec /usr/bin/xbacklight -dec 1
 bindsym $win+P exec ~/.i3/scripts/hdmi_setup --toggle
