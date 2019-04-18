@@ -2,10 +2,10 @@
 [ -z "$PS1" ] && return
 
 # Autolaunch zsh
-if [ -f ~/.zshrc -a -f "$(which zsh)" ]; then
-    export SHELL="$(which zsh)"
-    exec $(which zsh) -l
-fi
+#if [ -f ~/.zshrc -a -f "$(which zsh)" ]; then
+#    export SHELL="$(which zsh)"
+#    exec $(which zsh) -l
+#fi
 
 # source bashrc extend
 [ -f ~/.bash_aliases ] && . ~/.bash_aliases
