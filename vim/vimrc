@@ -55,9 +55,15 @@ hi DiffDelete       ctermbg=235  ctermfg=131  cterm=reverse
 hi DiffText         ctermbg=235  ctermfg=208  cterm=reverse
 
 let g:lightline = {
-    \ 'colorscheme': 'seoul256',
-\}
-
+\    'colorscheme': 'seoul256',
+\    'active': {
+\      'left': [ [ 'mode', 'paste' ],
+\                [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+\    },
+\    'component_function': {
+\      'gitbranch': 'fugitive#head'
+\    },
+\ }
 colorscheme gruvbox
 
 " syntastic
