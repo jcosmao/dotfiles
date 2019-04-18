@@ -28,3 +28,6 @@ source ~/.zsh/plugins/theme.zsh
 if declare -f launch_ssh_agent &> /dev/null; then
     launch_ssh_agent
 fi
+
+# fuzzysearch
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
