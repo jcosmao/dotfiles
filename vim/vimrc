@@ -71,12 +71,15 @@ set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
 
+" Color cmdline
+hi WildMenu ctermfg=208
+
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 let g:syntastic_python_checkers = ['flake8']
-let g:syntastic_python_flake8_args='--ignore=E501,F821'
+"let g:syntastic_python_flake8_args='--ignore=E501,F821'
 let g:syntastic_go_checkers = ['go', 'golint', 'gofmt']
 
 " Nerdtree + Nerdtree tabs
@@ -165,6 +168,7 @@ let g:fzf_history_dir = '~/.local/share/fzf-history'
 " Autoclose
 let g:AutoClosePreserveDotReg = 0
 
+
 " Mapping
 let mapleader=","
 map <silent> <F1> :set paste! <cr>
@@ -172,7 +176,9 @@ map <silent> <F2> :set number! <cr>
 map <silent> <F3> :NERDTreeTabsToggle <cr>
 map <silent> <F4> :TagbarOpenAutoClose <cr>
 map <silent> <F5> <Leader>ig
-map <silent> <F6> :Buffers <cr>
+map <silent> <C-b> :Buffers <cr>
+map <silent> <C-f> :Files <cr>
+map <silent> <C-c> :Tags <cr>
 map <silent> <F9> :2,$s/^\s*pick/fixup/g <cr>
 map <silent> <F10> :%s/\s\+$//e <cr>
 map <silent> <F12> :s/\s\+$//e <cr>
