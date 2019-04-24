@@ -178,7 +178,8 @@ map <silent> <F4> :TagbarOpenAutoClose <cr>
 map <silent> <F5> <Leader>ig
 map <silent> <C-b> :Buffers <cr>
 map <silent> <C-f> :Files <cr>
-map <silent> <C-c> :Tags <cr>
+map <silent> <C-g> :Tags <cr>
+map <silent> <C-S-g> :ts <cr>
 map <silent> <F9> :2,$s/^\s*pick/fixup/g <cr>
 map <silent> <F10> :%s/\s\+$//e <cr>
 map <silent> <F12> :s/\s\+$//e <cr>
