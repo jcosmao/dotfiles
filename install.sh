@@ -145,6 +145,7 @@ function print_help ()
      - bash: python-yaml, python-json, jq
      - terminal: gnome-terminal, rxvt-unicode
      - i3: i3-wm i3status i3lock xautolock dunst
+     - vim: silversearcher-ag
     "
 
     exit
