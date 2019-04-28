@@ -41,6 +41,7 @@ command! -bang WA wa<bang>
 command! -bang Wq wq<bang>
 command! -bang WQ wq<bang>
 
+
 hi Search ctermfg=red ctermbg=black cterm=bold,underline
 hi LineNr ctermfg=239 ctermbg=234 cterm=bold
 hi CursorLine ctermbg=233 term=bold cterm=bold
@@ -165,12 +166,14 @@ let g:fzf_colors =
 " explicitly bind the keys to down and up in your $FZF_DEFAULT_OPTS.
 let g:fzf_history_dir = '~/.local/share/fzf-history'
 
+command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, '--ignore tags --nogroup --column --color --color-path="0;38;5;202" --color-line-number="0" --color-match="1;33" -f', <bang>0)
+
 " Autoclose
 let g:AutoClosePreserveDotReg = 0
 
 
 " Mapping
-let mapleader=","
+let mapleader = ","
 map <silent> <F1> :set paste! <cr>
 map <silent> <F2> :set number! <cr>
 map <silent> <F3> :NERDTreeTabsToggle <cr>
@@ -178,8 +181,8 @@ map <silent> <F4> :TagbarOpenAutoClose <cr>
 map <silent> <F5> <Leader>ig
 map <silent> <C-b> :Buffers <cr>
 map <silent> <C-f> :Files <cr>
-map <silent> <C-g> :Tags <cr>
-map <silent> <C-S-g> :ts <cr>
+map <silent> <C-d> :Ag <cr>
+map <silent> <C-g> :ts <cr>
 map <silent> <F9> :2,$s/^\s*pick/fixup/g <cr>
 map <silent> <F10> :%s/\s\+$//e <cr>
 map <silent> <F12> :s/\s\+$//e <cr>
