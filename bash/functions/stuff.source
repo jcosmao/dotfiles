@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# disable lock terminal (ctrl-s behavior)
+stty -ixon
+
 alias venv='[[ -f ./bin/activate ]] && source ./bin/activate'
 
 function display_256_colors ()
