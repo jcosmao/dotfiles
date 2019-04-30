@@ -59,10 +59,13 @@ let g:lightline = {
 \    'colorscheme': 'seoul256',
 \    'active': {
 \      'left': [ [ 'mode', 'paste' ],
-\                [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+\                [ 'gitbranch', 'readonly', 'filename', 'modified', 'tagbar' ] ]
 \    },
 \    'component_function': {
-\      'gitbranch': 'fugitive#head'
+\      'gitbranch': 'fugitive#head',
+\    },
+\    'component': {
+\      'tagbar': '%{tagbar#currenttag("%s", "", "f")}',
 \    },
 \ }
 colorscheme gruvbox
