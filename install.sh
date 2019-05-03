@@ -27,7 +27,7 @@ function install_bash ()
     ln -sf ~/.bash/bashrc ~/.bashrc
     ln -sf ~/.bash/dir_colors ~/.dir_colors
     echo "source ~/.bashrc" > ~/.bash_profile
-    mkdir -p ~/.bin
+    mkdir -p ~/bin
     mkdir -p ~/.bash_custom
 }
 
@@ -74,7 +74,7 @@ function install_tmux ()
     cp -r tmux ~/.tmux
     ln -sf ~/.tmux/tmux.conf ~/.tmux.conf
     ln -sf ~/.tmux/tm.completion.source ~/.bash/completions/tm.completion.source
-    ln -sf ~/.tmux/tm ~/.bin/tm
+    ln -sf ~/.tmux/tm ~/bin/tm
 }
 
 function install_git ()
@@ -145,6 +145,7 @@ function print_help ()
      - bash: python-yaml, python-json, jq
      - terminal: gnome-terminal, rxvt-unicode
      - i3: i3-wm i3status i3lock xautolock dunst
+     - vim: silversearcher-ag / fd (https://github.com/sharkdp/fd)
     "
 
     exit

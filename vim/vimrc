@@ -174,7 +174,6 @@ command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, '--ignore tags --nogroup --
 " Autoclose
 let g:AutoClosePreserveDotReg = 0
 
-nmap " :NERDTreeToggle<CR>
 
 " Mapping
 let mapleader = ","

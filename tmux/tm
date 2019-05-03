@@ -108,7 +108,7 @@ function print_help ()
 
 function main ()
 {
-    export tmux_cmd="$(which tmux) -2 -L $LC_BASTION -f $(tmux_conf)"
+    export tmux_cmd="$(which tmux) -2 -L $USER -f $(tmux_conf)"
 
     [[ $# -eq 0 ]] && tmux_ls && exit
 
