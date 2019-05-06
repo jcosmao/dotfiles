@@ -174,6 +174,10 @@ command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, '--ignore tags --nogroup --
 " Autoclose
 let g:AutoClosePreserveDotReg = 0
 
+autocmd BufNewFile,BufRead *.lib set filetype=sh
+autocmd BufNewFile,BufRead *.py set filetype=python
+autocmd BufNewFile,BufRead *.pp set filetype=puppet
+autocmd BufWritePre <buffer> :%s/\s\+$//e
 
 " Mapping
 let mapleader = ","
@@ -182,7 +186,6 @@ map <silent> <F2> :set number! <cr>
 map <silent> <F3> :NERDTreeTabsToggle <cr>
 map <silent> <F4> :TagbarOpenAutoClose <cr>
 map <silent> <F5> <Leader>ig
-map <silent> <C-s> :ts <cr>
 map <silent> <C-d> :Ag <cr>
 map <silent> <C-f> :Files <cr>
 map <silent> <C-b> :Buffers <cr>
@@ -209,8 +212,9 @@ map <silent> <C-S-Up> :wincmd k<cr>
 map <silent> <C-S-Down> :wincmd j<cr>
 map <silent> <C-S-Right> :wincmd l<cr>
 map <silent> <C-S-Left> :wincmd h<cr>
-
-autocmd BufNewFile,BufRead *.lib set filetype=sh
-autocmd BufNewFile,BufRead *.py set filetype=python
-autocmd BufNewFile,BufRead *.pp set filetype=puppet
-autocmd BufWritePre <buffer> :%s/\s\+$//e
+" Tag mapping
+map <silent> <C-s> :ts <cr>
+autocmd FileType python map <buffer> <C-]> :YcmCompleter GoTo<CR>
+autocmd FileType python map <buffer> <C-\> :YcmCompleter GoToReferences<CR>
+autocmd FileType python map <buffer> <C-p> :YcmCompleter GetType<CR>
+autocmd FileType python map <buffer> <C-h> :YcmCompleter GetDoc<CR>
