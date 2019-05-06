@@ -7,6 +7,8 @@ cd $SCRIPTPATH
 function update ()
 {
     echo "- Update all submodules"
+    # To update submodule to HEAD
+    # git submodule update --init --recursive --remote
     git submodule update --init --recursive
     git pull --recurse-submodules
     (
@@ -58,7 +60,7 @@ function install_vim ()
     # compile ycm
     (
         cd ~/.vim/bundle/YouCompleteMe
-        ./install.sh
+        ./install.py --clang-completer --cs-completer --go-completer
     )
     # fuzzysearch
     (
