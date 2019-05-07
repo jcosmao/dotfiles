@@ -119,6 +119,7 @@ autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  ctermbg=234
 autocmd VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=236
 
 " vim-go
+let g:go_version_warning = 0
 " do not override ctrl-c
 let g:go_def_mapping_enabled = 0
 let g:go_highlight_build_constraints = 1
@@ -198,9 +199,6 @@ map <silent> <leader>C :BCommits <cr>
 map <silent> <F9> :2,$s/^\s*pick/fixup/g <cr>
 map <silent> <F10> :%s/\s\+$//e <cr>
 map <silent> <F12> :s/\s\+$//e <cr>
-map <silent> <C-t> :tabnew <cr>
-map <silent> <tab> :tabnext<cr>
-map <silent> <S-tab> :tabprevious<cr>
 map <silent> <C-a> ggvG$
 map <silent> <M-Up> 10k
 map <silent> <M-Down> 10j
@@ -218,3 +216,7 @@ autocmd FileType python map <buffer> <C-]> :YcmCompleter GoTo<CR>
 autocmd FileType python map <buffer> <C-\> :YcmCompleter GoToReferences<CR>
 autocmd FileType python map <buffer> <C-p> :YcmCompleter GetType<CR>
 autocmd FileType python map <buffer> <C-h> :YcmCompleter GetDoc<CR>
+" Tab
+map <C-PageDown> :tabprevious<CR>
+map <C-PageUp>   :tabnext<CR>
+map <C-t>        :tabnew<CR>
