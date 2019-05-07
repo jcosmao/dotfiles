@@ -65,7 +65,7 @@ function install_vim ()
     # fuzzysearch
     (
         cd ~/.vim/bundle/fzf
-        ./install --all
+        ./install --no-update-rc --key-bindings --completion --xdg
     )
 }
 
