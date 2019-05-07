@@ -1,6 +1,10 @@
 # vim: set ft=sh:
 
 # fuzzysearch
-[ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
+if [[ $SHELL == '/bin/zsh' ]]; then
+    [ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
+else
+    [ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.bash ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.bash
+fi
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude .pyc --exclude __pycache__'
 export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
