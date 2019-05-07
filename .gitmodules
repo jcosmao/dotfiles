@@ -67,3 +67,6 @@
 [submodule "vim/bundle/python_match.vim"]
 	path = vim/bundle/python_match.vim
 	url = https://github.com/vim-scripts/python_match.vim.git
+[submodule "vim/bundle/vim-gutentags"]
+	path = vim/bundle/vim-gutentags
+	url = https://github.com/ludovicchabant/vim-gutentags.git
