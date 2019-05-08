@@ -8,7 +8,7 @@ function update ()
 {
     echo "- Update all submodules"
     # To update submodule to HEAD
-    # git submodule update --init --recursive --remote
+    # git submodule update --init --remote
     git submodule update --init --recursive
     git pull --recurse-submodules
     (
