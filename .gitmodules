@@ -72,7 +72,7 @@
 	url = https://github.com/mhinz/vim-startify.git
 [submodule "vim/bundle/commentary"]
 	path = vim/bundle/commentary
-	url = https://tpope.io/vim/commentary.git
+	url = https://github.com/tpope/vim-commentary.git
 [submodule "vim/bundle/indentLine"]
 	path = vim/bundle/indentLine
 	url = https://github.com/Yggdroot/indentLine.git
