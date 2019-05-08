@@ -202,11 +202,12 @@ let g:gutentags_modules = ['ctags', 'cscope']
 
 " Startify
 let g:startify_fortune_use_unicode = 1
+let g:startify_session_dir = '~/.cache/vim/session'
 let g:startify_session_persistence = 1
 let g:startify_session_before_save = [
-    \ 'echo "Cleaning up before saving.."',
-    \ 'silent! NERDTreeTabsClose'
-    \ ]
+\   'echo "Cleaning up before saving.."',
+\   'silent! NERDTreeTabsClose'
+\ ]
 
 autocmd BufNewFile,BufRead *.lib set filetype=sh
 autocmd BufNewFile,BufRead *.py set filetype=python
