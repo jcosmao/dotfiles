@@ -71,7 +71,7 @@
 	path = vim/bundle/vim-startify
 	url = https://github.com/mhinz/vim-startify.git
 [submodule "vim/bundle/commentary"]
-	path = vim/bundle/commentary
+	path = vim/bundle/vim-commentary
 	url = https://github.com/tpope/vim-commentary.git
 [submodule "vim/bundle/indentLine"]
 	path = vim/bundle/indentLine
