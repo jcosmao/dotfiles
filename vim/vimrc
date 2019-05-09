@@ -58,13 +58,21 @@ hi DiffChange       ctermbg=235  ctermfg=103  cterm=reverse
 hi DiffDelete       ctermbg=235  ctermfg=131  cterm=reverse
 hi DiffText         ctermbg=235  ctermfg=208  cterm=reverse
 
+
+function! GitRepo()
+    let git_repo = system("basename $(git rev-parse --show-toplevel 2> /dev/null) 2> /dev/null")
+    return substitute(git_repo, '\n\+$', '', '')
+endfunction
+
 let g:lightline = {
 \    'colorscheme': 'seoul256',
 \    'active': {
 \      'left': [ [ 'mode', 'paste' ],
-\                [ 'gitbranch', 'readonly', 'filename', 'modified', 'tagbar' ] ]
+\                [ 'gitrepo', 'gitbranch' ],
+\                [ 'readonly', 'filename', 'modified', 'tagbar' ] ],
 \    },
 \    'component_function': {
+\      'gitrepo': 'GitRepo',
 \      'gitbranch': 'fugitive#head',
 \    },
 \    'component': {
