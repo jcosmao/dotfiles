@@ -58,25 +58,16 @@ hi DiffChange       ctermbg=235  ctermfg=103  cterm=reverse
 hi DiffDelete       ctermbg=235  ctermfg=131  cterm=reverse
 hi DiffText         ctermbg=235  ctermfg=208  cterm=reverse
 
-
-function! GitRepo()
-    let git_repo = system("basename $(git rev-parse --show-toplevel 2> /dev/null) 2> /dev/null")
-    return substitute(git_repo, '\n\+$', '', '')
-endfunction
-
 let g:lightline = {
 \    'colorscheme': 'seoul256',
 \    'active': {
 \      'left': [ [ 'mode', 'paste' ],
-\                [ 'gitrepo', 'gitbranch' ],
+\                [ 'gitrepo' ],
 \                [ 'readonly', 'filename', 'modified', 'tagbar' ] ],
-\    },
-\    'component_function': {
-\      'gitrepo': 'GitRepo',
-\      'gitbranch': 'fugitive#head',
 \    },
 \    'component': {
 \      'tagbar': '%{tagbar#currenttag("%s", "", "f")}',
+\      'gitrepo': '%{g:lightline_git_info}',
 \    },
 \ }
 
@@ -84,7 +75,7 @@ let g:lightline = {
 let g:gruvbox_bold = 0
 let g:gruvbox_italic = 1
 let g:gruvbox_termcolors = 256
-let g:gruvbox_contrast_dark = 'medium'
+let g:gruvbox_contrast_dark = 'light'
 let g:gruvbox_contrast_light = 'medium'
 let g:gruvbox_italicize_comments = 1
 let g:gruvbox_italicize_strings = 1
