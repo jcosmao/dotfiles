@@ -15,11 +15,7 @@ function update ()
         cd vim/bundle/YouCompleteMe
         git submodule update --init --recursive
     )
-
-    echo "- Update antigen"
-    _antigen_update
 }
-
 
 function install_bash ()
 {
@@ -150,7 +146,7 @@ function print_help ()
 
     # Require:
      - bash: python-yaml, python-json, jq
-     - terminal: gnome-terminal, rxvt-unicode
+     - terminal: gnome-terminal, rxvt-unicode, termite
      - i3: i3-wm i3status i3lock xautolock dunst
      - vim: silversearcher-ag / fd (https://github.com/sharkdp/fd)
     "
