@@ -120,8 +120,10 @@ bindsym $mod+Shift+9 move container to workspace 9
 bindsym $mod+Shift+0 move container to workspace 10
 
 # focus output
-bindsym $mod+Ctrl+Right focus output next
-bindsym $mod+Ctrl+Left focus output prev
+bindsym $mod+Ctrl+Left focus output left
+bindsym $mod+Ctrl+Right focus output right
+bindsym $mod+Ctrl+Up focus output up
+bindsym $mod+Ctrl+Down focus output down
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -192,3 +194,9 @@ bindsym XF86MonBrightnessUp exec /usr/bin/xbacklight -inc 5
 bindsym XF86MonBrightnessDown exec /usr/bin/xbacklight -dec 1
 bindsym $win+P exec ~/.i3/scripts/hdmi_setup --toggle
 bindsym $win+Tab exec ~/.i3/scripts/hdmi_setup --switch_mode
+
+# pip3 install spotify-cli-linux --user
+bindsym XF86AudioStop exec notify-send "$(~/.local/bin/spotifycli --status)"
+bindsym XF86AudioPlay exec ~/.local/bin/spotifycli --playpause
+bindsym XF86AudioNext exec ~/.local/bin/spotifycli --next
+bindsym XF86AudioPrev exec ~/.local/bin/spotifycli --prev
