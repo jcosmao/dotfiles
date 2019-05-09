@@ -12,4 +12,4 @@ function! GitInfo()
 endfunction
 
 let g:lightline_git_info = ''
-au BufEnter * call GitInfo()
+au DirChanged,BufEnter * call GitInfo()
