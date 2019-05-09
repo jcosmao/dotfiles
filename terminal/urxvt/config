@@ -1,66 +1,6 @@
 !-------------------------------------------------------------------------------
 ! URxvt settings
 !-------------------------------------------------------------------------------
-URxvt.depth:                32
-URxvt.geometry:             90x30
-URxvt.transparent:          false
-URxvt.shading:              20
-URxvt.fading:               20
-! URxvt.urgentOnBell:         true
-! URxvt.visualBell:           true
-URxvt.loginShell:           true
-URxvt.internalBorder:       3
-URxvt.lineSpace:            0
-Urxvt.saveLines:            100000
-URxvt.iso14755:             false
-URxvt.iso14755_52:          false
-! Cursor
-URxvt.cursorBlink:          true
-URxvt.cursorColor:          #657b83
-URxvt.cursorUnderline:      false
-URxvt.pointerBlank:         true
-! Fonts
-URxvt.allow_bold:           false
-!URxvt*font:                 xft:Inconsolata:pixelsize=17:antialias=true:hinting=true
-!URxvt*boldFont:             xft:Inconsolata:pixelsize=17:antialias=true:hinting=true
-URxvt*font:                 xft:FiraCode-Regular:pixelsize=13:antialias=true:hinting=true:minspace=False, xft:DejaVu Sans Mono:pixelsize=13
-URxvt*boldFont:             xft:FiraCode-Regular:pixelsize=13:antialias=true:hinting=true:minspace=False, xft:DejaVu Sans Mono:pixelsize=13
-
-! Fix font space
-URxvt*letterSpace:          0
-
-! Scroll
-URxvt.scrollStyle:          rxvt
-URxvt.scrollBar:            false
-URxvt*scrollBar_right:      false
-URxvt*scrollTtyOutput:      false
-URxvt*scrollWithBuffer:     true
-URxvt*scrollTtyKeypress:    true
-URxvt.secondaryScreen:      1
-URxvt.secondaryScroll:      1
-! Scroll line by line up / down
-URxvt.keysym.Shift-Up:      command:\033]720;1\007
-URxvt.keysym.Shift-Down:    command:\033]721;1\007
-
-! Extensions
-URxvt.perl-ext-common:      default,clipboard,selection-to-clipboard,vtwheel,font-size,url-select
-
-! clipboard
-URxvt.clipboard.autocopy:   true
-URxvt.keysym.C-C:           perl:clipboard:copy
-URxvt.keysym.C-V:           perl:clipboard:paste
-URxvt.keysym.M-C-v:         perl:clipboard:paste_escaped
-
-! url-select. We can middle-click on any url and this will launch the browser
-URxvt.keysym.M-u:           perl:url-select:select_next
-URxvt.url-select.underline: true
-URxvt.url-select.launcher:  chromium
-
-!`font-size` plugin
-URxvt.keysym.C-minus:       perl:font-size:decrease
-URxvt.keysym.C-equal:       perl:font-size:increase
-URxvt.font-size.step:       1
-
 ! THEME
 hard contrast: *background: #1d2021
 *background: #282828
@@ -90,6 +30,60 @@ hard contrast: *background: #1d2021
 *color7:  #a89984
 *color15: #ebdbb2
 
+! COMMON
+URxvt.depth:                32
+URxvt.geometry:             90x30
+URxvt.transparent:          false
+URxvt.shading:              20
+URxvt.fading:               20
+URxvt.urgentOnBell:         true
+URxvt.visualBell:           true
+URxvt.loginShell:           true
+URxvt.internalBorder:       3
+Urxvt.saveLines:            100000
+Rxvt.iso14755:              false
+URxvt.cursorBlink:          true
+URxvt.cursorColor:          #657b83
+URxvt.cursorUnderline:      false
+URxvt.pointerBlank:         true
+URxvt.allow_bold:           false
+URxvt*font:                 xft:FiraCode-Regular:pixelsize=13:antialias=true:hinting=true:minspace=False, xft:DejaVu Sans Mono:pixelsize=13
+URxvt*boldFont:             xft:FiraCode-Regular:pixelsize=13:antialias=true:hinting=true:minspace=False, xft:DejaVu Sans Mono:pixelsize=13
+URxvt*letterSpace:          0
+URxvt.lineSpace:            0
+URxvt.scrollStyle:          rxvt
+URxvt.scrollBar:            false
+URxvt*scrollBar_right:      false
+URxvt*scrollTtyOutput:      false
+URxvt*scrollWithBuffer:     true
+URxvt*scrollTtyKeypress:    true
+! Scroll line by line up / down
+URxvt.keysym.Shift-Up:      command:\033]720;1\007
+URxvt.keysym.Shift-Down:    command:\033]721;1\007
+
+! Extensions - https://github.com/muennich/urxvt-perls
+URxvt.perl-ext-common:      default,clipboard,selection-to-clipboard,vtwheel,font-size,url-select
+
+! clipboard
+URxvt.clipboard.autocopy:   true
+URxvt.keysym.C-C:           perl:clipboard:copy
+URxvt.keysym.C-V:           perl:clipboard:paste
+URxvt.keysym.M-C-v:         perl:clipboard:paste_escaped
+URxvt.keysym.M-c:           perl:clipboard:copy
+URxvt.keysym.M-v:           perl:clipboard:paste
+URxvt.clipboard.copycmd:    xclip -i -selection clipboard
+URxvt.clipboard.pastecmd:   xclip -o -selection clipboard
+
+! url-select. We can middle-click on any url and this will launch the browser
+URxvt.keysym.M-u:           perl:url-select:select_next
+URxvt.url-select.underline: true
+URxvt.url-select.launcher:  firefox
+URxvt.urlButton:            1
+
+!`font-size` plugin
+URxvt.keysym.C-minus:       perl:font-size:decrease
+URxvt.keysym.C-equal:       perl:font-size:increase
+URxvt.font-size.step:       1
 
 
 ! emulate XTerm for proper recognition of key combinations in Vim
@@ -157,5 +151,3 @@ URxvt.keysym.M-C-S-Left       : \033[1;8D
 !URxvt.keysym.M-C-S-Page_Down : seen as Rxvt.keysym.S-Page_Down
 URxvt.keysym.M-C-S-Home       : \033[1;8H
 URxvt.keysym.M-C-S-End        : \033[1;8F
-
-

@@ -118,6 +118,11 @@ function install_terminal ()
         xrdb -merge $HOME/.Xresources
     fi
 
+    if which termite 2>&1 > /dev/null; then
+        echo "- Configure termite"
+        rm -rf $HOME/.config/termite
+        cp -r terminal/termite $HOME/.config
+    fi
 }
 
 function install_i3 ()
