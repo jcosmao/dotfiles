@@ -244,7 +244,7 @@ map <silent> <leader>\ :ts <cr>
 autocmd FileType python map <buffer> <leader>/ :YcmCompleter GetType<CR>
 autocmd FileType python map <buffer> <leader>? :YcmCompleter GetDoc<CR>
 
-if has("cscope") && isdirectory(".project")
+if has("cscope") && exists("b:gutentags_files")
   set csto=0
   " 0 == ':cs find s <x>'  symbol: find all references to the token under cursor
   map <silent> <C-\> :call Cscope_find('0', expand('<cword>'))<CR>

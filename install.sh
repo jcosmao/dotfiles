@@ -56,7 +56,7 @@ function install_vim ()
     # compile ycm
     (
         cd ~/.vim/bundle/YouCompleteMe
-        python3 ./install.py --quiet
+        ./install.py --quiet
         #--clang-complete
     )
     # fuzzysearch
