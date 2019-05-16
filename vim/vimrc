@@ -182,12 +182,16 @@ let g:AutoClosePreserveDotReg = 0
 
 " Gutentag / ctags/cscope
 let g:gutentags_cache_dir = '~/.cache/vim/tags'
-let g:gutentags_file_list_command = 'find . -type f -name "*py"'
 let g:gutentags_exclude_project_root = [ $HOME ]
 let g:gutentags_add_default_project_roots = 0
 let g:gutentags_project_root = ['.project']
 let g:gutentags_resolve_symlinks = 1
 let g:gutentags_modules = ['ctags', 'cscope']
+let g:gutentags_file_list_command = 'find . -type f -name "*py" -follow'
+let g:gutentags_ctags_extra_args = ['--fields=+nl']
+" debug
+" let g:gutentags_trace = 1
+" let g:gutentags_debug = 1
 
 " Startify
 let g:startify_fortune_use_unicode = 1
@@ -198,10 +202,8 @@ let g:startify_session_before_save = [
 \   'silent! NERDTreeTabsClose'
 \ ]
 
-autocmd BufNewFile,BufRead *.lib set filetype=sh
-autocmd BufNewFile,BufRead *.py set filetype=python
-autocmd BufNewFile,BufRead *.pp set filetype=puppet
-autocmd BufWritePre <buffer> :%s/\s\+$//e
+" python-syntax
+let g:python_highlight_all = 1
 
 " Mapping
 let mapleader = ","
@@ -241,14 +243,17 @@ map <C-t>        :tabnew<CR>
 
 " Tag mapping ctags/cscope
 map <silent> <leader>\ :ts <cr>
-autocmd FileType python map <buffer> <leader>/ :YcmCompleter GetType<CR>
-autocmd FileType python map <buffer> <leader>? :YcmCompleter GetDoc<CR>
-autocmd FileType python map <buffer> <C-]> :YcmCompleter GoTo<CR>
+map <buffer> <leader>/ :YcmCompleter GetType<CR>
+map <buffer> <leader>? :YcmCompleter GetDoc<CR>
+map <buffer> <C-]> :YcmCompleter GoTo<CR>
+autocmd bufenter *
+    \ if exists("b:gutentags_files") |
+    \   set csto=0 |
+    \   map <silent> <C-\> :call Cscope_find('0', expand('<cword>'))<CR> |
+    \ else |
+    \   map <silent> <C-\> :YcmCompleter GoToReferences<CR> |
+    \ endif
 
-if has("cscope") && exists("b:gutentags_files")
-  set csto=0
-  " 0 == ':cs find s <x>'  symbol: find all references to the token under cursor
-  map <silent> <C-\> :call Cscope_find('0', expand('<cword>'))<CR>
-else
-  autocmd FileType python map <buffer> <C-\> :YcmCompleter GoToReferences<CR>
-endif
+autocmd BufNewFile,BufRead *.lib set filetype=sh
+autocmd BufNewFile,BufRead *.pp set filetype=puppet
+autocmd BufWritePre <buffer> :%s/\s\+$//e
