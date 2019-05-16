@@ -243,6 +243,7 @@ map <C-t>        :tabnew<CR>
 map <silent> <leader>\ :ts <cr>
 autocmd FileType python map <buffer> <leader>/ :YcmCompleter GetType<CR>
 autocmd FileType python map <buffer> <leader>? :YcmCompleter GetDoc<CR>
+autocmd FileType python map <buffer> <C-]> :YcmCompleter GoTo<CR>
 
 if has("cscope") && exists("b:gutentags_files")
   set csto=0
