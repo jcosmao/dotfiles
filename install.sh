@@ -24,6 +24,7 @@ function install_bash ()
     cp -r bash ~/.bash
     ln -sf ~/.bash/bashrc ~/.bashrc
     ln -sf ~/.bash/dir_colors ~/.dir_colors
+    ln -sf ~/.bash/agignore ~/.agignore
     echo "source ~/.bashrc" > ~/.bash_profile
     mkdir -p ~/bin
     mkdir -p ~/.bash_custom

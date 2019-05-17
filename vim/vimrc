@@ -150,10 +150,6 @@ let g:fzf_action = {
 " - down / up / left / right
 let g:fzf_layout = { 'down': '~40%' }
 
-" In Neovim, you can set up fzf window using a Vim command
-" let g:fzf_layout = { 'window': 'enew' }
-" let g:fzf_layout = { 'window': '-tabnew' }
-
 " Customize fzf colors to match your color scheme
 let g:fzf_colors =
 \ { 'fg':      ['fg', 'Normal'],
@@ -175,23 +171,24 @@ let g:fzf_colors =
 " explicitly bind the keys to down and up in your $FZF_DEFAULT_OPTS.
 let g:fzf_history_dir = '~/.local/share/fzf-history'
 
-command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, '--ignore tags --nogroup --column --color --color-path="0;38;5;202" --color-line-number="0" --color-match="1;33" -f', <bang>0)
+" map FZF :Ag  to silversearcher-ag
+command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, '-i -U --nogroup --column --color --color-path="0;38;5;202" --color-line-number="0" --color-match="1;33" -p ~/.agignore -f', <bang>0)
 
 " Autoclose
 let g:AutoClosePreserveDotReg = 0
 
 " Gutentag / ctags/cscope
 let g:gutentags_cache_dir = '~/.cache/vim/tags'
-let g:gutentags_exclude_project_root = [ $HOME ]
+let g:gutentags_exclude_project_root = []
 let g:gutentags_add_default_project_roots = 0
 let g:gutentags_project_root = ['.project']
 let g:gutentags_resolve_symlinks = 1
 let g:gutentags_modules = ['ctags', 'cscope']
-let g:gutentags_file_list_command = 'find . -type f -name "*py" -follow'
+let g:gutentags_file_list_command = 'find . -type f -name "*py" -not -path "*/\.*" -follow'
 let g:gutentags_ctags_extra_args = ['--fields=+nl']
 " debug
-" let g:gutentags_trace = 1
-" let g:gutentags_debug = 1
+"let g:gutentags_trace = 1
+"let g:gutentags_debug = 1
 
 " Startify
 let g:startify_fortune_use_unicode = 1
@@ -206,13 +203,16 @@ let g:startify_session_before_save = [
 let g:python_highlight_all = 1
 
 " Mapping
-let mapleader = ","
+let mapleader = " "
 map <silent> <F1> :set paste! <cr>
 map <silent> <F2> :set number! <cr>
 map <silent> <F3> :NERDTreeTabsToggle <cr>
-map <silent> <F4> :TagbarOpenAutoClose <cr>
+map <silent> <F4> :TagbarToggle <cr>
 map <silent> <F5> :IndentLinesToggle <cr>
-map <silent> <C-f> :Ag <cr>
+map <silent> <F9> :2,$s/^\s*pick/fixup/g <cr>
+map <silent> <F10> :%s/\s\+$//e <cr>
+map <silent> <F12> :s/\s\+$//e <cr>
+map <silent> <leader>s :Ag <cr>
 map <silent> <leader>f :Files <cr>
 map <silent> <leader>b :Buffers <cr>
 map <silent> <leader>l :Lines <cr>
@@ -222,30 +222,31 @@ map <silent> <leader>T :BTags <cr>
 map <silent> <leader>c :Commits <cr>
 map <silent> <leader>C :BCommits <cr>
 map <silent> <leader>h :History <cr>
-map <silent> <F9> :2,$s/^\s*pick/fixup/g <cr>
-map <silent> <F10> :%s/\s\+$//e <cr>
-map <silent> <F12> :s/\s\+$//e <cr>
-map <silent> <C-a> ggvG$
-map <silent> <M-Up> 10k
-map <silent> <M-Down> 10j
+map <silent> <C-a> ^
+map <silent> <C-e> $
 map <silent> <C-Right> w
 map <silent> <C-Left> b
-map <silent> <bar> :vsplit<cr>
-map <silent> <Bslash> :split <cr>
+map <silent> <M-Up> 10k
+map <silent> <M-Down> 10j
+map <silent> <leader>v :vsplit<cr>
+map <silent> <leader>x :split <cr>
 map <silent> <C-S-Up> :wincmd k<cr>
 map <silent> <C-S-Down> :wincmd j<cr>
 map <silent> <C-S-Right> :wincmd l<cr>
 map <silent> <C-S-Left> :wincmd h<cr>
+map <silent> <leader><leader> :noh <cr>
 " Tab
 map <C-PageDown> :tabprevious<CR>
 map <C-PageUp>   :tabnext<CR>
 map <C-t>        :tabnew<CR>
 
 " Tag mapping ctags/cscope
+map <silent> <leader>/ :YcmCompleter GetType<CR>
+map <silent> <leader>? :YcmCompleter GetDoc<CR>
+map <silent> <C-]> :YcmCompleter GoTo<CR>
+map <silent> <leader>] :execute 'tag' expand('<cword>')<CR>
 map <silent> <leader>\ :ts <cr>
-map <buffer> <leader>/ :YcmCompleter GetType<CR>
-map <buffer> <leader>? :YcmCompleter GetDoc<CR>
-map <buffer> <C-]> :YcmCompleter GoTo<CR>
+
 autocmd bufenter *
     \ if exists("b:gutentags_files") |
     \   set csto=0 |
