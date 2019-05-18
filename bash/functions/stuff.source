@@ -3,7 +3,22 @@
 # disable lock terminal (ctrl-s behavior)
 stty -ixon
 
-alias venv='[[ -f ./bin/activate ]] && source ./bin/activate'
+# Use neovim by default if present in PATH
+if which nvim 2&>1 >/dev/null; then
+    alias vim=$(which nvim)
+fi
+
+function venv() {
+    dir=${1:-.}
+    if [[ -d "$dir" && -f "$dir/bin/activate" ]]; then
+        source $dir/bin/activate
+        return
+    else
+        # source first venv found...
+        activate=$(fd --type f "^activate$" . | head -n1)
+        [[ -f $activate ]] && source $activate
+    fi
+}
 
 function display_256_colors ()
 {

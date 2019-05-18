@@ -4,11 +4,14 @@ SCRIPT=$(readlink -f $0)
 SCRIPTPATH=$(dirname $SCRIPT)
 cd $SCRIPTPATH
 
-function update ()
+mkdir -p ~/bin
+
+function update_repo ()
 {
-    echo "- Update all submodules"
-    # To update submodule to HEAD
-    # git submodule update --init --remote
+    git fetch
+    git reset --hard origin/master
+    git clean -fd
+    git ls-files --others --exclude-standard | xargs rm -rf
     git submodule update --init --recursive
     git pull --recurse-submodules
     (
@@ -48,23 +51,46 @@ function _antigen_update()
     rm -rf $HOME/.antigen
 }
 
+function upgrade_vim ()
+{
+    echo "- Update neovim from latest"
+    wget https://github.com/neovim/neovim/releases/download/stable/nvim.appimage -O /tmp/nvim.appimage 2>/dev/null
+    chmod +x /tmp/nvim.appimage
+    echo "  - install neovim under ~/bin/nvim"
+    (
+        cd ~/bin
+        /tmp/nvim.appimage --appimage-extract
+        mv squashfs-root .nvim
+        ln -sf ~/bin/.nvim/usr/bin/nvim ~/bin/nvim
+    ) &>/dev/null
+
+    echo "- Update all vim submodules to HEAD"
+    git submodule update --init --remote
+    git pull --recurse-submodules
+}
+
 function install_vim ()
 {
-    echo "- Install vim"
-    rm -rf ~/.vim
+    echo "- Install vim/neovim"
+    rm -rf ~/.vim ~/.config/nvim
     cp -r vim ~/.vim
     ln -sf ~/.vim/vimrc ~/.vimrc
+    ln -sf ~/.vim ~/.config/nvim
     # compile ycm
+    echo "  - install plugin YCM "
     (
+        COMPLETERS=''
+        which go 2&>1 >/dev/null && COMPLETERS+='--go-completer '
+
         cd ~/.vim/bundle/YouCompleteMe
-        ./install.py --quiet
-        #--clang-complete
+        ./install.py --quiet $COMPLETERS
     )
     # fuzzysearch
+    echo "  - install plugin fzf "
     (
         cd ~/.vim/bundle/fzf
         ./install --no-update-rc --key-bindings --completion --xdg
-    )
+    ) 2&>1 > /dev/null
 }
 
 function install_tmux ()
@@ -165,16 +191,17 @@ function main ()
     while [[ $# -ne 0 ]]; do
         arg="$1"; shift
         case "$arg" in
-            --update)   update ;;
-            --bash)     install_bash ;;
-            --zsh)      install_zsh ;;
-            --vim)      install_vim ;;
-            --tmux)     install_tmux ;;
-            --git)      install_git ;;
-            --i3)       install_i3 ;;
-            --poezio)   install_poezio ;;
-            --term)     install_terminal ;;
-            --help)     print_help ;;
+            --update)      update_repo ;;
+            --bash)        install_bash ;;
+            --zsh)         install_zsh ;;
+            --vim)         install_vim ;;
+            --upgrade_vim) upgrade_vim ;;
+            --tmux)        install_tmux ;;
+            --git)         install_git ;;
+            --i3)          install_i3 ;;
+            --poezio)      install_poezio ;;
+            --term)        install_terminal ;;
+            --help)        print_help ;;
             * ) [[ $arg =~ \-+.* ]] && print_help "$arg unknown"
         esac
     done

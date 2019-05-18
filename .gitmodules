@@ -82,3 +82,9 @@
 [submodule "vim/bundle/python-syntax"]
 	path = vim/bundle/python-syntax
 	url = https://github.com/vim-python/python-syntax.git
+[submodule "vim/bundle/ZoomWin"]
+	path = vim/bundle/ZoomWin
+	url = https://github.com/regedarek/ZoomWin.git
+[submodule "vim/bundle/comfortable-motion"]
+	path = vim/bundle/comfortable-motion
+	url = https://github.com/yuttie/comfortable-motion.vim.git
