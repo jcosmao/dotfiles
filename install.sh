@@ -8,6 +8,7 @@ mkdir -p ~/bin
 
 function update_repo ()
 {
+    echo "- Update dotfiles repo"
     git fetch
     git reset --hard origin/master
     git clean -fd
@@ -67,6 +68,8 @@ function upgrade_vim ()
     echo "- Update all vim submodules to HEAD"
     git submodule update --init --remote
     git pull --recurse-submodules
+
+    install_vim
 }
 
 function install_vim ()
