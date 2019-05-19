@@ -249,13 +249,13 @@ command! -bang WQ wq<bang>
 " Mapping
 let mapleader = " "
 map <silent> <F1> :set paste! <cr>
-map <silent> <F2> :set number! | :call SyntasticToggleQuiet <cr>
+map <silent> <F2> :set number! <cr>
 map <silent> <F3> :NERDTreeTabsToggle <cr>
 map <silent> <F4> :TagbarToggle <cr>
 map <silent> <F5> :IndentLinesToggle <cr>
 map <silent> <F6> :call ToggleMouse() <cr>
-noremap <silent> <F7> :SyntasticToggleWarnings <cr>
-noremap <silent> <F8> :SyntasticToggleStyle <cr>
+map <silent> <F7> :SyntasticToggleWarnings <cr>
+map <silent> <F8> :SyntasticToggleStyle <cr>
 map <silent> <F9> :2,$s/^\s*pick/fixup/g <cr>
 map <silent> <F10> :%s/\s\+$//e <cr>
 map <silent> <F12> :s/\s\+$//e <cr>
