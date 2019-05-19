@@ -60,6 +60,7 @@ function upgrade_vim ()
     echo "  - install neovim under ~/bin/nvim"
     (
         cd ~/bin
+        rm -rf .nvim
         /tmp/nvim.appimage --appimage-extract
         mv squashfs-root .nvim
         ln -sf ~/bin/.nvim/usr/bin/nvim ~/bin/nvim
