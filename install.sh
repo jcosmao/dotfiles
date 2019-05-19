@@ -62,7 +62,7 @@ function upgrade_vim ()
         /tmp/nvim.appimage --appimage-extract
         mv squashfs-root .nvim
         ln -sf ~/bin/.nvim/usr/bin/nvim ~/bin/nvim
-    ) &>/dev/null
+    ) &> /dev/null
 
     echo "- Update all vim submodules to HEAD"
     git submodule update --init --remote
@@ -90,7 +90,7 @@ function install_vim ()
     (
         cd ~/.vim/bundle/fzf
         ./install --no-update-rc --key-bindings --completion --xdg
-    ) 2&>1 > /dev/null
+    ) &> /dev/null
 }
 
 function install_tmux ()
