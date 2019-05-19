@@ -10,15 +10,12 @@ function update_repo ()
 {
     echo "- Update dotfiles repo"
     git fetch
-    git reset --hard origin/master
-    git clean -fd
     git ls-files --others --exclude-standard | xargs rm -rf
+    git clean -xfd
+    git submodule foreach --recursive git clean -xfd
+    git reset --hard
+    git submodule foreach --recursive git reset --hard
     git submodule update --init --recursive
-    git pull --recurse-submodules
-    (
-        cd vim/bundle/YouCompleteMe
-        git submodule update --init --recursive
-    )
 }
 
 function install_bash ()
@@ -54,6 +51,15 @@ function _antigen_update()
 
 function upgrade_vim ()
 {
+    echo "- Update all vim submodules to HEAD"
+    git submodule update --init --remote
+    git pull --recurse-submodules
+
+    install_vim
+}
+
+function install_neovim ()
+{
     echo "- Update neovim from latest"
     wget https://github.com/neovim/neovim/releases/download/stable/nvim.appimage -O /tmp/nvim.appimage 2>/dev/null
     chmod +x /tmp/nvim.appimage
@@ -65,12 +71,7 @@ function upgrade_vim ()
         mv squashfs-root .nvim
         ln -sf ~/bin/.nvim/usr/bin/nvim ~/bin/nvim
     ) &> /dev/null
-
-    echo "- Update all vim submodules to HEAD"
-    git submodule update --init --remote
-    git pull --recurse-submodules
-
-    install_vim
+    echo "  - Need to manually install python-neovim / python3-neovim (pip|distrib..)"
 }
 
 function install_vim ()
@@ -84,7 +85,7 @@ function install_vim ()
     echo "  - install plugin YCM "
     (
         COMPLETERS=''
-        which go 2&>1 >/dev/null && COMPLETERS+='--go-completer '
+        which go &> /dev/null && COMPLETERS+='--go-completer '
 
         cd ~/.vim/bundle/YouCompleteMe
         ./install.py --quiet $COMPLETERS
@@ -174,7 +175,7 @@ function install_poezio ()
 function print_help ()
 {
     echo "
-    $0 [--update|--bash|--zsh|--vim|--tmux|--git|--term|--i3|--poezio]
+    $0 [--update|--bash|--zsh|--vim|--upgrade_vim|--tmux|--git|--term|--i3|--poezio]
 
     # Require:
      - bash: python-yaml, python-json, jq
@@ -199,6 +200,7 @@ function main ()
             --bash)        install_bash ;;
             --zsh)         install_zsh ;;
             --vim)         install_vim ;;
+            --neovim)      install_neovim ;;
             --upgrade_vim) upgrade_vim ;;
             --tmux)        install_tmux ;;
             --git)         install_git ;;

@@ -3,11 +3,6 @@
 # disable lock terminal (ctrl-s behavior)
 stty -ixon
 
-# Use neovim by default if present in PATH
-if which nvim 2&>1 >/dev/null; then
-    alias vim=$(which nvim)
-fi
-
 function venv() {
     dir=${1:-.}
     if [[ -d "$dir" && -f "$dir/bin/activate" ]]; then

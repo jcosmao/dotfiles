@@ -4,3 +4,8 @@ export VISUAL=vim
 export EDITOR=vim
 # tmux disable retitle
 export DISABLE_AUTO_TITLE=true
+
+# Use neovim by default if present in PATH
+if which nvim  &> /dev/null; then
+    alias vim=$(which nvim)
+fi

@@ -38,10 +38,15 @@ set undodir=~/.cache/vim/undodir
 set undofile                    " Persistent undo
 set clipboard+=unnamedplus
 
-
 "
 " Plugins configuration
 "
+
+" Neovim / Python plugins
+" pip install neovim; pip3 install neovim
+" Can also be in a virtualenv
+let g:python_host_prog = '/usr/bin/python2'
+let g:python3_host_prog = '/usr/bin/python3'
 
 " gruvbox theme
 let g:gruvbox_bold = 0
@@ -244,7 +249,7 @@ command! -bang WQ wq<bang>
 " Mapping
 let mapleader = " "
 map <silent> <F1> :set paste! <cr>
-map <silent> <F2> :set number! <cr>
+map <silent> <F2> :set number! | :call SyntasticToggleQuiet <cr>
 map <silent> <F3> :NERDTreeTabsToggle <cr>
 map <silent> <F4> :TagbarToggle <cr>
 map <silent> <F5> :IndentLinesToggle <cr>
