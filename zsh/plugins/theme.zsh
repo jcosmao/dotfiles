@@ -12,7 +12,7 @@ function __get_host_color
   HOST_COLOR_ARRAY=(5 12 13 14 32 45 74 121 135 159 201 206 215 229)
   fixed_nb=$(awk '{print $1}' <(md5sum <(hostname)) | sed -re 's/[^0-9]//g' | cut -c 1-10)
   array_size=${#HOST_COLOR_ARRAY[@]}
-  color_index=$((fixed_nb%array_size - 1))
+  color_index=$((fixed_nb%array_size))
   echo ${HOST_COLOR_ARRAY[$color_index]}
 }
 
