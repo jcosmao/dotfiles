@@ -284,7 +284,7 @@ map <silent> <leader><Down> :wincmd j<cr>
 map <silent> <leader><Right> :wincmd l<cr>
 map <silent> <leader><Left> :wincmd h<cr>
 map <silent> <leader><leader> :noh <cr>
-map <silent> <leader><ENTER>  <C-w>o
+map <silent> <leader><ENTER> :ZoomWinTabToggle <cr>
 noremap <expr> n (v:searchforward ? 'n' : 'N')
 noremap <expr> N (v:searchforward ? 'N' : 'n')
 

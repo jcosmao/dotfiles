@@ -88,3 +88,6 @@
 [submodule "vim/bundle/comfortable-motion"]
 	path = vim/bundle/comfortable-motion
 	url = https://github.com/yuttie/comfortable-motion.vim.git
+[submodule "vim/bundle/zoomwintab.vim"]
+	path = vim/bundle/zoomwintab.vim
+	url = https://github.com/troydm/zoomwintab.vim.git
