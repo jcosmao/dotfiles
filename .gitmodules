@@ -91,3 +91,6 @@
 [submodule "vim/bundle/zoomwintab.vim"]
 	path = vim/bundle/zoomwintab.vim
 	url = https://github.com/troydm/zoomwintab.vim.git
+[submodule "vim/bundle/ale"]
+	path = vim/bundle/ale
+	url = https://github.com/w0rp/ale.git

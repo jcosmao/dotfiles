@@ -36,8 +36,7 @@ set smartindent
 set autoread                    " Set vim to update autmatically when a file's read-only state is changed
 set undodir=~/.cache/vim/undodir
 set undofile                    " Persistent undo
-set clipboard+=unnamedplus
-
+set clipboard^=unnamedplus,unnamed
 "
 " Plugins configuration
 "
@@ -83,45 +82,28 @@ let g:lightline = {
 \    },
 \ }
 
-" Syntastic
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-let g:syntastic_aggregate_errors = 1
-let g:syntastic_enable_highlighting = 1
-let g:syntastic_python_checkers = ['flake8']
-let g:syntastic_go_checkers = ['go', 'golint', 'gofmt']
-let g:syntastic_error_symbol = ''
-let g:syntastic_warning_symbol = ''
-let g:syntastic_style_error_symbol = ''
-let g:syntastic_style_warning_symbol = ''
-" By default, disable style checks
-let g:syntastic_quiet_messages = {
-\   "level": [],
-\   "type":  ["style"],
-\ }
-
-fun! SyntasticToggleQuiet(k, v)
-  let idx = index(g:syntastic_quiet_messages[a:k], a:v)
-  if idx == -1
-    call add(g:syntastic_quiet_messages[a:k], a:v)
-    echom 'Syntastic: '.a:k.':'.a:v.' disabled (filtered).'
-  else
-    call remove(g:syntastic_quiet_messages[a:k], idx)
-    echom 'Syntastic: '.a:k.':'.a:v.' enabled (not filtered).'
-  endif
-  call SyntasticCheck()
-endfun
-
-command! SyntasticToggleWarnings call SyntasticToggleQuiet('level', 'warnings')
-command! SyntasticToggleStyle    call SyntasticToggleQuiet('type', 'style')
+" Ale
+let g:ale_lint_on_enter = 1
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_echo_msg_error_str = 'Error'
+let g:ale_echo_msg_warning_str = 'Warning'
+let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+let g:ale_linters = {
+\   'python': ['flake8'],
+\   'go': ['go', 'golint', 'gofmt'],
+\}
+" Ale autofix
+let g:ale_fix_on_save = 1
+let g:ale_fixers = {
+\   '*': ['remove_trailing_lines', 'trim_whitespace'],
+\}
 
 " Nerdtree + Nerdtree tabs
 let g:nerdtree_tabs_open_on_console_startup = 0
 let NERDTreeQuitOnOpen = 1
 let NERDTreeShowBookmarks = 1
 let g:NERDTreeWinSize = 40
+let NERDTreeIgnore = ['\.pyc', '__pycache__', '.egg-info[[dir]]', 'pip-wheel-metadata[[dir]]']
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 " Ultisnip
@@ -248,17 +230,17 @@ command! -bang WQ wq<bang>
 
 " Mapping
 let mapleader = " "
+map <silent> <leader>V :tabedit $MYVIMRC <cr>
+map <silent> <leader>S :source $MYVIMRC \| :echo $MYVIMRC 'reloaded' <cr>
 map <silent> <F1> :set paste! <cr>
 map <silent> <F2> :set number! <cr>
 map <silent> <F3> :NERDTreeTabsToggle <cr>
 map <silent> <F4> :TagbarToggle <cr>
 map <silent> <F5> :IndentLinesToggle <cr>
 map <silent> <F6> :call ToggleMouse() <cr>
-map <silent> <F7> :SyntasticToggleWarnings <cr>
-map <silent> <F8> :SyntasticToggleStyle <cr>
-map <silent> <F9> :2,$s/^\s*pick/fixup/g <cr>
-map <silent> <F10> :%s/\s\+$//e <cr>
-map <silent> <F12> :s/\s\+$//e <cr>
+map <silent> <F10> :2,$s/^\s*pick/fixup/g <cr>
+map <silent> <F11> :s/\s\+$//e <cr>
+map <silent> <F12> :%s/\s\+$//e <cr>
 map <silent> <leader>s :Ag <cr>
 map <silent> <leader>f :Files <cr>
 map <silent> <leader>b :Buffers <cr>
@@ -287,6 +269,9 @@ map <silent> <leader><leader> :noh <cr>
 map <silent> <leader><ENTER> :ZoomWinTabToggle <cr>
 noremap <expr> n (v:searchforward ? 'n' : 'N')
 noremap <expr> N (v:searchforward ? 'N' : 'n')
+map <silent> <leader>l :lopen <cr>
+map <silent> <leader>, <Plug>(ale_previous_wrap)
+map <silent> <leader>. <Plug>(ale_next_wrap)
 
 " Tab
 map <C-PageDown> :tabprevious<CR>
@@ -311,4 +296,3 @@ autocmd bufenter *
 
 autocmd BufNewFile,BufRead *.lib set filetype=sh
 autocmd BufNewFile,BufRead *.pp set filetype=puppet
-autocmd BufWritePre <buffer> :%s/\s\+$//e
