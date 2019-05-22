@@ -106,6 +106,12 @@ function install_tmux ()
     ln -sf ~/.tmux/tmux.conf ~/.tmux.conf
     ln -sf ~/.tmux/tm.completion.source ~/.bash/completions/tm.completion.source
     ln -sf ~/.tmux/tm ~/bin/tm
+
+    version=$(tmux -V | grep -Po '(\d|\.)+' 2> /dev/null)
+    if [[ $version > 2.8 ]]; then
+        python ~/.tmux/tmux-migrate-options.py ~/.tmux/tmux.conf > ~/.tmux/tmux.conf.NEW
+        mv ~/.tmux/tmux.conf.NEW ~/.tmux/tmux.conf
+    fi
 }
 
 function install_git ()

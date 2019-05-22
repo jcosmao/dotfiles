@@ -67,6 +67,8 @@ hi DiffAdd      ctermbg=235 ctermfg=108     cterm=reverse
 hi DiffChange   ctermbg=235 ctermfg=103     cterm=reverse
 hi DiffDelete   ctermbg=235 ctermfg=131     cterm=reverse
 hi DiffText     ctermbg=235 ctermfg=208     cterm=reverse
+hi Directory    ctermfg=12
+hi NERDTreeClosable ctermfg=9
 
 " lightline
 let g:lightline = {
@@ -112,7 +114,7 @@ let g:ale_lint_on_enter = 1
 let g:ale_lint_on_text_changed = 'never'
 let g:ale_echo_msg_error_str = 'Error'
 let g:ale_echo_msg_warning_str = 'Warning'
-let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+let g:ale_echo_msg_format = '[%linter%] [%code%] %s [%severity%]'
 let g:ale_linters = {
 \   'python': ['flake8'],
 \   'go': ['go', 'golint', 'gofmt'],
@@ -125,6 +127,8 @@ let g:ale_fixers = {
 
 " Nerdtree + Nerdtree tabs
 let g:nerdtree_tabs_open_on_console_startup = 0
+let g:nerdtree_tabs_focus_on_files = 1
+let g:nerdtree_tabs_autofind = 1
 let NERDTreeQuitOnOpen = 1
 let NERDTreeShowBookmarks = 1
 let g:NERDTreeWinSize = 40
@@ -147,6 +151,7 @@ let g:ycm_seed_identifiers_with_syntax = 1
 let g:ycm_add_preview_to_completeopt = 0
 let g:ycm_autoclose_preview_window_after_insertion = 1
 let g:ycm_autoclose_preview_window_after_completion = 0
+let g:ycm_log_level = 'error'
 
 " Indent Line
 let g:indentLine_enabled = 1
@@ -237,6 +242,15 @@ noremap <silent> <ScrollWheelUp>   :call comfortable_motion#flick(-40)<CR>
 nnoremap <silent> <M-Down> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * 2)<CR>
 nnoremap <silent> <M-Up> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * -2)<CR>
 
+" ListToggle
+let g:lt_location_list_toggle_map = '<leader>l'
+let g:lt_quickfix_list_toggle_map = '<leader>q'
+let g:lt_height = 10
+
+" Signify
+let g:signify_update_on_bufenter    = 0
+let g:signify_update_on_focusgained = 1
+
 
 "
 " Commands mapping
@@ -262,15 +276,15 @@ map <silent> <F2> :set number! <cr>
 map <silent> <F3> :NERDTreeTabsToggle <cr>
 map <silent> <F4> :TagbarToggle <cr>
 map <silent> <F5> :IndentLinesToggle <cr>
-map <silent> <F6> :call ToggleMouse() <cr>
-map <silent> <F10> :2,$s/^\s*pick/fixup/g <cr>
-map <silent> <F11> :s/\s\+$//e <cr>
-map <silent> <F12> :%s/\s\+$//e <cr>
+map <silent> <F6> :SignifyToggle <cr>
+map <silent> <F11> :2,$s/^\s*pick/fixup/g <cr>
+map <silent> <F12> :call ToggleMouse() <cr>
+map <silent> <leader>a :execute 'Ag' expand('<cword>') <cr>
 map <silent> <leader>s :Ag <cr>
 map <silent> <leader>f :Files <cr>
 map <silent> <leader>b :Buffers <cr>
-map <silent> <leader>l :Lines <cr>
-map <silent> <leader>L :BLines <cr>
+map <silent> <leader>d :Lines <cr>
+map <silent> <leader>D :BLines <cr>
 map <silent> <leader>t :Tags <cr>
 map <silent> <leader>T :BTags <cr>
 map <silent> <leader>c :Commits <cr>
@@ -292,23 +306,29 @@ map <silent> <leader><Right> :wincmd l<cr>
 map <silent> <leader><Left> :wincmd h<cr>
 map <silent> <leader><leader> :noh <cr>
 map <silent> <leader><ENTER> :ZoomWinTabToggle <cr>
-noremap <expr> n (v:searchforward ? 'n' : 'N')
-noremap <expr> N (v:searchforward ? 'N' : 'n')
-map <silent> <leader>m :lopen <cr>
 map <silent> <leader>, <Plug>(ale_previous_wrap)
 map <silent> <leader>. <Plug>(ale_next_wrap)
+
+" Always forward with n / backward with N
+noremap <expr> n (v:searchforward ? 'n' : 'N')
+noremap <expr> N (v:searchforward ? 'N' : 'n')
 
 " Tab
 map <C-PageDown> :tabprevious<CR>
 map <C-PageUp>   :tabnext<CR>
 map <C-t>        :tabnew<CR>
 
+for i in range(1, 9)
+    execute "map <leader>" . i . " " . i . "gt"
+endfor
+map <leader>0 :tablast <cr>
+
 " Tag mapping ctags/cscope
-map <silent> <leader>/ :YcmCompleter GetType<CR>
 map <silent> <leader>? :YcmCompleter GetDoc<CR>
 map <silent> <C-]> :YcmCompleter GoTo<CR>
 map <silent> <leader>] :execute 'tag' expand('<cword>')<CR>
-map <silent> <leader>\ :ts <cr>
+map <silent> <leader>[ :YcmCompleter GetType<CR>
+map <silent> <leader>\ :execute 'tselect' expand('<cword>')<cr>
 
 autocmd bufenter *
     \ if exists("b:gutentags_files") |

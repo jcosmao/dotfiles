@@ -6,6 +6,7 @@
 #    export SHELL="$(which zsh)"
 #    exec $(which zsh) -l
 #fi
+export SHELL=/bin/bash
 
 # source bashrc extend
 [ -f ~/.bash_aliases ] && . ~/.bash_aliases

@@ -94,3 +94,12 @@
 [submodule "vim/bundle/ale"]
 	path = vim/bundle/ale
 	url = https://github.com/w0rp/ale.git
+[submodule "vim/bundle/lightline-ale"]
+	path = vim/bundle/lightline-ale
+	url = https://github.com/maximbaz/lightline-ale.git
+[submodule "vim/bundle/ListToggle"]
+	path = vim/bundle/ListToggle
+	url = https://github.com/Valloric/ListToggle.git
+[submodule "vim/bundle/vim-signify"]
+	path = vim/bundle/vim-signify
+	url = https://github.com/mhinz/vim-signify.git
