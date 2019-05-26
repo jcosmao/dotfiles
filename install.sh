@@ -81,15 +81,6 @@ function install_vim ()
     cp -r vim ~/.vim
     ln -sf ~/.vim/vimrc ~/.vimrc
     ln -sf ~/.vim ~/.config/nvim
-    # compile ycm
-    echo "  - install plugin YCM "
-    (
-        COMPLETERS=''
-        which go &> /dev/null && COMPLETERS+='--go-completer '
-
-        cd ~/.vim/bundle/YouCompleteMe
-        ./install.py --quiet $COMPLETERS
-    )
     # fuzzysearch
     echo "  - install plugin fzf "
     (

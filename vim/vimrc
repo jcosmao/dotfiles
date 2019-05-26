@@ -12,8 +12,8 @@ syntax on
 set nocompatible
 set background=dark
 set magic
-set ruler              " affiche la position du curseur en bas droite
-set showmode           " affiche le mode (insert ou autre)
+set ruler                           " affiche la position du curseur en bas droite
+set showmode                        " affiche le mode (insert ou autre)
 set laststatus=2
 set number
 set cursorline
@@ -21,22 +21,27 @@ set t_Co=256
 set encoding=utf-8
 set fileencoding=utf-8
 set termencoding=utf-8
-set backspace=indent,eol,start  " activation de la touche backspace
-set ai                          " autoindentation active
-set sm                          " syntax match: soulignement d'une parenth e associ ,...
-set hlsearch                    " colorisation de la recherche
-set ts=4                        " taille des tabulations
-set sw=4                        " taille des indentations
-set tw=0                        " textwidth: largeur du texte (commentaires) 0=pas de limite
-set expandtab                   " converti les tab en espaces
+set backspace=indent,eol,start      " activation de la touche backspace
+set ai                              " autoindentation active
+set sm                              " syntax match: soulignement d'une parenth e associ ,...
+set hlsearch                        " colorisation de la recherche
+set ts=4                            " taille des tabulations
+set sw=4                            " taille des indentations
+set tw=0                            " textwidth: largeur du texte (commentaires) 0=pas de limite
+set expandtab                       " converti les tab en espaces
 set directory=/tmp
-set wildmode=longest,list,full  " vim bar autocomplete
+set wildmode=longest,list,full      " vim bar autocomplete
 set wildmenu
 set smartindent
-set autoread                    " Set vim to update autmatically when a file's read-only state is changed
+set autoread                        " Set vim to update autmatically when a file's read-only state is changed
 set undodir=~/.cache/vim/undodir
-set undofile                    " Persistent undo
-set clipboard^=unnamedplus,unnamed
+set undofile                        " Persistent undo
+set undolevels=10000                " maximum number of changes that can be undone
+set undoreload=100000               " maximum number lines to save for undo on a buffer reload
+set history=1000                    " remember more commands and search history
+set nobackup                        " no backup or swap file, live dangerously
+set noswapfile                      " swap files give annoying warning
+set clipboard^=unnamedplus,unnamed  " send yank to system clipboard
 "
 " Plugins configuration
 "
@@ -46,6 +51,36 @@ set clipboard^=unnamedplus,unnamed
 " Can also be in a virtualenv
 let g:python_host_prog = '/usr/bin/python2'
 let g:python3_host_prog = '/usr/bin/python3'
+
+" Autocompletion - NCM2
+autocmd BufEnter * call ncm2#enable_for_buffer()
+set completeopt=menuone,noselect,noinsert
+set shortmess+=c
+set pumheight=10
+" CTRL-C doesn't trigger the InsertLeave autocmd . map to <ESC> instead.
+inoremap <c-c> <ESC>
+inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
+inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+inoremap <silent> <expr> <CR> ncm2_ultisnips#expand_or("\<CR>", 'n')
+
+let ncm2#popup_delay = 5
+let ncm2#complete_length = [[1, 1]]
+let g:ncm2#matcher = 'substrfuzzy'
+
+" Python - jedi-vim  (autocompletion disabled)
+let g:jedi#auto_initialization = 1
+let g:jedi#completions_enabled = 0
+let g:jedi#auto_vim_configuration = 0
+let g:jedi#smart_auto_mappings = 0
+let g:jedi#popup_on_dot = 0
+let g:jedi#completions_command = ""
+let g:jedi#show_call_signatures = "1"
+let g:jedi#goto_command = "<C-]>"
+let g:jedi#usages_command = "]"
+let g:jedi#documentation_command = "?"
+let g:jedi#completions_command = "<C-Space>"
+let g:jedi#rename_command = "<leader>r"
 
 " gruvbox theme
 let g:gruvbox_bold = 0
@@ -68,6 +103,7 @@ hi DiffChange   ctermbg=235 ctermfg=103     cterm=reverse
 hi DiffDelete   ctermbg=235 ctermfg=131     cterm=reverse
 hi DiffText     ctermbg=235 ctermfg=208     cterm=reverse
 hi Directory    ctermfg=12
+hi NERDTreeOpenable ctermfg=88
 hi NERDTreeClosable ctermfg=9
 
 " lightline
@@ -140,18 +176,6 @@ let g:UltiSnipsEditSplit="vertical"
 let g:UltiSnipsExpandTrigger="<c-j>"
 let g:UltiSnipsJumpForwardTrigger = "<Right>"
 let g:UltiSnipsJumpBackwardTrigger = "<Left>"
-
-" YCM
-let g:ycm_key_list_select_completion = ['<tab>', '<Down>']
-let g:ycm_key_list_previous_completion = ['<s-tab>', '<Up>']
-let g:ycm_complete_in_comments = 1
-let g:ycm_complete_in_strings = 1
-let g:ycm_collect_identifiers_from_tags_files = 1
-let g:ycm_seed_identifiers_with_syntax = 1
-let g:ycm_add_preview_to_completeopt = 0
-let g:ycm_autoclose_preview_window_after_insertion = 1
-let g:ycm_autoclose_preview_window_after_completion = 0
-let g:ycm_log_level = 'error'
 
 " Indent Line
 let g:indentLine_enabled = 1
@@ -324,20 +348,14 @@ endfor
 map <leader>0 :tablast <cr>
 
 " Tag mapping ctags/cscope
-map <silent> <leader>? :YcmCompleter GetDoc<CR>
-map <silent> <C-]> :YcmCompleter GoTo<CR>
 map <silent> <leader>] :execute 'tag' expand('<cword>')<CR>
-map <silent> <leader>[ :YcmCompleter GetType<CR>
 map <silent> <leader>\ :execute 'tselect' expand('<cword>')<cr>
 
 autocmd bufenter *
-    \ if exists("b:gutentags_files") |
-    \   set csto=0 |
-    \   map <silent> <C-\> :call Cscope_find('0', expand('<cword>'))<CR> |
-    \ else |
-    \   map <silent> <C-\> :YcmCompleter GoToReferences<CR> |
-    \ endif
-
+\   if exists("b:gutentags_files") |
+\       set csto=0 |
+\       map <silent> <C-\> :call Cscope_find('0', expand('<cword>')) <CR> |
+\   endif
 
 autocmd BufNewFile,BufRead *.lib set filetype=sh
 autocmd BufNewFile,BufRead *.pp set filetype=puppet

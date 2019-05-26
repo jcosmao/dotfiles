@@ -103,3 +103,33 @@
 [submodule "vim/bundle/vim-signify"]
 	path = vim/bundle/vim-signify
 	url = https://github.com/mhinz/vim-signify.git
+[submodule "ncm2"]
+	path = ncm2
+	url = https://github.com/ncm2/ncm2.git
+[submodule "vim/bundle/ncm2"]
+	path = vim/bundle/ncm2
+	url = https://github.com/ncm2/ncm2.git
+[submodule "vim/bundle/ncm2-jedi"]
+	path = vim/bundle/ncm2-jedi
+	url = https://github.com/ncm2/ncm2-jedi.git
+[submodule "vim/bundle/ncm2-path"]
+	path = vim/bundle/ncm2-path
+	url = https://github.com/ncm2/ncm2-path.git
+[submodule "vim/bundle/ncm2-ultisnips"]
+	path = vim/bundle/ncm2-ultisnips
+	url = https://github.com/ncm2/ncm2-ultisnips.git
+[submodule "vim/bundle/ncm2-bufword"]
+	path = vim/bundle/ncm2-bufword
+	url = https://github.com/ncm2/ncm2-bufword.git
+[submodule "vim/bundle/nvim-yarp"]
+	path = vim/bundle/nvim-yarp
+	url = https://github.com/roxma/nvim-yarp.git
+[submodule "vim/bundle/jedi-vim"]
+	path = vim/bundle/jedi-vim
+	url = https://github.com/davidhalter/jedi-vim.git
+[submodule "vim/bundle/vim-hug-neovim-rpc"]
+	path = vim/bundle/vim-hug-neovim-rpc
+	url = https://github.com/roxma/vim-hug-neovim-rpc.git
+[submodule "vim/bundle/ncm2-tagprefix"]
+	path = vim/bundle/ncm2-tagprefix
+	url = https://github.com/ncm2/ncm2-tagprefix.git
