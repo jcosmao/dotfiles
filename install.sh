@@ -61,7 +61,8 @@ function upgrade_vim ()
 function install_neovim ()
 {
     echo "- Update neovim from latest"
-    wget https://github.com/neovim/neovim/releases/download/stable/nvim.appimage -O /tmp/nvim.appimage 2>/dev/null
+    wget https://github.com/neovim/neovim/releases/download/stable/nvim.appimage -O /tmp/nvim.appimage 2>/dev/null || \
+        cp nvim/nvim.appimage /tmp
     chmod +x /tmp/nvim.appimage
     echo "  - install neovim under ~/bin/nvim"
     (
