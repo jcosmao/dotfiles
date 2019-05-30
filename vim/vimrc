@@ -82,6 +82,29 @@ let g:jedi#documentation_command = "?"
 let g:jedi#completions_command = "<C-Space>"
 let g:jedi#rename_command = "<leader>r"
 
+" Jedi force python version
+python << endpython
+import sys
+import vim
+
+def force_python_version():
+    file_path = vim.eval("expand('%:p:h')")
+    for python_path in sys.path:
+        if python_path in file_path:
+            # we are in a python2 dir
+            vim.command("let g:jedi#force_py_version = 2")
+            # print("JEDI version forced to python2")
+            return
+    # Default behavior
+    vim.command("let g:jedi#force_py_version = 'auto'")
+endpython
+
+function! ForcePythonVersion()
+    python force_python_version()
+endfunction
+
+autocmd BufEnter *.py call ForcePythonVersion()
+
 " gruvbox theme
 let g:gruvbox_bold = 0
 let g:gruvbox_italic = 1
