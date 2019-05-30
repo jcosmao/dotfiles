@@ -8,13 +8,20 @@ function! Cscope_fzf_sink_open_file(lines)
 endfunction
 
 function! Cscope_find(option, query)
+  let a:current_file = expand('%s')
+  if a:current_file =~# '/test_'
+    let a:filter = "'/test_ !def "
+  else
+    let a:filter = '!/test_ !def '
+  endif
+
   let color = '{ x = $1; $1 = ""; y = $2;$2 = ""; z = $3; $3 = ""; printf "\033[34m%s\033[0m:\033[31m%s\033[0m\011\033[32m%s\033[0m\011\033[37m%s\033[0m\n", x,z,y,$0; }'
   let opts = {
   \ 'source':  "cscope -d -L -f " . b:gutentags_files['cscope'] . " -" . a:option . " " . a:query . " | awk '" . color . "'",
   \ 'sink':  function('Cscope_fzf_sink_open_file'),
   \ 'options': ['--ansi',
   \             '--multi', '--bind', 'alt-a:select-all,alt-d:deselect-all',
-  \             '--color', 'fg:188,fg+:222,bg+:#3a3a3a,hl+:104', '-q !/test_ '],
+  \             '--color', 'fg:188,fg+:222,bg+:#3a3a3a,hl+:104', '-q ' . a:filter ],
   \ 'down': '40%'
   \ }
   call fzf#run(opts)

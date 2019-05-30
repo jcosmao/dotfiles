@@ -42,6 +42,7 @@ set history=1000                    " remember more commands and search history
 set nobackup                        " no backup or swap file, live dangerously
 set noswapfile                      " swap files give annoying warning
 set clipboard^=unnamedplus,unnamed  " send yank to system clipboard
+
 "
 " Plugins configuration
 "
@@ -254,14 +255,15 @@ command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, '-i -U --nogroup --column -
 let g:AutoClosePreserveDotReg = 0
 
 " Gutentag / ctags/cscope
+let g:project_root_dir = fnamemodify(finddir('.project', '.;'), ':h')
 let g:gutentags_cache_dir = '~/.cache/vim/tags'
 let g:gutentags_exclude_project_root = []
 let g:gutentags_add_default_project_roots = 0
 let g:gutentags_project_root = ['.project']
 let g:gutentags_resolve_symlinks = 1
 let g:gutentags_modules = ['ctags', 'cscope']
-let g:gutentags_file_list_command = 'find . -type f -name "*py" -not -path "*/\.*" -follow'
-let g:gutentags_ctags_extra_args = ['--fields=+nl']
+let g:gutentags_file_list_command = 'find ' . g:project_root_dir . ' -type f -name "*py" -not -path "*/\.*" -follow'
+let g:gutentags_ctags_extra_args = ['--fields=+niaSszt --extra=+q --languages=python --python-kinds=-vi --tag-relative=yes']
 " debug
 "let g:gutentags_trace = 1
 "let g:gutentags_debug = 1
