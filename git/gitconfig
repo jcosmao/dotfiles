@@ -1,43 +1,78 @@
+# vim: set ft=gitconfig:
+
+[core]
+	excludesfile = ~/.gitignore
+    attributesfile = ~/.gitattributes
+
 [user]
-        name = USERNAME
-        email = MAIL
-[branch]
-        autosetupmerge = true
-        autosetuprebase = always
-[color]
-        ui = auto
-[color "branch"]
-        current = yellow reverse
-        local = yellow
-        remote = green
-[color "diff"]
-        meta = yellow bold
-        frag = magenta bold
-        old = red bold
-        new = green bold
-        whitespace = red reverse
-[color "status"]
-        added = yellow
-        changed = green
-        untracked = cyan
-[alias]
-        st = status --porcelain
-        ci = commit
-        br = branch
-        co = checkout
-        df = diff
-        dc = diff --cached
-        lg = log -p
-        lol = log --graph --decorate --pretty=oneline --abbrev-commit
-        lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
-        ls = ls-files
-        sync = "!f() { git fetch && git rebase origin/master && git pushdev --force; }; f"
-        newbranch = "!f() { git checkout master && git pull && git checkout -b $1; }; f"
-        pushdev = !git push --set-upstream origin "`git branch --no-color 2>/dev/null | grep '*' | sed -e 's/\\* //'`:USERNAME/`git branch --no-color 2>/dev/null | grep '*' | sed -e 's/\\* //'`"
-        stat-dev-branch = "!f() { git diff --stat $(git merge-base master origin/$1)..origin/$1 ; }; f"
-        diff-dev-branch = "!f() { git diff $(git merge-base master origin/$1)..origin/$1 ; }; f"
-        merge-dev-branch = "!f() { git merge --log --no-ff -m \"Merge branch $1\" origin/$1 ; }; f"
-[push]
-        default = tracking
+    name = USERNAME
+    email = MAIL
+
 [credential]
 	helper = store
+
+[branch]
+    autosetupmerge = true
+    autosetuprebase = always
+
+[color]
+    ui = auto
+
+[color "branch"]
+    current = yellow reverse
+    local = yellow
+    remote = green
+
+[color "diff"]
+    meta = yellow bold
+    frag = magenta bold
+    old = red bold
+    new = green bold
+    whitespace = red reverse
+
+[color "status"]
+    added = yellow
+    changed = green
+    untracked = cyan
+
+[push]
+    default = current
+    followTags = true
+
+[merge]
+	# Include summaries of merged commits in newly created merge commit messages
+    log = true
+
+[apply]
+	# Detect whitespace errors when applying a patch
+    whitespace = fix
+
+[stash]
+    showPatch = true
+
+[help]
+	# Automatically correct and execute mistyped commands
+    autocorrect = 1
+
+[alias]
+    aliases = config --get-regexp alias
+    # View abbreviated SHA, description, and history graph of the latest 20 commits
+    l = log --pretty=oneline -n 20 --graph --abbrev-commit
+    lol = log --graph --decorate --pretty=oneline --abbrev-commit
+    lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
+    ls = ls-files
+    # Show the diff between the latest commit and the current state
+    d = !"git diff-index --quiet HEAD -- || clear; git --no-pager diff --patch-with-stat"
+    st = status --porcelain
+    cl = clone --recursive
+    co = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
+    cm = commit --signoff
+    ca = commit --signoff -a --amend --reuse-message=HEAD
+    pf = push --force
+    retag = "!r() { git tag -d $1 && git push origin :refs/tags/$1 && git tag $1; }; r"
+    # Remove branches that have already been merged with master
+    dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
+    rst = "!f() { git clean -xfd && git reset --hard; }; f"
+    pushdev = !git push --set-upstream origin "`git branch --no-color 2>/dev/null | grep '*' | sed -e 's/\\* //'`:USERNAME/`git branch --no-color 2>/dev/null | grep '*' | sed -e 's/\\* //'`"
+    # List contributors with number of commits
+    contributors = shortlog --summary --numbered

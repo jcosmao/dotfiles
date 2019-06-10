@@ -49,15 +49,6 @@ function _antigen_update()
     rm -rf $HOME/.antigen
 }
 
-function upgrade_vim ()
-{
-    echo "- Update all vim submodules to HEAD"
-    git submodule update --init --remote
-    git pull --recurse-submodules
-
-    install_vim
-}
-
 function install_neovim ()
 {
     echo "- Update neovim from latest"
@@ -82,12 +73,7 @@ function install_vim ()
     cp -r vim ~/.vim
     ln -sf ~/.vim/vimrc ~/.vimrc
     ln -sf ~/.vim ~/.config/nvim
-    # fuzzysearch
-    echo "  - install plugin fzf "
-    (
-        cd ~/.vim/bundle/fzf
-        ./install --no-update-rc --key-bindings --completion --xdg
-    ) &> /dev/null
+    echo "  - vim exec :PlugInstall"
 }
 
 function install_tmux ()
@@ -109,13 +95,15 @@ function install_tmux ()
 function install_git ()
 {
     echo "- Install git"
+    git_username=$(git config --get user.name 2> /dev/null)
+    git_mail=$(git config --get user.email 2> /dev/null)
     rm -rf ~/.git
     cp -r git ~/.git
     ln -sf ~/.git/gitconfig ~/.gitconfig
-    read -p 'git username : ' git_username
-    read -p 'git mail : ' git_mail
-    [[ -n $git_username ]] && sed -i "s/USERNAME/$git_username/g" ~/.gitconfig
-    [[ -n $git_mail ]] && sed -i "s/MAIL/$git_mail/g" ~/.gitconfig
+    [[ -z $git_username ]] && read -p 'git username : ' git_username
+    [[ -z $git_mail ]] && read -p 'git mail : ' git_mail
+    [[ -n $git_username ]] && sed -i "s/USERNAME/$git_username/g" ~/.git/gitconfig
+    [[ -n $git_mail ]] && sed -i "s/MAIL/$git_mail/g" ~/.git/gitconfig
 }
 
 function install_terminal ()
@@ -173,7 +161,7 @@ function install_poezio ()
 function print_help ()
 {
     echo "
-    $0 [--update|--bash|--zsh|--vim|--upgrade_vim|--tmux|--git|--term|--i3|--poezio]
+    $0 [--update|--term|--vim|--neovim|--term|--i3|--poezio]
 
     # Require:
      - bash: python-yaml, python-json, jq
@@ -194,18 +182,17 @@ function main ()
     while [[ $# -ne 0 ]]; do
         arg="$1"; shift
         case "$arg" in
-            --update)      update_repo ;;
-            --bash)        install_bash ;;
-            --zsh)         install_zsh ;;
-            --vim)         install_vim ;;
-            --neovim)      install_neovim ;;
-            --upgrade_vim) upgrade_vim ;;
-            --tmux)        install_tmux ;;
-            --git)         install_git ;;
-            --i3)          install_i3 ;;
-            --poezio)      install_poezio ;;
-            --term)        install_terminal ;;
-            --help)        print_help ;;
+            --update) update_repo ;;
+            --vim)    install_vim ;;
+            --neovim) install_neovim ;;
+            --i3)     install_i3 ;;
+            --poezio) install_poezio ;;
+            --term)   install_bash;
+                      install_zsh;
+                      install_tmux;
+                      install_git;
+                      install_terminal ;;
+            --help)   print_help ;;
             * ) [[ $arg =~ \-+.* ]] && print_help "$arg unknown"
         esac
     done

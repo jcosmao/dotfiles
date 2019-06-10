@@ -32,17 +32,17 @@ autoload -U +X bashcompinit && bashcompinit
 [[ -e ~/.bash_aliases ]] && source ~/.bash_aliases
 
 if [[ -e ~/.bash ]]; then
-    for src in $(find ~/.bash/completions -type f -name '*.source' ); do
+    for src in $(find ~/.bash/completions -type f -follow -name '*.source' ); do
         source $src
     done
-    for src in $(find ~/.bash/functions -type f -name '*.source' ); do
+    for src in $(find ~/.bash/functions -type f -follow -name '*.source' ); do
         source $src
     done
 fi
 
 # Not versionned
 if [[ -e ~/.bash_custom ]]; then
-    for src in $(find ~/.bash_custom -type f -name '*.source' ); do
+    for src in $(find ~/.bash_custom -type f -follow -name '*.source' ); do
         source $src
     done
 fi

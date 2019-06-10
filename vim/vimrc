@@ -1,7 +1,3 @@
-" Load plugins in vim/bundle
-execute pathogen#infect()
-execute pathogen#helptags()
-
 "
 " Common
 "
@@ -41,11 +37,95 @@ set undoreload=100000               " maximum number lines to save for undo on a
 set history=1000                    " remember more commands and search history
 set nobackup                        " no backup or swap file, live dangerously
 set noswapfile                      " swap files give annoying warning
-set clipboard^=unnamedplus,unnamed  " send yank to system clipboard
+set clipboard^=unnamedplus          " send yank to system clipboard
+set updatetime=100
+set hidden                          " Allow modified hidden buffers
 
 "
-" Plugins configuration
+" Plugins Install
 "
+
+" PlugInstall [name ...] [#threads] 	Install plugins
+" PlugUpdate [name ...] [#threads] 	Install or update plugins
+" PlugClean[!] 	Remove unused directories (bang version will clean without prompt)
+" PlugUpgrade 	Upgrade vim-plug itself
+" PlugStatus 	Check the status of plugins
+" PlugDiff 	Examine changes from the previous update and the pending changes
+" PlugSnapshot[!] [output path] 	Generate script for restoring the current snapshot of the plugins<Paste>
+
+call plug#begin('~/.vim/plug')
+
+" Update vimrc
+Plug 'jcosmao/dotfiles', {'dir': '~/.dotfiles',
+            \            'do': 'cp ~/.dotfiles/vim/vimrc ~/.vim/vimrc'}
+Plug 'mhinz/vim-startify'
+Plug 'morhetz/gruvbox'
+Plug 'scrooloose/nerdtree'
+Plug 'jistr/vim-nerdtree-tabs'
+Plug 'itchyny/lightline.vim'
+Plug 'maximbaz/lightline-ale'
+Plug 'Yggdroot/indentLine'
+Plug 'jiangmiao/auto-pairs'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-eunuch'
+Plug 'junegunn/fzf.vim'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf',
+            \          'do': './install --no-update-rc --key-bindings --completion --xdg' }
+Plug 'yuttie/comfortable-motion.vim'
+Plug 'troydm/zoomwintab.vim'
+Plug 'Valloric/ListToggle'
+Plug 'roxma/vim-paste-easy'
+Plug 'roxma/vim-hug-neovim-rpc'  " compat Vim8
+Plug 'tpope/vim-sensible'
+
+" git
+Plug 'mhinz/vim-signify'
+Plug 'tpope/vim-fugitive'
+
+" completion / linter
+Plug 'roxma/nvim-yarp'
+Plug 'ncm2/ncm2'
+Plug 'ncm2/ncm2-jedi',  { 'for': 'python' }
+Plug 'ncm2/ncm2-path'
+Plug 'ncm2/ncm2-ultisnips'
+Plug 'ncm2/ncm2-bufword'
+Plug 'ncm2/ncm2-tagprefix'
+Plug 'w0rp/ale'
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
+
+" ctags / cscope
+Plug 'ludovicchabant/vim-gutentags'
+Plug 'majutsushi/tagbar'
+
+" python
+Plug 'davidhalter/jedi-vim', { 'for': 'python' }
+Plug 'vim-scripts/python_match.vim', { 'for': 'python' }
+Plug 'vim-python/python-syntax', { 'for': 'python' }
+
+" other
+Plug 'fatih/vim-go', { 'for': 'go' }
+Plug 'elzr/vim-json'
+Plug 'vim-perl/vim-perl'
+Plug 'rodjek/vim-puppet'
+Plug 'stephpy/vim-yaml'
+Plug 'chr4/nginx.vim'
+Plug 'pearofducks/ansible-vim'
+
+call plug#end()
+
+
+"
+" Plugins Configuration
+"
+
+function! PlugLoaded(name)
+    return (
+        \ has_key(g:plugs, a:name) &&
+        \ isdirectory(g:plugs[a:name].dir) &&
+        \ stridx(&rtp, g:plugs[a:name].dir) >= 0)
+endfunction
 
 " Neovim / Python plugins
 " pip install neovim; pip3 install neovim
@@ -54,20 +134,22 @@ let g:python_host_prog = '/usr/bin/python2'
 let g:python3_host_prog = '/usr/bin/python3'
 
 " Autocompletion - NCM2
-autocmd BufEnter * call ncm2#enable_for_buffer()
-set completeopt=menuone,noselect,noinsert
-set shortmess+=c
-set pumheight=10
-" CTRL-C doesn't trigger the InsertLeave autocmd . map to <ESC> instead.
-inoremap <c-c> <ESC>
-inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
-inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-inoremap <silent> <expr> <CR> ncm2_ultisnips#expand_or("\<CR>", 'n')
+if PlugLoaded('ncm2')
+    autocmd BufEnter * call ncm2#enable_for_buffer()
+    set completeopt=menuone,noselect,noinsert
+    set shortmess+=c
+    set pumheight=10
+    " CTRL-C doesn't trigger the InsertLeave autocmd . map to <ESC> instead.
+    inoremap <c-c> <ESC>
+    inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
+    inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+    inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+    inoremap <silent> <expr> <CR> ncm2_ultisnips#expand_or("\<CR>", 'n')
 
-let ncm2#popup_delay = 5
-let ncm2#complete_length = [[1, 1]]
-let g:ncm2#matcher = 'substrfuzzy'
+    let ncm2#popup_delay = 5
+    let ncm2#complete_length = [[1, 1]]
+    let g:ncm2#matcher = 'substrfuzzy'
+endif
 
 " Python - jedi-vim  (autocompletion disabled)
 let g:jedi#auto_initialization = 1
@@ -83,12 +165,19 @@ let g:jedi#documentation_command = "?"
 let g:jedi#completions_command = "<C-Space>"
 let g:jedi#rename_command = "<leader>r"
 
+if has("nvim")
+    function! JediForcePythonVersion()
+        python jedi_force_python_version()
+    endfunction
+
+    autocmd BufEnter *.py call JediForcePythonVersion()
+
 " Jedi force python version
 python << endpython
 import sys
 import vim
 
-def force_python_version():
+def jedi_force_python_version():
     file_path = vim.eval("expand('%:p:h')")
     for python_path in sys.path:
         if python_path in file_path:
@@ -99,12 +188,7 @@ def force_python_version():
     # Default behavior
     vim.command("let g:jedi#force_py_version = 'auto'")
 endpython
-
-function! ForcePythonVersion()
-    python force_python_version()
-endfunction
-
-autocmd BufEnter *.py call ForcePythonVersion()
+endif
 
 " gruvbox theme
 let g:gruvbox_bold = 0
@@ -249,24 +333,43 @@ let g:fzf_colors =
 let g:fzf_history_dir = '~/.local/share/fzf-history'
 
 " map FZF :Ag  to silversearcher-ag
-command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, '-i -U --nogroup --column --color --color-path="0;38;5;202" --color-line-number="0" --color-match="1;33" -p ~/.agignore -f', <bang>0)
+command! -bang -nargs=* Ag
+  \ call fzf#vim#ag(
+  \   <q-args>, '-i -U --nogroup --column --color --color-path="0;38;5;202" --color-line-number="0" --color-match="1;33" -p ~/.agignore -f',
+  \   <bang>0)
+
+" ripgrep https://github.com/BurntSushi/ripgrep
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+  \   'rg --column --line-number --no-heading --color=always --smart-case --ignore-file ~/.agignore '.shellescape(<q-args>), 1,
+  \   <bang>0 ? fzf#vim#with_preview('up:60%')
+  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+  \   <bang>0)
 
 " Autoclose
 let g:AutoClosePreserveDotReg = 0
 
 " Gutentag / ctags/cscope
-let g:project_root_dir = fnamemodify(finddir('.project', '.;'), ':h')
+let g:gutentags_project_root = ['.project']         " create .project dir in project root dir to build tags automatically
 let g:gutentags_cache_dir = '~/.cache/vim/tags'
 let g:gutentags_exclude_project_root = []
+let g:gutentags_exclude_filetypes = []
 let g:gutentags_add_default_project_roots = 0
-let g:gutentags_project_root = ['.project']
 let g:gutentags_resolve_symlinks = 1
 let g:gutentags_modules = ['ctags', 'cscope']
-let g:gutentags_file_list_command = 'find ' . g:project_root_dir . ' -type f -name "*py" -not -path "*/\.*" -follow'
-let g:gutentags_ctags_extra_args = ['--fields=+niaSszt --extra=+q --languages=python --python-kinds=-vi --tag-relative=yes']
+let g:gutentags_file_list_command = 'find . -type f -not -path "*/\.*" -follow'
+let g:gutentags_ctags_extra_args = ['--fields=+niaSszt --extra=+q --python-kinds=-vi --tag-relative=yes']
+let g:gutentags_enabled_user_func = 'GutentagsEnableFunc'
+
+function! GutentagsEnableFunc(path)
+    let file_ext = fnamemodify(a:path, ':e')
+    let allowed_file_ext = ['py', 'go', 'pl', 'sh']
+    if (index(allowed_file_ext, file_ext) >= 0) | return 1 | else | return 0 | endif
+endfunction
+
 " debug
-"let g:gutentags_trace = 1
-"let g:gutentags_debug = 1
+" let g:gutentags_trace = 1
+" let g:gutentags_debug = 1
 
 " Startify
 let g:startify_fortune_use_unicode = 1
@@ -297,11 +400,22 @@ let g:lt_quickfix_list_toggle_map = '<leader>q'
 let g:lt_height = 10
 
 " Signify
-let g:signify_update_on_bufenter    = 0
-let g:signify_update_on_focusgained = 1
+let g:signify_update_on_bufenter    = 1
+let g:signify_update_on_focusgained = 0
+" refresh when vim-fugitive command is used
+autocmd User Fugitive SignifyRefresh
 
+" vim-json
+let g:vim_json_syntax_conceal = 0
 
-"
+" tagbar
+let g:tagbar_map_showproto = '/'
+let g:tagbar_sort = 0
+let g:tagbar_compact = 1
+let g:tagbar_autoshowtag = 1
+let g:tagbar_previewwin_pos = "aboveleft"
+let g:tagbar_autopreview = 0
+
 " Commands mapping
 "
 
@@ -328,8 +442,8 @@ map <silent> <F5> :IndentLinesToggle <cr>
 map <silent> <F6> :SignifyToggle <cr>
 map <silent> <F11> :2,$s/^\s*pick/fixup/g <cr>
 map <silent> <F12> :call ToggleMouse() <cr>
-map <silent> <leader>a :execute 'Ag' expand('<cword>') <cr>
-map <silent> <leader>s :Ag <cr>
+map <silent> <leader>a :execute 'Rg' expand('<cword>') <cr>
+map <silent> <leader>s :Rg <cr>
 map <silent> <leader>f :Files <cr>
 map <silent> <leader>b :Buffers <cr>
 map <silent> <leader>d :Lines <cr>
@@ -357,6 +471,8 @@ map <silent> <leader><leader> :noh <cr>
 map <silent> <leader><ENTER> :ZoomWinTabToggle <cr>
 map <silent> <leader>, <Plug>(ale_previous_wrap)
 map <silent> <leader>. <Plug>(ale_next_wrap)
+map <silent> <leader>< <Plug>(signify-prev-hunk)
+map <silent> <leader>> <Plug>(signify-next-hunk)
 
 " Always forward with n / backward with N
 noremap <expr> n (v:searchforward ? 'n' : 'N')
@@ -376,11 +492,19 @@ map <leader>0 :tablast <cr>
 map <silent> <leader>] :execute 'tag' expand('<cword>')<CR>
 map <silent> <leader>\ :execute 'tselect' expand('<cword>')<cr>
 
-autocmd bufenter *
+autocmd bufEnter *
 \   if exists("b:gutentags_files") |
 \       set csto=0 |
 \       map <silent> <C-\> :call Cscope_find('0', expand('<cword>')) <CR> |
 \   endif
 
+autocmd BufWinEnter *
+\   if exists("b:gutentags_files") |
+\       call tagbar#autoopen(0) |
+\   endif
+
+autocmd VimLeavePre * :execute 'TagbarClose'
+
+" Specific filetype
 autocmd BufNewFile,BufRead *.lib set filetype=sh
 autocmd BufNewFile,BufRead *.pp set filetype=puppet
