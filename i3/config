@@ -35,6 +35,11 @@ new_float pixel 2
 hide_edge_borders smart
 focus_follows_mouse yes
 
+# i3 blocks
+#smart_borders on
+#gaps inner 5
+#gaps outer 5
+
 # start a terminal
 bindsym $mod+Return exec termite
 
@@ -154,6 +159,7 @@ bindsym $mod+d mode "resize"
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 bar {
+    font pango:DejaVu Sans Mono, FontAwesome 8
     position top
     status_command i3status  | ~/.i3/scripts/i3status.spotify.py
     colors {
@@ -167,11 +173,6 @@ bar {
     }
 }
 
-# i3 blocks
-smart_borders on
-gaps inner 5
-gaps outer 5
-
 # class        border  backgr. text    indicator
 client.focused #81a2be #81a2be #1d1f21 #282a2e
 client.focused_inactive #373b41 #373b41 #969896 #282a2e
@@ -184,8 +185,8 @@ exec --no-startup-id "/usr/bin/feh --randomize --bg-scale ~/Wallpapers/*"
 exec --no-startup-id "/usr/bin/dunst"
 exec --no-startup-id "/usr/bin/enpass"
 exec --no-startup-id "/usr/bin/nm-applet"
-exec --no-startup-id "/usr/bin/signal-desktop --start-in-tray"
-exec --no-startup-id "pidof redshift || redshift -l 48.00:-4.00 -m randr -t 5700:4500 -g 0.9:0.9:0.9"
+# exec --no-startup-id "/usr/bin/signal-desktop --start-in-tray"
+exec --no-startup-id "redshift -l 48.00:-4.00 -m randr -t 5700:4500 -g 0.9:0.9:0.9"
 bindsym Ctrl+Shift+l exec --no-startup-id ~/.i3/scripts/i3lock_blur.sh
 bindsym XF86AudioLowerVolume exec amixer -D pulse sset Master 2%-
 bindsym XF86AudioRaiseVolume exec amixer -D pulse sset Master 2%+
@@ -200,3 +201,4 @@ bindsym XF86AudioStop exec notify-send "$(~/.local/bin/spotifycli --status)"
 bindsym XF86AudioPlay exec ~/.local/bin/spotifycli --playpause
 bindsym XF86AudioNext exec ~/.local/bin/spotifycli --next
 bindsym XF86AudioPrev exec ~/.local/bin/spotifycli --prev
+bindsym $mod+q exec ~/.i3/scripts/i3_exit.sh

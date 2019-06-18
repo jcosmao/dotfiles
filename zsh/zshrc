@@ -13,6 +13,9 @@ antigen bundle zsh-users/zsh-completions
 antigen bundle zsh-users/zsh-autosuggestions
 antigen bundle zsh-users/zsh-syntax-highlighting
 antigen bundle jcosmao/blox-zsh-theme
+source ~/.zsh/plugins/theme.zsh
+
+# Apply after override theme variables
 antigen apply
 
 autoload -U +X compinit && compinit
@@ -22,7 +25,7 @@ autoload -U +X bashcompinit && bashcompinit
 zstyle ":completion:*:commands" rehash 1
 
 source ~/.zsh/plugins/zsh-bash.zsh
-source ~/.zsh/plugins/theme.zsh
+
 
 # ssh-agent ~/.bash/functions
 if declare -f launch_ssh_agent &> /dev/null; then

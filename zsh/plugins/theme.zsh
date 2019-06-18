@@ -9,7 +9,7 @@ fi
 
 function __get_host_color
 {
-  HOST_COLOR_ARRAY=(5 12 13 14 32 45 74 121 135 159 201 206 215 229)
+  HOST_COLOR_ARRAY=(5 11 12 13 14 39 45 69 99 123 135 159 202)
   fixed_nb=$(awk '{print $1}' <(md5sum <(hostname)) | sed -re 's/[^0-9]//g' | cut -c 1-10)
   array_size=${#HOST_COLOR_ARRAY[@]}
   color_index=$((fixed_nb%array_size))
@@ -17,17 +17,26 @@ function __get_host_color
 }
 
 # Layout
-BLOX_SEG__UPPER_LEFT=(blox_block__openstack blox_block__host blox_block__cwd blox_block__git)
-BLOX_SEG__UPPER_RIGHT=(blox_block__virtualenv blox_block__git_repo_name blox_block__nodejs)
-BLOX_SEG__LOWER_LEFT=(blox_block__symbol)
-BLOX_SEG__LOWER_RIGHT=(blox_block__bgjobs)
+BLOX_SEG__UPPER_LEFT=(openstack host cwd git exec_time)
+BLOX_SEG__UPPER_RIGHT=(virtualenv nodejs git_repo_name)
+BLOX_SEG__LOWER_LEFT=(bgjobs symbol)
+BLOX_SEG__LOWER_RIGHT=()
 
 BLOX_CONF__ONELINE=false
 BLOX_CONF__NEWLINE=false
+BLOX_BLOCK__HOST_USER_SHOW_ALWAYS=true
 BLOX_BLOCK__HOST_MACHINE_SHOW_ALWAYS=false
 BLOX_BLOCK__HOST_USER_COLOR='magenta'
 BLOX_BLOCK__HOST_MACHINE_COLOR="$(__get_host_color)"
 BLOX_BLOCK__HOST_USER_ROOT_COLOR='9'
 BLOX_BLOCK__CWD_COLOR='242'
-BLOX_BLOCK__GIT_BRANCH_COLOR='245'
 BLOX_BLOCK__CWD_TRUNC='4'
+BLOX_BLOCK__GIT_BRANCH_COLOR='245'
+BLOX_BLOCK__GIT_CLEAN_SYMBOL=""
+BLOX_BLOCK__GIT_DIRTY_SYMBOL=""
+BLOX_BLOCK__GIT_UNPULLED_SYMBOL=""
+BLOX_BLOCK__GIT_UNPUSHED_SYMBOL=""
+BLOX_BLOCK__GIT_STASHED_SYMBOL=""
+BLOX_BLOCK__VIRTUALENV_COLOR='yellow'
+BLOX_BLOCK__BGJOBS_COLOR='110'
+BLOX_BLOCK__BGJOBS_SYMBOL=' '

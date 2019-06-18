@@ -120,6 +120,13 @@ call plug#end()
 " Plugins Configuration
 "
 
+" Neovim / Python plugins
+" pip install neovim; pip3 install neovim
+" Can also be in a virtualenv
+" By default, let nvim choose default python version
+" let g:python_host_prog = '/usr/bin/python2'
+" let g:python3_host_prog = '/usr/bin/python3'
+
 function! PlugLoaded(name)
     return (
         \ has_key(g:plugs, a:name) &&
@@ -127,14 +134,8 @@ function! PlugLoaded(name)
         \ stridx(&rtp, g:plugs[a:name].dir) >= 0)
 endfunction
 
-" Neovim / Python plugins
-" pip install neovim; pip3 install neovim
-" Can also be in a virtualenv
-let g:python_host_prog = '/usr/bin/python2'
-let g:python3_host_prog = '/usr/bin/python3'
-
 " Autocompletion - NCM2
-if PlugLoaded('ncm2')
+if has('python3') && PlugLoaded('ncm2')
     autocmd BufEnter * call ncm2#enable_for_buffer()
     set completeopt=menuone,noselect,noinsert
     set shortmess+=c
@@ -151,6 +152,26 @@ if PlugLoaded('ncm2')
     let g:ncm2#matcher = 'substrfuzzy'
 endif
 
+" If current python file belong to python2, force jedi version
+" to python2 to allow completion. Fallback to jedi 'auto' mode
+" otherwise
+
+if has("nvim")
+    autocmd BufEnter *.py call JediForcePythonVersion()
+
+    if has('python3')
+        py3file $HOME/.vim/plugin/jedi_force_python_version.py
+        function! JediForcePythonVersion()
+            python3 jedi_force_python_version()
+        endfunction
+    else
+        pyfile $HOME/.vim/plugin/jedi_force_python_version.py
+        function! JediForcePythonVersion()
+            python jedi_force_python_version()
+        endfunction
+    endif
+endif
+
 " Python - jedi-vim  (autocompletion disabled)
 let g:jedi#auto_initialization = 1
 let g:jedi#completions_enabled = 0
@@ -164,31 +185,6 @@ let g:jedi#usages_command = "]"
 let g:jedi#documentation_command = "?"
 let g:jedi#completions_command = "<C-Space>"
 let g:jedi#rename_command = "<leader>r"
-
-if has("nvim")
-    function! JediForcePythonVersion()
-        python jedi_force_python_version()
-    endfunction
-
-    autocmd BufEnter *.py call JediForcePythonVersion()
-
-" Jedi force python version
-python << endpython
-import sys
-import vim
-
-def jedi_force_python_version():
-    file_path = vim.eval("expand('%:p:h')")
-    for python_path in sys.path:
-        if python_path in file_path:
-            # we are in a python2 dir
-            vim.command("let g:jedi#force_py_version = 2")
-            # print("JEDI version forced to python2")
-            return
-    # Default behavior
-    vim.command("let g:jedi#force_py_version = 'auto'")
-endpython
-endif
 
 " gruvbox theme
 let g:gruvbox_bold = 0
@@ -357,8 +353,8 @@ let g:gutentags_exclude_filetypes = []
 let g:gutentags_add_default_project_roots = 0
 let g:gutentags_resolve_symlinks = 1
 let g:gutentags_modules = ['ctags', 'cscope']
-let g:gutentags_file_list_command = 'find . -type f -not -path "*/\.*" -follow'
 let g:gutentags_ctags_extra_args = ['--fields=+niaSszt --extra=+q --python-kinds=-vi --tag-relative=yes']
+let g:gutentags_file_list_command = 'find . -type f -regextype posix-egrep -regex ".*\.(py|go|pl|sh)$" -not -path "*/\.*" -follow'
 let g:gutentags_enabled_user_func = 'GutentagsEnableFunc'
 
 function! GutentagsEnableFunc(path)
