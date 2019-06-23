@@ -146,22 +146,20 @@ function install_i3 ()
     rm -rf "$HOME/.i3"
     cp -r i3 ~/.i3
     ln -sf ~/.i3/i3status.conf ~/.i3status.conf
-    rm -rf "$HOME/.config/dunst"
-    cp -r dunst ~/.config
 }
 
-function install_poezio ()
-{
-    echo '- Install poezio'
-    rm -rf "$HOME/.config/poezio"
-    cp -r poezio ~/.config
+function install_config () {
+    echo '- Install .config'
+    for cfg in $(ls config); do
+        [[ -f config/$cfg ]] && cp -f config/$cfg $HOME/.config/
+        [[ -d config/$cfg ]] && rm -rf $HOME/.config/$cfg && cp -rf config/$cfg $HOME/.config/
+    done
 }
-
 
 function print_help ()
 {
     echo "
-    $0 [--update|--term|--vim|--neovim|--term|--i3|--poezio]
+    $0 [--update|--term|--vim|--neovim|--term]
 
     # Require:
      - bash: python-yaml, python-json, jq
@@ -185,13 +183,12 @@ function main ()
             --update) update_repo ;;
             --vim)    install_vim ;;
             --neovim) install_neovim ;;
-            --i3)     install_i3 ;;
-            --poezio) install_poezio ;;
             --term)   install_bash;
                       install_zsh;
                       install_tmux;
                       install_git;
                       install_terminal ;;
+            --config) install_config;;
             --help)   print_help ;;
             * ) [[ $arg =~ \-+.* ]] && print_help "$arg unknown"
         esac

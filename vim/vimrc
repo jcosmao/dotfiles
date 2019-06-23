@@ -56,8 +56,6 @@ set hidden                          " Allow modified hidden buffers
 call plug#begin('~/.vim/plug')
 
 " Update vimrc
-Plug 'jcosmao/dotfiles', {'dir': '~/.dotfiles',
-            \            'do': 'cp ~/.dotfiles/vim/vimrc ~/.vim/vimrc'}
 Plug 'mhinz/vim-startify'
 Plug 'morhetz/gruvbox'
 Plug 'scrooloose/nerdtree'
@@ -101,6 +99,7 @@ Plug 'majutsushi/tagbar'
 
 " python
 Plug 'davidhalter/jedi-vim', { 'for': 'python' }
+Plug 'jcosmao/jedi-vim-pyversion', { 'for': 'python' }
 Plug 'vim-scripts/python_match.vim', { 'for': 'python' }
 Plug 'vim-python/python-syntax', { 'for': 'python' }
 
@@ -152,26 +151,6 @@ if has('python3') && PlugLoaded('ncm2')
     let g:ncm2#matcher = 'substrfuzzy'
 endif
 
-" If current python file belong to python2, force jedi version
-" to python2 to allow completion. Fallback to jedi 'auto' mode
-" otherwise
-
-if has("nvim")
-    autocmd BufEnter *.py call JediForcePythonVersion()
-
-    if has('python3')
-        py3file $HOME/.vim/plugin/jedi_force_python_version.py
-        function! JediForcePythonVersion()
-            python3 jedi_force_python_version()
-        endfunction
-    else
-        pyfile $HOME/.vim/plugin/jedi_force_python_version.py
-        function! JediForcePythonVersion()
-            python jedi_force_python_version()
-        endfunction
-    endif
-endif
-
 " Python - jedi-vim  (autocompletion disabled)
 let g:jedi#auto_initialization = 1
 let g:jedi#completions_enabled = 0
@@ -181,6 +160,7 @@ let g:jedi#popup_on_dot = 0
 let g:jedi#completions_command = ""
 let g:jedi#show_call_signatures = "1"
 let g:jedi#goto_command = "<C-]>"
+let g:jedi#goto_stubs_command = ""
 let g:jedi#usages_command = "]"
 let g:jedi#documentation_command = "?"
 let g:jedi#completions_command = "<C-Space>"
@@ -375,6 +355,12 @@ let g:startify_session_before_save = [
 \   'echo "Cleaning up before saving.."',
 \   'silent! NERDTreeTabsClose'
 \ ]
+let g:startify_bookmarks = []
+let g:startify_lists = [
+\ { 'type': 'sessions',  'header': ['   Sessions']       },
+\ { 'type': 'files',     'header': ['   Files']            },
+\ { 'type': 'bookmarks', 'header': ['   Bookmarks']      },
+\ ]
 
 " python-syntax
 let g:python_highlight_all = 1
@@ -412,6 +398,11 @@ let g:tagbar_autoshowtag = 1
 let g:tagbar_previewwin_pos = "aboveleft"
 let g:tagbar_autopreview = 0
 
+" Autopair
+let g:AutoPairsMapCR = 0
+let g:AutoPairsFlyMode = 0
+
+"
 " Commands mapping
 "
 
