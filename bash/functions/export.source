@@ -5,6 +5,14 @@ export EDITOR=nvim
 # tmux disable retitle
 export DISABLE_AUTO_TITLE=true
 
+if which go &> /dev/null; then
+    GOROOT=$(go env GOROOT)
+    export GOROOT=${GOROOT:-/usr/local/go}
+    export GOPATH="$HOME/go"
+    export GOBIN="$GOPATH/bin"
+    export PATH="$PATH:$GOROOT/bin:$GOBIN"
+fi
+
 # Use neovim by default if present in PATH
 if which nvim  &> /dev/null; then
     alias vim=$(which nvim)

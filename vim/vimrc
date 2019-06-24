@@ -1,47 +1,4 @@
 "
-" Common
-"
-
-filetype plugin indent on
-syntax on
-
-set nocompatible
-set background=dark
-set magic
-set ruler                           " affiche la position du curseur en bas droite
-set showmode                        " affiche le mode (insert ou autre)
-set laststatus=2
-set number
-set cursorline
-set t_Co=256
-set encoding=utf-8
-set fileencoding=utf-8
-set termencoding=utf-8
-set backspace=indent,eol,start      " activation de la touche backspace
-set ai                              " autoindentation active
-set sm                              " syntax match: soulignement d'une parenth e associ ,...
-set hlsearch                        " colorisation de la recherche
-set ts=4                            " taille des tabulations
-set sw=4                            " taille des indentations
-set tw=0                            " textwidth: largeur du texte (commentaires) 0=pas de limite
-set expandtab                       " converti les tab en espaces
-set directory=/tmp
-set wildmode=longest,list,full      " vim bar autocomplete
-set wildmenu
-set smartindent
-set autoread                        " Set vim to update autmatically when a file's read-only state is changed
-set undodir=~/.cache/vim/undodir
-set undofile                        " Persistent undo
-set undolevels=10000                " maximum number of changes that can be undone
-set undoreload=100000               " maximum number lines to save for undo on a buffer reload
-set history=1000                    " remember more commands and search history
-set nobackup                        " no backup or swap file, live dangerously
-set noswapfile                      " swap files give annoying warning
-set clipboard^=unnamedplus          " send yank to system clipboard
-set updatetime=100
-set hidden                          " Allow modified hidden buffers
-
-"
 " Plugins Install
 "
 
@@ -84,7 +41,8 @@ Plug 'tpope/vim-fugitive'
 " completion / linter
 Plug 'roxma/nvim-yarp'
 Plug 'ncm2/ncm2'
-Plug 'ncm2/ncm2-jedi',  { 'for': 'python' }
+Plug 'ncm2/ncm2-jedi', { 'for': 'python' }
+Plug 'ncm2/ncm2-go', { 'for': 'go' }
 Plug 'ncm2/ncm2-path'
 Plug 'ncm2/ncm2-ultisnips'
 Plug 'ncm2/ncm2-bufword'
@@ -114,6 +72,50 @@ Plug 'pearofducks/ansible-vim'
 
 call plug#end()
 
+"
+" Common
+"
+
+set nocompatible
+filetype off
+filetype plugin indent on
+syntax on
+set ttyfast                         " Indicate fast terminal conn for faster redraw
+set lazyredraw                      " Wait to redraw
+set background=dark
+set magic
+set ruler                           " affiche la position du curseur en bas droite
+set showmode                        " affiche le mode (insert ou autre)
+set laststatus=2
+set number
+set cursorline
+set t_Co=256
+set encoding=utf-8
+set fileencoding=utf-8
+set termencoding=utf-8
+set backspace=indent,eol,start      " activation de la touche backspace
+set ai                              " autoindentation active
+set sm                              " syntax match: soulignement d'une parenth e associ ,...
+set hlsearch                        " colorisation de la recherche
+set ts=4                            " taille des tabulations
+set sw=4                            " taille des indentations
+set tw=0                            " textwidth: largeur du texte (commentaires) 0=pas de limite
+set expandtab                       " converti les tab en espaces
+set directory=/tmp
+set wildmode=longest,list,full      " vim bar autocomplete
+set wildmenu
+set smartindent
+set autoread                        " Set vim to update autmatically when a file's read-only state is changed
+set undodir=~/.cache/vim/undodir
+set undofile                        " Persistent undo
+set undolevels=10000                " maximum number of changes that can be undone
+set undoreload=100000               " maximum number lines to save for undo on a buffer reload
+set history=1000                    " remember more commands and search history
+set nobackup                        " no backup or swap file, live dangerously
+set noswapfile                      " swap files give annoying warning
+set clipboard^=unnamedplus          " send yank to system clipboard
+set updatetime=100
+set hidden                          " Allow modified hidden buffers
 
 "
 " Plugins Configuration
@@ -160,7 +162,6 @@ let g:jedi#popup_on_dot = 0
 let g:jedi#completions_command = ""
 let g:jedi#show_call_signatures = "1"
 let g:jedi#goto_command = "<C-]>"
-let g:jedi#goto_stubs_command = ""
 let g:jedi#usages_command = "]"
 let g:jedi#documentation_command = "?"
 let g:jedi#completions_command = "<C-Space>"
@@ -237,7 +238,7 @@ let g:ale_echo_msg_warning_str = 'Warning'
 let g:ale_echo_msg_format = '[%linter%] [%code%] %s [%severity%]'
 let g:ale_linters = {
 \   'python': ['flake8'],
-\   'go': ['go', 'golint', 'gofmt'],
+\   'go': ['gometalinter', 'gofmt'],
 \}
 " Ale autofix
 let g:ale_fix_on_save = 1
@@ -266,17 +267,20 @@ let g:indentLine_enabled = 1
 let g:indentLine_char = '▏'
 
 " vim-go
-let g:go_version_warning = 0
-let g:go_def_mapping_enabled = 0
-let g:go_highlight_build_constraints = 1
-let g:go_highlight_extra_types = 1
+
+let g:go_fmt_command = "goimports"  "Auto :GoImports
+let g:go_autodetect_gopath = 1
+let g:go_list_type = "quickfix"
+
+let g:go_highlight_types = 1
 let g:go_highlight_fields = 1
 let g:go_highlight_functions = 1
+let g:go_highlight_function_calls = 1
+let g:go_highlight_extra_types = 1
 let g:go_highlight_methods = 1
-let g:go_highlight_operators = 1
-let g:go_highlight_structs = 1
-let g:go_highlight_types = 1
-let g:go_fmt_command = "goimports"  "Auto :GoImports
+let g:go_highlight_generate_tags = 1
+
+autocmd Filetype go nmap <C-]> <Plug>(go-def)
 
 " Fzf
 " This is the default extra key bindings
