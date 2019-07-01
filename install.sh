@@ -113,7 +113,7 @@ function install_terminal ()
     rm -rf $font_dir
     cp -rp terminal/fonts $font_dir
     if [[ -f $(which fc-cache 2>/dev/null) ]]; then
-        echo "Resetting font cache..."
+        echo "  - Resetting font cache..."
         fc-cache -f $font_dir
     fi
 
@@ -138,14 +138,6 @@ function install_terminal ()
         rm -rf $HOME/.config/termite
         cp -r terminal/termite $HOME/.config
     fi
-}
-
-function install_i3 ()
-{
-    echo '- Install i3'
-    rm -rf "$HOME/.i3"
-    cp -r i3 ~/.i3
-    ln -sf ~/.i3/i3status.conf ~/.i3status.conf
 }
 
 function install_config () {

@@ -159,9 +159,9 @@ bindsym $mod+d mode "resize"
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 bar {
-    font pango:DejaVu Sans Mono, FontAwesome 8
+    font pango:DejaVu Sans Mono, Font Awesome 9
     position top
-    status_command i3status  | ~/.i3/scripts/i3status.spotify.py
+    status_command i3status  | ~/.config/i3/scripts/i3status.spotify.py
     colors {
         separator #969896
         background #1d1f21
@@ -179,26 +179,32 @@ client.focused_inactive #373b41 #373b41 #969896 #282a2e
 client.unfocused #282a2e #282a2e #969896 #282a2e
 client.urgent #373b41 #cc6666 #ffffff #cc6666
 
-exec --no-startup-id "setxkbmap -layout us -variant altgr-intl -option terminate:ctrl_alt_bksp"
+for_window [class="KeePass2"] floating enable
+for_window [class="KeePass2"] resize set 1024 768
+
+exec --no-startup-id "setxkbmap -layout us -variant altgr-intl"
 exec --no-startup-id "/usr/bin/feh --randomize --bg-scale ~/Wallpapers/*"
-# exec --no-startup-id "/usr/bin/xautolock -locker '~/.i3/scripts/i3lock_blur.sh'"
+# exec --no-startup-id "/usr/bin/xautolock -locker '~/.config/i3/scripts/i3lock_blur.sh'"
 exec --no-startup-id "/usr/bin/dunst"
 exec --no-startup-id "/usr/bin/enpass"
 exec --no-startup-id "/usr/bin/nm-applet"
 # exec --no-startup-id "/usr/bin/signal-desktop --start-in-tray"
 exec --no-startup-id "redshift -l 48.00:-4.00 -m randr -t 5700:4500 -g 0.9:0.9:0.9"
-bindsym Ctrl+Shift+l exec --no-startup-id ~/.i3/scripts/i3lock_blur.sh
+
+# fn keys
 bindsym XF86AudioLowerVolume exec amixer -D pulse sset Master 2%-
 bindsym XF86AudioRaiseVolume exec amixer -D pulse sset Master 2%+
 bindsym XF86AudioMute exec amixer -D pulse sset Master toggle
 bindsym XF86MonBrightnessUp exec /usr/bin/xbacklight -inc 5
 bindsym XF86MonBrightnessDown exec /usr/bin/xbacklight -dec 1
-bindsym $win+P exec ~/.i3/scripts/hdmi_setup --toggle
-bindsym $win+Tab exec ~/.i3/scripts/hdmi_setup --switch_mode
+bindsym $win+P exec ~/.config/i3/scripts/hdmi_setup --toggle
+bindsym $win+Tab exec ~/.config/i3/scripts/hdmi_setup --switch_mode
 
 # pip3 install spotify-cli-linux --user
 bindsym XF86AudioStop exec notify-send "$(~/.local/bin/spotifycli --status)"
 bindsym XF86AudioPlay exec ~/.local/bin/spotifycli --playpause
 bindsym XF86AudioNext exec ~/.local/bin/spotifycli --next
 bindsym XF86AudioPrev exec ~/.local/bin/spotifycli --prev
-bindsym $mod+q exec ~/.i3/scripts/i3_exit.sh
+
+bindsym Ctrl+Shift+l exec --no-startup-id ~/.config/i3/scripts/i3lock_blur.sh
+bindsym $mod+q exec ~/.config/i3/scripts/i3_exit.sh
