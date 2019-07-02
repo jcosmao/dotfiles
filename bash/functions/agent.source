@@ -2,31 +2,27 @@
 
 function launch_ssh_agent ()
 {
-    ttl=36000 # 10h
+    ssh_agent_cmd="ssh-agent -s -t 36000"
 
-    # kill ssh-agent if no ttl set
-    ps -o pid,user,command -U $USER | grep ssh-agent | grep -Pv "(grep|ssh-agent -s -t $ttl)" | while read pid user cmd; do
-        kill $pid
-    done
+    if [[ -f ~/.ssh-agent ]]; then
+        eval "$(<~/.ssh-agent)" >/dev/null
+    fi
+
+    if env | grep -q SSH_AGENT_PID=; then
+        cmd=$(ps ef --no-headers -o cmd $SSH_AGENT_PID)
+        if [[ $ssh_agent_cmd != $cmd ]]; then
+            kill $SSH_AGENT_PID &> /dev/null
+        fi
+    fi
 
     ssh-add -l &>/dev/null
     # Seems no ssh-agent running
     if [ "$?" == 2 ]; then
-      # Try to export ssh-agent env
-      test -r ~/.ssh-agent && \
-        eval "$(<~/.ssh-agent)" >/dev/null
-
-      # Still no ssh-agent
-      ssh-add -l &>/dev/null
-      if [ "$?" == 2 ]; then
+        # Try to export ssh-agent env
         (umask 066; ssh-agent -s -t 36000 > ~/.ssh-agent)
         eval "$(<~/.ssh-agent)" >/dev/null
-      fi
     fi
 
-    ssh-add -l &>/dev/null
-    # ssh-agent running, but no key registered
-    if [ "$?" == 1 ]; then
-        ssh-add
-    fi
+    # Add default ssh-key to agent cache
+    ssh-add 2> /dev/null
 }
