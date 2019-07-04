@@ -15,14 +15,18 @@ function launch_ssh_agent ()
         fi
     fi
 
-    ssh-add -l &>/dev/null
+    output=$(ssh-add -l 2> /dev/null)
+    rc=$?
     # Seems no ssh-agent running
-    if [ "$?" == 2 ]; then
+    if [[ $rc -eq 2 ]]; then
         # Try to export ssh-agent env
         (umask 066; ssh-agent -s -t 36000 > ~/.ssh-agent)
         eval "$(<~/.ssh-agent)" >/dev/null
+        ssh-add 2> /dev/null
+    elif [[ $rc -eq 1 ]]; then
+        # Add default ssh-key to agent cache
+        ssh-add 2> /dev/null
+    else
+        return
     fi
-
-    # Add default ssh-key to agent cache
-    ssh-add 2> /dev/null
 }
