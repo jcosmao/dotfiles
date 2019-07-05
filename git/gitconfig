@@ -3,6 +3,7 @@
 [core]
 	excludesfile = ~/.gitignore
     attributesfile = ~/.gitattributes
+    hooksPath = ~/.git/hooks
 
 [user]
     name = USERNAME
@@ -66,11 +67,15 @@
     co = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
     cm = commit --signoff
     ca = commit --signoff -a --amend --reuse-message=HEAD
+    po = !git push --set-upstream origin "$(git symbolic-ref --short HEAD)"
+    pushdev = !git push --set-upstream origin "dev/USERNAME/$(git symbolic-ref --short HEAD)"
+    pd = !git pushdev
     pf = push --force
+    pick = cherry-pick -s -x --allow-empty
+    cp = !git pick
     retag = "!r() { git tag -d $1 && git push origin :refs/tags/$1 && git tag $1; }; r"
     # Remove branches that have already been merged with master
     dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
     rst = "!f() { git clean -xfd && git reset --hard; }; f"
-    pushdev = !git push --set-upstream origin "`git branch --no-color 2>/dev/null | grep '*' | sed -e 's/\\* //'`:USERNAME/`git branch --no-color 2>/dev/null | grep '*' | sed -e 's/\\* //'`"
     # List contributors with number of commits
     contributors = shortlog --summary --numbered

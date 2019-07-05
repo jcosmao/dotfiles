@@ -1,0 +1,12 @@
+#!/bin/bash
+
+branch=$(git symbolic-ref --short HEAD 2> /dev/null)
+issue=$(echo $branch | grep -Po '^\w+-\d+')
+
+if [[ -n $issue ]]; then
+    if cat $1 | grep -Pq '^Issue: \w+-\d+'; then
+        exit 0
+    else
+        echo -e "\nIssue: $issue" >> $1
+    fi
+fi
