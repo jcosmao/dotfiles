@@ -36,9 +36,9 @@ hide_edge_borders smart
 focus_follows_mouse yes
 
 # i3 blocks
-#smart_borders on
-#gaps inner 5
-#gaps outer 5
+smart_borders on
+gaps inner 5
+gaps outer 5
 
 # start a terminal
 bindsym $mod+Return exec termite
@@ -161,10 +161,11 @@ bindsym $mod+d mode "resize"
 bar {
     font pango:DejaVu Sans Mono, Font Awesome 9
     position top
-    status_command i3status  | ~/.config/i3/scripts/i3status.spotify.py
+    status_command i3blocks
+    tray_padding 4 px
     colors {
         separator #969896
-        background #1d1f21
+        background #303336
         statusline #c5c8c6
         focused_workspace #81a2be #81a2be #1d1f21
         active_workspace #373b41 #373b41 #ffffff
@@ -182,8 +183,8 @@ client.urgent #373b41 #cc6666 #ffffff #cc6666
 for_window [class="KeePass2"] floating enable
 for_window [class="KeePass2"] resize set 1024 768
 
-exec --no-startup-id "setxkbmap -layout us -variant altgr-intl"
-exec --no-startup-id "/usr/bin/feh --randomize --bg-scale ~/Wallpapers/*"
+exec_always --no-startup-id "setxkbmap -layout us -variant altgr-intl"
+exec_always --no-startup-id "/usr/bin/feh --randomize --bg-scale ~/Wallpapers/*"
 # exec --no-startup-id "/usr/bin/xautolock -locker '~/.config/i3/scripts/i3lock_blur.sh'"
 exec --no-startup-id "/usr/bin/dunst"
 exec --no-startup-id "/usr/bin/enpass"
@@ -192,19 +193,19 @@ exec --no-startup-id "/usr/bin/nm-applet"
 exec --no-startup-id "redshift -l 48.00:-4.00 -m randr -t 5700:4500 -g 0.9:0.9:0.9"
 
 # fn keys
-bindsym XF86AudioLowerVolume exec amixer -D pulse sset Master 2%-
-bindsym XF86AudioRaiseVolume exec amixer -D pulse sset Master 2%+
-bindsym XF86AudioMute exec amixer -D pulse sset Master toggle
+bindsym XF86AudioLowerVolume exec amixer -D pulse sset Master 2%- && pkill -SIGRTMIN+10 i3blocks
+bindsym XF86AudioRaiseVolume exec amixer -D pulse sset Master 2%+ && pkill -SIGRTMIN+10 i3blocks
+bindsym XF86AudioMute exec amixer -D pulse sset Master toggle && pkill -SIGRTMIN+10 i3blocks
 bindsym XF86MonBrightnessUp exec /usr/bin/xbacklight -inc 5
 bindsym XF86MonBrightnessDown exec /usr/bin/xbacklight -dec 1
 bindsym $win+P exec ~/.config/i3/scripts/hdmi_setup --toggle
 bindsym $win+Tab exec ~/.config/i3/scripts/hdmi_setup --switch_mode
 
 # pip3 install spotify-cli-linux --user
-bindsym XF86AudioStop exec notify-send "$(~/.local/bin/spotifycli --status)"
-bindsym XF86AudioPlay exec ~/.local/bin/spotifycli --playpause
-bindsym XF86AudioNext exec ~/.local/bin/spotifycli --next
-bindsym XF86AudioPrev exec ~/.local/bin/spotifycli --prev
+bindsym XF86AudioStop exec notify-send "$(~/.local/bin/spotifycli --status)" && pkill -SIGRTMIN+11 i3blocks
+bindsym XF86AudioPlay exec ~/.local/bin/spotifycli --playpause && pkill -SIGRTMIN+11 i3blocks
+bindsym XF86AudioNext exec ~/.local/bin/spotifycli --next && pkill -SIGRTMIN+11 i3blocks
+bindsym XF86AudioPrev exec ~/.local/bin/spotifycli --prev && pkill -SIGRTMIN+11 i3blocks
 
 bindsym Ctrl+Shift+l exec --no-startup-id ~/.config/i3/scripts/i3lock_blur.sh
 bindsym $mod+q exec ~/.config/i3/scripts/i3_exit.sh

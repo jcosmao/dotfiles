@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import json
+import os
+import subprocess
+import sys
+
+iface_type = os.environ.get('BLOCK_INSTANCE', 'ethernet')
+label = ''
+color_up = '#B8A391'
+color_down = '#676767'
+
+
+def _get_first_ifname(ifaces, iface_type=iface_type):
+    for iface in ifaces:
+        if iface_type == 'ethernet' and iface['ifname'].startswith('e'):
+            return iface
+        elif iface_type == 'wireless' and iface['ifname'].startswith('wl'):
+            return iface
+
+
+if __name__ == "__main__":
+    output = subprocess.check_output(
+        "ip -br -j addr show",
+        shell=True
+    )
+    json_str = output.decode('utf8')
+    ifaces = json.loads(json_str)
+
+    first = _get_first_ifname(ifaces, iface_type)
+
+    if first:
+        try:
+            print('{} {}'.format(label, first['addr_info'][0]['local']))
+            print('{} {}'.format(label, first['addr_info'][0]['local']))
+            print(color_up)
+        except Exception:
+            print('{} ip'.format(label))
+            print('{} ip'.format(label))
+            print(color_down)

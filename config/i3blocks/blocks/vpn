@@ -1,0 +1,14 @@
+#!/bin/bash
+
+label=' '
+color_up='#9ec600'
+color_down='#676767'
+
+echo $label
+echo $label
+
+if [[ -f /var/run/vpnc.pid ]]; then
+    echo $color_up
+else
+    echo $color_down
+fi

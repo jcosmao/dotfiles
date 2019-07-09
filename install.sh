@@ -117,6 +117,11 @@ function install_terminal ()
         fc-cache -f $font_dir
     fi
 
+    echo "- Install icons"
+    icons_dir="$HOME/.icons"
+    rm -rf $icons_dir
+    cp -rp terminal/icons $icons_dir
+
     if which gnome-terminal 2>&1 > /dev/null; then
         echo "- Install gnome-terminal color scheme"
         for theme in $( ls terminal/gnome-terminal ); do
@@ -151,12 +156,12 @@ function install_config () {
 function print_help ()
 {
     echo "
-    $0 [--update|--term|--vim|--neovim|--term]
+    $0 [--update|--term|--vim|--neovim|--config]
 
     # Require:
      - bash: python-yaml, python-json, jq
      - terminal: gnome-terminal, rxvt-unicode, termite
-     - i3: i3-wm i3status i3lock xautolock dunst
+     - i3: i3-wm i3lock xautolock dunst i3blocks rofi sysstat acpi
      - vim: silversearcher-ag / fd (https://github.com/sharkdp/fd)
     "
 

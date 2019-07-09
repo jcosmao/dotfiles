@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import json
+import subprocess
+import sys
+
+label=''
+color_up = '#9ec600'
+color_down = '#ff9980'
+
+
+if __name__ == "__main__":
+    output = subprocess.check_output(
+        "ip -br -j addr show",
+        shell=True
+    )
+    json_str = output.decode('utf8')
+    ifaces = json.loads(json_str)
+
+    first = None
+    for iface in ifaces:
+        if iface['ifname'].startswith('e'):
+            first = iface
+
+    if not first:
+        sys.exit(0)
+
+    print(label)
+    print(label)
+    if first['operstate'] == 'DOWN':
+        print(color_down)
+    else:
+        print(color_up)

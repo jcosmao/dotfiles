@@ -1,0 +1,71 @@
+# vim: ft=cfg
+
+command=~/.config/i3blocks/blocks/$BLOCK_NAME
+separator_block_width=30
+markup=none
+
+[spotify]
+interval=15
+signal=11
+
+# Network
+
+[vpn]
+instance=ethernet
+interval=5
+
+[ethernet]
+interval=10
+separator=false
+separator_block_width=10
+
+[ip]
+instance=ethernet
+interval=10
+
+[wifi]
+interval=10
+separator=false
+separator_block_width=10
+
+[ip]
+instance=wireless
+interval=10
+
+[bandwidth]
+command=~/.config/i3blocks/blocks/$BLOCK_NAME -o ' ' -i ' '
+interval=5
+
+# Monitoring
+
+[cpu_usage]
+label=
+command=~/.config/i3blocks/blocks/$BLOCK_NAME -d 0
+interval=10
+separator=false
+separator_block_width=10
+
+[memory]
+label=
+interval=30
+separator=false
+separator_block_width=10
+
+[disk-home]
+label=
+command=df -h -l --output='used' "$HOME" | grep -E -o '[0-9]+G'
+interval=30
+
+# Common
+
+[volume]
+label=
+interval=10
+signal=10
+
+[battery]
+interval=10
+
+[calendar]
+label=
+interval=5
