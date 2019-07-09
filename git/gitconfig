@@ -67,8 +67,9 @@
     co = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
     cm = commit --signoff
     ca = commit --signoff -a --amend --reuse-message=HEAD
-    po = !git push --set-upstream origin "$(git symbolic-ref --short HEAD)"
-    pushdev = !git push --set-upstream origin "dev/USERNAME/$(git symbolic-ref --short HEAD)"
+    pushorigin = !git push --set-upstream origin $(git symbolic-ref --short HEAD)
+    po = !git pushorigin
+    pushdev = !git push --set-upstream origin $(git symbolic-ref --short HEAD):dev/USERNAME/$(git symbolic-ref --short HEAD)
     pd = !git pushdev
     pf = push --force
     pick = cherry-pick -s -x --allow-empty
