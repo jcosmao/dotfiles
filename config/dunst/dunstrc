@@ -1,7 +1,7 @@
 [global]
     monitor = 0
     follow = mouse
-    geometry = "320x5-15+15"
+    geometry = "320x5-15+35"
     indicate_hidden = yes
     shrink = no
     transparency = 0
@@ -34,7 +34,7 @@
     always_run_script = true
     startup_notification = false
     verbosity = mesg
-    corner_radius = 0
+    corner_radius = 2
     force_xinerama = false
     mouse_left_click = close_current
     mouse_middle_click = do_action

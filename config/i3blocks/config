@@ -10,8 +10,11 @@ signal=11
 
 # Network
 
+[bandwidth]
+command=~/.config/i3blocks/blocks/$BLOCK_NAME -o ' ' -i ' '
+interval=5
+
 [vpn]
-instance=ethernet
 interval=5
 
 [ethernet]
@@ -31,10 +34,6 @@ separator_block_width=10
 [ip]
 instance=wireless
 interval=10
-
-[bandwidth]
-command=~/.config/i3blocks/blocks/$BLOCK_NAME -o ' ' -i ' '
-interval=5
 
 # Monitoring
 
@@ -59,7 +58,7 @@ interval=30
 # Common
 
 [volume]
-label=
+label=
 interval=10
 signal=10
 

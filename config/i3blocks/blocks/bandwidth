@@ -47,9 +47,6 @@ if ! [ -e "/sys/class/net/${INTERFACE}/operstate" ] || \
     (! [ "$TREAT_UNKNOWN_AS_UP" = "1" ] &&
     ! [ "`cat /sys/class/net/${INTERFACE}/operstate`" = "up" ])
 then
-    echo "$INTERFACE down"
-    echo "$INTERFACE down"
-    echo "#FF0000"
     exit 0
 fi
 
@@ -94,9 +91,9 @@ tx_rate=$(( $tx_diff / $time_diff ))
 echo -n "$INLABEL"
 rx_kib=$(( $rx_rate >> 10 ))
 if hash bc 2>/dev/null && [[ "$rx_rate" -gt 1048576 ]]; then
-  printf '%sM' "`echo "scale=1; $rx_kib / 1024" | bc`"
+  printf '%3s Mo' "`echo "scale=1; $rx_kib / 1024" | bc`"
 else
-  echo -n "${rx_kib}K"
+  printf '%3s Ko' $rx_kib
 fi
 
 echo -n " "
@@ -105,10 +102,10 @@ echo -n " "
 echo -n "$OUTLABEL"
 tx_kib=$(( $tx_rate >> 10 ))
 if hash bc 2>/dev/null && [[ "$tx_rate" -gt 1048576 ]]; then
-  printf '%sM' "`echo "scale=1; $tx_kib / 1024" | bc`"
+  printf '%3s Mo' "`echo "scale=1; $tx_kib / 1024" | bc`"
 else
-  echo -n "${tx_kib}K"
+  printf '%3s Ko' $tx_kib
 fi
 
-echo -e "\nshort format"
+echo -e "\n..."
 echo "$COLOR"

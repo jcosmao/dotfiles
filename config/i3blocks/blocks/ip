@@ -33,9 +33,9 @@ if __name__ == "__main__":
     if first:
         try:
             print('{} {}'.format(label, first['addr_info'][0]['local']))
-            print('{} {}'.format(label, first['addr_info'][0]['local']))
+            print(label)
             print(color_up)
         except Exception:
             print('{} ip'.format(label))
-            print('{} ip'.format(label))
+            print(label)
             print(color_down)

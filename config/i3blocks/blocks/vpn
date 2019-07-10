@@ -1,6 +1,6 @@
 #!/bin/bash
 
-label=' '
+label=' '
 color_up='#9ec600'
 color_down='#676767'
 

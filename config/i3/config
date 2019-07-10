@@ -52,6 +52,7 @@ bindsym $mod+F4      kill
 # There also is the (new) i3-dmenu-desktop which only displays applications
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 # installed.
+# bindsym $mod+r exec --no-startup-id i3-dmenu-desktop
 bindsym $mod+r exec --no-startup-id dmenu_recency
 
 # change focus
@@ -159,19 +160,22 @@ bindsym $mod+d mode "resize"
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 bar {
-    font pango:DejaVu Sans Mono, Font Awesome 9
     position top
+    font pango:Fira Code Medium, Font Awesome 5 Free 9
+    height 28
+    tray_padding 5
     status_command i3blocks
-    tray_padding 4 px
+    # $i3-theme-bar
     colors {
         separator #969896
-        background #303336
+        background #333333
         statusline #c5c8c6
         focused_workspace #81a2be #81a2be #1d1f21
         active_workspace #373b41 #373b41 #ffffff
         inactive_workspace #282a2e #282a2e #969896
         urgent_workspace #cc6666 #cc6666 #ffffff
     }
+
 }
 
 # class        border  backgr. text    indicator
@@ -185,7 +189,6 @@ for_window [class="KeePass2"] resize set 1024 768
 
 exec_always --no-startup-id "setxkbmap -layout us -variant altgr-intl"
 exec_always --no-startup-id "/usr/bin/feh --randomize --bg-scale ~/Wallpapers/*"
-# exec --no-startup-id "/usr/bin/xautolock -locker '~/.config/i3/scripts/i3lock_blur.sh'"
 exec --no-startup-id "/usr/bin/dunst"
 exec --no-startup-id "/usr/bin/enpass"
 exec --no-startup-id "/usr/bin/nm-applet"
@@ -197,7 +200,7 @@ bindsym XF86AudioLowerVolume exec amixer -D pulse sset Master 2%- && pkill -SIGR
 bindsym XF86AudioRaiseVolume exec amixer -D pulse sset Master 2%+ && pkill -SIGRTMIN+10 i3blocks
 bindsym XF86AudioMute exec amixer -D pulse sset Master toggle && pkill -SIGRTMIN+10 i3blocks
 bindsym XF86MonBrightnessUp exec /usr/bin/xbacklight -inc 5
-bindsym XF86MonBrightnessDown exec /usr/bin/xbacklight -dec 1
+bindsym XF86MonBrightnessDown exec /usr/bin/xbacklight -dec 5
 bindsym $win+P exec ~/.config/i3/scripts/hdmi_setup --toggle
 bindsym $win+Tab exec ~/.config/i3/scripts/hdmi_setup --switch_mode
 
@@ -209,3 +212,25 @@ bindsym XF86AudioPrev exec ~/.local/bin/spotifycli --prev && pkill -SIGRTMIN+11 
 
 bindsym Ctrl+Shift+l exec --no-startup-id ~/.config/i3/scripts/i3lock_blur.sh
 bindsym $mod+q exec ~/.config/i3/scripts/i3_exit.sh
+
+
+# taf
+# bind monitor / workspace
+# workspace 1 output DP-1-1
+# workspace 2 output DP-1-2
+# workspace 3 output DP-1-2
+# workspace 4 output DP-1-2
+# workspace 5 output DP-1-2
+# workspace 6 output DP-1-2
+# workspace 7 output DP-1-2
+# workspace 8 output DP-1-2
+# workspace 9 output DP-1-2
+# workspace 10 output eDP-1
+#
+# exec --no-startup-id "i3-msg 'workspace 1; append_layout ~/.config/i3/workspace_1.json'"
+# exec --no-startup-id "i3-msg 'workspace 10; append_layout ~/.config/i3/workspace_10.json'"
+# exec --no-startup-id "autorandr --change 2x24_and_laptop"
+# exec --no-startup-id "/usr/bin/xautolock -locker '~/.config/i3/scripts/i3lock_blur.sh'"
+#
+# bindsym XF86MonBrightnessUp exec ~/bin/xbacklight --inc 500
+# bindsym XF86MonBrightnessDown exec ~/bin/xbacklight --dec 500

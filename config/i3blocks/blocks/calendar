@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#!/bin/bash
+# vim: ft=sh
 
 # rofi-calendar: A pop-up calendar for i3blocks.
 # Requirements:
@@ -14,7 +15,8 @@ month_number=${full_date:5:2}
 day_number=${full_date:8:2}
 
 cal_command() {
-    cal -S "$month_number" "$year_number" | sed '1d;s/ *$//g;/^$/d'
+    ncal -Shb "$month_number" "$year_number" 2> /dev/null || \
+        cal -S "$month_number" "$year_number" 2> /dev/null | sed '1d;s/ *$//g;/^$/d'
 }
 
 custom_month() {
@@ -51,12 +53,12 @@ case "$BLOCK_BUTTON" in
             | sed "s#\b${day_number// /}\b#<span bgcolor='\#2b83a6' color='\#ffffff'>${day_number// /}</span>#" \
             | rofi \
                 -dmenu \
-                -width '-21' \
+                -width '-23' \
                 -lines "$cal_lines" \
                 -font 'Monospace 10' \
                 -location '3' \
                 -xoffset '-15' \
-                -yoffset '24' \
+                -yoffset '30' \
                 -theme-str 'configuration { show-icons: false; }' \
                 -theme-str 'window { fullscreen: false; } inputbar { children: [ prompt ]; } listview { scrollbar: false; }' \
                 -theme-str 'element normal.normal, element selected.normal, element alternate.normal { background-color: #212121; text-color: #c4cad4; }' \
@@ -68,4 +70,4 @@ case "$BLOCK_BUTTON" in
         ;;
 esac
 
-echo "${full_date:11:17}"
+echo "${full_date:11:17} "
