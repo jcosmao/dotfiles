@@ -51,8 +51,9 @@ function _antigen_update()
 
 function install_neovim ()
 {
-    echo "- Update neovim from latest"
-    wget https://github.com/neovim/neovim/releases/download/stable/nvim.appimage -O /tmp/nvim.appimage 2>/dev/null || \
+    release=$1
+    echo "- Update neovim from $release"
+    wget https://github.com/neovim/neovim/releases/download/$release/nvim.appimage -O /tmp/nvim.appimage 2>/dev/null || \
         cp nvim/nvim.appimage /tmp
     chmod +x /tmp/nvim.appimage
     echo "  - install neovim under ~/bin/nvim"
@@ -179,7 +180,9 @@ function main ()
         case "$arg" in
             --update) update_repo ;;
             --vim)    install_vim ;;
-            --neovim) install_neovim ;;
+            --neovim) release='stable';
+                      [[ $1 == 'nightly' ]] && release='nightly' && shift;
+                      install_neovim $release;;
             --term)   install_bash;
                       install_zsh;
                       install_tmux;

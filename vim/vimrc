@@ -47,6 +47,10 @@ Plug 'ncm2/ncm2-path'
 Plug 'ncm2/ncm2-ultisnips'
 Plug 'ncm2/ncm2-bufword'
 Plug 'ncm2/ncm2-tagprefix'
+if has('nvim-0.4')
+    Plug 'ncm2/float-preview.nvim'
+endif
+
 Plug 'w0rp/ale'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
@@ -116,7 +120,6 @@ set noswapfile                      " swap files give annoying warning
 set clipboard^=unnamedplus          " send yank to system clipboard
 set updatetime=100
 set hidden                          " Allow modified hidden buffers
-
 "
 " Plugins Configuration
 "
@@ -147,25 +150,27 @@ if has('python3') && PlugLoaded('ncm2')
     inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
     inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
     inoremap <silent> <expr> <CR> ncm2_ultisnips#expand_or("\<CR>", 'n')
-
+    inoremap <C-space> <C-r>=ncm2#force_trigger()<cr>
     let ncm2#popup_delay = 5
     let ncm2#complete_length = [[1, 1]]
     let g:ncm2#matcher = 'substrfuzzy'
+
 endif
 
 " Python - jedi-vim  (autocompletion disabled)
 let g:jedi#auto_initialization = 1
+let g:jedi#show_call_signatures = 0
 let g:jedi#completions_enabled = 0
 let g:jedi#auto_vim_configuration = 0
 let g:jedi#smart_auto_mappings = 0
-let g:jedi#popup_on_dot = 0
+let g:jedi#popup_on_dot = 1
 let g:jedi#completions_command = ""
-let g:jedi#show_call_signatures = "1"
 let g:jedi#goto_command = "<C-]>"
+let g:jedi#goto_stubs_command = ""
 let g:jedi#usages_command = "]"
 let g:jedi#documentation_command = "?"
-let g:jedi#completions_command = "<C-Space>"
 let g:jedi#rename_command = "<leader>r"
+autocmd Filetype python nmap <C-]> call jedi#goto()
 
 " gruvbox theme
 let g:gruvbox_bold = 0
