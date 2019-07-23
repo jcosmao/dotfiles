@@ -227,10 +227,10 @@ bindsym $mod+q exec ~/.config/i3/scripts/i3_exit.sh
 # workspace 9 output DP-1-2
 # workspace 10 output eDP-1
 #
-# exec --no-startup-id "i3-msg 'workspace 1; append_layout ~/.config/i3/workspace_1.json'"
-# exec --no-startup-id "i3-msg 'workspace 10; append_layout ~/.config/i3/workspace_10.json'"
-# exec --no-startup-id "autorandr --change 2x24_and_laptop"
-# exec --no-startup-id "/usr/bin/xautolock -locker '~/.config/i3/scripts/i3lock_blur.sh'"
+# exec_always --no-startup-id "i3-msg 'workspace 1; append_layout ~/.config/i3/workspace_1.json'"
+# exec_always --no-startup-id "i3-msg 'workspace 10; append_layout ~/.config/i3/workspace_10.json'"
+# exec_always --no-startup-id "autorandr --change 2x24_and_laptop"
+# exec_always --no-startup-id "~/.config/i3/scripts/touchpad_setup.sh"
 #
 # bindsym XF86MonBrightnessUp exec ~/bin/xbacklight --inc 500
 # bindsym XF86MonBrightnessDown exec ~/bin/xbacklight --dec 500
