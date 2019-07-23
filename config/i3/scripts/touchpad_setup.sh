@@ -31,9 +31,9 @@ gnome_setup="
 touchpad_id=$(xinput list | grep Touchpad | grep -Po '(?<=id=)\d+')
 
 echo "$gnome_setup" | while read line; do
-    id=$(echo "$line" | grep -a -m 1 -Po '\d{3}' | head -1)
+    name=$(echo "$line" | grep -Po '.*(?= \(\d+\))')
     value=$(echo "$line" | cut -d':' -f2)
     if [[ -n "$value" ]]; then
-        xinput set-prop $touchpad_id $id $value 2> /dev/null
+        xinput set-prop $touchpad_id "$name" $value 2> /dev/null
     fi
 done
