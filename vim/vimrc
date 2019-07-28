@@ -16,7 +16,6 @@ call plug#begin('~/.vim/plug')
 Plug 'mhinz/vim-startify'
 Plug 'morhetz/gruvbox'
 Plug 'scrooloose/nerdtree'
-Plug 'jistr/vim-nerdtree-tabs'
 Plug 'itchyny/lightline.vim'
 Plug 'maximbaz/lightline-ale'
 Plug 'Yggdroot/indentLine'
@@ -251,17 +250,12 @@ let g:ale_fixers = {
 \   '*': ['remove_trailing_lines', 'trim_whitespace'],
 \}
 
-" Nerdtree + Nerdtree tabs
-let g:nerdtree_tabs_open_on_console_startup = 0
-let g:nerdtree_tabs_focus_on_files = 1
-let g:nerdtree_tabs_autofind = 1
+" Nerdtree
 let NERDTreeQuitOnOpen = 1
+let NERDTreeShowHidden = 1
 let NERDTreeShowBookmarks = 1
-let g:NERDTreeWinSize = 40
-let NERDTreeIgnore = ['\.pyc', '__pycache__', '.egg-info[[dir]]', 'pip-wheel-metadata[[dir]]']
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-autocmd FileType nerdtree let t:nerdtree_winnr = bufwinnr('%')
-autocmd BufWinEnter * call PreventBuffersInNERDTree()
+let NERDTreeWinSize = 40
+let NERDTreeIgnore = ['.git[[dir]]', '.swp', '.pyc', '__pycache__', '.egg-info[[dir]]', 'pip-wheel-metadata[[dir]]']
 
 function! PreventBuffersInNERDTree()
   if bufname('#') =~ 'NERD_tree' && bufname('%') !~ 'NERD_tree'
@@ -274,6 +268,19 @@ function! PreventBuffersInNERDTree()
   if exists('g:launching_fzf') | unlet g:launching_fzf | endif
 endfunction
 
+function! NERDTreeToggle()
+    if exists("g:NERDTree") && g:NERDTree.IsOpen()
+        NERDTreeClose
+    elseif filereadable(expand('%'))
+        NERDTreeFind
+    else
+        NERDTreeCWD
+    endif
+endfunction
+
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+autocmd FileType nerdtree let t:nerdtree_winnr = bufwinnr('%')
+autocmd BufWinEnter * call PreventBuffersInNERDTree()
 
 " Ultisnip
 let g:UltiSnipsEditSplit="vertical"
@@ -376,7 +383,8 @@ let g:startify_session_dir = '~/.cache/vim/session'
 let g:startify_session_persistence = 1
 let g:startify_session_before_save = [
 \   'echo "Cleaning up before saving.."',
-\   'silent! NERDTreeTabsClose'
+\   'silent! NERDTreeTabsClose',
+\   'silent! NERDTreeClose',
 \ ]
 let g:startify_bookmarks = []
 let g:startify_lists = [
@@ -446,7 +454,7 @@ map <silent> <leader>V :tabedit $MYVIMRC <cr>
 map <silent> <leader>S :source $MYVIMRC \| :echo $MYVIMRC 'reloaded' <cr>
 map <silent> <F1> :set paste! <cr>
 map <silent> <F2> :set number! <cr>
-map <silent> <F3> :NERDTreeTabsToggle <cr>
+map <silent> <F3> :call NERDTreeToggle() <cr>
 map <silent> <F4> :TagbarToggle <cr>
 map <silent> <F5> :IndentLinesToggle <cr>
 map <silent> <F6> :SignifyToggle <cr>
