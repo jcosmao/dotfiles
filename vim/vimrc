@@ -385,6 +385,7 @@ let g:startify_session_before_save = [
 \   'echo "Cleaning up before saving.."',
 \   'silent! NERDTreeTabsClose',
 \   'silent! NERDTreeClose',
+\   'silent! TagbarClose',
 \ ]
 let g:startify_bookmarks = []
 let g:startify_lists = [
@@ -422,7 +423,7 @@ autocmd User Fugitive SignifyRefresh
 let g:vim_json_syntax_conceal = 0
 
 " tagbar
-let g:tagbar_map_showproto = '/'
+let g:tagbar_map_showproto = '\'
 let g:tagbar_sort = 0
 let g:tagbar_compact = 1
 let g:tagbar_autoshowtag = 1
