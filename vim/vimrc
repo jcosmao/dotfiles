@@ -417,7 +417,8 @@ let g:lt_height = 10
 let g:signify_update_on_bufenter    = 1
 let g:signify_update_on_focusgained = 0
 " refresh when vim-fugitive command is used
-autocmd User Fugitive SignifyRefresh
+" (add silent! to ignore error: https://github.com/mhinz/vim-signify/issues/270)
+autocmd User Fugitive silent! SignifyRefresh
 
 " vim-json
 let g:vim_json_syntax_conceal = 0
