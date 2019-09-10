@@ -419,6 +419,7 @@ let g:signify_update_on_focusgained = 0
 " refresh when vim-fugitive command is used
 " (add silent! to ignore error: https://github.com/mhinz/vim-signify/issues/270)
 autocmd User Fugitive silent! SignifyRefresh
+autocmd User Fugitive silent! TagbarClose
 
 " vim-json
 let g:vim_json_syntax_conceal = 0
