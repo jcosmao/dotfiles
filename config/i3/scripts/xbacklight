@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Need brightness-udev for non root users to access file
+
+
+function inc_brightness() {
+    inc=$1
+    current=$(cat /sys/class/backlight/intel_backlight/brightness)
+    echo $((current + inc)) > /sys/class/backlight/intel_backlight/brightness
+    exit
+}
+
+function dec_brightness() {
+    dec=$1
+    current=$(cat /sys/class/backlight/intel_backlight/brightness)
+    echo $((current - dec)) > /sys/class/backlight/intel_backlight/brightness
+    exit
+}
+
+
+function main ()
+{
+    while [[ $# -ne 0 ]]; do
+        arg="$1"; shift
+        case "$arg" in
+            --inc) val=$1; inc_brightness $val ;;
+            --dec) val=$1; dec_brightness $val ;;
+            * ) [[ $arg =~ \-+.* ]] && echo "$arg unknown"
+        esac
+    done
+}
+
+main "$@"
