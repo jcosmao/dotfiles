@@ -7,7 +7,7 @@ select=$(
 
 function lock()
 {
-    ~/.i3/scripts/i3lock_blur.sh
+    ~/.config/i3/scripts/i3lock_blur.sh
 }
 
 case "$select" in
