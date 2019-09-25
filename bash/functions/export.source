@@ -18,3 +18,6 @@ if which nvim  &> /dev/null; then
     alias vim=$(which nvim)
     alias vi=$(which nvim)
 fi
+
+# Always preserve env
+alias sudo="sudo -E"
