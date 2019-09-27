@@ -9,6 +9,9 @@
     name = USERNAME
     email = MAIL
 
+[gitreview]
+    name = USERNAME
+
 [credential]
 	helper = store
 
@@ -57,14 +60,16 @@
 
 [alias]
     aliases = config --get-regexp alias
+    br = branch -vv
     l = log --stat
     lol = log --graph --decorate --pretty=oneline --abbrev-commit
     ls = ls-files
+    track = !git branch -u origin/$(git symbolic-ref --short HEAD)
     # Show the diff between the latest commit and the current state
     d = !"git diff-index --quiet HEAD -- || clear; git --no-pager diff --patch-with-stat"
     st = status --short
     cl = clone --recursive
-    co = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
+    co = "!f() { git fetch; git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
     cm = commit --signoff
     ca = commit --signoff -a --amend --reuse-message=HEAD
     pushorigin = !git push --set-upstream origin $(git symbolic-ref --short HEAD)
@@ -80,3 +85,5 @@
     rst = "!f() { git clean -xfd && git reset --hard; }; f"
     # List contributors with number of commits
     contributors = shortlog --summary --numbered
+    # https://stackoverflow.com/questions/3161204/how-to-find-the-nearest-parent-of-a-git-branch
+    base = "!f() { git show-branch -a 2> /dev/null | grep '\\*' | grep -v $(git rev-parse --abbrev-ref HEAD) | head -n1 | sed -e 's/.*\\[\\(.*\\)\\].*/\\1/' -e 's/[\\^~].*//' -e 's,origin/,,'; }; f"

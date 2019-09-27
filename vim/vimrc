@@ -19,7 +19,7 @@ Plug 'scrooloose/nerdtree'
 Plug 'itchyny/lightline.vim'
 Plug 'maximbaz/lightline-ale'
 Plug 'Yggdroot/indentLine'
-Plug 'jiangmiao/auto-pairs'
+Plug 'Raimondi/delimitMate'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-eunuch'
@@ -431,10 +431,6 @@ let g:tagbar_compact = 1
 let g:tagbar_autoshowtag = 1
 let g:tagbar_previewwin_pos = "aboveleft"
 let g:tagbar_autopreview = 0
-
-" Autopair
-let g:AutoPairsMapCR = 0
-let g:AutoPairsFlyMode = 0
 
 "
 " Commands mapping

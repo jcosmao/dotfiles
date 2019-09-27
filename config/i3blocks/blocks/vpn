@@ -7,7 +7,7 @@ color_down='#676767'
 echo $label
 echo $label
 
-if [[ -f /var/run/vpnc.pid ]]; then
+if [[ -f /var/run/vpnc.pid || -n $(pidof nm-vpnc-service) ]]; then
     echo $color_up
 else
     echo $color_down
