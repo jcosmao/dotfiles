@@ -64,7 +64,10 @@
     l = log --stat
     lol = log --graph --decorate --pretty=oneline --abbrev-commit
     ls = ls-files
-    track = !git branch -u origin/$(git symbolic-ref --short HEAD)
+    trackshow = !git rev-parse --abbrev-ref --symbolic-full-name @{u}
+    tr = !git trackshow
+    trackset = !git branch -u origin/$(git symbolic-ref --short HEAD)
+    ts = !git trackset
     # Show the diff between the latest commit and the current state
     d = !"git diff-index --quiet HEAD -- || clear; git --no-pager diff --patch-with-stat"
     st = status --short

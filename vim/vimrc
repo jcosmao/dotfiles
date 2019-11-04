@@ -449,6 +449,7 @@ command! -bang WQ wq<bang>
 
 " Mapping
 let mapleader = " "
+map <silent> <leader>? :exec printf('view %s/help.md', fnamemodify(expand($MYVIMRC), ':p:h'))<cr>
 map <silent> <leader>V :tabedit $MYVIMRC <cr>
 map <silent> <leader>S :source $MYVIMRC \| :echo $MYVIMRC 'reloaded' <cr>
 map <silent> <F1> :set paste! <cr>
