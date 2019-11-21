@@ -73,6 +73,7 @@ function install_vim ()
     rm -rf ~/.vim ~/.config/nvim
     cp -r vim ~/.vim
     ln -sf ~/.vim/vimrc ~/.vimrc
+    mkdir -p ~/.config
     ln -sf ~/.vim ~/.config/nvim
     echo "  - vim exec :PlugInstall"
 }

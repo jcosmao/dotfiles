@@ -38,33 +38,40 @@ Plug 'mhinz/vim-signify'
 Plug 'tpope/vim-fugitive'
 
 " completion / linter
-Plug 'roxma/nvim-yarp'
-Plug 'ncm2/ncm2'
-Plug 'ncm2/ncm2-jedi', { 'for': 'python' }
-Plug 'ncm2/ncm2-go', { 'for': 'go' }
-Plug 'ncm2/ncm2-path'
-Plug 'ncm2/ncm2-ultisnips'
-Plug 'ncm2/ncm2-bufword'
-Plug 'ncm2/ncm2-tagprefix'
+if has('python3') && v:version > 704
+    Plug 'roxma/nvim-yarp'
+    Plug 'ncm2/ncm2'
+    Plug 'ncm2/ncm2-jedi', { 'for': 'python' }
+    Plug 'ncm2/ncm2-go', { 'for': 'go' }
+    Plug 'ncm2/ncm2-path'
+    Plug 'ncm2/ncm2-ultisnips'
+    Plug 'ncm2/ncm2-bufword'
+    Plug 'ncm2/ncm2-tagprefix'
+    " python completion
+    Plug 'davidhalter/jedi-vim', { 'for': 'python' }
+    Plug 'jcosmao/jedi-vim-pyversion', { 'for': 'python' }
+    " snippets
+    Plug 'SirVer/ultisnips'
+    Plug 'honza/vim-snippets'
+    " lint
+    Plug 'w0rp/ale'
+else
+    " basic vim completion / lint
+    Plug 'vim-scripts/VimCompletesMe'
+    Plug 'vim-syntastic/syntastic'
+endif
+
 if has('nvim-0.4')
     Plug 'ncm2/float-preview.nvim'
 endif
-
-Plug 'w0rp/ale'
-Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
 
 " ctags / cscope
 Plug 'ludovicchabant/vim-gutentags'
 Plug 'majutsushi/tagbar'
 
-" python
-Plug 'davidhalter/jedi-vim', { 'for': 'python' }
-Plug 'jcosmao/jedi-vim-pyversion', { 'for': 'python' }
+" other
 Plug 'vim-scripts/python_match.vim', { 'for': 'python' }
 Plug 'vim-python/python-syntax', { 'for': 'python' }
-
-" other
 Plug 'fatih/vim-go', { 'for': 'go' }
 Plug 'elzr/vim-json'
 Plug 'vim-perl/vim-perl'
@@ -138,7 +145,7 @@ function! PlugLoaded(name)
 endfunction
 
 " Autocompletion - NCM2
-if has('python3') && PlugLoaded('ncm2')
+if PlugLoaded('ncm2')
     autocmd BufEnter * call ncm2#enable_for_buffer()
     set completeopt=menuone,noselect,noinsert
     set shortmess+=c
@@ -153,23 +160,24 @@ if has('python3') && PlugLoaded('ncm2')
     let ncm2#popup_delay = 5
     let ncm2#complete_length = [[1, 1]]
     let g:ncm2#matcher = 'substrfuzzy'
-
 endif
 
 " Python - jedi-vim  (autocompletion disabled)
-let g:jedi#auto_initialization = 1
-let g:jedi#show_call_signatures = 0
-let g:jedi#completions_enabled = 0
-let g:jedi#auto_vim_configuration = 0
-let g:jedi#smart_auto_mappings = 0
-let g:jedi#popup_on_dot = 1
-let g:jedi#completions_command = ""
-let g:jedi#goto_command = "<C-]>"
-let g:jedi#goto_stubs_command = ""
-let g:jedi#usages_command = "]"
-let g:jedi#documentation_command = "?"
-let g:jedi#rename_command = "<leader>r"
-autocmd Filetype python nmap <C-]> call jedi#goto()
+if PlugLoaded('jedi-vim')
+    let g:jedi#auto_initialization = 1
+    let g:jedi#show_call_signatures = 0
+    let g:jedi#completions_enabled = 0
+    let g:jedi#auto_vim_configuration = 0
+    let g:jedi#smart_auto_mappings = 0
+    let g:jedi#popup_on_dot = 1
+    let g:jedi#completions_command = ""
+    let g:jedi#goto_command = "<C-]>"
+    let g:jedi#goto_stubs_command = ""
+    let g:jedi#usages_command = "]"
+    let g:jedi#documentation_command = "?"
+    let g:jedi#rename_command = "<leader>r"
+    autocmd Filetype python nmap <C-]> call jedi#goto()
+endif
 
 " gruvbox theme
 let g:gruvbox_bold = 0
@@ -228,27 +236,51 @@ let g:lightline = {
 \   }
 \}
 
-" lightline-ale
-let g:lightline#ale#indicator_checking = "\uf110 "
-let g:lightline#ale#indicator_warnings = "\uf071  "
-let g:lightline#ale#indicator_errors = "\uf05e  "
-let g:lightline#ale#indicator_ok = "\uf00c "
+if PlugLoaded('ale')
+    " lightline-ale
+    let g:lightline#ale#indicator_checking = "\uf110 "
+    let g:lightline#ale#indicator_warnings = "\uf071  "
+    let g:lightline#ale#indicator_errors = "\uf05e  "
+    let g:lightline#ale#indicator_ok = "\uf00c "
 
-" Ale
-let g:ale_lint_on_enter = 1
-let g:ale_lint_on_text_changed = 'never'
-let g:ale_echo_msg_error_str = 'Error'
-let g:ale_echo_msg_warning_str = 'Warning'
-let g:ale_echo_msg_format = '[%linter%] [%code%] %s [%severity%]'
-let g:ale_linters = {
-\   'python': ['flake8'],
-\   'go': ['gometalinter', 'gofmt'],
-\}
-" Ale autofix
-let g:ale_fix_on_save = 1
-let g:ale_fixers = {
-\   '*': ['remove_trailing_lines', 'trim_whitespace'],
-\}
+    " Ale
+    let g:ale_lint_on_enter = 1
+    let g:ale_lint_on_text_changed = 'never'
+    let g:ale_echo_msg_error_str = 'Error'
+    let g:ale_echo_msg_warning_str = 'Warning'
+    let g:ale_echo_msg_format = '[%linter%] [%code%] %s [%severity%]'
+    let g:ale_linters = {
+    \   'python': ['flake8'],
+    \   'go': ['gometalinter', 'gofmt'],
+    \}
+    " Ale autofix
+    let g:ale_fix_on_save = 1
+    let g:ale_fixers = {
+    \   '*': ['remove_trailing_lines', 'trim_whitespace'],
+    \}
+endif
+
+" Syntastic
+if PlugLoaded('syntastic')
+    let g:syntastic_always_populate_loc_list = 1
+    let g:syntastic_auto_loc_list = 1
+    let g:syntastic_check_on_open = 1
+    let g:syntastic_check_on_wq = 0
+    let g:syntastic_aggregate_errors = 1
+    let g:syntastic_enable_highlighting = 1
+    let g:syntastic_python_checkers = ['flake8']
+    let g:syntastic_go_checkers = ['go', 'golint', 'gofmt']
+    let g:syntastic_error_symbol = ''
+    let g:syntastic_warning_symbol = ''
+    let g:syntastic_style_error_symbol = ''
+    let g:syntastic_style_warning_symbol = ''
+    " By default, disable style checks
+    let g:syntastic_quiet_messages = {
+    \   "level": [],
+    \   "type":  ["style"],
+    \ }
+    autocmd BufWritePre * :%s/\s\+$//e
+endif
 
 " Nerdtree
 let NERDTreeQuitOnOpen = 1
@@ -455,8 +487,8 @@ map <silent> <leader>S :source $MYVIMRC \| :echo $MYVIMRC 'reloaded' <cr>
 map <silent> <F1> :set paste! <cr>
 map <silent> <F2> :set number! <cr>
 map <silent> <F3> :call NERDTreeToggle() <cr>
-map <silent> <F4> :TagbarToggle <cr>
-map <silent> <F5> :IndentLinesToggle <cr>
+map <silent> <F4> :IndentLinesToggle <cr>
+map <silent> <F5> :TagbarToggle <cr>
 map <silent> <F6> :SignifyToggle <cr>
 map <silent> <F11> :2,$s/^\s*pick/fixup/g <cr>
 map <silent> <F12> :call ToggleMouse() <cr>
@@ -473,7 +505,7 @@ map <silent> <leader>C :BCommits <cr>
 map <silent> <leader>h :History <cr>
 map <silent> <C-a> ^
 map <silent> <C-e> $
-map <silent> <C-Right> w
+map <silent> <C-Right> e
 map <silent> <C-Left> b
 map <silent> <leader>v :vsplit<cr>
 map <silent> <leader>x :split <cr>

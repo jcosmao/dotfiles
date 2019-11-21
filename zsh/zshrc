@@ -20,14 +20,12 @@ antigen apply
 
 autoload -U +X compinit && compinit
 autoload -U +X bashcompinit && bashcompinit
-
-# Auto reload completion
-zstyle ":completion:*:commands" rehash 1
-
 source ~/.zsh/plugins/zsh-bash.zsh
-
 
 # ssh-agent ~/.bash/functions
 if declare -f launch_ssh_agent &> /dev/null; then
     launch_ssh_agent
 fi
+
+# Auto reload completion
+zstyle ":completion:*:commands" rehash 1

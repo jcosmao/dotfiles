@@ -9,7 +9,7 @@ function launch_ssh_agent ()
     fi
 
     if env | grep -q SSH_AGENT_PID=; then
-        cmd=$(ps ef --no-headers -o cmd $SSH_AGENT_PID)
+        cmd=$(ps --no-headers -o cmd $SSH_AGENT_PID)
         if [[ $ssh_agent_cmd != $cmd ]]; then
             kill $SSH_AGENT_PID &> /dev/null
         fi

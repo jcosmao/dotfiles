@@ -1,5 +1,6 @@
 #!/bin/bash
 
-tmux -L $USER list-windows | awk -F: '{system("tmux -L $USER move-window -s "$1" -t 100"$1)}'
-tmux -L $USER list-windows | sort -sk2 | awk -F: '{system("tmux -L $USER move-window -s "$1" -t "(NR))}'
+user=${LC_BASTION:-$USER}
 
+tmux -L $user list-windows | awk -v user="$user" -F: '{system("tmux -L "user" move-window -s "$1" -t 100"$1)}'
+tmux -L $user list-windows | sort -sk2 | awk -v user="$user" -F: '{system("tmux -L "user" move-window -s "$1" -t "(NR))}'

@@ -28,6 +28,10 @@ setopt NO_NOMATCH
 
 autoload -U +X bashcompinit && bashcompinit
 
+# source profile
+[[ -f /etc/profile ]] && source /etc/profile
+[[ -f $HOME/.profile ]] && source $HOME/.profile
+
 # source bash aliases/completion/functions
 [[ -e ~/.bash_aliases ]] && source ~/.bash_aliases
 
