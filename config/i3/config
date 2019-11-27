@@ -231,6 +231,7 @@ bindsym $mod+q exec ~/.config/i3/scripts/i3_exit.sh
 # exec_always --no-startup-id "i3-msg 'workspace 10; append_layout ~/.config/i3/workspace_10.json'"
 # exec_always --no-startup-id "autorandr --change 2x24_and_laptop"
 # exec_always --no-startup-id "~/.config/i3/scripts/touchpad_setup.sh"
+# exec_always --no-startup-id "~/.config/i3/scripts/termite_font_size.sh"
 #
 # bindsym XF86MonBrightnessUp exec ~/bin/xbacklight --inc 500
 # bindsym XF86MonBrightnessDown exec ~/bin/xbacklight --dec 500
