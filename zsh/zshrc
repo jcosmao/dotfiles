@@ -29,3 +29,8 @@ fi
 
 # Auto reload completion
 zstyle ":completion:*:commands" rehash 1
+
+# if we SSH then autolaunch default tmux session
+if [[ -n $SSH_TTY && -z $TMUX ]]; then
+    tm default
+fi
