@@ -78,7 +78,6 @@ Plug 'vim-perl/vim-perl'
 Plug 'rodjek/vim-puppet'
 Plug 'stephpy/vim-yaml'
 Plug 'chr4/nginx.vim'
-Plug 'pearofducks/ansible-vim'
 
 call plug#end()
 
@@ -163,21 +162,19 @@ if PlugLoaded('ncm2')
 endif
 
 " Python - jedi-vim  (autocompletion disabled)
-if PlugLoaded('jedi-vim')
-    let g:jedi#auto_initialization = 1
-    let g:jedi#show_call_signatures = 0
-    let g:jedi#completions_enabled = 0
-    let g:jedi#auto_vim_configuration = 0
-    let g:jedi#smart_auto_mappings = 0
-    let g:jedi#popup_on_dot = 1
-    let g:jedi#completions_command = ""
-    let g:jedi#goto_command = "<C-]>"
-    let g:jedi#goto_stubs_command = ""
-    let g:jedi#usages_command = "]"
-    let g:jedi#documentation_command = "?"
-    let g:jedi#rename_command = "<leader>r"
-    autocmd Filetype python nmap <C-]> call jedi#goto()
-endif
+let g:jedi#auto_initialization = 1
+let g:jedi#show_call_signatures = 0
+let g:jedi#completions_enabled = 0
+let g:jedi#auto_vim_configuration = 0
+let g:jedi#smart_auto_mappings = 0
+let g:jedi#popup_on_dot = 1
+let g:jedi#completions_command = ""
+let g:jedi#goto_command = "<C-]>"
+let g:jedi#goto_stubs_command = ""
+let g:jedi#usages_command = "]"
+let g:jedi#documentation_command = "?"
+let g:jedi#rename_command = "<leader>r"
+autocmd Filetype python nmap <C-]> call jedi#goto()
 
 " gruvbox theme
 let g:gruvbox_bold = 0
@@ -236,49 +233,48 @@ let g:lightline = {
 \   }
 \}
 
-if PlugLoaded('ale')
-    " lightline-ale
-    let g:lightline#ale#indicator_checking = "\uf110 "
-    let g:lightline#ale#indicator_warnings = "\uf071  "
-    let g:lightline#ale#indicator_errors = "\uf05e  "
-    let g:lightline#ale#indicator_ok = "\uf00c "
+" lightline-ale
+let g:lightline#ale#indicator_checking = "\uf110 "
+let g:lightline#ale#indicator_warnings = "\uf071  "
+let g:lightline#ale#indicator_errors = "\uf05e  "
+let g:lightline#ale#indicator_ok = "\uf00c "
 
-    " Ale
-    let g:ale_lint_on_enter = 1
-    let g:ale_lint_on_text_changed = 'never'
-    let g:ale_echo_msg_error_str = 'Error'
-    let g:ale_echo_msg_warning_str = 'Warning'
-    let g:ale_echo_msg_format = '[%linter%] [%code%] %s [%severity%]'
-    let g:ale_linters = {
-    \   'python': ['flake8'],
-    \   'go': ['gometalinter', 'gofmt'],
-    \}
-    " Ale autofix
-    let g:ale_fix_on_save = 1
-    let g:ale_fixers = {
-    \   '*': ['remove_trailing_lines', 'trim_whitespace'],
-    \}
-endif
+" Ale
+let g:ale_lint_on_enter = 1
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_echo_msg_error_str = 'Error'
+let g:ale_echo_msg_warning_str = 'Warning'
+let g:ale_echo_msg_format = '[%linter%] [%code%] %s [%severity%]'
+let g:ale_linters = {
+\   'python': ['flake8'],
+\   'go': ['gometalinter', 'gofmt'],
+\}
+" Ale autofix
+let g:ale_fix_on_save = 1
+let g:ale_fixers = {
+\   '*': ['remove_trailing_lines', 'trim_whitespace'],
+\}
 
 " Syntastic
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+let g:syntastic_aggregate_errors = 1
+let g:syntastic_enable_highlighting = 1
+let g:syntastic_python_checkers = ['flake8']
+let g:syntastic_go_checkers = ['go', 'golint', 'gofmt']
+let g:syntastic_error_symbol = ''
+let g:syntastic_warning_symbol = ''
+let g:syntastic_style_error_symbol = ''
+let g:syntastic_style_warning_symbol = ''
+" By default, disable style checks
+let g:syntastic_quiet_messages = {
+\   "level": [],
+\   "type":  ["style"],
+\ }
+
 if PlugLoaded('syntastic')
-    let g:syntastic_always_populate_loc_list = 1
-    let g:syntastic_auto_loc_list = 1
-    let g:syntastic_check_on_open = 1
-    let g:syntastic_check_on_wq = 0
-    let g:syntastic_aggregate_errors = 1
-    let g:syntastic_enable_highlighting = 1
-    let g:syntastic_python_checkers = ['flake8']
-    let g:syntastic_go_checkers = ['go', 'golint', 'gofmt']
-    let g:syntastic_error_symbol = ''
-    let g:syntastic_warning_symbol = ''
-    let g:syntastic_style_error_symbol = ''
-    let g:syntastic_style_warning_symbol = ''
-    " By default, disable style checks
-    let g:syntastic_quiet_messages = {
-    \   "level": [],
-    \   "type":  ["style"],
-    \ }
     autocmd BufWritePre * :%s/\s\+$//e
 endif
 
