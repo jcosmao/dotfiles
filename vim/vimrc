@@ -14,7 +14,7 @@ call plug#begin('~/.vim/plug')
 
 " Update vimrc
 Plug 'mhinz/vim-startify'
-Plug 'morhetz/gruvbox'
+Plug 'gruvbox-community/gruvbox'
 Plug 'scrooloose/nerdtree'
 Plug 'itchyny/lightline.vim'
 Plug 'maximbaz/lightline-ale'
@@ -78,6 +78,7 @@ Plug 'vim-perl/vim-perl'
 Plug 'rodjek/vim-puppet'
 Plug 'stephpy/vim-yaml'
 Plug 'chr4/nginx.vim'
+Plug 'pearofducks/ansible-vim', { 'do': 'cd ~/.vim; patch -p1 -f < ./jinja.patch' }
 
 call plug#end()
 
