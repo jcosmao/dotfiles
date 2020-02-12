@@ -14,7 +14,7 @@ call plug#begin('~/.vim/plug')
 
 " Update vimrc
 Plug 'mhinz/vim-startify'
-Plug 'gruvbox-community/gruvbox'
+Plug 'gruvbox-material/vim', {'as': 'gruvbox-material'}
 Plug 'scrooloose/nerdtree'
 Plug 'itchyny/lightline.vim'
 Plug 'maximbaz/lightline-ale'
@@ -32,6 +32,9 @@ Plug 'Valloric/ListToggle'
 Plug 'roxma/vim-paste-easy'
 Plug 'roxma/vim-hug-neovim-rpc'  " compat Vim8
 Plug 'tpope/vim-sensible'
+Plug 'chrisbra/Colorizer'
+Plug 'sheerun/vim-polyglot', { 'do': 'cd ~/.vim; patch -p1 -f < ./jinja.patch' }
+Plug 'frazrepo/vim-rainbow'
 
 " git
 Plug 'mhinz/vim-signify'
@@ -69,17 +72,6 @@ endif
 Plug 'ludovicchabant/vim-gutentags'
 Plug 'majutsushi/tagbar'
 
-" other
-Plug 'vim-scripts/python_match.vim', { 'for': 'python' }
-Plug 'vim-python/python-syntax', { 'for': 'python' }
-Plug 'fatih/vim-go', { 'for': 'go' }
-Plug 'elzr/vim-json'
-Plug 'vim-perl/vim-perl'
-Plug 'rodjek/vim-puppet'
-Plug 'stephpy/vim-yaml'
-Plug 'chr4/nginx.vim'
-Plug 'pearofducks/ansible-vim', { 'do': 'cd ~/.vim; patch -p1 -f < ./jinja.patch' }
-
 call plug#end()
 
 "
@@ -99,7 +91,6 @@ set showmode                        " affiche le mode (insert ou autre)
 set laststatus=2
 set number
 set cursorline
-set t_Co=256
 set encoding=utf-8
 set fileencoding=utf-8
 set termencoding=utf-8
@@ -126,6 +117,7 @@ set noswapfile                      " swap files give annoying warning
 set clipboard^=unnamedplus          " send yank to system clipboard
 set updatetime=100
 set hidden                          " Allow modified hidden buffers
+set signcolumn=yes
 "
 " Plugins Configuration
 "
@@ -178,32 +170,62 @@ let g:jedi#rename_command = "<leader>r"
 autocmd Filetype python nmap <C-]> call jedi#goto()
 
 " gruvbox theme
-let g:gruvbox_bold = 0
-let g:gruvbox_italic = 1
-let g:gruvbox_termcolors = 256
-let g:gruvbox_contrast_dark = 'medium'
-let g:gruvbox_contrast_light = 'medium'
-let g:gruvbox_italicize_comments = 1
-let g:gruvbox_italicize_strings = 1
-let g:gruvbox_improved_strings = 0
-let g:gruvbox_improved_warnings = 1
-colorscheme gruvbox
+set termguicolors
+set background=dark
+let g:gruvbox_material_background = 'hard'
+let g:gruvbox_material_disable_italic_comment = 0
+let g:gruvbox_material_enable_bold = 1
+let g:gruvbox_material_enable_italic = 1
+let g:gruvbox_material_visual = 'grey background'
+let g:gruvbox_material_menu_selection_background = 'green'
+let g:gruvbox_material_palette = {
+    \ 'bg0':        ['#262626',   '235',  'Black'],
+    \ 'bg1':        ['#2e2d2d',   '236',  'DarkGrey'],
+    \ 'bg2':        ['#32302f',   '236',  'DarkGrey'],
+    \ 'bg3':        ['#45403d',   '237',  'DarkGrey'],
+    \ 'bg4':        ['#45403d',   '237',  'DarkGrey'],
+    \ 'bg5':        ['#5a524c',   '239',  'DarkGrey'],
+    \ 'bg_grey0':   ['#7c6f64',   '243',  'DarkGrey'],
+    \ 'bg_grey1':   ['#a89984',   '246',  'LightGrey'],
+    \ 'bg_red':     ['#ea6962',   '167',  'Red'],
+    \ 'bg_green':   ['#a9b665',   '142',  'Green'],
+    \ 'bg_yellow':  ['#d8a657',   '214',  'Yellow'],
+    \ 'bg_green1':  ['#34381b',   '22',   'DarkGreen'],
+    \ 'bg_green2':  ['#3b4439',   '22',   'DarkGreen'],
+    \ 'bg_red1':    ['#402120',   '52',   'DarkRed'],
+    \ 'bg_red2':    ['#4c3432',   '52',   'DarkRed'],
+    \ 'bg_blue1':   ['#0e363e',   '17',   'DarkBlue'],
+    \ 'bg_blue2':   ['#374141',   '17',   'DarkBlue'],
+    \ 'fg0':        ['#ebdbb2',   '223',  'White'],
+    \ 'fg1':        ['#ebdbb2',   '223',  'White'],
+    \ 'red':        ['#ea6962',   '167',  'Red'],
+    \ 'orange':     ['#e78a4e',   '208',  'DarkYellow'],
+    \ 'yellow':     ['#d8a657',   '214',  'Yellow'],
+    \ 'green':      ['#a9b665',   '142',  'Green'],
+    \ 'aqua':       ['#89b482',   '108',  'Cyan'],
+    \ 'blue':       ['#7daea3',   '109',  'Blue'],
+    \ 'purple':     ['#d3869b',   '175',  'Magenta'],
+    \ 'grey':       ['#928374',   '245',  'LightGrey'],
+    \ 'none':       ['NONE',      'NONE', 'NONE']
+    \ }
+
+colorscheme gruvbox-material
 
 " override colorscheme config
-hi WildMenu     ctermbg=208 ctermfg=16
-hi Search       ctermfg=red ctermbg=black   cterm=bold,underline
-hi CursorLine   ctermbg=233 term=bold       cterm=bold
-hi DiffAdd      ctermbg=235 ctermfg=108     cterm=reverse
-hi DiffChange   ctermbg=235 ctermfg=103     cterm=reverse
-hi DiffDelete   ctermbg=235 ctermfg=131     cterm=reverse
-hi DiffText     ctermbg=235 ctermfg=208     cterm=reverse
-hi Directory    ctermfg=12
-hi NERDTreeOpenable ctermfg=88
-hi NERDTreeClosable ctermfg=9
+hi WildMenu         ctermbg=208 ctermfg=16
+hi Search           ctermfg=red ctermbg=black   cterm=bold,underline    guifg=#E95E1B   guibg=black     gui=bold,underline
+hi CursorLine       ctermbg=233 term=bold       cterm=bold              guibg=#121212   gui=bold
+hi DiffAdd          ctermbg=235 ctermfg=108     cterm=reverse           guibg=#262626   guifg=#87AF87   gui=reverse
+hi DiffChange       ctermbg=235 ctermfg=103     cterm=reverse           guibg=#262626   guifg=#8787AF   gui=reverse
+hi DiffDelete       ctermbg=235 ctermfg=131     cterm=reverse           guibg=#262626   guifg=#AF5F5F   gui=reverse
+hi DiffText         ctermbg=235 ctermfg=208     cterm=reverse           guibg=#262626   guifg=#FF8700   gui=reverse
+hi Directory        ctermfg=12  guifg=#83A598
+hi NERDTreeOpenable ctermfg=88  guifg=#870000
+hi NERDTreeClosable ctermfg=9   guifg=#FB4934
 
 " lightline
 let g:lightline = {
-\   'colorscheme': 'wombat',
+\   'colorscheme': 'gruvbox_material',
 \   'active': {
 \       'left': [
 \           [ 'mode', 'paste' ],
@@ -460,6 +482,10 @@ let g:tagbar_compact = 1
 let g:tagbar_autoshowtag = 1
 let g:tagbar_previewwin_pos = "aboveleft"
 let g:tagbar_autopreview = 0
+
+" vim-rainbow
+let g:rainbow_active = 1
+
 
 "
 " Commands mapping
