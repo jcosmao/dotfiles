@@ -75,7 +75,10 @@ function install_vim ()
     ln -sf ~/.vim/vimrc ~/.vimrc
     mkdir -p ~/.config
     ln -sf ~/.vim ~/.config/nvim
-    echo "  - vim exec :PlugInstall"
+    echo "
+    - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
+    - Install fd: https://github.com/sharkdp/fd/releases/latest
+    - vim exec :PlugInstall"
 }
 
 function install_tmux ()
