@@ -18,17 +18,24 @@ if __name__ == "__main__":
     json_str = output.decode('utf8')
     ifaces = json.loads(json_str)
 
-    first = None
-    for iface in ifaces:
-        if iface['ifname'].startswith('e'):
-            first = iface
+    ethernet = list(filter(lambda x: x['ifname'].startswith('e'),
+                           ifaces))
 
-    if not first:
+    ethernet_up = list(filter(lambda x: x['operstate'] == 'UP',
+                              ethernet))
+
+    if not ethernet:
         sys.exit(0)
 
+    eth = None
+    if not ethernet_up:
+        eth = ethernet.pop()
+    else:
+        eth = ethernet_up.pop()
+
     print(label)
     print(label)
-    if first['operstate'] == 'DOWN':
+    if eth['operstate'] == 'DOWN':
         print(color_down)
     else:
         print(color_up)
