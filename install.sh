@@ -105,6 +105,7 @@ function install_git ()
     rm -rf ~/.git
     cp -r git ~/.git
     ln -sf ~/.git/gitconfig ~/.gitconfig
+    ln -sf ~/.git/gitignore ~/.gitignore
     [[ -z $git_username ]] && read -p 'git username : ' git_username
     [[ -z $git_mail ]] && read -p 'git mail : ' git_mail
     [[ -n $git_username ]] && sed -i "s/USERNAME/$git_username/g" ~/.git/gitconfig
