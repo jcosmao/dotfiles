@@ -12,7 +12,40 @@
 
 call plug#begin('~/.vim/plug')
 
-" Update vimrc
+" completion / linter
+if has('python3') && v:version > 704
+    Plug 'roxma/nvim-yarp'
+    Plug 'ncm2/ncm2'
+    Plug 'ncm2/ncm2-jedi', { 'for': 'python' }
+    Plug 'ncm2/ncm2-go', { 'for': 'go' }
+    Plug 'ncm2/ncm2-path'
+    Plug 'ncm2/ncm2-ultisnips'
+    Plug 'ncm2/ncm2-bufword'
+    Plug 'ncm2/ncm2-tagprefix'
+    " python completion
+    Plug 'davidhalter/jedi-vim', { 'for': 'python' }
+    Plug 'jcosmao/jedi-vim-pyversion', { 'for': 'python' }
+    " Go
+    Plug 'fatih/vim-go', { 'for': 'go' }
+    " snippets
+    Plug 'SirVer/ultisnips'
+    Plug 'honza/vim-snippets'
+    " lint
+    Plug 'w0rp/ale'
+else
+    " basic vim completion / lint
+    Plug 'vim-scripts/VimCompletesMe'
+    Plug 'vim-syntastic/syntastic'
+endif
+
+if has('nvim-0.4')
+    Plug 'ncm2/float-preview.nvim'
+endif
+
+" ctags / cscope
+Plug 'ludovicchabant/vim-gutentags'
+Plug 'majutsushi/tagbar'
+
 Plug 'mhinz/vim-startify'
 Plug 'gruvbox-material/vim', {'as': 'gruvbox-material'}
 Plug 'scrooloose/nerdtree'
@@ -33,45 +66,14 @@ Plug 'roxma/vim-paste-easy'
 Plug 'roxma/vim-hug-neovim-rpc'  " compat Vim8
 Plug 'tpope/vim-sensible'
 Plug 'chrisbra/Colorizer'
-Plug 'sheerun/vim-polyglot', { 'do': 'cd ~/.vim; patch -p1 -f < ./jinja.patch' }
 Plug 'frazrepo/vim-rainbow'
 Plug 'airblade/vim-rooter'
+Plug 'sheerun/vim-polyglot', { 'do': 'cd ~/.vim; patch -p1 -f < ./jinja.patch' }
 
 " git
 Plug 'mhinz/vim-signify'
 Plug 'tpope/vim-fugitive'
 
-" completion / linter
-if has('python3') && v:version > 704
-    Plug 'roxma/nvim-yarp'
-    Plug 'ncm2/ncm2'
-    Plug 'ncm2/ncm2-jedi', { 'for': 'python' }
-    Plug 'ncm2/ncm2-go', { 'for': 'go' }
-    Plug 'ncm2/ncm2-path'
-    Plug 'ncm2/ncm2-ultisnips'
-    Plug 'ncm2/ncm2-bufword'
-    Plug 'ncm2/ncm2-tagprefix'
-    " python completion
-    Plug 'davidhalter/jedi-vim', { 'for': 'python' }
-    Plug 'jcosmao/jedi-vim-pyversion', { 'for': 'python' }
-    " snippets
-    Plug 'SirVer/ultisnips'
-    Plug 'honza/vim-snippets'
-    " lint
-    Plug 'w0rp/ale'
-else
-    " basic vim completion / lint
-    Plug 'vim-scripts/VimCompletesMe'
-    Plug 'vim-syntastic/syntastic'
-endif
-
-if has('nvim-0.4')
-    Plug 'ncm2/float-preview.nvim'
-endif
-
-" ctags / cscope
-Plug 'ludovicchabant/vim-gutentags'
-Plug 'majutsushi/tagbar'
 
 call plug#end()
 
@@ -133,8 +135,7 @@ set signcolumn=yes
 function! PlugLoaded(name)
     return (
         \ has_key(g:plugs, a:name) &&
-        \ isdirectory(g:plugs[a:name].dir) &&
-        \ stridx(&rtp, g:plugs[a:name].dir) >= 0)
+        \ isdirectory(g:plugs[a:name].dir))
 endfunction
 
 " Autocompletion - NCM2
@@ -179,36 +180,38 @@ let g:gruvbox_material_enable_bold = 1
 let g:gruvbox_material_enable_italic = 1
 let g:gruvbox_material_visual = 'grey background'
 let g:gruvbox_material_menu_selection_background = 'green'
-let g:gruvbox_material_palette = {
-    \ 'bg0':        ['#262626',   '235',  'Black'],
-    \ 'bg1':        ['#2e2d2d',   '236',  'DarkGrey'],
-    \ 'bg2':        ['#32302f',   '236',  'DarkGrey'],
-    \ 'bg3':        ['#45403d',   '237',  'DarkGrey'],
-    \ 'bg4':        ['#45403d',   '237',  'DarkGrey'],
-    \ 'bg5':        ['#5a524c',   '239',  'DarkGrey'],
-    \ 'bg_grey0':   ['#7c6f64',   '243',  'DarkGrey'],
-    \ 'bg_grey1':   ['#a89984',   '246',  'LightGrey'],
-    \ 'bg_red':     ['#ea6962',   '167',  'Red'],
-    \ 'bg_green':   ['#a9b665',   '142',  'Green'],
-    \ 'bg_yellow':  ['#d8a657',   '214',  'Yellow'],
-    \ 'bg_green1':  ['#34381b',   '22',   'DarkGreen'],
-    \ 'bg_green2':  ['#3b4439',   '22',   'DarkGreen'],
-    \ 'bg_red1':    ['#402120',   '52',   'DarkRed'],
-    \ 'bg_red2':    ['#4c3432',   '52',   'DarkRed'],
-    \ 'bg_blue1':   ['#0e363e',   '17',   'DarkBlue'],
-    \ 'bg_blue2':   ['#374141',   '17',   'DarkBlue'],
-    \ 'fg0':        ['#ebdbb2',   '223',  'White'],
-    \ 'fg1':        ['#ebdbb2',   '223',  'White'],
-    \ 'red':        ['#ea6962',   '167',  'Red'],
-    \ 'orange':     ['#e78a4e',   '208',  'DarkYellow'],
-    \ 'yellow':     ['#d8a657',   '214',  'Yellow'],
-    \ 'green':      ['#a9b665',   '142',  'Green'],
-    \ 'aqua':       ['#89b482',   '108',  'Cyan'],
-    \ 'blue':       ['#7daea3',   '109',  'Blue'],
-    \ 'purple':     ['#d3869b',   '175',  'Magenta'],
-    \ 'grey':       ['#928374',   '245',  'LightGrey'],
-    \ 'none':       ['NONE',      'NONE', 'NONE']
-    \ }
+let g:gruvbox_material_palette = 'mix'
+" 29/04/20 Does not work anymore since recent upgrade
+" let g:gruvbox_material_palette = {
+"     \ 'bg0':        ['#262626',   '235',  'Black'],
+"     \ 'bg1':        ['#2e2d2d',   '236',  'DarkGrey'],
+"     \ 'bg2':        ['#32302f',   '236',  'DarkGrey'],
+"     \ 'bg3':        ['#45403d',   '237',  'DarkGrey'],
+"     \ 'bg4':        ['#45403d',   '237',  'DarkGrey'],
+"     \ 'bg5':        ['#5a524c',   '239',  'DarkGrey'],
+"     \ 'bg_grey0':   ['#7c6f64',   '243',  'DarkGrey'],
+"     \ 'bg_grey1':   ['#a89984',   '246',  'LightGrey'],
+"     \ 'bg_red':     ['#ea6962',   '167',  'Red'],
+"     \ 'bg_green':   ['#a9b665',   '142',  'Green'],
+"     \ 'bg_yellow':  ['#d8a657',   '214',  'Yellow'],
+"     \ 'bg_green1':  ['#34381b',   '22',   'DarkGreen'],
+"     \ 'bg_green2':  ['#3b4439',   '22',   'DarkGreen'],
+"     \ 'bg_red1':    ['#402120',   '52',   'DarkRed'],
+"     \ 'bg_red2':    ['#4c3432',   '52',   'DarkRed'],
+"     \ 'bg_blue1':   ['#0e363e',   '17',   'DarkBlue'],
+"     \ 'bg_blue2':   ['#374141',   '17',   'DarkBlue'],
+"     \ 'fg0':        ['#ebdbb2',   '223',  'White'],
+"     \ 'fg1':        ['#ebdbb2',   '223',  'White'],
+"     \ 'red':        ['#ea6962',   '167',  'Red'],
+"     \ 'orange':     ['#e78a4e',   '208',  'DarkYellow'],
+"     \ 'yellow':     ['#d8a657',   '214',  'Yellow'],
+"     \ 'green':      ['#a9b665',   '142',  'Green'],
+"     \ 'aqua':       ['#89b482',   '108',  'Cyan'],
+"     \ 'blue':       ['#7daea3',   '109',  'Blue'],
+"     \ 'purple':     ['#d3869b',   '175',  'Magenta'],
+"     \ 'grey':       ['#928374',   '245',  'LightGrey'],
+"     \ 'none':       ['NONE',      'NONE', 'NONE']
+"     \ }
 
 colorscheme gruvbox-material
 
@@ -345,10 +348,11 @@ let g:indentLine_enabled = 1
 let g:indentLine_char = '▏'
 
 " vim-go
-
+let g:go_debug = ['shell-commands']
 let g:go_fmt_command = "goimports"  "Auto :GoImports
 let g:go_autodetect_gopath = 1
 let g:go_list_type = "quickfix"
+let g:go_def_mapping_enabled = 0
 
 let g:go_highlight_types = 1
 let g:go_highlight_fields = 1
@@ -358,6 +362,8 @@ let g:go_highlight_extra_types = 1
 let g:go_highlight_methods = 1
 let g:go_highlight_generate_tags = 1
 
+" guru, godef, gopls
+let g:go_def_mode = 'gopls'
 autocmd Filetype go nmap <C-]> <Plug>(go-def)
 
 " Fzf

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -xe
+
 SCRIPT=$(readlink -f $0)
 SCRIPTPATH=$(dirname $SCRIPT)
 cd $SCRIPTPATH
@@ -67,7 +69,38 @@ function install_neovim ()
     echo "  - Need to manually install python-neovim / python3-neovim (pip|distrib..)"
 }
 
-function install_vim ()
+function install_vim_requirement ()
+{
+    echo "- Install vim requirements"
+
+    which apt-get 2>&1 > /dev/null
+    if [[ $? -ne 0 ]]; then
+        echo "Not on Ubuntu/Debian. need to install manually deps"
+        echo "
+        - pip3 install nvim
+        - ripgrep
+        - fd"
+        return
+    fi
+
+    # python neovim
+    which pip3 2>&1 > /dev/null || apt-get install -y python3-pip
+    python3 -m pip install --user --upgrade pip
+    python3 -m pip install --user setuptools
+    python3 -m pip install --user pynvim
+
+    # - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
+    version=$(basename $(curl -si https://github.com/BurntSushi/ripgrep/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
+    wget "https://github.com/BurntSushi/ripgrep/releases/download/$version/ripgrep_${version}_amd64.deb" -O /tmp/ripgrep.deb
+    sudo dpkg -i /tmp/ripgrep.deb
+
+    # - Install fd: https://github.com/sharkdp/fd/releases/latest
+    version=$(basename $(curl -si https://github.com/sharkdp/fd/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
+    wget "https://github.com/sharkdp/fd/releases/download/${version}/fd_${version:1}_amd64.deb" -O /tmp/fd.deb
+    sudo dpkg -i /tmp/ripgrep.deb
+}
+
+function install_vim_config ()
 {
     echo "- Install vim/neovim"
     rm -rf ~/.vim ~/.config/nvim
@@ -75,10 +108,7 @@ function install_vim ()
     ln -sf ~/.vim/vimrc ~/.vimrc
     mkdir -p ~/.config
     ln -sf ~/.vim ~/.config/nvim
-    echo "
-    - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
-    - Install fd: https://github.com/sharkdp/fd/releases/latest
-    - vim exec :PlugInstall"
+    echo "- vim +PlugInstall"
 }
 
 function install_tmux ()
@@ -184,16 +214,17 @@ function main ()
         arg="$1"; shift
         case "$arg" in
             --update) update_repo ;;
-            --vim)    install_vim ;;
-            --neovim) release='stable';
+            --vim)    release='stable';
                       [[ $1 == 'nightly' ]] && release='nightly' && shift;
-                      install_neovim $release;;
-            --term)   install_bash;
+                      install_neovim $release;
+                      install_vim_requirement;
+                      install_vim_config ;;
+            --cli)    install_bash;
                       install_zsh;
                       install_tmux;
-                      install_git;
+                      install_git;;
+            --config) install_config;
                       install_terminal ;;
-            --config) install_config;;
             --help)   print_help ;;
             * ) [[ $arg =~ \-+.* ]] && print_help "$arg unknown"
         esac
