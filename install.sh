@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -xe
+set -x
 
 SCRIPT=$(readlink -f $0)
 SCRIPTPATH=$(dirname $SCRIPT)
@@ -77,7 +77,7 @@ function install_vim_requirement ()
     if [[ $? -ne 0 ]]; then
         echo "Not on Ubuntu/Debian. need to install manually deps"
         echo "
-        - pip3 install nvim
+        - pip3 install pynvim jedi
         - ripgrep
         - fd"
         return
@@ -88,6 +88,7 @@ function install_vim_requirement ()
     python3 -m pip install --user --upgrade pip
     python3 -m pip install --user setuptools
     python3 -m pip install --user pynvim
+    python3 -m pip install --user jedi
 
     # - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
     version=$(basename $(curl -si https://github.com/BurntSushi/ripgrep/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
