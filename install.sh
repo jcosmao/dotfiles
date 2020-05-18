@@ -64,7 +64,8 @@ function install_neovim ()
         rm -rf .nvim
         /tmp/nvim.appimage --appimage-extract
         mv squashfs-root .nvim
-        ln -sf ~/bin/.nvim/usr/bin/nvim ~/bin/nvim
+        ln  ~/bin/.nvim/usr/bin/nvim ~/bin/nvim
+        [[ $(id -u) -eq 0 ]] && ln -sf ~/bin/.nvim/usr/bin/nvim /usr/local/bin/vim
     ) &> /dev/null
     echo "  - Need to manually install python-neovim / python3-neovim (pip|distrib..)"
 }
@@ -99,6 +100,8 @@ function install_vim_requirement ()
     version=$(basename $(curl -si https://github.com/sharkdp/fd/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
     wget "https://github.com/sharkdp/fd/releases/download/${version}/fd_${version:1}_amd64.deb" -O /tmp/fd.deb
     sudo dpkg -i /tmp/ripgrep.deb
+
+    sudo apt-get install -y exuberant-ctags cscope
 }
 
 function install_vim_config ()
