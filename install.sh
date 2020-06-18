@@ -8,18 +8,6 @@ cd $SCRIPTPATH
 
 mkdir -p ~/bin
 
-function update_repo ()
-{
-    echo "- Update dotfiles repo"
-    git fetch
-    git ls-files --others --exclude-standard | xargs rm -rf
-    git clean -xfd
-    git submodule foreach --recursive git clean -xfd
-    git reset --hard
-    git submodule foreach --recursive git reset --hard
-    git submodule update --init --recursive
-}
-
 function install_bash ()
 {
     echo "- Install bash files"
@@ -64,10 +52,9 @@ function install_neovim ()
         rm -rf .nvim
         /tmp/nvim.appimage --appimage-extract
         mv squashfs-root .nvim
-        ln  ~/bin/.nvim/usr/bin/nvim ~/bin/nvim
-        [[ $(id -u) -eq 0 ]] && ln -sf ~/bin/.nvim/usr/bin/nvim /usr/local/bin/vim
+        ln -s ~/bin/.nvim/usr/bin/nvim ~/bin/nvim
+        ln -sf ~/bin/.nvim/usr/bin/nvim /usr/local/bin/vim
     ) &> /dev/null
-    echo "  - Need to manually install python-neovim / python3-neovim (pip|distrib..)"
 }
 
 function install_vim_requirement ()
@@ -85,6 +72,7 @@ function install_vim_requirement ()
     fi
 
     # python neovim
+    apt-get install -y curl wget
     which pip3 2>&1 > /dev/null || apt-get install -y python3-pip
     python3 -m pip install --user --upgrade pip
     python3 -m pip install --user setuptools
@@ -196,7 +184,7 @@ function install_config () {
 function print_help ()
 {
     echo "
-    $0 [--update|--term|--vim|--neovim|--config]
+    $0 [--vim|--cli|--config|--help]
 
     # Require:
      - bash: python-yaml, python-json, jq
@@ -217,7 +205,6 @@ function main ()
     while [[ $# -ne 0 ]]; do
         arg="$1"; shift
         case "$arg" in
-            --update) update_repo ;;
             --vim)    release='stable';
                       [[ $1 == 'nightly' ]] && release='nightly' && shift;
                       install_neovim $release;
