@@ -61,8 +61,33 @@ function install_vim_requirement ()
 {
     echo "- Install vim requirements"
 
-    which apt-get 2>&1 > /dev/null
-    if [[ $? -ne 0 ]]; then
+    if which pacman 2>&1 > /dev/null ; then
+        sudo pacman -S --noconfirm \
+            python-pip \
+            ripgrep \
+            fd \
+            cscope \
+            ctags
+
+    elif which apt-get 2>&1 > /dev/null ; then
+        sudo apt-get install -y \
+            python3-pip \
+            curl \
+            wget \
+            exuberant-ctags \
+            cscope
+
+        # - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
+        version=$(basename $(curl -si https://github.com/BurntSushi/ripgrep/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
+        wget "https://github.com/BurntSushi/ripgrep/releases/download/$version/ripgrep_${version}_amd64.deb" -O /tmp/ripgrep.deb
+        sudo dpkg -i /tmp/ripgrep.deb
+
+        # - Install fd: https://github.com/sharkdp/fd/releases/latest
+        version=$(basename $(curl -si https://github.com/sharkdp/fd/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
+        wget "https://github.com/sharkdp/fd/releases/download/${version}/fd_${version:1}_amd64.deb" -O /tmp/fd.deb
+        sudo dpkg -i /tmp/ripgrep.deb
+
+    else
         echo "Not on Ubuntu/Debian. need to install manually deps"
         echo "
         - pip3 install pynvim jedi
@@ -72,24 +97,10 @@ function install_vim_requirement ()
     fi
 
     # python neovim
-    apt-get install -y curl wget
-    which pip3 2>&1 > /dev/null || apt-get install -y python3-pip
     python3 -m pip install --user --upgrade pip
     python3 -m pip install --user setuptools
     python3 -m pip install --user pynvim
     python3 -m pip install --user jedi
-
-    # - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
-    version=$(basename $(curl -si https://github.com/BurntSushi/ripgrep/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
-    wget "https://github.com/BurntSushi/ripgrep/releases/download/$version/ripgrep_${version}_amd64.deb" -O /tmp/ripgrep.deb
-    sudo dpkg -i /tmp/ripgrep.deb
-
-    # - Install fd: https://github.com/sharkdp/fd/releases/latest
-    version=$(basename $(curl -si https://github.com/sharkdp/fd/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
-    wget "https://github.com/sharkdp/fd/releases/download/${version}/fd_${version:1}_amd64.deb" -O /tmp/fd.deb
-    sudo dpkg -i /tmp/ripgrep.deb
-
-    sudo apt-get install -y exuberant-ctags cscope
 }
 
 function install_vim_config ()
