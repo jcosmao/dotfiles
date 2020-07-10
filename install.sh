@@ -111,7 +111,7 @@ function install_vim_config ()
     ln -sf ~/.vim/vimrc ~/.vimrc
     mkdir -p ~/.config
     ln -sf ~/.vim ~/.config/nvim
-    echo "- vim +PlugInstall"
+    $HOME/bin/nvim --headless +PlugInstall +qall 2> /dev/null
 }
 
 function install_tmux ()
