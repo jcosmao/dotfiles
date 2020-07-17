@@ -53,3 +53,12 @@ function open
 {
     nohup xdg-open $* </dev/null >/tmp/open.log 2>&1 &
 }
+
+function ssl_infos ()
+{
+    [[ -z $1 ]] && echo "need domain" && return
+
+    echo | \
+        openssl s_client -showcerts -connect $1 </dev/null | \
+        openssl x509 -text
+}
