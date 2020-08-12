@@ -3,10 +3,23 @@
 branch=$(git symbolic-ref --short HEAD 2> /dev/null)
 issue=$(echo $branch | grep -Po '^\w+-\d+')
 
+function is_openstack_repo {
+    root=$(git rev-parse --show-toplevel 2> /dev/null)
+    if [[ -f $root/.gitreview ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 if [[ -n $issue ]]; then
-    if cat $1 | grep -Pq '^Issue: \w+-\d+'; then
+    if cat $1 | grep -Pq '^(Issue|Ovh-Related-Task): \w+-\d+'; then
         exit 0
     else
-        echo -e "\nIssue: $issue" >> $1
+        if is_openstack_repo; then
+            echo -e "\nOvh-Related-Task: $issue" >> $1
+        else
+            echo -e "\nIssue: $issue" >> $1
+        fi
     fi
 fi
