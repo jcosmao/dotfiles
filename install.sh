@@ -8,8 +8,7 @@ cd $SCRIPTPATH
 
 mkdir -p ~/bin
 
-function install_bash ()
-{
+function install_bash {
     echo "- Install bash files"
     rm -rf ~/.bash
     cp -r bash ~/.bash
@@ -21,8 +20,7 @@ function install_bash ()
     mkdir -p ~/.bash_custom
 }
 
-function install_zsh ()
-{
+function install_zsh {
     _antigen_update
     echo "- Install zsh"
     rm -rf ~/.zsh
@@ -30,8 +28,7 @@ function install_zsh ()
     ln -sf ~/.zsh/zshrc ~/.zshrc
 }
 
-function _antigen_update()
-{
+function _antigen_update {
     #http://antigen.sharats.me/
     echo '- Get last antigen from git.io/antigen'
     curl -sL git.io/antigen > zsh/antigen.zsh
@@ -39,8 +36,7 @@ function _antigen_update()
     rm -rf $HOME/.antigen
 }
 
-function install_neovim ()
-{
+function install_neovim {
     release=$1
     echo "- Update neovim from $release"
     wget https://github.com/neovim/neovim/releases/download/$release/nvim.appimage -O /tmp/nvim.appimage 2>/dev/null || \
@@ -57,8 +53,7 @@ function install_neovim ()
     ) &> /dev/null
 }
 
-function install_vim_requirement ()
-{
+function install_vim_requirement {
     echo "- Install vim requirements"
 
     if which pacman 2>&1 > /dev/null ; then
@@ -85,7 +80,7 @@ function install_vim_requirement ()
         # - Install fd: https://github.com/sharkdp/fd/releases/latest
         version=$(basename $(curl -si https://github.com/sharkdp/fd/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
         wget "https://github.com/sharkdp/fd/releases/download/${version}/fd_${version:1}_amd64.deb" -O /tmp/fd.deb
-        sudo dpkg -i /tmp/ripgrep.deb
+        sudo dpkg -i /tmp/fd.deb
 
     else
         echo "Not on Ubuntu/Debian. need to install manually deps"
@@ -103,8 +98,7 @@ function install_vim_requirement ()
     python3 -m pip install --user jedi
 }
 
-function install_vim_config ()
-{
+function install_vim_config {
     echo "- Install vim/neovim"
     rm -rf ~/.vim ~/.config/nvim
     cp -r vim ~/.vim
@@ -114,8 +108,7 @@ function install_vim_config ()
     $HOME/bin/nvim --headless +PlugInstall +qall 2> /dev/null
 }
 
-function install_tmux ()
-{
+function install_tmux {
     echo "- Install tmux"
     rm -rf ~/.tmux
     cp -r tmux ~/.tmux
@@ -130,8 +123,7 @@ function install_tmux ()
     fi
 }
 
-function install_git ()
-{
+function install_git {
     echo "- Install git"
     git_username=$(git config --get user.name 2> /dev/null)
     git_mail=$(git config --get user.email 2> /dev/null)
@@ -145,8 +137,7 @@ function install_git ()
     [[ -n $git_mail ]] && sed -i "s/MAIL/$git_mail/g" ~/.git/gitconfig
 }
 
-function install_terminal ()
-{
+function install_terminal {
     echo "- Install fonts"
     font_dir="$HOME/.fonts"
     rm -rf $font_dir
@@ -184,7 +175,7 @@ function install_terminal ()
     fi
 }
 
-function install_config () {
+function install_config {
     echo '- Install .config'
     for cfg in $(ls config); do
         [[ -f config/$cfg ]] && cp -f config/$cfg $HOME/.config/
@@ -192,23 +183,21 @@ function install_config () {
     done
 }
 
-function print_help ()
-{
+function print_help {
     echo "
     $0 [--vim|--cli|--config|--help]
 
     # Require:
-     - bash: python-yaml, python-json, jq
-     - terminal: gnome-terminal, rxvt-unicode, termite
-     - i3: i3-wm i3lock xautolock dunst i3blocks rofi sysstat acpi
-     - vim: silversearcher-ag / fd (https://github.com/sharkdp/fd)
+        - bash: python-yaml, python-json, jq
+        - terminal: gnome-terminal, rxvt-unicode, termite
+        - i3: i3-wm i3lock xautolock dunst i3blocks rofi sysstat acpi
+        - vim: silversearcher-ag / fd (https://github.com/sharkdp/fd)
     "
 
     exit
 }
 
-function main ()
-{
+function main {
     echo "Install dotfiles for user $USER"
 
     [[ $# -eq 0 ]] && print_help
@@ -216,18 +205,18 @@ function main ()
     while [[ $# -ne 0 ]]; do
         arg="$1"; shift
         case "$arg" in
-            --vim)    release='stable';
-                      [[ $1 == 'nightly' ]] && release='nightly' && shift;
-                      install_neovim $release;
-                      install_vim_requirement;
-                      install_vim_config ;;
-            --cli)    install_bash;
-                      install_zsh;
-                      install_tmux;
-                      install_git;;
-            --config) install_config;
-                      install_terminal ;;
-            --help)   print_help ;;
+            --vim)      release='stable';
+                        [[ $1 == 'nightly' ]] && release='nightly' && shift;
+                        install_neovim $release;
+                        install_vim_requirement;
+                        install_vim_config ;;
+            --cli)      install_bash;
+                        install_zsh;
+                        install_tmux;
+                        install_git;;
+            --config)   install_config;
+                        install_terminal ;;
+            --help)     print_help ;;
             * ) [[ $arg =~ \-+.* ]] && print_help "$arg unknown"
         esac
     done
