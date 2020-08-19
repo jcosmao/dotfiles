@@ -22,3 +22,5 @@ alias bim=vim
 if which nvim  &> /dev/null; then
     alias vim=$(which nvim)
 fi
+
+alias pt="python -m unittest"

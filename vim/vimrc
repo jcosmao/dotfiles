@@ -25,6 +25,7 @@ if has('python3') && v:version > 704
     " python completion
     Plug 'davidhalter/jedi-vim', { 'for': 'python' }
     Plug 'jcosmao/jedi-vim-pyversion', { 'for': 'python' }
+    Plug 'numirias/semshi', {'for': 'python', 'do': ':UpdateRemotePlugins'}
     " Go
     Plug 'fatih/vim-go', { 'for': 'go' }
     " snippets
@@ -67,7 +68,8 @@ Plug 'roxma/vim-hug-neovim-rpc'  " compat Vim8
 Plug 'tpope/vim-sensible'
 Plug 'chrisbra/Colorizer'
 Plug 'frazrepo/vim-rainbow'
-Plug 'airblade/vim-rooter'
+" breaking change - does not detect root pattern with priority
+Plug 'airblade/vim-rooter', { 'commit': 'd64f3e04df9914e784508019a1a1f291cbb40bd4' }
 Plug 'sheerun/vim-polyglot', { 'do': 'cd ~/.vim; patch -p1 -f < ./jinja.patch' }
 
 " git
@@ -244,6 +246,7 @@ let g:ale_echo_msg_warning_str = 'Warning'
 let g:ale_echo_msg_format = '[%linter%] [%code%] %s [%severity%]'
 let g:ale_linters = {
 \   'python': ['flake8'],
+\   'yaml': ['yamllint'],
 \   'go': ['gometalinter', 'gofmt'],
 \}
 " Ale autofix
@@ -384,7 +387,7 @@ command! -bang -nargs=* Rg
 let g:AutoClosePreserveDotReg = 0
 
 " Vim rooter
-let g:rooter_patterns = ['.project/', '.git/']
+let g:rooter_patterns = ['.project/', '.project', '.git']
 let g:rooter_resolve_links = 1
 
 " Gutentag / ctags/cscope

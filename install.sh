@@ -96,6 +96,7 @@ function install_vim_requirement {
     python3 -m pip install --user setuptools
     python3 -m pip install --user pynvim
     python3 -m pip install --user jedi
+    python3 -m pip install --user yamllint
 }
 
 function install_vim_config {
