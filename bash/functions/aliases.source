@@ -13,8 +13,12 @@ if which go &> /dev/null; then
     export PATH="$PATH:$GOROOT/bin:$GOBIN"
 fi
 
+# fucking keyboard
+alias vi=vim
+alias vun=vim
+alias bim=vim
+
 # Use neovim by default if present in PATH
 if which nvim  &> /dev/null; then
     alias vim=$(which nvim)
-    alias vi=$(which nvim)
 fi
