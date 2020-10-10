@@ -397,7 +397,7 @@ let g:gutentags_exclude_filetypes = []
 let g:gutentags_add_default_project_roots = 0
 let g:gutentags_resolve_symlinks = 1
 let g:gutentags_modules = ['ctags', 'cscope']
-let g:gutentags_ctags_executable = '~/bin/ctags'
+let g:gutentags_ctags_executable = '~/.local/bin/ctags'
 let g:gutentags_ctags_extra_args = ['--fields=+niaSszt --extras=+q --python-kinds=-vi --tag-relative=yes']
 let g:gutentags_file_list_command = 'find . -type f -regextype posix-egrep -regex ".*\.(py|go|pl|inc|pm|sh|lib|pp)$" -not -path "*/\.*" -follow'
 let g:gutentags_enabled_user_func = 'GutentagsEnableFunc'
@@ -417,7 +417,7 @@ let g:tagbar_compact = 1
 let g:tagbar_autoshowtag = 1
 let g:tagbar_previewwin_pos = "aboveleft"
 let g:tagbar_autopreview = 0
-let g:tagbar_ctags_bin = '~/bin/ctags'
+let g:tagbar_ctags_bin = '~/.local/bin/ctags'
 
 " debug
 " let g:gutentags_trace = 1
@@ -562,10 +562,10 @@ autocmd bufEnter *
 \       map <silent> <C-\> :call Cscope_find('0', expand('<cword>')) <CR> |
 \   endif
 
-autocmd BufWinEnter *
-\   if exists("b:gutentags_files") |
-\       call tagbar#autoopen(0) |
-\   endif
+" autocmd BufWinEnter *
+" \   if exists("b:gutentags_files") |
+" \       call tagbar#autoopen(0) |
+" \   endif
 
 autocmd VimLeavePre * :execute 'TagbarClose'
 

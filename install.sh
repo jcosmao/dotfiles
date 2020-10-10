@@ -6,35 +6,9 @@ SCRIPT=$(readlink -f $0)
 SCRIPTPATH=$(dirname $SCRIPT)
 cd $SCRIPTPATH
 
-mkdir -p ~/bin
+mkdir -p ~/.config
+mkdir -p ~/.local/bin
 
-function install_bash {
-    echo "- Install bash files"
-    rm -rf ~/.bash
-    cp -r bash ~/.bash
-    ln -sf ~/.bash/bashrc ~/.bashrc
-    ln -sf ~/.bash/dir_colors ~/.dir_colors
-    ln -sf ~/.bash/agignore ~/.agignore
-    echo "source ~/.bashrc" > ~/.bash_profile
-    mkdir -p ~/bin
-    mkdir -p ~/.bash_custom
-}
-
-function install_zsh {
-    _antigen_update
-    echo "- Install zsh"
-    rm -rf ~/.zsh
-    cp -r zsh ~/.zsh
-    ln -sf ~/.zsh/zshrc ~/.zshrc
-}
-
-function _antigen_update {
-    #http://antigen.sharats.me/
-    echo '- Get last antigen from git.io/antigen'
-    curl -sL git.io/antigen > zsh/antigen.zsh
-    # cleanup old antigen install
-    rm -rf $HOME/.antigen
-}
 
 function install_neovim {
     release=$1
@@ -42,14 +16,15 @@ function install_neovim {
     wget https://github.com/neovim/neovim/releases/download/$release/nvim.appimage -O /tmp/nvim.appimage 2>/dev/null || \
         cp nvim/nvim.appimage /tmp
     chmod +x /tmp/nvim.appimage
-    echo "  - install neovim under ~/bin/nvim"
+    echo "  - install neovim under ~/.local/bin/nvim"
     (
-        cd ~/bin
+        cd ~/.local/bin
         rm -rf .nvim
         /tmp/nvim.appimage --appimage-extract
         mv squashfs-root .nvim
-        ln -s ~/bin/.nvim/usr/bin/nvim ~/bin/nvim
-        ln -sf ~/bin/.nvim/usr/bin/nvim /usr/local/bin/vim
+        ln -s ~/.local/bin/.nvim/usr/bin/nvim ~/.local/bin/nvim
+        ln -s ~/.local/bin/.nvim/usr/bin/nvim ~/.local/bin/vim
+        ln -sf ~/.local/bin/.nvim/usr/bin/nvim /usr/local/bin/vim
     ) &> /dev/null
 }
 
@@ -99,34 +74,63 @@ function install_vim_requirement {
 
 function install_vim_config {
     echo "- Install vim/neovim"
-    rm -rf ~/.vim ~/.config/nvim
-    cp -r vim ~/.vim
-    ln -sf ~/.vim/vimrc ~/.vimrc
-    mkdir -p ~/.config
-    ln -sf ~/.vim ~/.config/nvim
-    $HOME/bin/nvim --headless +PlugUpgrade +PlugInstall +PlugUpdate +qall 2> /dev/null
+    # Remove old install
+    [[ ! -L ~/.vim ]] && rm -rf ~/.vim
+
+    ln -sf $SCRIPTPATH/vim/vimrc ~/.vimrc
+    rm -rf ~/.config/nvim && ln -sf $SCRIPTPATH/vim ~/.config/nvim
+
+    $HOME/.local/bin/nvim --headless +PlugUpgrade +PlugInstall +PlugUpdate +qall 2> /dev/null
 }
 
 function install_ctags {
     echo "- Install ctags"
-    rm -rf ~/.ctags
-    cp -r ctags ~/.ctags
-    rm -rf ~/.ctags.d && ln -sf ~/.ctags/ctags.d ~/.ctags.d
-    ln -sf ~/.ctags/ctags ~/bin/ctags
+    [[ ! -L ~/.ctags ]] && rm -rf ~/.ctags
+    rm -rf ~/.ctags.d && ln -sf $SCRIPTPATH/ctags/ctags.d ~/.ctags.d
+    ln -sf $SCRIPTPATH/ctags/ctags ~/.local/bin/ctags
+}
+
+function install_shell {
+    echo "- Install bash/zsh"
+    ln -sf $SCRIPTPATH/shell ~/.shell
+
+    # bash
+    ln -sf $SCRIPTPATH/shell/bashrc ~/.bashrc
+    ln -sf $SCRIPTPATH/shell/dir_colors ~/.dir_colors
+    ln -sf $SCRIPTPATH/shell/agignore ~/.agignore
+    echo "source ~/.bashrc" > ~/.bash_profile
+    mkdir -p ~/.bash_custom
+
+    # zsh
+    _antigen_update
+    ln -sf $SCRIPTPATH/shell/zshrc ~/.zshrc
+
+    # bin
+    for bin in $(ls bin); do
+        ln -s $SCRIPTPATH/bin/$bin ~/.local/bin/$bin
+    done
+}
+
+function _antigen_update {
+    #http://antigen.sharats.me/
+    echo '- Get last antigen from git.io/antigen'
+    curl -sL git.io/antigen > zsh/antigen.zsh
+    # cleanup old antigen install
+    rm -rf $HOME/.antigen
 }
 
 function install_tmux {
     echo "- Install tmux"
-    rm -rf ~/.tmux
-    cp -r tmux ~/.tmux
-    ln -sf ~/.tmux/tmux.conf ~/.tmux.conf
-    ln -sf ~/.tmux/tm.completion.source ~/.bash/completions/tm.completion.source
-    ln -sf ~/.tmux/tm ~/bin/tm
+    [[ ! -L ~/.tmux ]] && rm -rf ~/.tmux
+    ln -sf $SCRIPTPATH/tmux/tm ~/.local/bin/tm
+    rm -f ~/.tmux && ln -sf $SCRIPTPATH/tmux ~/.tmux
 
     version=$(tmux -V | grep -Po '(\d|\.)+' 2> /dev/null)
     if [[ $version > 2.8 ]]; then
-        python ~/.tmux/tmux-migrate-options.py ~/.tmux/tmux.conf > ~/.tmux/tmux.conf.NEW
-        mv ~/.tmux/tmux.conf.NEW ~/.tmux/tmux.conf
+        rm ~/.tmux.conf
+        python tmux/tmux-migrate-options.py tmux/tmux.conf > ~/.tmux.conf
+    else
+        ln -sf $SCRIPTPATH/tmux/tmux.conf ~/.tmux.conf
     fi
 }
 
@@ -134,8 +138,7 @@ function install_git {
     echo "- Install git"
     git_username=$(git config --get user.name 2> /dev/null)
     git_mail=$(git config --get user.email 2> /dev/null)
-    rm -rf ~/.git
-    cp -r git ~/.git
+    rm -rf ~/.git && cp -r git ~/.git
     ln -sf ~/.git/gitconfig ~/.gitconfig
     ln -sf ~/.git/gitignore ~/.gitignore
     [[ -z $git_username ]] && read -p 'git username : ' git_username
@@ -147,8 +150,7 @@ function install_git {
 function install_terminal {
     echo "- Install fonts"
     font_dir="$HOME/.fonts"
-    rm -rf $font_dir
-    cp -rp terminal/fonts $font_dir
+    rm -rf $font_dir && ln -sf $SCRIPTPATH/terminal/fonts $font_dir
     if [[ -f $(which fc-cache 2>/dev/null) ]]; then
         echo "  - Resetting font cache..."
         fc-cache -f $font_dir
@@ -156,8 +158,7 @@ function install_terminal {
 
     echo "- Install icons"
     icons_dir="$HOME/.icons"
-    rm -rf $icons_dir
-    cp -rp terminal/icons $icons_dir
+    rm -rf $icons_dir && ln -sf $SCRIPTPATH/terminal/icons $icons_dir
 
     if which gnome-terminal 2>&1 > /dev/null; then
         echo "- Install gnome-terminal color scheme"
@@ -167,32 +168,28 @@ function install_terminal {
         done
     fi
 
-    if which urxvt 2>&1 > /dev/null; then
-        echo "- Configure urxvt"
-        rm -rf $HOME/.urxvt
-        cp -r terminal/urxvt $HOME/.urxvt
-        cp $HOME/.urxvt/config $HOME/.Xresources
-        xrdb -merge $HOME/.Xresources
-    fi
-
     if which termite 2>&1 > /dev/null; then
         echo "- Configure termite"
         rm -rf $HOME/.config/termite
-        cp -r terminal/termite $HOME/.config
+        ln -s $SCRIPTPATH/terminal/termite $HOME/.config/termite
     fi
 }
 
 function install_config {
     echo '- Install .config'
+    mkdir ~/.config.backup
+
     for cfg in $(ls config); do
-        [[ -f config/$cfg ]] && cp -f config/$cfg $HOME/.config/
-        [[ -d config/$cfg ]] && rm -rf $HOME/.config/$cfg && cp -rf config/$cfg $HOME/.config/
+        if [[ ! -L $HOME/.config/$cfg ]]; then
+            mv $HOME/.config/$cfg $HOME/.config.backup/$cfg.$(date '+%s')
+        fi
+        rm $HOME/.config/$cfg && ln -sf $SCRIPTPATH/config/$cfg $HOME/.config/$cfg
     done
 }
 
 function print_help {
     echo "
-    $0 [--vim|--cli|--config|--help]
+    $0 [--vim|--conf|--ux|--help]
 
     # Require:
         - bash: python-yaml, python-json, jq
@@ -218,11 +215,10 @@ function main {
                         install_vim_requirement;
                         install_vim_config;
                         install_ctags ;;
-            --cli)      install_bash;
-                        install_zsh;
+            --conf)     install_shell;
                         install_tmux;
                         install_git;;
-            --config)   install_config;
+            --ux)       install_config;
                         install_terminal ;;
             --help)     print_help ;;
             * ) [[ $arg =~ \-+.* ]] && print_help "$arg unknown"

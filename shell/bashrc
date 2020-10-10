@@ -1,0 +1,75 @@
+# If not running interactively, don't do anything
+[ -z "$PS1" ] && return
+
+# Autolaunch zsh
+#if [ -f ~/.zshrc -a -f "$(which zsh)" ]; then
+#    export SHELL="$(which zsh)"
+#    exec $(which zsh) -l
+#fi
+export SHELL=/bin/bash
+
+# source bashrc extend
+[ -f ~/.bash_aliases ] && . ~/.bash_aliases
+[ -d ~/.bash_custom ] && for source in $(find ~/.bash_custom -type f -name '*.source' ); do source $source; done
+[ -d ~/.bash ] && for source in $(find ~/.bash -type f -name '*.source' ); do source $source; done
+
+# ssh-agent ~/.bash/functions
+launch_ssh_agent 2> /dev/null
+
+# Set prompt
+PS1='# '
+PROMPT_COMMAND=prompt
+
+function prompt
+{
+    history -a
+    triangle='❯'
+    PS1=$(printf " %s %s\n ${triangle} " "$(prompt_left)" "$(prompt_add)")
+}
+
+function prompt_add ()
+{
+    add=''
+    if git branch > /dev/null 2>&1 ; then
+        add=$(set_git)
+    fi
+
+    if test -n "$VIRTUAL_ENV" ; then
+        add="$(set_virtualenv) ${add}"
+    fi
+
+    echo $add
+}
+
+function prompt_left
+{
+    PROMPT_LEFT=''
+    PROMPT_COLOR=$b_blue
+    left_color=$PROMPT_COLOR
+
+    [[ "`id -u`" -eq 0 ]] && left_color=${b_red}
+
+    if [[ -n $SSH_TTY ]]; then
+        PROMPT_LEFT="${yellow}\u${grey}@${left_color}\H${normal}"
+    else
+        PROMPT_LEFT="${left_color}\u:${normal}"
+    fi
+
+    echo "${PROMPT_LEFT} ${grey}\w${normal}"
+}
+
+function set_git
+{
+    branch=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
+    modified=$( git status --porcelain | grep -c '^ M')
+    removed=$( git status --porcelain | grep -c '^ D')
+    commit=''
+    [[ $removed -ne 0 || $modified -ne 0 ]] && commit=${yellow}$'\342\234\230'${normal}
+
+    echo "${mkbold}git(${magenta}${branch}${normal}${mkbold})${normal}${commit}"
+}
+
+function set_virtualenv
+{
+    echo "${mkbold}venv(${b_yellow}$(basename $VIRTUAL_ENV)${normal})"
+}
