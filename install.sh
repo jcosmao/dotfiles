@@ -61,15 +61,13 @@ function install_vim_requirement {
             python-pip \
             ripgrep \
             fd \
-            cscope \
-            ctags
+            cscope
 
     elif which apt-get 2>&1 > /dev/null ; then
         sudo apt-get install -y \
             python3-pip \
             curl \
             wget \
-            exuberant-ctags \
             cscope
 
         # - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
@@ -107,6 +105,14 @@ function install_vim_config {
     mkdir -p ~/.config
     ln -sf ~/.vim ~/.config/nvim
     $HOME/bin/nvim --headless +PlugUpgrade +PlugInstall +PlugUpdate +qall 2> /dev/null
+}
+
+function install_ctags {
+    echo "- Install ctags"
+    rm -rf ~/.ctags
+    cp -r ctags ~/.ctags
+    rm -rf ~/.ctags.d && ln -sf ~/.ctags/ctags.d ~/.ctags.d
+    ln -sf ~/.ctags/ctags ~/bin/ctags
 }
 
 function install_tmux {
@@ -210,7 +216,8 @@ function main {
                         [[ $1 == 'nightly' ]] && release='nightly' && shift;
                         install_neovim $release;
                         install_vim_requirement;
-                        install_vim_config ;;
+                        install_vim_config;
+                        install_ctags ;;
             --cli)      install_bash;
                         install_zsh;
                         install_tmux;
