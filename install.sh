@@ -9,6 +9,55 @@ cd $SCRIPTPATH
 mkdir -p ~/.config
 mkdir -p ~/.local/bin
 
+if [[ $(id -u) -eq 0 && $(echo $PATH | grep -c "$HOME/.local/bin") -eq 0 ]]; then
+    INSTALL_ROOT_BIN=1
+fi
+
+
+function install_vim_requirements {
+    echo "- Install vim requirements"
+
+    if which pacman 2>&1 > /dev/null ; then
+        sudo pacman -S --noconfirm \
+            python-pip
+    elif which apt-get 2>&1 > /dev/null ; then
+        sudo apt-get install -y \
+            python3-pip \
+            curl \
+            wget
+
+        if ! env | grep -q SSH_TTY; then
+            # - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
+            version=$(basename $(curl -si https://github.com/BurntSushi/ripgrep/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
+            wget "https://github.com/BurntSushi/ripgrep/releases/download/$version/ripgrep_${version}_amd64.deb" -O /tmp/ripgrep.deb
+            dpkg -x /tmp/ripgrep.deb /tmp/deb
+
+            # - Install fd: https://github.com/sharkdp/fd/releases/latest
+            version=$(basename $(curl -si https://github.com/sharkdp/fd/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
+            wget "https://github.com/sharkdp/fd/releases/download/${version}/fd_${version:1}_amd64.deb" -O /tmp/fd.deb
+            dpkg -x /tmp/fd.deb /tmp/deb
+
+            # save binary
+            cp /tmp/deb/usr/bin/* $SCRIPTPATH/bin && rm -rf /tmp/deb
+            chmod +x $SCRIPTPATH/bin/*
+        fi
+    fi
+
+    rm -rf ~/.ctags.d && ln -sf $SCRIPTPATH/ctags/ctags.d ~/.ctags.d
+
+    # install local bin
+    for bin in $(ls bin); do
+        ln -sf $SCRIPTPATH/bin/$bin ~/.local/bin/$bin
+        [[ $INSTALL_ROOT_BIN -eq 1 ]] && ln -sf $SCRIPTPATH/bin/$bin /usr/local/bin/$bin
+    done
+
+    # python neovim
+    python3 -m pip install --user --upgrade pip
+    python3 -m pip install --user setuptools
+    python3 -m pip install --user pynvim
+    python3 -m pip install --user jedi
+    python3 -m pip install --user yamllint
+}
 
 function install_neovim {
     release=$1
@@ -25,51 +74,10 @@ function install_neovim {
         ln -s ~/.local/bin/.nvim/usr/bin/nvim ~/.local/bin/nvim
         ln -s ~/.local/bin/.nvim/usr/bin/nvim ~/.local/bin/vim
         ln -sf ~/.local/bin/.nvim/usr/bin/nvim /usr/local/bin/vim
+        ln -sf ~/.local/bin/.nvim/usr/bin/nvim /usr/local/bin/vi
+        [[ $INSTALL_ROOT_BIN -eq 1 ]] && ln -sf ~/.local/bin/.nvim/usr/bin/nvim /usr/local/bin/vim && \
+                                         ln -sf /usr/local/bin/vim /usr/local/bin/vi
     ) &> /dev/null
-}
-
-function install_vim_requirement {
-    echo "- Install vim requirements"
-
-    if which pacman 2>&1 > /dev/null ; then
-        sudo pacman -S --noconfirm \
-            python-pip \
-            ripgrep \
-            fd \
-            cscope
-
-    elif which apt-get 2>&1 > /dev/null ; then
-        sudo apt-get install -y \
-            python3-pip \
-            curl \
-            wget \
-            cscope
-
-        # - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
-        version=$(basename $(curl -si https://github.com/BurntSushi/ripgrep/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
-        wget "https://github.com/BurntSushi/ripgrep/releases/download/$version/ripgrep_${version}_amd64.deb" -O /tmp/ripgrep.deb
-        sudo dpkg -i /tmp/ripgrep.deb
-
-        # - Install fd: https://github.com/sharkdp/fd/releases/latest
-        version=$(basename $(curl -si https://github.com/sharkdp/fd/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
-        wget "https://github.com/sharkdp/fd/releases/download/${version}/fd_${version:1}_amd64.deb" -O /tmp/fd.deb
-        sudo dpkg -i /tmp/fd.deb
-
-    else
-        echo "Not on Ubuntu/Debian. need to install manually deps"
-        echo "
-        - pip3 install pynvim jedi
-        - ripgrep
-        - fd"
-        return
-    fi
-
-    # python neovim
-    python3 -m pip install --user --upgrade pip
-    python3 -m pip install --user setuptools
-    python3 -m pip install --user pynvim
-    python3 -m pip install --user jedi
-    python3 -m pip install --user yamllint
 }
 
 function install_vim_config {
@@ -81,13 +89,6 @@ function install_vim_config {
     rm -rf ~/.config/nvim && ln -sf $SCRIPTPATH/vim ~/.config/nvim
 
     $HOME/.local/bin/nvim --headless +PlugUpgrade +PlugInstall +PlugUpdate +qall 2> /dev/null
-}
-
-function install_ctags {
-    echo "- Install ctags"
-    [[ ! -L ~/.ctags ]] && rm -rf ~/.ctags
-    rm -rf ~/.ctags.d && ln -sf $SCRIPTPATH/ctags/ctags.d ~/.ctags.d
-    ln -sf $SCRIPTPATH/ctags/ctags ~/.local/bin/ctags
 }
 
 function install_shell {
@@ -104,11 +105,6 @@ function install_shell {
     # zsh
     _antigen_update
     ln -sf $SCRIPTPATH/shell/zshrc ~/.zshrc
-
-    # bin
-    for bin in $(ls bin); do
-        ln -s $SCRIPTPATH/bin/$bin ~/.local/bin/$bin
-    done
 }
 
 function _antigen_update {
@@ -212,9 +208,8 @@ function main {
             --vim)      release='stable';
                         [[ $1 == 'nightly' ]] && release='nightly' && shift;
                         install_neovim $release;
-                        install_vim_requirement;
-                        install_vim_config;
-                        install_ctags ;;
+                        install_vim_requirements;
+                        install_vim_config;;
             --conf)     install_shell;
                         install_tmux;
                         install_git;;
