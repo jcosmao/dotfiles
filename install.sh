@@ -87,6 +87,8 @@ function install_vim_config {
 
     ln -sf $SCRIPTPATH/vim/vimrc ~/.vimrc
     rm -rf ~/.config/nvim && ln -sf $SCRIPTPATH/vim ~/.config/nvim
+    # vim8 compat
+    ln -sf $SCRIPTPATH/vim ~/.vim
 
     $HOME/.local/bin/nvim --headless +PlugUpgrade +PlugInstall +PlugUpdate +qall 2> /dev/null
 }
