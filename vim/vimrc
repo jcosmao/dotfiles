@@ -16,18 +16,19 @@ call plug#begin('~/.vim/plug')
 if has('python3') && v:version > 704
     Plug 'roxma/nvim-yarp'
     Plug 'ncm2/ncm2'
-    Plug 'ncm2/ncm2-jedi', { 'for': 'python' }
-    Plug 'ncm2/ncm2-go', { 'for': 'go' }
+    Plug 'ncm2/ncm2-jedi', {'for': 'python'}
+    Plug 'ncm2/ncm2-go', {'for': 'go'}
     Plug 'ncm2/ncm2-path'
     Plug 'ncm2/ncm2-ultisnips'
     Plug 'ncm2/ncm2-bufword'
     Plug 'ncm2/ncm2-tagprefix'
     " python completion
-    Plug 'davidhalter/jedi-vim', { 'for': 'python' }
-    Plug 'jcosmao/jedi-vim-pyversion', { 'for': 'python' }
+    Plug 'davidhalter/jedi-vim', {'for': 'python'}
+    Plug 'jcosmao/jedi-vim-pyversion', {'for': 'python'}
     Plug 'numirias/semshi', {'for': 'python', 'do': ':UpdateRemotePlugins'}
+    let g:polyglot_disabled = ['python']
     " Go
-    Plug 'fatih/vim-go', { 'for': 'go' }
+    Plug 'fatih/vim-go', {'for': 'go'}
     " snippets
     Plug 'SirVer/ultisnips'
     Plug 'honza/vim-snippets'
@@ -58,8 +59,8 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-eunuch'
 Plug 'junegunn/fzf.vim'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf',
-            \          'do': './install --no-update-rc --key-bindings --completion --xdg' }
+Plug 'junegunn/fzf', {'dir': '~/.fzf',
+\                     'do': './install --no-update-rc --key-bindings --completion --xdg'}
 Plug 'yuttie/comfortable-motion.vim'
 Plug 'troydm/zoomwintab.vim'
 Plug 'Valloric/ListToggle'
@@ -68,13 +69,14 @@ Plug 'roxma/vim-hug-neovim-rpc'  " compat Vim8
 Plug 'tpope/vim-sensible'
 Plug 'chrisbra/Colorizer'
 Plug 'frazrepo/vim-rainbow'
-" breaking change - does not detect root pattern with priority
-Plug 'airblade/vim-rooter', { 'commit': 'd64f3e04df9914e784508019a1a1f291cbb40bd4' }
-Plug 'sheerun/vim-polyglot', { 'do': 'cd ~/.vim; patch -p1 -f < ./jinja.patch' }
+" " breaking change - does not detect root pattern with priority
+Plug 'airblade/vim-rooter', {'commit': 'd64f3e04df9914e784508019a1a1f291cbb40bd4'}
+Plug 'sheerun/vim-polyglot', {'tag': 'v4.13.0',
+\                             'do': 'cd ~/.vim; patch -p1 -f < ./jinja.patch'}
 
-" git
+" " git
 Plug 'mhinz/vim-signify'
-Plug 'tpope/vim-fugitive'
+" Plug 'tpope/vim-fugitive'  " Disabled, semshi crash
 
 
 call plug#end()
@@ -285,31 +287,6 @@ let NERDTreeShowBookmarks = 1
 let NERDTreeWinSize = 40
 let NERDTreeIgnore = ['.git[[dir]]', '.swp', '.pyc', '__pycache__', '.egg-info[[dir]]', 'pip-wheel-metadata[[dir]]']
 
-function! PreventBuffersInNERDTree()
-  if bufname('#') =~ 'NERD_tree' && bufname('%') !~ 'NERD_tree'
-    \ && exists('t:nerdtree_winnr') && bufwinnr('%') == t:nerdtree_winnr
-    \ && &buftype == '' && !exists('g:launching_fzf')
-    let bufnum = bufnr('%')
-    close
-    exe 'b ' . bufnum
-  endif
-  if exists('g:launching_fzf') | unlet g:launching_fzf | endif
-endfunction
-
-function! NERDTreeToggle()
-    if exists("g:NERDTree") && g:NERDTree.IsOpen()
-        NERDTreeClose
-    elseif filereadable(expand('%'))
-        NERDTreeFind
-    else
-        NERDTreeCWD
-    endif
-endfunction
-
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-autocmd FileType nerdtree let t:nerdtree_winnr = bufwinnr('%')
-autocmd BufWinEnter * call PreventBuffersInNERDTree()
-
 " Ultisnip
 let g:UltiSnipsEditSplit="vertical"
 let g:UltiSnipsExpandTrigger="<c-j>"
@@ -467,6 +444,7 @@ let g:signify_update_on_focusgained = 0
 autocmd User Fugitive silent! SignifyRefresh
 autocmd User Fugitive silent! TagbarClose
 
+
 " vim-json
 let g:vim_json_syntax_conceal = 0
 
@@ -562,10 +540,41 @@ autocmd bufEnter *
 \       map <silent> <C-\> :call Cscope_find('0', expand('<cword>')) <CR> |
 \   endif
 
+function! PreventBuffersInNERDTree()
+  if bufname('#') =~ 'NERD_tree' && bufname('%') !~ 'NERD_tree'
+    \ && exists('t:nerdtree_winnr') && bufwinnr('%') == t:nerdtree_winnr
+    \ && &buftype == '' && !exists('g:launching_fzf')
+    let bufnum = bufnr('%')
+    close
+    exe 'b ' . bufnum
+  endif
+  if exists('g:launching_fzf') | unlet g:launching_fzf | endif
+endfunction
+
+function! NERDTreeToggle()
+    if exists("g:NERDTree") && g:NERDTree.IsOpen()
+        NERDTreeClose
+    elseif filereadable(expand('%'))
+        NERDTreeFind
+    else
+        NERDTreeCWD
+    endif
+endfunction
+
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+autocmd FileType nerdtree let t:nerdtree_winnr = bufwinnr('%')
+autocmd BufWinEnter * call PreventBuffersInNERDTree()
+
 " autocmd BufWinEnter *
 " \   if exists("b:gutentags_files") |
 " \       call tagbar#autoopen(0) |
 " \   endif
+
+autocmd User StartifyReady
+            \ NERDTree | wincmd w
+
+autocmd User StartifyBufferOpened
+            \ NERDTreeFind | wincmd w
 
 autocmd VimLeavePre * :execute 'TagbarClose'
 

@@ -47,9 +47,16 @@ function install_vim_requirements {
 
     # install local bin
     for bin in $(ls bin); do
-        ln -sf $SCRIPTPATH/bin/$bin ~/.local/bin/$bin
-        [[ $INSTALL_ROOT_BIN -eq 1 ]] && ln -sf $SCRIPTPATH/bin/$bin /usr/local/bin/$bin
+        # check ldd
+        if [[ $(ldd bin/$bin | grep -c 'not found') -eq 0 ]]; then
+            bin_name=$(echo $bin | cut -d. -f1)
+            ln -sf $SCRIPTPATH/bin/$bin ~/.local/bin/$bin_name
+            [[ $INSTALL_ROOT_BIN -eq 1 ]] && ln -sf $SCRIPTPATH/bin/$bin /usr/local/bin/$bin_name
+        fi
     done
+
+    # cscope
+    ldd bin/cscope.15.9-2 | grep -q 'not found'
 
     # python neovim
     python3 -m pip install --user --upgrade pip
@@ -82,13 +89,11 @@ function install_neovim {
 
 function install_vim_config {
     echo "- Install vim/neovim"
-    # Remove old install
-    [[ ! -L ~/.vim ]] && rm -rf ~/.vim
 
     ln -sf $SCRIPTPATH/vim/vimrc ~/.vimrc
     rm -rf ~/.config/nvim && ln -sf $SCRIPTPATH/vim ~/.config/nvim
     # vim8 compat
-    ln -sf $SCRIPTPATH/vim ~/.vim
+    rm -rf ~/.vim  && ln -sf $SCRIPTPATH/vim ~/.vim
 
     $HOME/.local/bin/nvim --headless +PlugUpgrade +PlugInstall +PlugUpdate +qall 2> /dev/null
 }
