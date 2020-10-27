@@ -1,0 +1,16 @@
+diff --git a/plug/blamer.nvim/autoload/blamer.vim b/plug/blamer.nvim/autoload/blamer.vim
+index 5fecda3..2643278 100644
+--- a/plug/blamer.nvim/autoload/blamer.vim
++++ b/plug/blamer.nvim/autoload/blamer.vim
+@@ -94,7 +94,9 @@ endfunction
+ 
+ function! blamer#GetMessage(file, line_number, line_count) abort
+   let l:file_path_escaped = shellescape(a:file)
+-  let l:command = 'git --no-pager blame -p -L ' . a:line_number . ',' . a:line_count . ' -- ' . l:file_path_escaped
++  let l:file_name = shellescape(expand("%:t"))
++  let l:file_path = shellescape(expand("%:h"))
++  let l:command = 'git -C ' . l:file_path . ' --no-pager blame -p -L ' . a:line_number . ',' . a:line_count . ' -- ' . l:file_name
+   let l:result = system(l:command)
+ 
+   let l:lines = split(l:result, '\n')
+

@@ -13,59 +13,6 @@ if [[ $(id -u) -eq 0 && $(echo $PATH | grep -c "$HOME/.local/bin") -eq 0 ]]; the
     INSTALL_ROOT_BIN=1
 fi
 
-
-function install_vim_requirements {
-    echo "- Install vim requirements"
-
-    if which pacman 2>&1 > /dev/null ; then
-        sudo pacman -S --noconfirm \
-            python-pip
-    elif which apt-get 2>&1 > /dev/null ; then
-        sudo apt-get install -y \
-            python3-pip \
-            curl \
-            wget
-
-        if ! env | grep -q SSH_TTY; then
-            # - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
-            version=$(basename $(curl -si https://github.com/BurntSushi/ripgrep/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
-            wget "https://github.com/BurntSushi/ripgrep/releases/download/$version/ripgrep_${version}_amd64.deb" -O /tmp/ripgrep.deb
-            dpkg -x /tmp/ripgrep.deb /tmp/deb
-
-            # - Install fd: https://github.com/sharkdp/fd/releases/latest
-            version=$(basename $(curl -si https://github.com/sharkdp/fd/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
-            wget "https://github.com/sharkdp/fd/releases/download/${version}/fd_${version:1}_amd64.deb" -O /tmp/fd.deb
-            dpkg -x /tmp/fd.deb /tmp/deb
-
-            # save binary
-            cp /tmp/deb/usr/bin/* $SCRIPTPATH/bin && rm -rf /tmp/deb
-            chmod +x $SCRIPTPATH/bin/*
-        fi
-    fi
-
-    rm -rf ~/.ctags.d && ln -sf $SCRIPTPATH/ctags/ctags.d ~/.ctags.d
-
-    # install local bin
-    for bin in $(ls bin); do
-        # check ldd
-        if [[ $(ldd bin/$bin | grep -c 'not found') -eq 0 ]]; then
-            bin_name=$(echo $bin | cut -d. -f1)
-            ln -sf $SCRIPTPATH/bin/$bin ~/.local/bin/$bin_name
-            [[ $INSTALL_ROOT_BIN -eq 1 ]] && ln -sf $SCRIPTPATH/bin/$bin /usr/local/bin/$bin_name
-        fi
-    done
-
-    # cscope
-    ldd bin/cscope.15.9-2 | grep -q 'not found'
-
-    # python neovim
-    python3 -m pip install --user --upgrade pip
-    python3 -m pip install --user setuptools
-    python3 -m pip install --user pynvim
-    python3 -m pip install --user jedi
-    python3 -m pip install --user yamllint
-}
-
 function install_neovim {
     release=$1
     echo "- Update neovim from $release"
@@ -85,6 +32,63 @@ function install_neovim {
         [[ $INSTALL_ROOT_BIN -eq 1 ]] && ln -sf ~/.local/bin/.nvim/usr/bin/nvim /usr/local/bin/vim && \
                                          ln -sf /usr/local/bin/vim /usr/local/bin/vi
     ) &> /dev/null
+
+    if which apt-get 2>&1 > /dev/null ; then
+        if ! env | grep -q SSH_TTY; then
+            # - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
+            version=$(
+                basename $(curl -si https://github.com/BurntSushi/ripgrep/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
+            wget "https://github.com/BurntSushi/ripgrep/releases/download/$version/ripgrep_${version}_amd64.deb" -O /tmp/ripgrep.deb
+            dpkg -x /tmp/ripgrep.deb /tmp/deb
+
+            # - Install fd: https://github.com/sharkdp/fd/releases/latest
+            version=$(basename $(curl -si https://github.com/sharkdp/fd/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
+            wget "https://github.com/sharkdp/fd/releases/download/${version}/fd_${version:1}_amd64.deb" -O /tmp/fd.deb
+            dpkg -x /tmp/fd.deb /tmp/deb
+
+            # save binary
+            cp /tmp/deb/usr/bin/* $SCRIPTPATH/bin && rm -rf /tmp/deb
+            chmod +x $SCRIPTPATH/bin/*
+        fi
+    fi
+}
+
+function install_vim_requirements {
+    echo "- Install vim requirements"
+
+    if [[ ! -e ~/.local/bin/nvim ]]; then
+        install_neovim 'stable'
+    fi
+
+    pip_freeze=$(python3 -m pip freeze)
+    if [[ $? -ne 0 ]]; then
+        if which pacman 2>&1 > /dev/null ; then
+            sudo pacman -S --noconfirm python-pip
+        elif which apt-get 2>&1 > /dev/null ; then
+            sudo apt-get install -y python3-pip
+        fi
+    fi
+
+    pip_require=(jedi==0.17.2 pynvim==0.4.2 yamllint==1.25.0)
+    pip_installed=$(echo "$pip_freeze" | grep -P "(^$(echo ${pip_require[@]} | sed -e 's/ /|^/g'))" | wc -l)
+
+    if [[ ${#pip_require[@]} -ne $pip_installed ]]; then
+        python3 -m pip install --user --upgrade --use-feature=2020-resolver \
+            pip setuptools \
+            ${pip_require[@]}
+    fi
+
+    rm -rf ~/.ctags.d && ln -sf $SCRIPTPATH/ctags/ctags.d ~/.ctags.d
+
+    # install local bin
+    for bin in $(ls bin); do
+        # check ldd
+        if [[ $(ldd bin/$bin | grep -c 'not found') -eq 0 ]]; then
+            bin_name=$(echo $bin | cut -d. -f1)
+            ln -sf $SCRIPTPATH/bin/$bin ~/.local/bin/$bin_name
+            [[ $INSTALL_ROOT_BIN -eq 1 ]] && ln -sf $SCRIPTPATH/bin/$bin /usr/local/bin/$bin_name
+        fi
+    done
 }
 
 function install_vim_config {
@@ -192,7 +196,7 @@ function install_config {
 
 function print_help {
     echo "
-    $0 [--vim|--conf|--ux|--help]
+    $0 [--vim|--conf|--ui|--help]
 
     # Require:
         - bash: python-yaml, python-json, jq
@@ -212,17 +216,17 @@ function main {
     while [[ $# -ne 0 ]]; do
         arg="$1"; shift
         case "$arg" in
-            --vim)      release='stable';
-                        [[ $1 == 'nightly' ]] && release='nightly' && shift;
+            --vim)  [[ $1 =~ ^(stable|nightly)$ ]] && \
+                        release=$1 && shift && \
                         install_neovim $release;
-                        install_vim_requirements;
-                        install_vim_config;;
-            --conf)     install_shell;
-                        install_tmux;
-                        install_git;;
-            --ux)       install_config;
-                        install_terminal ;;
-            --help)     print_help ;;
+                    install_vim_requirements;
+                    install_vim_config;;
+            --conf) install_shell;
+                    install_tmux;
+                    install_git;;
+            --ui)   install_config;
+                    install_terminal ;;
+            --help) print_help ;;
             * ) [[ $arg =~ \-+.* ]] && print_help "$arg unknown"
         esac
     done

@@ -40,9 +40,9 @@ else
     Plug 'vim-syntastic/syntastic'
 endif
 
-if has('nvim-0.4')
-    Plug 'ncm2/float-preview.nvim'
-endif
+" if has('nvim-0.4')
+"     Plug 'ncm2/float-preview.nvim'
+" endif
 
 " ctags / cscope
 Plug 'ludovicchabant/vim-gutentags'
@@ -72,11 +72,12 @@ Plug 'frazrepo/vim-rainbow'
 " " breaking change - does not detect root pattern with priority
 Plug 'airblade/vim-rooter', {'commit': 'd64f3e04df9914e784508019a1a1f291cbb40bd4'}
 Plug 'sheerun/vim-polyglot', {'tag': 'v4.13.0',
-\                             'do': 'cd ~/.vim; patch -p1 -f < ./jinja.patch'}
+\                             'do': 'cd ~/.vim; patch -p1 -N -r /dev/null < ./jinja.patch'}
 
 " " git
 Plug 'mhinz/vim-signify'
-" Plug 'tpope/vim-fugitive'  " Disabled, semshi crash
+Plug 'APZelos/blamer.nvim', {'do': 'cd~/.vim; patch -p1 -N -r /dev/null < ./blamer.nvim.patch'}
+Plug 'rhysd/git-messenger.vim'
 
 
 call plug#end()
@@ -170,6 +171,7 @@ let g:jedi#popup_on_dot = 1
 let g:jedi#completions_command = ""
 let g:jedi#goto_command = "<C-]>"
 let g:jedi#goto_stubs_command = ""
+let g:jedi#goto_assignments_command = ""
 let g:jedi#usages_command = "]"
 let g:jedi#documentation_command = "?"
 let g:jedi#rename_command = "<leader>r"
@@ -444,6 +446,9 @@ let g:signify_update_on_focusgained = 0
 autocmd User Fugitive silent! SignifyRefresh
 autocmd User Fugitive silent! TagbarClose
 
+let g:blamer_template = '| <commit-short> | <committer> • <committer-time> • <summary>'
+let g:blamer_date_format = '%d/%m/%y'
+let g:blamer_delay = 500
 
 " vim-json
 let g:vim_json_syntax_conceal = 0
@@ -477,7 +482,8 @@ map <silent> <F2> :set number! <cr>
 map <silent> <F3> :call NERDTreeToggle() <cr>
 map <silent> <F4> :IndentLinesToggle <cr>
 map <silent> <F5> :TagbarToggle <cr>
-map <silent> <F6> :SignifyToggle <cr>
+map <silent> <F7> :SignifyToggle <cr>
+map <silent> <F8> :BlamerToggle <cr>
 map <silent> <F11> :2,$s/^\s*pick/fixup/g <cr>
 map <silent> <F12> :call ToggleMouse() <cr>
 map <silent> <leader>a :execute 'Rg' expand('<cword>') <cr>
@@ -488,9 +494,9 @@ map <silent> <leader>d :Lines <cr>
 map <silent> <leader>D :BLines <cr>
 map <silent> <leader>t :Tags <cr>
 map <silent> <leader>T :BTags <cr>
-map <silent> <leader>c :Commits <cr>
-map <silent> <leader>C :BCommits <cr>
+map <silent> <leader>c :BCommits <cr>
 map <silent> <leader>h :History <cr>
+map <silent> <leader>g :GitMessenger <cr>
 map <silent> <C-a> ^
 map <silent> <C-e> $
 map <silent> <C-Right> e
