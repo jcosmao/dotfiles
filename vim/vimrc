@@ -72,11 +72,11 @@ Plug 'frazrepo/vim-rainbow'
 " " breaking change - does not detect root pattern with priority
 Plug 'airblade/vim-rooter', {'commit': 'd64f3e04df9914e784508019a1a1f291cbb40bd4'}
 Plug 'sheerun/vim-polyglot', {'tag': 'v4.13.0',
-\                             'do': 'cd ~/.vim; patch -p1 -N -r /dev/null < ./jinja.patch'}
+\                             'do': 'cd ~/.vim; patch -p1 -stNr /dev/null < ./jinja.patch; true'}
 
 " " git
 Plug 'mhinz/vim-signify'
-Plug 'APZelos/blamer.nvim', {'do': 'cd~/.vim; patch -p1 -N -r /dev/null < ./blamer.nvim.patch'}
+Plug 'APZelos/blamer.nvim', {'do': 'cd ~/.vim; patch -p1 -stNr /dev/null < ./blamer.nvim.patch; true'}
 Plug 'rhysd/git-messenger.vim'
 
 

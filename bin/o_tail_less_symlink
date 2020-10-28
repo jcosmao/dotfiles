@@ -1,0 +1,18 @@
+#!/bin/bash
+
+if [[ $(basename $0) == 'o_tail_less_symlink' ]]; then
+    echo "This script need to be called from otail / oless symlink"
+    exit 1
+fi
+
+file=$1
+if [[ -z $file ]]; then
+    echo "$0 <file> <openstack_log_colorizer options>"
+    exit 1
+else
+    shift
+fi
+options=$*
+
+[[ $(basename $0) == 'otail' ]] && tail -F $file | ~/.local/bin/openstack_log_colorizer $options
+[[ $(basename $0) == 'oless' ]] && cat $file | ~/.local/bin/openstack_log_colorizer $options | less -R
