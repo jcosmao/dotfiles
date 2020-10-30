@@ -11,7 +11,7 @@ export SHELL=/bin/bash
 # source bashrc extend
 [ -f ~/.bash_aliases ] && . ~/.bash_aliases
 [ -d ~/.bash_custom ] && for source in $(find ~/.bash_custom -type f -name '*.source' ); do source $source; done
-[ -d ~/.bash ] && for source in $(find ~/.bash -type f -name '*.source' ); do source $source; done
+[ -e ~/.shell ] && for source in $(find ~/.shell/ -type f -name '*.source' ); do source $source; done
 
 # ssh-agent ~/.bash/functions
 launch_ssh_agent 2> /dev/null
