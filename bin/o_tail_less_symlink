@@ -5,14 +5,20 @@ if [[ $(basename $0) == 'o_tail_less_symlink' ]]; then
     exit 1
 fi
 
-file=$1
-if [[ -z $file ]]; then
-    echo "$0 <file> <openstack_log_colorizer options>"
+files=$*
+if [[ -z $files ]]; then
+    echo "$0 <file(s)> <openstack_log_colorizer options>"
     exit 1
 else
-    shift
+    for f in $files; do
+        if [[ -f $f ]]; then
+            os_file="$os_file $f"
+            shift
+        fi
+    done
 fi
+
 options=$*
 
-[[ $(basename $0) == 'otail' ]] && tail -F $file | ~/.local/bin/openstack_log_colorizer $options
-[[ $(basename $0) == 'oless' ]] && cat $file | ~/.local/bin/openstack_log_colorizer $options | less -R
+[[ $(basename $0) == 'otail' ]] && tail -F $os_file | ~/.local/bin/openstack_log_colorizer $options
+[[ $(basename $0) == 'oless' ]] && cat $os_file | ~/.local/bin/openstack_log_colorizer $options | less -R
