@@ -203,6 +203,10 @@ hi Directory        ctermfg=12  guifg=#83A598
 hi NERDTreeOpenable ctermfg=88  guifg=#870000
 hi NERDTreeClosable ctermfg=9   guifg=#FB4934
 
+let s:palette = g:lightline#colorscheme#gruvbox_material#palette
+let s:palette.tabline.tabsel = [ [ '#282828', '#98971a', 238, 10, 'bold' ] ]
+unlet s:palette
+
 " lightline
 let g:lightline = {
 \   'colorscheme': 'gruvbox_material',
@@ -233,6 +237,10 @@ let g:lightline = {
 \       'linter_warnings': 'warning',
 \       'linter_errors': 'error',
 \       'linter_ok': 'left',
+\   },
+\   'tab': {
+\       'active': [ 'tabnum', 'filename', 'modified' ],
+\       'inactive': [ 'tabnum', 'filename', 'modified' ]
 \   }
 \}
 
