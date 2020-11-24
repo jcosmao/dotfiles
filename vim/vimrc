@@ -61,6 +61,7 @@ Plug 'tpope/vim-eunuch'
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', {'dir': '~/.fzf',
 \                     'do': './install --no-update-rc --key-bindings --completion --xdg; cd  ~/.vim/plug/fzf.vim; patch -p1 -stNr /dev/null < ~/.vim/fzf.vim.patch; true'}
+Plug 'chengzeyi/fzf-preview.vim'
 Plug 'yuttie/comfortable-motion.vim'
 Plug 'troydm/zoomwintab.vim'
 Plug 'Valloric/ListToggle'
@@ -327,48 +328,8 @@ let g:go_def_mode = 'gopls'
 autocmd Filetype go nmap <C-]> <Plug>(go-def)
 
 " Fzf
-" This is the default extra key bindings
-let g:fzf_action = {
-\   'ctrl-t': 'tab split',
-\   'ctrl-x': 'split',
-\   'ctrl-v': 'vsplit'
-\ }
-
-let g:fzf_layout = { 'down': '~40%' }
-
-let g:fzf_colors =
-\ { 'fg':      ['fg', 'Normal'],
-  \ 'bg':      ['bg', 'Normal'],
-  \ 'hl':      ['fg', 'Comment'],
-  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-  \ 'hl+':     ['fg', 'Statement'],
-  \ 'info':    ['fg', 'PreProc'],
-  \ 'prompt':  ['fg', 'Conditional'],
-  \ 'pointer': ['fg', 'Exception'],
-  \ 'marker':  ['fg', 'Keyword'],
-  \ 'spinner': ['fg', 'Label'],
-  \ 'header':  ['fg', 'Comment'] }
-
-" Enable per-command history.
-" CTRL-N and CTRL-P will be automatically bound to next-history and
-" previous-history instead of down and up. If you don't like the change,
-" explicitly bind the keys to down and up in your $FZF_DEFAULT_OPTS.
-let g:fzf_history_dir = '~/.local/share/fzf-history'
-
-" map FZF :Ag  to silversearcher-ag
-command! -bang -nargs=* Ag
-  \ call fzf#vim#ag(
-  \   <q-args>, '-i -U --nogroup --column --color --color-path="0;38;5;202" --color-line-number="0" --color-match="1;33" -p ~/.agignore -f',
-  \   <bang>0)
-
-" ripgrep https://github.com/BurntSushi/ripgrep
-command! -bang -nargs=* Rg
-  \ call fzf#vim#grep(
-  \   'rg --column --line-number --no-heading --color=always --smart-case --ignore-file ~/.agignore '.shellescape(<q-args>), 1,
-  \   <bang>0 ? fzf#vim#with_preview('up:60%')
-  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
-  \   <bang>0)
+let g:fzf_layout = { 'down': '~60%' }
+let g:fzf_preview_window = ['right:hidden', '?']
 
 " Autoclose
 let g:AutoClosePreserveDotReg = 0
@@ -548,10 +509,17 @@ map <silent> <leader>\ :execute 'tselect' expand('<cword>')<cr>
 autocmd FileType puppet nnoremap <C-]> :execute 'tag' trim(expand('<cword>'), '^::')<CR>
 autocmd FileType puppet nnoremap <leader>] :execute 'tag' trim(expand('<cword>'), '^::')<CR>
 
+command! -bang -nargs=* FZFCscope
+\   call fzf#vim#grep(
+\       "cscope -d -L -f " . b:gutentags_files['cscope'] . " -0 " . shellescape(<q-args>) . " | sed -e 's,^" . getcwd() . "/,,' | cut -d' ' -f1,3,4- | while read file line code; do printf \"\033[35m${file}\033[0m:${line}:1: $code\n\"; done",
+\       0,
+\       fzf_preview#p(<bang>0, {'options': '--delimiter : --nth 3..'}),
+\       <bang>0)
+
 autocmd bufEnter *
 \   if exists("b:gutentags_files") |
 \       set csto=0 |
-\       map <silent> <C-\> :call Cscope_find('0', expand('<cword>')) <CR> |
+\       map <silent> <C-\> :execute 'FZFCscope' expand('<cword>') <CR> |
 \   endif
 
 function! PreventBuffersInNERDTree()
