@@ -18,10 +18,15 @@ if has('python3') && v:version > 704
     Plug 'ncm2/ncm2'
     Plug 'ncm2/ncm2-jedi', {'for': 'python'}
     Plug 'ncm2/ncm2-go', {'for': 'go'}
+    Plug 'ncm2/ncm2-pyclang', {'for': ['c','cpp']}
     Plug 'ncm2/ncm2-path'
-    Plug 'ncm2/ncm2-ultisnips'
+    Plug 'ncm2/ncm2-ultisnips' | Plug 'SirVer/ultisnips'
     Plug 'ncm2/ncm2-bufword'
     Plug 'ncm2/ncm2-tagprefix'
+    Plug 'ncm2/ncm2-syntax' | Plug 'Shougo/neco-syntax'
+    Plug 'ncm2/ncm2-neoinclude' | Plug 'Shougo/neoinclude.vim'
+    Plug 'filipekiss/ncm2-look.vim'
+
     " python completion
     Plug 'davidhalter/jedi-vim', {'for': 'python'}
     Plug 'jcosmao/jedi-vim-pyversion', {'for': 'python'}
@@ -30,7 +35,6 @@ if has('python3') && v:version > 704
     " Go
     Plug 'fatih/vim-go', {'for': 'go'}
     " snippets
-    Plug 'SirVer/ultisnips'
     Plug 'honza/vim-snippets'
     " lint
     Plug 'w0rp/ale'
@@ -40,9 +44,6 @@ else
     Plug 'vim-syntastic/syntastic'
 endif
 
-" if has('nvim-0.4')
-"     Plug 'ncm2/float-preview.nvim'
-" endif
 
 " ctags / cscope
 Plug 'ludovicchabant/vim-gutentags'
@@ -66,7 +67,6 @@ Plug 'yuttie/comfortable-motion.vim'
 Plug 'troydm/zoomwintab.vim'
 Plug 'Valloric/ListToggle'
 Plug 'roxma/vim-paste-easy'
-Plug 'roxma/vim-hug-neovim-rpc'  " compat Vim8
 Plug 'tpope/vim-sensible'
 Plug 'chrisbra/Colorizer'
 Plug 'frazrepo/vim-rainbow', {'for': ['python', 'go', 'cpp', 'perl', 'puppet']}
@@ -149,18 +149,23 @@ if PlugLoaded('ncm2')
     autocmd BufEnter * call ncm2#enable_for_buffer()
     set completeopt=menuone,noselect,noinsert
     set shortmess+=c
-    set pumheight=10
-    " CTRL-C doesn't trigger the InsertLeave autocmd . map to <ESC> instead.
-    inoremap <c-c> <ESC>
-    inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
-    inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-    inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-    inoremap <silent> <expr> <CR> ncm2_ultisnips#expand_or("\<CR>", 'n')
-    inoremap <C-space> <C-r>=ncm2#force_trigger()<cr>
+    set pumheight=20
+
+    " inoremap <expr> <Esc> pumvisible() ? "\<C-e>" : "\<Esc>"
+    inoremap <expr> <C-c> pumvisible() ? "\<C-e>" : "\<C-c>"
+    inoremap <expr> <Tab> pumvisible() ? "\<Down>" : "\<Tab>"
+    inoremap <expr> <S-Tab> pumvisible() ? "\<Up>" : "\<S-Tab>"
+    inoremap <expr> <M-Down> pumvisible() ? "\<PageDown>" : "\<M-Down>"
+    inoremap <expr> <M-Up> pumvisible() ? "\<PageUp>" : "\<M-Up>"
+    inoremap <silent> <expr> <CR> (pumvisible() ? ncm2_ultisnips#expand_or("", 'n') : "\<CR>")
+
     let ncm2#popup_delay = 5
     let ncm2#complete_length = [[1, 1]]
     let g:ncm2#matcher = 'substrfuzzy'
+    let g:ncm2_look_enabled = 1
 endif
+
+
 
 " Python - jedi-vim  (autocompletion disabled)
 let g:jedi#auto_initialization = 1
@@ -370,6 +375,7 @@ let g:tagbar_ctags_bin = '~/.local/bin/ctags'
 " let g:gutentags_debug = 1
 
 " Startify
+let g:startify_change_to_dir = 0
 let g:startify_fortune_use_unicode = 1
 let g:startify_session_dir = '~/.cache/vim/session'
 let g:startify_session_persistence = 1
@@ -498,81 +504,6 @@ for i in range(1, 9)
     execute "map <leader>" . i . " " . i . "gt"
 endfor
 map <leader>0 :tablast <cr>
-
-" Tag mapping ctags/cscope
-"
-command! -bang -nargs=* Tags
-  \ call fzf#vim#tags(<q-args>, {
-  \      'options': '
-  \         -1 -0 +i
-  \         --exact
-  \         --with-nth 1,3
-  \         --delimiter "\t"
-  \         --nth 1
-  \         --height=60%
-  \         --preview-window="right:60%"
-  \         --bind ?:toggle-preview,page-up:preview-up,page-down:preview-down
-  \         --preview ''~/.vim/plugin/fzf.preview.sh {2} $(echo {5} | cut -d ":" -f 2)'''
-  \ }, <bang>0)
-
-function! GoToDef(tag)
-    let l:tag = a:tag
-
-    if &filetype == 'python'
-        let r = execute(":call jedi#goto()")
-        if r !~# "jedi-vim: Couldn't find any definitions"
-            return
-        endif
-    endif
-
-    if &filetype == 'puppet'
-        " For puppet filetype, ctags are not generated with ^::
-        let l:tag = trim(expand(a:tag), '^::')
-    endif
-
-    if !exists("b:gutentags_files")
-        echohl WarningMsg
-        echo 'GoToDef(): Gutentags disabled'
-        echohl None
-        return
-    endif
-
-    let tlist = taglist('^'.l:tag.'$')
-
-    if len(tlist) == 0
-        echohl WarningMsg
-        echo 'GoToDef(): Tag not found'
-        echohl None
-        return 1
-    elseif len(tlist) == 1
-        execute 'tag' l:tag
-    else
-        execute 'Tags' '^'.l:tag.'$'
-    endif
-
-endfunction
-
-" map <silent> <leader>] :execute 'tag' expand('<cword>')<CR>
-map <silent> <C-]> :call GoToDef(expand('<cword>'))<cr>
-map <silent> <leader>] :call GoToDef(expand('<cword>'))<cr>
-map <silent> <leader>\ :execute 'tselect' expand('<cword>')<cr>
-
-autocmd Filetype go nmap <C-]> <Plug>(go-def)
-" autocmd FileType puppet nnoremap <C-]> call GoToDef(trim(expand('<cword>'), '^::'))
-" autocmd FileType puppet nnoremap <leader>] :execute 'tag' trim(expand('<cword>'), '^::')<CR>
-
-command! -bang -nargs=* FZFCscope
-\   call fzf#vim#grep(
-\       "cscope -d -L -f " . b:gutentags_files['cscope'] . " -0 " . shellescape(<q-args>) . " | sed -e 's,^" . getcwd() . "/,,' | cut -d' ' -f1,3,4- | while read file line code; do printf \"\033[35m${file}\033[0m:${line}:1: $code\n\"; done",
-\       0,
-\       fzf_preview#p(<bang>0, {'options': '--delimiter : --nth 3..'}),
-\       <bang>0)
-
-autocmd bufEnter *
-\   if exists("b:gutentags_files") |
-\       set csto=0 |
-\       map <silent> <C-\> :execute 'FZFCscope' expand('<cword>') <CR> |
-\   endif
 
 function! PreventBuffersInNERDTree()
   if bufname('#') =~ 'NERD_tree' && bufname('%') !~ 'NERD_tree'
