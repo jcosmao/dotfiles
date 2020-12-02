@@ -351,15 +351,15 @@ let g:gutentags_modules = ['ctags', 'cscope']
 let g:gutentags_ctags_executable = '~/.local/bin/ctags'
 let g:gutentags_ctags_extra_args = ['--fields=+niaSszt --python-kinds=-vi --tag-relative=yes']
 let g:gutentags_file_list_command = 'find . -type f -regextype posix-egrep -regex ".*\.(py|go|pl|inc|pm|sh|lib|pp)$" -not -path "*/\.*" -follow'
-let g:gutentags_enabled_user_func = 'GutentagsEnableFunc'
 let g:gutentags_scopefile = '.cscope.gutentags'
 let g:gutentags_ctags_tagfile = '.ctags.gutentags'
+" let g:gutentags_enabled_user_func = 'GutentagsEnableFunc'
 
-function! GutentagsEnableFunc(path)
-    let file_ext = fnamemodify(a:path, ':e')
-    let allowed_file_ext = ['py', 'go', 'pl', 'inc', 'pm', 'sh', 'lib', 'pp']
-    if (index(allowed_file_ext, file_ext) >= 0) | return 1 | else | return 0 | endif
-endfunction
+" function! GutentagsEnableFunc(path)
+"     let file_ext = fnamemodify(a:path, ':e')
+"     let allowed_file_ext = ['py', 'go', 'pl', 'inc', 'pm', 'sh', 'lib', 'pp']
+"     if (index(allowed_file_ext, file_ext) >= 0) | return 1 | else | return 0 | endif
+" endfunction
 
 " tagbar
 let g:tagbar_map_showproto = '\'
