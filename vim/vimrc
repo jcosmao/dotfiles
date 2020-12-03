@@ -192,6 +192,7 @@ let g:gruvbox_material_visual = 'grey background'
 let g:gruvbox_material_menu_selection_background = 'green'
 " available: material / mix / original
 let g:gruvbox_material_palette = 'mix'
+" available: soft / medium / hard
 let g:gruvbox_material_background = 'soft'
 
 colorscheme gruvbox-material
@@ -465,7 +466,7 @@ map <silent> <leader>f :Files <cr>
 map <silent> <leader>b :Buffers <cr>
 map <silent> <leader>d :Lines <cr>
 map <silent> <leader>D :BLines <cr>
-map <silent> <leader>t :Tags <cr>
+map <silent> <leader>t :FZFCtags <cr>
 map <silent> <leader>T :BTags <cr>
 map <silent> <leader>c :BCommits <cr>
 map <silent> <leader>h :History <cr>
