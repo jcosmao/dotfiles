@@ -68,7 +68,7 @@ Plug 'Valloric/ListToggle'
 Plug 'roxma/vim-paste-easy'
 Plug 'tpope/vim-sensible'
 Plug 'chrisbra/Colorizer'
-Plug 'frazrepo/vim-rainbow', {'for': ['python', 'go', 'cpp', 'perl', 'puppet']}
+Plug 'junegunn/rainbow_parentheses.vim'
 " " breaking change - does not detect root pattern with priority
 Plug 'airblade/vim-rooter', {'commit': 'd64f3e04df9914e784508019a1a1f291cbb40bd4'}
 Plug 'sheerun/vim-polyglot', {'tag': 'v4.13.0',
