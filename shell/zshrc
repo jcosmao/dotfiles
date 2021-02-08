@@ -1,6 +1,8 @@
 # Load Antigen
 source ~/.shell/antigen.zsh
 
+export SHELL='zsh'
+
 # Load various lib files
 antigen use oh-my-zsh
 
