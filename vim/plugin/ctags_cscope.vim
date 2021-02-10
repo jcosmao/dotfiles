@@ -78,6 +78,11 @@ function! GoToDef(tag)
         let l:tag = trim(expand(a:tag), '^::')
     endif
 
+    " For perl, keep only sub name (package_name::function)
+    if &filetype == 'perl' && a:tag !~# '^\(package\|use\)'
+        let l:tag = substitute(expand(a:tag), '.*::\(.*\)', '\1', 'g')
+    endif
+
     if !exists("b:gutentags_files")
         echohl WarningMsg
         echo 'GoToDef(): Gutentags disabled'
