@@ -62,8 +62,9 @@ command! -bang -nargs=* FZFCtags
   \         --preview "bat --color always --highlight-line {5} {2}"'
   \ }))
 
-function! GoToDef(tag)
+function! GoToDef(tag, ctx_line)
     let l:tag = a:tag
+    let l:ctx_line = a:ctx_line
 
     if &filetype == 'python'
         let r = execute(":call jedi#goto()")
@@ -73,16 +74,6 @@ function! GoToDef(tag)
         endif
     endif
 
-    if &filetype == 'puppet'
-        " For puppet filetype, ctags are not generated with ^::
-        let l:tag = trim(expand(a:tag), '^::')
-    endif
-
-    " For perl, keep only sub name (package_name::function)
-    if &filetype == 'perl' && a:tag !~# '^\(package\|use\)'
-        let l:tag = substitute(expand(a:tag), '.*::\(.*\)', '\1', 'g')
-    endif
-
     if !exists("b:gutentags_files")
         echohl WarningMsg
         echo 'GoToDef(): Gutentags disabled'
@@ -90,11 +81,24 @@ function! GoToDef(tag)
         return
     endif
 
+    if &filetype == 'puppet'
+        " For puppet filetype, ctags are not generated with ^::
+        let l:tag = trim(expand(a:tag), '^::')
+    endif
+
+    " Get matching tag list from ctags
     let tlist = taglist('^'.l:tag.'$')
+
+    " For perl, keep only sub name (package_name::function)  a:ctx_line !~# '\(require\|package\|use\)'
+    if &filetype == 'perl' && len(tlist) == 0
+        let l:tag = substitute(expand(a:tag), '.*::\(.*\)', '\1', 'g')
+        " Update taglist
+        let tlist = taglist('^'.l:tag.'$')
+    endif
 
     if len(tlist) == 0
         echohl WarningMsg
-        echo 'GoToDef(): Tag not found'
+        echo 'GoToDef(): Tag ^'.l:tag.'$ not found'
         echohl None
         return 1
     elseif len(tlist) == 1
@@ -110,7 +114,7 @@ endfunction
 " Tag mapping ctags/cscope
 
 " map <silent> <leader>] :execute 'tag' expand('<cword>')<CR>
-map <silent> <C-]> :call GoToDef(expand('<cword>'))<cr>
+map <silent> <C-]> :call GoToDef(expand('<cword>'), getline('.'))<cr>
 map <silent> <leader>] :execute 'FZFCtags' '^'.expand('<cword>').'$'<cr>
 map <silent> <leader>\ :execute 'tselect' expand('<cword>')<cr>
 
