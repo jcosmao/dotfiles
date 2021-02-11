@@ -60,7 +60,7 @@ function install_vim_requirements {
         install_neovim 'stable'
     fi
 
-    pip_freeze=$(python3 -m pip freeze)
+    pip_freeze=$(python3 -m pip freeze --user)
     if [[ $? -ne 0 ]]; then
         if which pacman 2>&1 > /dev/null ; then
             sudo pacman -S --noconfirm python-pip
@@ -73,7 +73,7 @@ function install_vim_requirements {
     pip_installed=$(echo "$pip_freeze" | grep -P "(^$(echo ${pip_require[@]} | sed -e 's/ /|^/g'))" | wc -l)
 
     if [[ ${#pip_require[@]} -ne $pip_installed ]]; then
-        python3 -m pip install --user --upgrade --use-feature=2020-resolver \
+        python3 -m pip install --user --upgrade  \
             pip setuptools \
             ${pip_require[@]}
     fi
