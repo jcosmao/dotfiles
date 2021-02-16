@@ -1,0 +1,8 @@
+# https://github.com/pyenv/pyenv-installer
+
+export PYENV_ROOT="$HOME/.pyenv"
+[[ ! -f $PYENV_ROOT/bin/pyenv ]] && return
+
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
