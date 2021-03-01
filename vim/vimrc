@@ -124,7 +124,7 @@ set noswapfile                      " swap files give annoying warning
 set clipboard^=unnamedplus          " send yank to system clipboard
 set updatetime=100
 set hidden                          " Allow modified hidden buffers
-set signcolumn=yes
+set signcolumn=auto
 "
 " Plugins Configuration
 "
