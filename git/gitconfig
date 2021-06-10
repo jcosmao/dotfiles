@@ -41,7 +41,7 @@
 
 [push]
     default = current
-    followTags = true
+    followTags = false
 
 [merge]
 	# Include summaries of merged commits in newly created merge commit messages
