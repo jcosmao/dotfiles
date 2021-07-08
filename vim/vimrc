@@ -46,7 +46,7 @@ endif
 
 " ctags / cscope
 Plug 'ludovicchabant/vim-gutentags'
-Plug 'majutsushi/tagbar'
+Plug 'preservim/tagbar'
 
 Plug 'mhinz/vim-startify'
 Plug 'gruvbox-material/vim', {'as': 'gruvbox-material'}
@@ -168,6 +168,17 @@ hi DiffText         ctermbg=235 ctermfg=208     cterm=reverse           guibg=#2
 hi Directory        ctermfg=12  guifg=#83A598
 hi NERDTreeOpenable ctermfg=88  guifg=#870000
 hi NERDTreeClosable ctermfg=9   guifg=#FB4934
+
+" override semshi colorscheme
+hi semshiParameter  ctermfg=109 guifg=#83a598
+hi semshiImported   ctermfg=210 guifg=#ff9741
+hi semshiGlobal     ctermfg=214 guifg=#ffc649
+
+" override tagbar colorscheme
+hi default TagbarAccessPublic    guifg=Green     ctermfg=Green
+hi default TagbarAccessProtected guifg=White     ctermfg=White
+hi default TagbarAccessPrivate   guifg=Red       ctermfg=Red
+
 
 let s:palette = g:lightline#colorscheme#gruvbox_material#palette
 let s:palette.tabline.tabsel = [ [ '#282828', '#98971a', 238, 10, 'bold' ] ]
@@ -394,8 +405,19 @@ let g:startify_lists = [
 \ { 'type': 'bookmarks', 'header': ['   Bookmarks']      },
 \ ]
 
-" python-syntax
-let g:python_highlight_all = 1
+" python-syntax || semshi
+if PlugLoaded('semshi')
+    let g:python_highlight_all = 0
+    autocmd BufWritePost python call BugResetSemshi()
+else
+    let g:python_highlight_all = 1
+endif
+
+function! BugResetSemshi()
+    Semshi disable
+    Semshi enable
+endfunction
+
 
 " Comfortable motion
 let g:comfortable_motion_no_default_key_mappings = 1
