@@ -41,7 +41,7 @@ gaps inner 5
 gaps outer 5
 
 # start a terminal
-bindsym $mod+Return exec termite
+bindsym $mod+Return exec /home/jcosmao/bin/termite
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -52,8 +52,8 @@ bindsym $mod+F4      kill
 # There also is the (new) i3-dmenu-desktop which only displays applications
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 # installed.
-# bindsym $mod+r exec --no-startup-id i3-dmenu-desktop
-bindsym $mod+r exec --no-startup-id dmenu_recency
+bindsym $mod+r exec --no-startup-id i3-dmenu-desktop
+# bindsym $mod+r exec --no-startup-id dmenu_recency
 
 # change focus
 bindsym $win+Left focus left
@@ -187,51 +187,66 @@ client.urgent #373b41 #cc6666 #ffffff #cc6666
 for_window [class="KeePass2"] floating enable
 for_window [class="KeePass2"] resize set 1024 768
 
-exec_always --no-startup-id "setxkbmap -layout us -variant altgr-intl"
+exec_always --no-startup-id "/usr/bin/setxkbmap -layout us -variant altgr-intl"
 exec_always --no-startup-id "/usr/bin/feh --randomize --bg-scale ~/Wallpapers/*"
 exec --no-startup-id "/usr/bin/dunst"
-exec --no-startup-id "/usr/bin/enpass"
+#exec --no-startup-id "/usr/bin/enpass"
 exec --no-startup-id "/usr/bin/nm-applet"
+exec --no-startup-id "/usr/bin/xfce4-power-manager"
 # exec --no-startup-id "/usr/bin/signal-desktop --start-in-tray"
-exec --no-startup-id "redshift -l 48.00:-4.00 -m randr -t 5700:4500 -g 0.9:0.9:0.9"
+exec_always --no-startup-id "pkill redshift; redshift -l 48.00:-4.00 -m randr -t 4500:3800 -g 0.9:0.9:0.9"
+exec_always --no-startup-id "~/.config/i3/scripts/touchpad_setup.sh"
+# exec_always --no-startup-id "~/.config/i3/scripts/termite_font_size.sh"
+
+# Disable screen auto off/lock
+# exec_always --no-startup-id "gsettings set org.gnome.desktop.session idle-delay 0"
+# exec_always --no-startup-id "gsettings set org.gnome.desktop.lockdown disable-lock-screen true"
+
 
 # fn keys
 bindsym XF86AudioLowerVolume exec amixer -D pulse sset Master 2%- && pkill -SIGRTMIN+10 i3blocks
 bindsym XF86AudioRaiseVolume exec amixer -D pulse sset Master 2%+ && pkill -SIGRTMIN+10 i3blocks
 bindsym XF86AudioMute exec amixer -D pulse sset Master toggle && pkill -SIGRTMIN+10 i3blocks
-bindsym XF86MonBrightnessUp exec /usr/bin/xbacklight -inc 5
-bindsym XF86MonBrightnessDown exec /usr/bin/xbacklight -dec 5
 bindsym $win+P exec ~/.config/i3/scripts/hdmi_setup --toggle
 bindsym $win+Tab exec ~/.config/i3/scripts/hdmi_setup --switch_mode
-
 # pip3 install spotify-cli-linux --user
 bindsym XF86AudioStop exec notify-send "$(~/.local/bin/spotifycli --status)" && pkill -SIGRTMIN+11 i3blocks
 bindsym XF86AudioPlay exec ~/.local/bin/spotifycli --playpause && pkill -SIGRTMIN+11 i3blocks
 bindsym XF86AudioNext exec ~/.local/bin/spotifycli --next && pkill -SIGRTMIN+11 i3blocks
 bindsym XF86AudioPrev exec ~/.local/bin/spotifycli --prev && pkill -SIGRTMIN+11 i3blocks
-
+bindsym XF86MonBrightnessUp exec ~/bin/xbacklight --inc 500
+bindsym XF86MonBrightnessDown exec ~/bin/xbacklight --dec 500
 bindsym Ctrl+Shift+l exec --no-startup-id ~/.config/i3/scripts/i3lock_blur.sh
 bindsym $mod+q exec ~/.config/i3/scripts/i3_exit.sh
 
-
 # taf
+exec_always --no-startup-id "autorandr --change 2x24_and_laptop"
 # bind monitor / workspace
-# workspace 1 output DP-1-1
-# workspace 2 output DP-1-2
-# workspace 3 output DP-1-2
-# workspace 4 output DP-1-2
-# workspace 5 output DP-1-2
-# workspace 6 output DP-1-2
-# workspace 7 output DP-1-2
-# workspace 8 output DP-1-2
-# workspace 9 output DP-1-2
-# workspace 10 output eDP-1
-#
-# exec_always --no-startup-id "i3-msg 'workspace 1; append_layout ~/.config/i3/workspace_1.json'"
-# exec_always --no-startup-id "i3-msg 'workspace 10; append_layout ~/.config/i3/workspace_10.json'"
-# exec_always --no-startup-id "autorandr --change 2x24_and_laptop"
-# exec_always --no-startup-id "~/.config/i3/scripts/touchpad_setup.sh"
-# exec_always --no-startup-id "~/.config/i3/scripts/termite_font_size.sh"
-#
-# bindsym XF86MonBrightnessUp exec ~/bin/xbacklight --inc 500
-# bindsym XF86MonBrightnessDown exec ~/bin/xbacklight --dec 500
+workspace 1 output DP-1-1
+workspace 2 output DP-1-2
+workspace 3 output DP-1-2
+workspace 4 output DP-1-2
+workspace 5 output DP-1-2
+workspace 6 output DP-1-2
+workspace 7 output DP-1-2
+workspace 8 output DP-1-2
+workspace 9 output DP-1-2
+workspace 10 output eDP-1
+
+# Home office
+#exec_always --no-startup-id "autorandr --force home_office"
+
+#workspace 1 output DP-1-3
+#workspace 2 output HDMI-1
+#workspace 3 output HDMI-1
+#workspace 4 output HDMI-1
+#workspace 5 output HDMI-1
+#workspace 6 output HDMI-1
+#workspace 7 output HDMI-1
+#workspace 8 output HDMI-1
+#workspace 9 output HDMI-1
+#workspace 10 output eDP-1
+
+
+exec_always --no-startup-id "i3-msg 'workspace 1; append_layout ~/.config/i3/workspace_1.json'"
+exec_always --no-startup-id "i3-msg 'workspace 10; append_layout ~/.config/i3/workspace_10.json'"

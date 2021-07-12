@@ -11,14 +11,6 @@
     },
     "name": "poezio",
     "percent": 1,
-    "swallows": [
-       {
-       // "class": "^Gnome\\-terminal$",
-       // "instance": "^gnome\\-terminal\\-server$",
-       // "title": "^poezio$",
-       // "transient_for": "^$",
-       // "window_role": "^gnome\\-terminal\\-window\\-75b19b9b\\-eee5\\-42c2\\-83d7\\-d6dd0b75fd28$"
-       }
-    ],
+    "swallows": [],
     "type": "con"
 }
