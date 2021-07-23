@@ -18,15 +18,15 @@ function s:sink_cscope(line)
 endfunction
 
 let s:current_file = expand('%s')
-if s:current_file =~# '/tests/unit/'
-  let s:filter = "'/test/unit/ "
+if s:current_file =~# '/tests/'
+  let s:filter = "'/tests/ "
 else
-  let s:filter = "!/tests/unit/ "
+  let s:filter = "!/tests/ "
 endif
 
 command! -bang -nargs=* FZFCscope
   \ call fzf#run(fzf#wrap({
-  \     'source': 'cscope -d -L -f '.b:gutentags_files['cscope'].' -0 '. shellescape(<q-args>).' | sed -e "s,^'.getcwd().'/,," | grep -Pv "(class|def) '.<q-args>.'"',
+  \     'source': 'cscope -d -L -f '.b:gutentags_files['cscope'].' -0 '. shellescape(<q-args>).' | sed -e "s,^'.getcwd().'/,," | grep -Pv "\d+\s\s*\#" | grep -Pv "(class|def) '.<q-args>.'"',
   \     'sink*': function('s:sink_cscope'),
   \     'options': '
   \         --query '.s:filter.'
