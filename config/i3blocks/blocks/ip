@@ -13,13 +13,25 @@ color_down = '#676767'
 
 
 def _get_first_ifname(ifaces, iface_type=iface_type):
+
+    iface_up = None
+    iface_first = None
+
     for iface in ifaces:
-        if iface['operstate'] != 'UP':
-            continue
-        if iface_type == 'ethernet' and iface['ifname'].startswith('e'):
-            return iface
-        elif iface_type == 'wireless' and iface['ifname'].startswith('wl'):
-            return iface
+        if iface_type == 'ethernet' and \
+                iface['ifname'].startswith('e'):
+            iface_first = iface if not iface_first else None
+            iface_up = iface if iface['operstate'] == 'UP' else None
+
+        elif iface_type == 'wireless' and \
+                iface['ifname'].startswith('wl'):
+            iface_first = iface if not iface_first else None
+            iface_up = iface if iface['operstate'] == 'UP' else None
+
+    if iface_up:
+        return iface_up
+    else:
+        return iface_first
 
 
 if __name__ == "__main__":
