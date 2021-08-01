@@ -1,7 +1,7 @@
 # vim: ft=dosini cms=#%s
 
 [options]
-font             = Fira Mono Regular 10
+font             = Fira Mono Regular 9
 scrollback_lines = -1
 clickable_url    = false
 browser          = firefox

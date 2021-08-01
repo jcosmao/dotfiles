@@ -143,8 +143,8 @@ function install_tmux {
 
 function install_git {
     echo "- Install git"
-    git_username=$(git config --get user.name 2> /dev/null)
-    git_mail=$(git config --get user.email 2> /dev/null)
+    git_username=$(git config --get user.name 2> /dev/null || echo $GIT_USER)
+    git_mail=$(git config --get user.email 2> /dev/null || echo $GIT_MAIL)
     rm -rf ~/.git && cp -r git ~/.git
     ln -sf ~/.git/gitconfig ~/.gitconfig
     ln -sf ~/.git/gitignore ~/.gitignore
@@ -152,6 +152,8 @@ function install_git {
     [[ -z $git_mail ]] && read -p 'git mail : ' git_mail
     [[ -n $git_username ]] && sed -i "s/USERNAME/$git_username/g" ~/.git/gitconfig
     [[ -n $git_mail ]] && sed -i "s/MAIL/$git_mail/g" ~/.git/gitconfig
+    # Do not duplicate --signoff - config file ?
+    git config --global trailer.sign.ifexists replace
 }
 
 function install_terminal {
@@ -190,8 +192,11 @@ function install_config {
         if [[ ! -L $HOME/.config/$cfg ]]; then
             mv $HOME/.config/$cfg $HOME/.config.backup/$cfg.$(date '+%s')
         fi
-        rm $HOME/.config/$cfg && ln -sf $SCRIPTPATH/config/$cfg $HOME/.config/$cfg
+        rm -f $HOME/.config/$cfg && ln -sf $SCRIPTPATH/config/$cfg $HOME/.config/$cfg
     done
+
+    # build i3 config
+    $HOME/.config/i3/i3_build_conf.sh
 }
 
 function print_help {

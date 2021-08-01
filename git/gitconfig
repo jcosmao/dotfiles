@@ -65,9 +65,7 @@
     lol = log --graph --decorate --pretty=oneline --abbrev-commit
     ls = ls-files
     trackshow = !git rev-parse --abbrev-ref --symbolic-full-name @{u}
-    tr = !git trackshow
     trackset = !git branch -u origin/$(git symbolic-ref --short HEAD)
-    ts = !git trackset
     # Show the diff between the latest commit and the current state
     d = !"git diff-index --quiet HEAD -- || clear; git --no-pager diff --patch-with-stat"
     st = status --short
@@ -76,12 +74,9 @@
     cm = commit --signoff
     ca = commit --signoff -a --amend --reuse-message=HEAD
     pushorigin = !git push --set-upstream origin $(git symbolic-ref --short HEAD)
-    po = !git pushorigin
     pushdev = !git push --set-upstream origin $(git symbolic-ref --short HEAD):dev/USERNAME/$(git symbolic-ref --short HEAD)
-    pd = !git pushdev
     pf = push --force
     pick = cherry-pick -s -x --allow-empty
-    cp = !git pick
     retag = "!r() { git tag -d $1 && git push origin :refs/tags/$1 && git tag $1; }; r"
     # Remove branches that have already been merged with master
     dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"

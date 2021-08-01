@@ -28,7 +28,13 @@ if has('python3') && v:version > 704
 
     " python completion
     Plug 'davidhalter/jedi-vim', {'for': 'python'}
+
+    " create .python{version} at the root project dir to force jedi to use
+    " this python version (useful to jump module from python path when there
+    " is both python2/3 in system)
     Plug 'jcosmao/jedi-vim-pyversion', {'for': 'python'}
+
+    " python syntax hilight
     Plug 'numirias/semshi', {'for': 'python', 'do': ':UpdateRemotePlugins'}
     let g:polyglot_disabled = ['python']
     " Go
@@ -95,9 +101,11 @@ set background=dark
 set magic
 set ruler                           " affiche la position du curseur en bas droite
 set showmode                        " affiche le mode (insert ou autre)
+set showcmd                         " Show current command.
 set laststatus=2
 set number
 set cursorline
+set signcolumn=auto
 set encoding=utf-8
 set fileencoding=utf-8
 set termencoding=utf-8
@@ -124,7 +132,10 @@ set noswapfile                      " swap files give annoying warning
 set clipboard^=unnamedplus          " send yank to system clipboard
 set updatetime=100
 set hidden                          " Allow modified hidden buffers
-set signcolumn=auto
+set nofoldenable                    " Folding makes things unreadable.
+set noautochdir
+
+
 "
 " Plugins Configuration
 "
@@ -345,22 +356,33 @@ let g:go_def_mode = 'gopls'
 let g:fzf_layout = { 'down': '~60%' }
 let g:fzf_preview_window = ['right:hidden', '?']
 
+" Added --no-ignore
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep('rg --no-ignore --column --no-heading --line-number --color=always '.shellescape(<q-args>),
+  \ 1,
+  \ fzf#vim#with_preview(),
+  \ <bang>0)
+
 " Vim rooter
 let g:rooter_patterns = ['.project/', '.project', '.git']
 let g:rooter_resolve_links = 1
 
 " Gutentag / ctags/cscope
-let g:gutentags_project_root = ['.project']         " create .project dir in project root dir to build tags automatically
+"
+" create .project dir in project root dir to build tags automatically
+" by default, tags will be generated for all files in this root dir
+" To override files list for tags generate, add executable in .project/file_list
+" that should return files list
+let g:gutentags_project_root = ['.project']
 let g:gutentags_exclude_project_root = []
-let g:gutentags_exclude_filetypes = []
+let g:gutentags_exclude_filetypes = ['gitcommit', 'conf', 'sh', 'yaml', 'json', 'text']
 let g:gutentags_add_default_project_roots = 0
 let g:gutentags_resolve_symlinks = 1
 let g:gutentags_modules = ['ctags', 'cscope']
 let g:gutentags_ctags_executable = '~/.local/bin/ctags'
 let g:gutentags_ctags_extra_args = ['--fields=+niaSszt --python-kinds=-vi --tag-relative=yes']
-" let g:gutentags_file_list_command = 'find . -type f -regextype posix-egrep -regex ".*\.(py|go|pl|inc|pm|sh|lib|pp)$" -not -path "*/\.*"'
 " rg --type-list
-let g:gutentags_file_list_command = 'rg --files -tsh -tperl -tpy -tgo -tcpp -tpuppet -tjson -tyaml'
+let g:gutentags_file_list_command = '.project/file_list || rg --no-ignore --files -tsh -tperl -tpy -tgo -tcpp -tpuppet -tjson -tyaml'
 let g:gutentags_scopefile = '.cscope.gutentags'
 let g:gutentags_ctags_tagfile = '.ctags.gutentags'
 " let g:gutentags_enabled_user_func = 'GutentagsEnableFunc'
@@ -405,18 +427,21 @@ let g:startify_lists = [
 \ { 'type': 'bookmarks', 'header': ['   Bookmarks']      },
 \ ]
 
-" python-syntax || semshi
-if PlugLoaded('semshi')
-    let g:python_highlight_all = 0
-    autocmd BufWritePost python call BugResetSemshi()
-else
-    let g:python_highlight_all = 1
-endif
+let g:semshi#always_update_all_highlights = 1
+let g:semshi#tolerate_syntax_errors = 1
 
-function! BugResetSemshi()
-    Semshi disable
-    Semshi enable
-endfunction
+" python-syntax || semshi
+" if PlugLoaded('semshi')
+"     let g:python_highlight_all = 0
+"     autocmd BufWritePost python call BugResetSemshi()
+" else
+"     let g:python_highlight_all = 1
+" endif
+
+" function! BugResetSemshi()
+"     Semshi disable
+"     Semshi enable
+" endfunction
 
 
 " Comfortable motion
@@ -425,11 +450,6 @@ let g:comfortable_motion_interval = 1000.0 / 60
 let g:comfortable_motion_friction = 80.0
 let g:comfortable_motion_air_drag = 4.0
 let g:comfortable_motion_impulse_multiplier = 1  " Feel free to increase/decrease this value.
-
-noremap <silent> <ScrollWheelDown> :call comfortable_motion#flick(40)<CR>
-noremap <silent> <ScrollWheelUp>   :call comfortable_motion#flick(-40)<CR>
-nnoremap <silent> <M-Down> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * 2)<CR>
-nnoremap <silent> <M-Up> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * -2)<CR>
 
 " ListToggle
 let g:lt_location_list_toggle_map = '<leader>l'
@@ -468,16 +488,18 @@ command! -bang Wq wq<bang>
 command! -bang WQ wq<bang>
 
 " Mapping
-let mapleader = " "
+let mapleader = " "   " Leader key set to <space bar>
 map <silent> <leader>? :exec printf('view %s/help.md', fnamemodify(expand($MYVIMRC), ':p:h'))<cr>
 map <silent> <leader>V :tabedit $MYVIMRC <cr>
 map <silent> <leader>S :source $MYVIMRC \| :echo $MYVIMRC 'reloaded' <cr>
-map <silent> <F1> :set paste! <cr>
-map <silent> <F2> :set number! <cr>
-map <silent> <F3> :call NERDTreeToggle() <cr>
-map <silent> <F4> :IndentLinesToggle <cr>
-map <silent> <F5> :TagbarToggle <cr>
-map <silent> <F7> :SignifyToggle <cr>
+map <silent> <leader><ESC> :set nonumber \| :IndentLinesDisable \| :SignifyDisable <cr>
+map <silent> <leader><F1> :set number \| :IndentLinesEnable \| :SignifyEnable <cr>
+map <silent> <F1> :call NERDTreeToggle() <cr>
+map <silent> <F2> :TagbarToggle <cr>
+map <silent> <F3> :IndentLinesToggle <cr>
+map <silent> <F4> :set number! <cr>
+map <silent> <F5> :SignifyToggle <cr>
+map <silent> <F10> :set paste! <cr>
 map <silent> <F11> :2,$s/^\s*pick/fixup/g <cr>
 map <silent> <F12> :call ToggleMouse() <cr>
 map <silent> <leader>a :execute 'Rg' expand('<cword>') <cr>
@@ -510,6 +532,13 @@ map <silent> <leader>, <Plug>(ale_previous_wrap)
 map <silent> <leader>. <Plug>(ale_next_wrap)
 map <silent> <leader>< <Plug>(signify-prev-hunk)
 map <silent> <leader>> <Plug>(signify-next-hunk)
+
+" comfortable motion mapping
+noremap <silent> <ScrollWheelDown> :call comfortable_motion#flick(40)<CR>
+noremap <silent> <ScrollWheelUp>   :call comfortable_motion#flick(-40)<CR>
+nnoremap <silent> <M-Down> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * 2)<CR>
+nnoremap <silent> <M-Up> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * -2)<CR>
+
 
 " Always forward with n / backward with N
 noremap <expr> n (v:searchforward ? 'n' : 'N')
