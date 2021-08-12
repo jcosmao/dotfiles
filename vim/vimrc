@@ -55,7 +55,6 @@ Plug 'ludovicchabant/vim-gutentags'
 Plug 'preservim/tagbar'
 
 Plug 'mhinz/vim-startify'
-Plug 'gruvbox-material/vim', {'as': 'gruvbox-material'}
 Plug 'scrooloose/nerdtree'
 Plug 'itchyny/lightline.vim'
 Plug 'maximbaz/lightline-ale'
@@ -84,6 +83,11 @@ Plug 'sheerun/vim-polyglot', {'tag': 'v4.13.0',
 Plug 'mhinz/vim-signify'
 Plug 'rhysd/git-messenger.vim'
 
+" Colorscheme
+Plug 'gruvbox-material/vim', {'as': 'gruvbox-material'}
+Plug 'sainnhe/everforest'
+Plug 'sainnhe/edge'
+Plug 'sainnhe/sonokai'
 
 call plug#end()
 
@@ -166,7 +170,23 @@ let g:gruvbox_material_palette = 'mix'
 " available: soft / medium / hard
 let g:gruvbox_material_background = 'soft'
 
-colorscheme gruvbox-material
+" available: soft / medium / hard
+let g:everforest_background = 'hard'
+let g:everforest_enable_italic = 1
+let g:everforest_disable_italic_comment = 1
+
+" available: edge(default), aura, neon
+let g:edge_style = 'neon'
+let g:edge_enable_italic = 1
+let g:edge_disable_italic_comment = 1
+
+" Available values: `'default'`, `'atlantis'`, `'andromeda'`, `'shusia'`, `'maia'`, `'espresso'`
+let g:sonokai_style = 'espresso'
+let g:sonokai_enable_italic = 1
+let g:sonokai_disable_italic_comment = 1
+
+" available: gruvbox-material, edge, everforest, sonokai
+colorscheme edge
 
 " override colorscheme config
 hi WildMenu         ctermbg=208 ctermfg=16
@@ -231,6 +251,11 @@ let g:lightline = {
 \       'inactive': [ 'tabnum', 'filename', 'modified' ]
 \   }
 \}
+
+" Autoset lightline colorsheme (except gruvbox-material which does not match)
+if colors_name != 'gruvbox-material'
+    let g:lightline.colorscheme = colors_name
+endif
 
 " lightline-ale
 let g:lightline#ale#indicator_checking = "\uf110 "
