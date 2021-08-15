@@ -99,11 +99,15 @@ function install_vim_config {
     # vim8 compat
     rm -rf ~/.vim  && ln -sf $SCRIPTPATH/vim ~/.vim
 
-    $HOME/.local/bin/nvim --headless +PlugUpgrade +PlugInstall +PlugUpdate! +qall 2> /dev/null
+    $HOME/.local/bin/nvim --headless +PlugUpgrade +PlugClean! +PlugInstall +PlugUpdate! +qall 2> /dev/null
+
+    # Install tree-sitter parser from tar
+    which gcc &> /dev/null || (cd ~/.config/nvim/plug/nvim-treesitter/parser && tar xzf ~/.config/nvim/tree-sitter-parsers.tgz)
 }
 
 function install_shell {
     echo "- Install bash/zsh"
+    rm -f ~/.shell
     ln -sf $SCRIPTPATH/shell ~/.shell
 
     # bash
@@ -121,7 +125,7 @@ function install_shell {
 function _antigen_update {
     #http://antigen.sharats.me/
     echo '- Get last antigen from git.io/antigen'
-    curl -sL git.io/antigen > zsh/antigen.zsh
+    curl -sL git.io/antigen > shell/antigen.zsh
     # cleanup old antigen install
     rm -rf $HOME/.antigen
 }
@@ -175,12 +179,6 @@ function install_terminal {
             echo "  - $theme"
             bash terminal/gnome-terminal/$theme
         done
-    fi
-
-    if which termite 2>&1 > /dev/null; then
-        echo "- Configure termite"
-        rm -rf $HOME/.config/termite
-        ln -s $SCRIPTPATH/terminal/termite $HOME/.config/termite
     fi
 }
 

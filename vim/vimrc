@@ -36,7 +36,7 @@ if has('python3') && v:version > 704
 
     " python syntax hilight
     Plug 'numirias/semshi', {'for': 'python', 'do': ':UpdateRemotePlugins'}
-    let g:polyglot_disabled = ['python']
+    " let g:polyglot_disabled = ['python']
     " Go
     Plug 'fatih/vim-go', {'for': 'go'}
     " snippets
@@ -49,9 +49,8 @@ else
     Plug 'vim-syntastic/syntastic'
 endif
 
-
 " ctags / cscope
-Plug 'ludovicchabant/vim-gutentags'
+Plug 'ludovicchabant/vim-gutentags', {'do': 'cd  ~/.vim/plug/vim-gutentags; patch -p1 -stNr /dev/null < ~/.vim/vim-gutentags.patch; true'}
 Plug 'preservim/tagbar'
 
 Plug 'mhinz/vim-startify'
@@ -84,16 +83,21 @@ Plug 'mhinz/vim-signify'
 Plug 'rhysd/git-messenger.vim'
 
 " Colorscheme
-Plug 'gruvbox-material/vim', {'as': 'gruvbox-material'}
+Plug 'sainnhe/gruvbox-material'
 Plug 'sainnhe/everforest'
 Plug 'sainnhe/edge'
+Plug 'rafamadriz/neon'
 Plug 'sainnhe/sonokai'
+
+" nvim 0.5
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
 call plug#end()
 
 "
 " Common
 "
+
 
 set nocompatible
 filetype off
@@ -160,6 +164,7 @@ endfunction
 " gruvbox theme
 set termguicolors
 set background=dark
+
 let g:gruvbox_material_disable_italic_comment = 0
 let g:gruvbox_material_enable_bold = 1
 let g:gruvbox_material_enable_italic = 1
@@ -185,8 +190,14 @@ let g:sonokai_style = 'espresso'
 let g:sonokai_enable_italic = 1
 let g:sonokai_disable_italic_comment = 1
 
+" available: default, doom, dark, light
+let g:neon_style = "doom"
+let g:neon_italic_keyword = 1
+let g:neon_italic_function = 1
+let g:neon_transparent = 1
+
 " available: gruvbox-material, edge, everforest, sonokai
-colorscheme edge
+colorscheme gruvbox-material
 
 " override colorscheme config
 hi WildMenu         ctermbg=208 ctermfg=16
@@ -209,6 +220,9 @@ hi semshiGlobal     ctermfg=214 guifg=#ffc649
 hi default TagbarAccessPublic    guifg=Green     ctermfg=Green
 hi default TagbarAccessProtected guifg=White     ctermfg=White
 hi default TagbarAccessPrivate   guifg=Red       ctermfg=Red
+
+autocmd FileType sh :highlight! link TSVariable Blue
+autocmd FileType sh :highlight! link TSConstant Blue
 
 
 let s:palette = g:lightline#colorscheme#gruvbox_material#palette
@@ -253,7 +267,11 @@ let g:lightline = {
 \}
 
 " Autoset lightline colorsheme (except gruvbox-material which does not match)
-if colors_name != 'gruvbox-material'
+if colors_name == 'gruvbox-material'
+    let g:lightline.colorscheme = 'gruvbox_material'
+elseif colors_name == 'neon'
+    let g:lightline.colorscheme = 'edge'
+else
     let g:lightline.colorscheme = colors_name
 endif
 
@@ -285,22 +303,6 @@ if PlugLoaded('ncm2')
     let g:ncm2#matcher = 'substrfuzzy'
     let g:ncm2_look_enabled = 1
 endif
-
-" Python - jedi-vim  (autocompletion disabled)
-let g:jedi#auto_initialization = 1
-let g:jedi#show_call_signatures = 0
-let g:jedi#completions_enabled = 0
-let g:jedi#auto_vim_configuration = 0
-let g:jedi#smart_auto_mappings = 0
-let g:jedi#popup_on_dot = 1
-let g:jedi#completions_command = ""
-let g:jedi#goto_command = ""
-let g:jedi#goto_stubs_command = ""
-let g:jedi#goto_assignments_command = ""
-let g:jedi#usages_command = "]"
-let g:jedi#documentation_command = "?"
-let g:jedi#rename_command = "<leader>r"
-
 
 " Ale
 let g:ale_lint_on_enter = 1
@@ -408,8 +410,8 @@ let g:gutentags_ctags_executable = '~/.local/bin/ctags'
 let g:gutentags_ctags_extra_args = ['--fields=+niaSszt --python-kinds=-vi --tag-relative=yes']
 " rg --type-list
 let g:gutentags_file_list_command = '.project/file_list || rg --no-ignore --files -tsh -tperl -tpy -tgo -tcpp -tpuppet -tjson -tyaml'
-let g:gutentags_scopefile = '.cscope.gutentags'
-let g:gutentags_ctags_tagfile = '.ctags.gutentags'
+let g:gutentags_scopefile = '.project/cscope.gutentags'
+let g:gutentags_ctags_tagfile = '.project/ctags.gutentags'
 " let g:gutentags_enabled_user_func = 'GutentagsEnableFunc'
 
 " function! GutentagsEnableFunc(path)
@@ -452,23 +454,6 @@ let g:startify_lists = [
 \ { 'type': 'bookmarks', 'header': ['   Bookmarks']      },
 \ ]
 
-let g:semshi#always_update_all_highlights = 1
-let g:semshi#tolerate_syntax_errors = 1
-
-" python-syntax || semshi
-" if PlugLoaded('semshi')
-"     let g:python_highlight_all = 0
-"     autocmd BufWritePost python call BugResetSemshi()
-" else
-"     let g:python_highlight_all = 1
-" endif
-
-" function! BugResetSemshi()
-"     Semshi disable
-"     Semshi enable
-" endfunction
-
-
 " Comfortable motion
 let g:comfortable_motion_no_default_key_mappings = 1
 let g:comfortable_motion_interval = 1000.0 / 60
@@ -495,6 +480,29 @@ let g:vim_json_syntax_conceal = 0
 
 " vim-rainbow
 let g:rainbow_active = 1
+
+" Semshi
+let g:semshi#always_update_all_highlights = 1
+let g:semshi#tolerate_syntax_errors = 1
+
+" Treesitter
+lua <<EOF
+require'nvim-treesitter.configs'.setup {
+  ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+  ignore_install = {}, -- List of parsers to ignore installing
+  highlight = {
+    enable = true,              -- false will disable the whole extension
+    disable = {},  -- list of language that will be disabled
+    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+    -- Using this option may slow down your editor, and you may see some duplicate highlights.
+    -- Instead of true it can also be a list of languages
+    additional_vim_regex_highlighting = false,
+  },
+  indent = { enable = true },
+  incremental_selection = { enable = true },
+}
+EOF
 
 
 "
