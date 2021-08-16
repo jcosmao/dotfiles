@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 # Author: Gaël Lambert (gaelL) <gael.lambert@netwiki.fr>
@@ -230,7 +230,7 @@ def check_args():
     # Just allow one arg
     num_args = sum(1 for i in [ARGS.level, ARGS.exclude, ARGS.include] if i)
     if num_args > 1:
-        print 'Args conflicts select just one arg'
+        print('Args conflicts select just one arg')
         PARSER.print_help()
         return False
     return True
@@ -296,7 +296,4 @@ if __name__ == '__main__':
             continue
 
         # Print parsed and colored line
-        print colorize(parsed_line)
-
-
-
+        print(colorize(parsed_line))

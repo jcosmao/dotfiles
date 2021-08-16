@@ -1,3 +1,72 @@
+" Vim rooter
+let g:rooter_patterns = ['.project/', '.project', '.git']
+let g:rooter_resolve_links = 1
+
+" Gutentag / ctags/cscope
+"
+" create .project dir in project root dir to build tags automatically
+" by default, tags will be generated for all files in this root dir
+" To override files list for tags generate, add executable in .project/file_list
+" that should return files list
+let g:gutentags_project_root = ['.project']
+let g:gutentags_exclude_project_root = []
+let g:gutentags_exclude_filetypes = [
+\   'no ft', 'systemd',
+\   'gitcommit', 'git', 'gitconfig', 'gitrebase', 'gitsendemail',
+\   'cfg', 'conf', 'rst', 'dosini',
+\   'sh', 'yaml', 'json', 'text'
+\]
+let g:gutentags_add_default_project_roots = 0
+let g:gutentags_generate_on_empty_buffer = 0
+let g:gutentags_resolve_symlinks = 1
+let g:gutentags_modules = ['ctags', 'cscope']
+let g:gutentags_ctags_executable = '~/.local/bin/ctags'
+let g:gutentags_ctags_extra_args = ['--fields=+niaSszt --python-kinds=-vi --tag-relative=yes']
+" rg --type-list
+let g:gutentags_file_list_command = '.project/file_list || rg --no-ignore --files -tsh -tperl -tpy -tgo -tcpp -tpuppet -tjson -tyaml'
+let g:gutentags_scopefile = '.cscope.gutentags'
+let g:gutentags_ctags_tagfile = '.ctags.gutentags'
+let g:gutentags_ctags_exclude = [
+\  '*.git', '*.svn', '*.hg',
+\  'cache', 'build', 'dist', 'bin', 'node_modules', 'bower_components',
+\  '*-lock.json',  '*.lock',
+\  '*.min.*',
+\  '*.bak',
+\  '*.zip',
+\  '*.pyc',
+\  '*.class',
+\  '*.sln',
+\  '*.csproj', '*.csproj.user',
+\  '*.tmp',
+\  '*.cache',
+\  '*.vscode',
+\  '*.pdb',
+\  '*.exe', '*.dll', '*.bin',
+\  '*.mp3', '*.ogg', '*.flac',
+\  '*.swp', '*.swo',
+\  '.DS_Store', '*.plist',
+\  '*.bmp', '*.gif', '*.ico', '*.jpg', '*.png', '*.svg',
+\  '*.rar', '*.zip', '*.tar', '*.tar.gz', '*.tar.xz', '*.tar.bz2',
+\  '*.pdf', '*.doc', '*.docx', '*.ppt', '*.pptx', '*.xls',
+\]
+
+" debug
+" let g:gutentags_trace = 1
+" let g:gutentags_debug = 1
+
+" tagbar
+let g:tagbar_map_showproto = '\'
+let g:tagbar_sort = 0
+let g:tagbar_compact = 1
+let g:tagbar_autoshowtag = 1
+let g:tagbar_previewwin_pos = "aboveleft"
+let g:tagbar_autopreview = 0
+let g:tagbar_ctags_bin = '~/.local/bin/ctags'
+
+" autocmd BufWinEnter * if exists("b:gutentags_files") | call tagbar#autoopen(0) | endif
+autocmd VimLeavePre * :execute 'TagbarClose'
+
+
 function s:sink_ctags(line)
     if empty(a:line)
       return
@@ -36,10 +105,7 @@ command! -bang -nargs=* FZFCscope
   \         --with-nth 1
   \         --nth 1
   \         --delimiter " "
-  \         --height=60%
   \         --preview-window "+{3}-15"
-  \         --bind ?:toggle-preview,page-up:preview-up,page-down:preview-down
-  \         --color "preview-bg:235"
   \         --preview "bat --color always --highlight-line {3} {1}"'
   \ }))
 
@@ -55,10 +121,7 @@ command! -bang -nargs=* FZFCtags
   \         --with-nth 1,4,2
   \         --nth 1
   \         --delimiter "\t"
-  \         --height=60%
   \         --preview-window "+{5}-15"
-  \         --bind ?:toggle-preview,page-up:preview-up,page-down:preview-down
-  \         --color "preview-bg:235"
   \         --preview "bat --color always --highlight-line {5} {2}"'
   \ }))
 

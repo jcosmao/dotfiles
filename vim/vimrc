@@ -173,7 +173,7 @@ let g:gruvbox_material_menu_selection_background = 'green'
 " available: material / mix / original
 let g:gruvbox_material_palette = 'mix'
 " available: soft / medium / hard
-let g:gruvbox_material_background = 'soft'
+let g:gruvbox_material_background = 'medium'
 
 " available: soft / medium / hard
 let g:everforest_background = 'hard'
@@ -221,9 +221,9 @@ hi default TagbarAccessPublic    guifg=Green     ctermfg=Green
 hi default TagbarAccessProtected guifg=White     ctermfg=White
 hi default TagbarAccessPrivate   guifg=Red       ctermfg=Red
 
+" Fix missing tree-sitter binding on colorscheme (gruvbox_material)
 autocmd FileType sh :highlight! link TSVariable Blue
 autocmd FileType sh :highlight! link TSConstant Blue
-
 
 let s:palette = g:lightline#colorscheme#gruvbox_material#palette
 let s:palette.tabline.tabsel = [ [ '#282828', '#98971a', 238, 10, 'bold' ] ]
@@ -284,7 +284,7 @@ let g:lightline#ale#indicator_ok = "\uf00c "
 " Autocompletion - NCM2
 if PlugLoaded('ncm2')
     autocmd BufEnter * call ncm2#enable_for_buffer()
-    set completeopt=menuone,noinsert
+    set completeopt=menuone,noinsert,noselect
     set shortmess+=c
     set pumheight=20
 
@@ -295,6 +295,9 @@ if PlugLoaded('ncm2')
     inoremap <expr> <M-Down> pumvisible() ? "\<PageDown>" : "\<M-Down>"
     inoremap <expr> <M-Up> pumvisible() ? "\<PageUp>" : "\<M-Up>"
     inoremap <silent> <expr> <CR> (pumvisible() ? ncm2_ultisnips#expand_or("", 'n') : "\<CR>")
+
+    let g:ncm2#manual_complete_length = [[1,1]]
+    inoremap <C-space> <C-r>=ncm2#manual_trigger()<cr>
 
     let ncm2#popup_delay = 5
     " let ncm2#complete_length = [[1, 1]]
@@ -378,63 +381,6 @@ let g:go_highlight_generate_tags = 1
 
 " guru, godef, gopls
 let g:go_def_mode = 'gopls'
-
-" Fzf
-let g:fzf_layout = { 'down': '~60%' }
-let g:fzf_preview_window = ['right:hidden', '?']
-
-" Added --no-ignore
-command! -bang -nargs=* Rg
-  \ call fzf#vim#grep('rg --no-ignore --column --no-heading --line-number --color=always '.shellescape(<q-args>),
-  \ 1,
-  \ fzf#vim#with_preview(),
-  \ <bang>0)
-
-" Vim rooter
-let g:rooter_patterns = ['.project/', '.project', '.git']
-let g:rooter_resolve_links = 1
-
-" Gutentag / ctags/cscope
-"
-" create .project dir in project root dir to build tags automatically
-" by default, tags will be generated for all files in this root dir
-" To override files list for tags generate, add executable in .project/file_list
-" that should return files list
-let g:gutentags_project_root = ['.project']
-let g:gutentags_exclude_project_root = []
-let g:gutentags_exclude_filetypes = ['gitcommit', 'conf', 'sh', 'yaml', 'json', 'text']
-let g:gutentags_add_default_project_roots = 0
-let g:gutentags_resolve_symlinks = 1
-let g:gutentags_modules = ['ctags', 'cscope']
-let g:gutentags_ctags_executable = '~/.local/bin/ctags'
-let g:gutentags_ctags_extra_args = ['--fields=+niaSszt --python-kinds=-vi --tag-relative=yes']
-" rg --type-list
-let g:gutentags_file_list_command = '.project/file_list || rg --no-ignore --files -tsh -tperl -tpy -tgo -tcpp -tpuppet -tjson -tyaml'
-let g:gutentags_scopefile = '.project/cscope.gutentags'
-let g:gutentags_ctags_tagfile = '.project/ctags.gutentags'
-" let g:gutentags_enabled_user_func = 'GutentagsEnableFunc'
-
-" function! GutentagsEnableFunc(path)
-"     let file_ext = fnamemodify(a:path, ':e')
-"     let allowed_file_ext = ['py', 'go', 'pl', 'inc', 'pm', 'sh', 'lib', 'pp']
-"     if (index(allowed_file_ext, file_ext) >= 0) | return 1 | else | return 0 | endif
-" endfunction
-
-" debug
-" let g:gutentags_trace = 1
-" let g:gutentags_debug = 1
-
-" tagbar
-let g:tagbar_map_showproto = '\'
-let g:tagbar_sort = 0
-let g:tagbar_compact = 1
-let g:tagbar_autoshowtag = 1
-let g:tagbar_previewwin_pos = "aboveleft"
-let g:tagbar_autopreview = 0
-let g:tagbar_ctags_bin = '~/.local/bin/ctags'
-
-" autocmd BufWinEnter * if exists("b:gutentags_files") | call tagbar#autoopen(0) | endif
-autocmd VimLeavePre * :execute 'TagbarClose'
 
 " Startify
 let g:startify_change_to_dir = 0
