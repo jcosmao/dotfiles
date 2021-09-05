@@ -1,3 +1,9 @@
+let NERDTreeQuitOnOpen = 0
+let NERDTreeShowHidden = 1
+let NERDTreeShowBookmarks = 1
+let NERDTreeWinSize = 40
+let NERDTreeIgnore = ['.git[[dir]]', '.swp', '.pyc', '__pycache__', '.egg-info[[dir]]', 'pip-wheel-metadata[[dir]]']
+
 function! PreventBuffersInNERDTree()
   if bufname('#') =~ 'NERD_tree' && bufname('%') !~ 'NERD_tree'
     \ && exists('t:nerdtree_winnr') && bufwinnr('%') == t:nerdtree_winnr
@@ -33,5 +39,5 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
 autocmd FileType nerdtree let t:nerdtree_winnr = bufwinnr('%')
 autocmd BufWinEnter * call PreventBuffersInNERDTree()
 autocmd bufenter * call NERDTreeRefresh()
-autocmd User StartifyReady NERDTree | wincmd w
-autocmd User StartifyBufferOpened NERDTreeFind | wincmd w
+" autocmd User StartifyReady NERDTree | wincmd w
+" autocmd User StartifyBufferOpened NERDTreeFind | wincmd w

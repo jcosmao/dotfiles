@@ -23,7 +23,7 @@ let g:gutentags_modules = ['ctags', 'cscope']
 let g:gutentags_ctags_executable = '~/.local/bin/ctags'
 let g:gutentags_ctags_extra_args = ['--fields=+niaSszt --python-kinds=-vi --tag-relative=yes']
 " rg --type-list
-let g:gutentags_file_list_command = '.project/file_list || rg --no-ignore --files -tsh -tperl -tpy -tgo -tcpp -tpuppet -tjson -tyaml'
+let g:gutentags_file_list_command = '/bin/true ; .project/file_list || rg --no-ignore --files -tsh -tperl -tpy -tgo -tcpp -tpuppet -tjson -tyaml'
 let g:gutentags_scopefile = '.cscope.gutentags'
 let g:gutentags_ctags_tagfile = '.ctags.gutentags'
 let g:gutentags_ctags_exclude = [

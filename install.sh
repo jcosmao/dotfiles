@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -x
 
 SCRIPT=$(readlink -f $0)
