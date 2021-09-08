@@ -3,6 +3,7 @@ set -x
 
 SCRIPT=$(readlink -f $0)
 SCRIPTPATH=$(dirname $SCRIPT)
+IS_SSH=$(env | grep -c SSH_TTY)
 cd $SCRIPTPATH
 
 mkdir -p ~/.config
@@ -33,7 +34,7 @@ function install_neovim {
     ) &> /dev/null
 
     if which apt-get 2>&1 > /dev/null ; then
-        if ! env | grep -q SSH_TTY; then
+        if [[ $IS_SSH -eq 0 ]]; then
             # - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
             version=$(
                 basename $(curl -si https://github.com/BurntSushi/ripgrep/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
@@ -68,7 +69,7 @@ function install_vim_requirements {
         fi
     fi
 
-    pip_require=(jedi==0.17.2 pynvim==0.4.2 yamllint==1.25.0)
+    pip_require=(python-lsp-server pynvim yamllint)
     pip_installed=$(echo "$pip_freeze" | grep -P "(^$(echo ${pip_require[@]} | sed -e 's/ /|^/g'))" | wc -l)
 
     if [[ ${#pip_require[@]} -ne $pip_installed ]]; then
@@ -91,13 +92,10 @@ function install_vim_requirements {
 }
 
 function install_vim_config {
-    echo "- Install vim/neovim"
+    echo "- Install neovim"
 
-    ln -sf $SCRIPTPATH/vim/vimrc ~/.vimrc
     rm -rf ~/.config/nvim && ln -sf $SCRIPTPATH/vim ~/.config/nvim
-    # vim8 compat
-    rm -rf ~/.vim  && ln -sf $SCRIPTPATH/vim ~/.vim
-
+    [[ $RESET -eq 1 ]] && rm -rf ~/.config/nvim/plug
     $HOME/.local/bin/nvim --headless +PlugUpgrade +PlugClean! +PlugInstall +PlugUpdate! +qall 2> /dev/null
 
     # Install tree-sitter parser from tar
@@ -126,7 +124,7 @@ function _antigen_update {
     echo '- Get last antigen from git.io/antigen'
     curl -sL git.io/antigen > shell/antigen.zsh
     # cleanup old antigen install
-    rm -rf $HOME/.antigen
+    [[ $RESET -eq 1 ]] && rm -rf $HOME/.antigen
 }
 
 function install_tmux {
@@ -159,26 +157,21 @@ function install_git {
     git config --global trailer.sign.ifexists replace
 }
 
-function install_terminal {
+function install_fonts {
     echo "- Install fonts"
     font_dir="$HOME/.fonts"
-    rm -rf $font_dir && ln -sf $SCRIPTPATH/terminal/fonts $font_dir
+    rm -rf $font_dir && ln -sf $SCRIPTPATH/fonts $font_dir
     if [[ -f $(which fc-cache 2>/dev/null) ]]; then
         echo "  - Resetting font cache..."
         fc-cache -f $font_dir
     fi
+}
 
+function install_icons {
+    [[ $IS_SSH -eq 1 ]] && return
     echo "- Install icons"
     icons_dir="$HOME/.icons"
-    rm -rf $icons_dir && ln -sf $SCRIPTPATH/terminal/icons $icons_dir
-
-    if which gnome-terminal 2>&1 > /dev/null; then
-        echo "- Install gnome-terminal color scheme"
-        for theme in $( ls terminal/gnome-terminal ); do
-            echo "  - $theme"
-            bash terminal/gnome-terminal/$theme
-        done
-    fi
+    rm -rf $icons_dir && ln -sf $SCRIPTPATH/icons $icons_dir
 }
 
 function install_config {
@@ -192,6 +185,8 @@ function install_config {
         rm -f $HOME/.config/$cfg && ln -sf $SCRIPTPATH/config/$cfg $HOME/.config/$cfg
     done
 
+    [[ $IS_SSH -eq 1 ]] && return
+
     # build i3 config
     $HOME/.config/i3/i3_build_conf.sh
     cp $HOME/.config/termite/config.base $HOME/.config/termite/config
@@ -199,11 +194,10 @@ function install_config {
 
 function print_help {
     echo "
-    $0 [--vim|--conf|--ui|--help]
+    $0 [--vim|--conf|--help]
 
     # Require:
         - bash: python-yaml, python-json, jq
-        - terminal: gnome-terminal, rxvt-unicode, termite
         - i3: i3-wm i3lock xautolock dunst i3blocks rofi sysstat acpi
         - vim: silversearcher-ag / fd (https://github.com/sharkdp/fd)
     "
@@ -219,6 +213,7 @@ function main {
     while [[ $# -ne 0 ]]; do
         arg="$1"; shift
         case "$arg" in
+            --reset) export RESET=1;;
             --vim)  [[ $1 =~ ^(stable|nightly)$ ]] && \
                         release=$1 && shift && \
                         install_neovim $release;
@@ -226,9 +221,10 @@ function main {
                     install_vim_config;;
             --conf) install_shell;
                     install_tmux;
-                    install_git;;
-            --ui)   install_config;
-                    install_terminal ;;
+                    install_git;
+                    install_config;
+                    install_icons ;
+                    install_fonts ;;
             --help) print_help ;;
             * ) [[ $arg =~ \-+.* ]] && print_help "$arg unknown"
         esac

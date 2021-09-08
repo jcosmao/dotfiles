@@ -129,13 +129,13 @@ function! GoToDef(tag, ctx_line)
     let l:tag = a:tag
     let l:ctx_line = a:ctx_line
 
-    if &filetype == 'python'
-        let r = execute(":call jedi#goto()")
-        if r !~# "jedi-vim: Couldn't find any definitions"
-            echo "GoToDef: jedi#goto()"
-            return
-        endif
-    endif
+    " if &filetype == 'python'
+    "     let r = execute(":call jedi#goto()")
+    "     if r !~# "jedi-vim: Couldn't find any definitions"
+    "         echo "GoToDef: jedi#goto()"
+    "         return
+    "     endif
+    " endif
 
     if !exists("b:gutentags_files")
         echohl WarningMsg
@@ -179,9 +179,8 @@ endfunction
 " map <silent> <leader>] :execute 'tag' expand('<cword>')<CR>
 map <silent> <C-]> :call GoToDef(expand('<cword>'), getline('.'))<cr>
 map <silent> <leader>] :execute 'FZFCtags' '^'.expand('<cword>').'$'<cr>
-map <silent> <leader>\ :execute 'tselect' expand('<cword>')<cr>
+map <silent> <leader>[ :execute 'tselect' expand('<cword>')<cr>
 
-autocmd Filetype go nmap <C-]> <Plug>(go-def)
 " autocmd FileType puppet nnoremap <C-]> call GoToDef(trim(expand('<cword>'), '^::'))
 " autocmd FileType puppet nnoremap <leader>] :execute 'tag' trim(expand('<cword>'), '^::')<CR>
 
