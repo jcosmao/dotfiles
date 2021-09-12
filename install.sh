@@ -190,6 +190,7 @@ function install_config {
     # build i3 config
     $HOME/.config/i3/i3_build_conf.sh
     cp $HOME/.config/termite/config.base $HOME/.config/termite/config
+    cp $HOME/.config/alacritty/alacritty.base.yml $HOME/.config/alacritty/alacritty.yml
 }
 
 function print_help {

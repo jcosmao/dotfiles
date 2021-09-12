@@ -17,6 +17,15 @@ function! custom#GitInfo()
     endif
 endfunction
 
+function! custom#LightlineToggleBuffer()
+    let disable_on_buffer = ["NvimTree", "__Tagbar__.1"]
+    let current_buffer = bufname()
+    if index(disable_on_buffer, current_buffer) >= 0
+        call lightline#disable()
+    else
+        call lightline#enable()
+    endif
+endfunction
 
 function! custom#HieraEncrypt()
     let git_root = split(system('git -C '.shellescape(expand("%:p:h")).' rev-parse --show-toplevel'), '\n')[0]

@@ -6,6 +6,7 @@ export VISUAL=nvim
 export EDITOR=nvim
 # tmux disable retitle
 export DISABLE_AUTO_TITLE=true
+export XDG_CONFIG_HOME=$HOME/.config
 
 # fucking keyboard
 alias vi=vim

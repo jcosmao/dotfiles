@@ -1,5 +1,6 @@
 let g:lightline_git_info = ''
 au BufEnter * call custom#GitInfo()
+au BufEnter * call custom#LightlineToggleBuffer()
 
 " lightline
 let g:lightline = {
