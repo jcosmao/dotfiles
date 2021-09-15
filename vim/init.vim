@@ -66,6 +66,7 @@ Plug 'airblade/vim-rooter', {'commit': 'd64f3e04df9914e784508019a1a1f291cbb40bd4
 " python syntax hilight
 Plug 'numirias/semshi', {'for': 'python', 'do': ':UpdateRemotePlugins'}
 Plug 'fatih/vim-go', {'for': 'go'}
+Plug 'rodjek/vim-puppet', {'for': 'puppet'}
 
 " ctags / cscope
 
