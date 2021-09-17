@@ -30,7 +30,7 @@ if declare -f launch_ssh_agent &> /dev/null; then
 fi
 
 # Auto reload completion
-zstyle ":completion:*:commands" rehash 1
+zstyle ":completion:*:commands" rehash true
 
 # if we SSH then autolaunch default tmux session
 #if [[ -n $SSH_TTY && -z $TMUX ]]; then
