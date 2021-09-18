@@ -1,6 +1,7 @@
 let g:lightline_git_info = ''
 au BufEnter * call custom#GitInfo()
 au BufEnter * call custom#LightlineToggleBuffer()
+au VimEnter * call vista#RunForNearestMethodOrFunction()
 
 " lightline
 let g:lightline = {
@@ -9,7 +10,7 @@ let g:lightline = {
 \       'left': [
 \           [ 'mode', 'paste' ],
 \           [ 'gitrepo' ],
-\           [ 'readonly', 'filename', 'modified', 'tagbar' ],
+\           [ 'readonly', 'filename', 'modified', 'method' ],
 \       ],
 \      'right': [
 \           [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok', 'lineinfo' ],
@@ -17,8 +18,10 @@ let g:lightline = {
 \           [ 'fileformat', 'fileencoding', 'filetype' ],
 \       ],
 \   },
+\   'component_function': {
+\       'method': 'custom#NearestMethodOrFunction',
+\   },
 \   'component': {
-\       'tagbar': '%{tagbar#currenttag("%s", "", "f")}',
 \       'gitrepo': '%{g:lightline_git_info}',
 \    },
 \   'component_expand': {

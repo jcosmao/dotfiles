@@ -25,9 +25,9 @@ Plug 'hrsh7th/cmp-nvim-lua'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 Plug 'quangnguyen30192/cmp-nvim-ultisnips'
-Plug 'ray-x/lsp_signature.nvim'
 Plug 'folke/trouble.nvim'
 Plug 'w0rp/ale'
+Plug 'jubnzv/virtual-types.nvim'
 
 " Utils
 
@@ -71,7 +71,7 @@ Plug 'rodjek/vim-puppet', {'for': 'puppet'}
 " ctags / cscope
 
 Plug 'ludovicchabant/vim-gutentags', {'do': 'cd  ~/.vim/plug/vim-gutentags; patch -p1 -stNr /dev/null < ~/.vim/plugin_patch/vim-gutentags.patch; true'}
-Plug 'preservim/tagbar'
+Plug 'liuchengxu/vista.vim'
 
 " git
 
@@ -168,7 +168,7 @@ map <silent> <leader>S :source $MYVIMRC \| :echo $MYVIMRC 'reloaded' <cr>
 map <silent> <leader><ESC> :set nonumber \| :IndentLinesDisable \| :SignifyDisable \| :set signcolumn=no <cr>
 map <silent> <leader><F1> :set number \| :IndentLinesEnable \| :SignifyEnable \| :set signcolumn=auto <cr>
 map <silent> <F1> :NvimTreeToggle <cr>
-map <silent> <F2> :TagbarToggle <cr>
+map <silent> <F2> :Vista!! <cr>
 map <silent> <F3> :IndentLinesToggle <cr>
 map <silent> <F4> :set number! <cr>
 map <silent> <F5> :SignifyToggle <cr>

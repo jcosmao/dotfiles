@@ -49,4 +49,8 @@ function! custom#ToggleMouse()
         " enable mouse everywhere
         set mouse=a
     endif
-endfunc
+endfunction
+
+function! custom#NearestMethodOrFunction() abort
+  return get(b:, 'vista_nearest_method_or_function', '')
+endfunction

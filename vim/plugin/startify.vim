@@ -7,7 +7,7 @@ let g:startify_session_before_save = [
 \   'echo "Cleaning up before saving.."',
 \   'silent! NERDTreeTabsClose',
 \   'silent! NERDTreeClose',
-\   'silent! TagbarClose',
+\   'silent! Vista!',
 \ ]
 let g:startify_bookmarks = []
 let g:startify_lists = [

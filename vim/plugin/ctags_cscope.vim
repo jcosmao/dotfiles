@@ -64,8 +64,6 @@ let g:tagbar_autopreview = 0
 let g:tagbar_ctags_bin = '~/.local/bin/ctags'
 
 " autocmd BufWinEnter * if exists("b:gutentags_files") | call tagbar#autoopen(0) | endif
-autocmd VimLeavePre * :execute 'TagbarClose'
-
 
 function s:sink_ctags(line)
     if empty(a:line)

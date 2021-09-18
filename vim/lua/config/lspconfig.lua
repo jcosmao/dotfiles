@@ -9,7 +9,10 @@ local on_attach = function(client, bufnr)
     local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
 
     -- show signature when typing
-    require'lsp_signature'.on_attach()
+    -- require'lsp_signature'.on_attach()
+
+    -- display types
+    lspconfig.ocamllsp.setup{on_attach=require'virtualtypes'.on_attach}
 
     -- Enable completion triggered by <c-x><c-o>
     buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
@@ -64,7 +67,7 @@ local function goto_definition_ctag_fallback(_, method, result)
     end
 end
 
-vim.lsp.handlers["textDocument/definition"] = goto_definition_ctag_fallback
+-- vim.lsp.handlers["textDocument/definition"] = goto_definition_ctag_fallback
 
 -- https://langserver.org/
 -- Install langserver with :LspInstall xxx
@@ -78,7 +81,12 @@ local function setup_servers()
     --     	table.remove(servers, i)
     --     end
     -- end
-    -- table.insert(servers, 'pylsp')
+
+    -- Enable pylsp if found in PATH
+    r, s, t = os.execute("which pylsp > /dev/null")
+    if r == 0 or t == 0 then
+        table.insert(servers, 'pylsp')
+    end
 
     for _, server in pairs(servers) do
         lspconfig[server].setup{
