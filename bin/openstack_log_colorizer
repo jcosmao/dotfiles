@@ -105,12 +105,13 @@ def colored_level(level):
 def parse_line(line):
     "Parse line and return dict of each elements"
     # Line example : Openstack
-    # 2014-08-14 18:43:58.950 4092 INFO neutron.plugins.openvswitch.agent.ovs_neutron_agent
+    # 2014-08-14 18:43:58.950 4092 INFO neutron.plugins.openvswitch.agent.ovs_neutron_agent [-]
     regex = (r'^([0-9]+-[0-9]+-[0-9]+) ' # date
              '([0-9]+:[0-9]+:[0-9]+\.[0-9]+) ' # time
              '([0-9]+):? ' # process
              '([A-Z]+) ' # level
              '([^ ]+) ' # name
+             '(\[[^\]]+\]) ' # context
              '(.+)') # text
 
     result = re.match(regex, line)
@@ -120,7 +121,8 @@ def parse_line(line):
           'process': result.group(3),
           'level': result.group(4),
           'name': result.group(5),
-          'text': result.group(6),
+          'req': result.group(6),
+          'text': result.group(7),
           '_type': 'default',
         }
 
@@ -190,11 +192,12 @@ def colorize(line):
             colored_text=grey(line['text'])
         else:
             colored_text=white(line['text'])
-        return '%s %s %s: %s %s %s' % ( grey(line['date']),
+        return '%s %s %s: %s %s %s %s' % ( grey(line['date']),
                                    grey(line['time']),
                                    grey(line['process']),
                                    colored_level(line['level']),
                                    blue(line['name']),
+                                   grey(line['req']),
                                    colored_text,)
     # Default parsed line without date and time
     elif line.get('_type') == 'default_without_datatime':
