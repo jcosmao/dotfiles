@@ -1,0 +1,54 @@
+# vim: set ft=sh:
+
+# Node JS
+export NVM_DIR="$HOME/.nvm"
+
+if [[ -d $NVM_DIR ]]; then
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+else
+    echo "NodeJS install"
+    (
+        git clone https://github.com/nvm-sh/nvm.git "$NVM_DIR"
+        cd "$NVM_DIR"
+        git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)`
+    ) &> /dev/null && \. "$NVM_DIR/nvm.sh"
+
+    nvm install --lts
+    nvm alias default node
+fi
+
+# Go path
+if which go &> /dev/null; then
+    GOROOT=$(go env GOROOT)
+    export GOROOT=${GOROOT:-/usr/local/go}
+    export GOPATH="$HOME/go"
+    export GOBIN="$GOPATH/bin"
+    export PATH="$PATH:$GOROOT/bin:$GOBIN"
+fi
+
+# Ruby path
+if which ruby &> /dev/null; then
+    mkdir -p $HOME/.gem
+    alias gem_install="gem install --user-install"
+
+    # gem install bundler
+    # bundle install
+    export BUNDLE_PATH=$HOME/.gem
+    export GEM_HOME=$HOME/.gem
+
+    if [[ -d $HOME/.gem/ruby ]]; then
+        v=$(ls $HOME/.gem/ruby | head -1)
+        GEM_PATH="$HOME/.gem/ruby/${v}/bin"
+        [[ -d $GEM_PATH ]] && export PATH="$PATH:$GEM_PATH"
+    fi
+fi
+
+# https://github.com/pyenv/pyenv-installer
+export PYENV_ROOT="$HOME/.pyenv"
+
+if [[ -f $PYENV_ROOT/bin/pyenv ]]; then
+    export PATH="$HOME/.pyenv/bin:$PATH"
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
+fi

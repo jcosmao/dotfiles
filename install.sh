@@ -110,21 +110,11 @@ function install_shell {
     # bash
     ln -sf $SCRIPTPATH/shell/bashrc ~/.bashrc
     ln -sf $SCRIPTPATH/shell/dir_colors ~/.dir_colors
-    ln -sf $SCRIPTPATH/shell/agignore ~/.agignore
     echo "source ~/.bashrc" > ~/.bash_profile
     mkdir -p ~/.bash_custom
 
     # zsh
-    _antigen_update
     ln -sf $SCRIPTPATH/shell/zshrc ~/.zshrc
-}
-
-function _antigen_update {
-    #http://antigen.sharats.me/
-    echo '- Get last antigen from git.io/antigen'
-    curl -sL git.io/antigen > shell/antigen.zsh
-    # cleanup old antigen install
-    [[ $RESET -eq 1 ]] && rm -rf $HOME/.antigen
 }
 
 function install_tmux {

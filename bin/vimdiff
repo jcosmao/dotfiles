@@ -1,3 +1,0 @@
-#!/bin/bash
-
-$HOME/.local/bin/nvim -d $*

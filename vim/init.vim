@@ -110,6 +110,7 @@ set backspace=indent,eol,start      " activation de la touche backspace
 set ai                              " autoindentation active
 set sm                              " syntax match: soulignement d'une parenth e associ ,...
 set hlsearch                        " colorisation de la recherche
+set ignorecase
 set ts=4                            " taille des tabulations
 set sw=4                            " taille des indentations
 set tw=0                            " textwidth: largeur du texte (commentaires) 0=pas de limite
@@ -129,6 +130,7 @@ set noswapfile                      " swap files give annoying warning
 set clipboard^=unnamedplus          " send yank to system clipboard
 set updatetime=100
 set hidden                          " Allow modified hidden buffers
+set autowriteall
 set nofoldenable                    " Folding makes things unreadable.
 set noautochdir
 

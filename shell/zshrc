@@ -1,34 +1,35 @@
-# Load Antigen
-source ~/.shell/antigen.zsh
+# Download Znap, if it's not there yet.
+if [[ ! -f ~/.znap/zsh-snap/znap.zsh ]]; then
+    mkdir -p ~/.znap
+    git clone https://github.com/marlonrichert/zsh-snap.git ~/.znap/zsh-snap
+fi
 
-export SHELL='zsh'
+source ~/.znap/zsh-snap/znap.zsh  # Start Znap
 
-# Plugins
-antigen use oh-my-zsh
+# `znap source` automatically downloads and installs your plugins.
+znap source ohmyzsh/ohmyzsh lib/{history,completion,key-bindings,clipboard}
+znap source zsh-users/zsh-completions
+znap source zsh-users/zsh-autosuggestions
+znap source zdharma/fast-syntax-highlighting
+znap source mfaerevaag/wd
+znap install bigH/git-fuzzy
 
-antigen bundle mfaerevaag/wd
-antigen bundle zsh-users/zsh-completions
-antigen bundle zsh-users/zsh-autosuggestions
-antigen bundle zdharma/fast-syntax-highlighting
-antigen bundle jcosmao/blox-zsh-theme
-source ~/.shell/plugins/theme.zsh
+for f in $(find ~/.shell/zsh -name '*.zsh'); do
+    . $f
+done
 
-# Apply after override theme variables
-antigen apply
-
-autoload -U +X compinit && compinit
-autoload -U +X bashcompinit && bashcompinit
-source ~/.shell/plugins/zsh-bash.zsh
-source ~/.shell/completions/completion.source
-source ~/.shell/completions/tm.completion.source
+znap prompt jcosmao/blox-zsh-theme
 
 # ssh-agent ~/.bash/functions
 if declare -f launch_ssh_agent &> /dev/null; then
     launch_ssh_agent
 fi
 
-# Auto reload completion
-zstyle ":completion:*:commands" rehash true
+# Set LS_COLORS
+[[ -x $(which dircolors) ]] && eval $(dircolors -b $HOME/.dir_colors)
+
+# completion color
+zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"
 
 # if we SSH then autolaunch default tmux session
 #if [[ -n $SSH_TTY && -z $TMUX ]]; then

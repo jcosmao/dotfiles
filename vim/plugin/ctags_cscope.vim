@@ -93,7 +93,7 @@ endif
 
 command! -bang -nargs=* FZFCscope
   \ call fzf#run(fzf#wrap({
-  \     'source': 'cscope -d -L -f '.b:gutentags_files['cscope'].' -0 '. shellescape(<q-args>).' | sed -e "s,^'.getcwd().'/,," | grep -Pv "\d+\s\s*\#" | grep -Pv "(class|def) '.<q-args>.'"',
+  \     'source': 'cscope -d -L -f '.b:gutentags_files['cscope'].' -0 '. shellescape(<q-args>).' | sed -e "s,^'.getcwd().'/,," | grep -Pv "\d+\s\s*(\#|:|\")" | grep -Pv "(class|def|func|function|sub) '.<q-args>.'"',
   \     'sink*': function('s:sink_cscope'),
   \     'options': '
   \         --query '.s:filter.'

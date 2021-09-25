@@ -1,0 +1,17 @@
+# vim: ft=sh
+
+export PATH="$HOME/.local/bin:$PATH"
+export TERM=xterm-256color
+export VISUAL=nvim
+export EDITOR=nvim
+# tmux disable retitle
+export DISABLE_AUTO_TITLE=true
+export XDG_CONFIG_HOME=$HOME/.config
+
+# fucking keyboard
+alias vi=vim
+alias vun=vim
+alias bim=vim
+alias gti=git
+
+alias vimdiff="nvim -d"
