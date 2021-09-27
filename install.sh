@@ -13,6 +13,11 @@ if [[ $(id -u) -eq 0 && $(echo $PATH | grep -c "$HOME/.local/bin") -eq 0 ]]; the
     INSTALL_ROOT_BIN=1
 fi
 
+if [[ $(hostname -s) =~ ^admin ]]; then
+    INSTALL_ROOT_BIN=0
+    INSTALL_PIP=0
+fi
+
 function install_neovim {
     release=$1
     echo "- Update neovim from $release"
@@ -60,8 +65,23 @@ function install_vim_requirements {
         install_neovim 'stable'
     fi
 
+    rm -rf ~/.ctags.d && ln -sf $SCRIPTPATH/ctags/ctags.d ~/.ctags.d
+
+    # install local bin
+    for bin in $(ls bin); do
+        # check ldd
+        if [[ $(ldd bin/$bin | grep -c 'not found') -eq 0 ]]; then
+            bin_name=$(echo $bin | cut -d. -f1)
+            ln -sf $SCRIPTPATH/bin/$bin ~/.local/bin/$bin_name
+            [[ $INSTALL_ROOT_BIN -eq 1 ]] && ln -sf $SCRIPTPATH/bin/$bin /usr/local/bin/$bin_name
+        fi
+    done
+
     pip_freeze=$(python3 -m pip freeze --user)
     if [[ $? -ne 0 ]]; then
+
+        [[ $INSTALL_PIP -eq 0 ]] && echo "Skip pip deps" && return
+
         if which pacman 2>&1 > /dev/null ; then
             sudo pacman -S --noconfirm python-pip
         elif which apt-get 2>&1 > /dev/null ; then
@@ -77,18 +97,6 @@ function install_vim_requirements {
             pip setuptools \
             ${pip_require[@]}
     fi
-
-    rm -rf ~/.ctags.d && ln -sf $SCRIPTPATH/ctags/ctags.d ~/.ctags.d
-
-    # install local bin
-    for bin in $(ls bin); do
-        # check ldd
-        if [[ $(ldd bin/$bin | grep -c 'not found') -eq 0 ]]; then
-            bin_name=$(echo $bin | cut -d. -f1)
-            ln -sf $SCRIPTPATH/bin/$bin ~/.local/bin/$bin_name
-            [[ $INSTALL_ROOT_BIN -eq 1 ]] && ln -sf $SCRIPTPATH/bin/$bin /usr/local/bin/$bin_name
-        fi
-    done
 }
 
 function install_vim_config {

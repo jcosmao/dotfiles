@@ -1,6 +1,0 @@
-# enable bash completion
-if [ -d /etc/bash_completion.d ]; then
-    for i in /etc/bash_completion.d/* ; do
-        . $i 2>/dev/null
-    done
-fi
