@@ -7,12 +7,11 @@ fi
 source ~/.znap/zsh-snap/znap.zsh  # Start Znap
 
 # `znap source` automatically downloads and installs your plugins.
-znap source ohmyzsh/ohmyzsh lib/{history,completion,key-bindings,clipboard}
+znap source ohmyzsh/ohmyzsh plugins/wd lib/{history,completion,key-bindings,clipboard}
 znap source zsh-users/zsh-completions
 znap source zsh-users/zsh-autosuggestions
 znap source zdharma/fast-syntax-highlighting
 znap source 3v1n0/zsh-bash-completions-fallback
-znap source mfaerevaag/wd
 znap install bigH/git-fuzzy
 
 for f in $(find ~/.shell/zsh -name '*.zsh'); do
@@ -31,6 +30,7 @@ fi
 
 # completion color
 zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"
+fpath=($fpath ~/.znap/ohmyzsh/plugins/wd)
 
 # if we SSH then autolaunch default tmux session
 #if [[ -n $SSH_TTY && -z $TMUX ]]; then
