@@ -43,20 +43,20 @@ cmp.setup {
             behavior = cmp.ConfirmBehavior.Insert,
             select = true
         }),
-        ["<Tab>"] = cmp.mapping(function(fallback)
-            if vim.fn.pumvisible() == 1 then
-                vim.fn.feedkeys(t("<C-n>"), "n")
+        ['<Tab>'] = function(fallback)
+            if cmp.visible() then
+                cmp.select_next_item()
             else
                 fallback()
             end
-        end, {"i", "s"}),
-        ["<S-Tab>"] = cmp.mapping(function(fallback)
-            if vim.fn.pumvisible() == 1 then
-                vim.fn.feedkeys(t("<C-p>"), "n")
+        end,
+        ['<S-Tab>'] = function(fallback)
+            if cmp.visible() then
+                cmp.select_prev_item()
             else
                 fallback()
             end
-        end, {"i", "s"})
+        end,
     },
     snippet = {expand = function(args) vim.fn["UltiSnips#Anon"](args.body) end},
     sources = {
