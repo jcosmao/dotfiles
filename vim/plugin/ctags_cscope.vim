@@ -174,6 +174,9 @@ endfunction
 
 " Tag mapping ctags/cscope
 
+" Append : to <cword> vim allowed char. This allow expand(<cword>) detect
+" puppet class like xxx::yyy
+autocmd FileType puppet set iskeyword+=:
 " map <silent> <leader>] :execute 'tag' expand('<cword>')<CR>
 map <silent> <C-]> :call GoToDef(expand('<cword>'), getline('.'))<cr>
 map <silent> <leader>] :execute 'FZFCtags' '^'.expand('<cword>').'$'<cr>
