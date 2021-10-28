@@ -107,7 +107,7 @@ function install_vim_config {
     $HOME/.local/bin/nvim --headless +PlugUpgrade +PlugClean! +PlugInstall +PlugUpdate! +qall 2> /dev/null
 
     # Install tree-sitter parser from tar
-    which gcc &> /dev/null || (cd ~/.config/nvim/plug/nvim-treesitter/parser && tar xzf ~/.config/nvim/tree-sitter-parsers.tgz)
+    which gcc &> /dev/null || (cd ~/.vim/plug/nvim-treesitter/parser && tar xzf ~/.config/nvim/tree-sitter-parsers.tgz)
 }
 
 function install_shell {

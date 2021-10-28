@@ -3,19 +3,24 @@
 # Node JS
 export NVM_DIR="$HOME/.nvm"
 
+# mkdir ~/.nvm  to auto install nodejs
 if [[ -d $NVM_DIR ]]; then
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-else
-    echo "NodeJS install"
-    (
-        git clone https://github.com/nvm-sh/nvm.git "$NVM_DIR"
-        cd "$NVM_DIR"
-        git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)`
-    ) &> /dev/null && \. "$NVM_DIR/nvm.sh"
+    if [[ ! -f "$NVM_DIR/nvm.sh" ]]; then
+        echo "NodeJS install"
+        (
+            git clone https://github.com/nvm-sh/nvm.git "$NVM_DIR"
+            cd "$NVM_DIR"
+            git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)`
+        ) &> /dev/null && \. "$NVM_DIR/nvm.sh"
 
-    nvm install --lts
-    nvm alias default node
+        nvm install --lts
+        nvm alias default node
+    fi
+
+    if [[ -f "$NVM_DIR/nvm.sh" ]]; then
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+    fi
 fi
 
 # Go path
@@ -47,8 +52,16 @@ fi
 # https://github.com/pyenv/pyenv-installer
 export PYENV_ROOT="$HOME/.pyenv"
 
-if [[ -f $PYENV_ROOT/bin/pyenv ]]; then
-    export PATH="$HOME/.pyenv/bin:$PATH"
-    eval "$(pyenv init -)"
-    eval "$(pyenv virtualenv-init -)"
+if [[ -d $PYENV_ROOT ]]; then
+
+    if [[ ! -f $PYENV_ROOT/bin/pyenv ]]; then
+        git clone https://github.com/pyenv/pyenv.git $PYENV_ROOT
+        git clone https://github.com/pyenv/pyenv-virtualenv.git $PYENV_ROOT/plugins/pyenv-virtualenv
+    fi
+
+    if [[ -f $PYENV_ROOT/bin/pyenv ]]; then
+        export PATH="$HOME/.pyenv/bin:$PATH"
+        eval "$(pyenv init -)"
+        eval "$(pyenv virtualenv-init -)"
+    fi
 fi

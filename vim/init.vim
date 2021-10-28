@@ -14,21 +14,22 @@ call plug#begin('~/.vim/plug')
 
 " completion / linter
 
-Plug 'neovim/nvim-lspconfig'
-Plug 'kabouzeid/nvim-lspinstall'
-Plug 'onsails/lspkind-nvim'
-Plug 'hrsh7th/nvim-cmp'
-Plug 'hrsh7th/cmp-buffer'
-Plug 'hrsh7th/cmp-nvim-lsp'
-Plug 'hrsh7th/cmp-path'
-Plug 'hrsh7th/cmp-nvim-lua'
-Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
-Plug 'quangnguyen30192/cmp-nvim-ultisnips'
-Plug 'folke/trouble.nvim'
-Plug 'w0rp/ale'
-Plug 'jubnzv/virtual-types.nvim'
-
+if has('python3')
+    Plug 'neovim/nvim-lspconfig'
+    Plug 'kabouzeid/nvim-lspinstall'
+    Plug 'onsails/lspkind-nvim'
+    Plug 'hrsh7th/nvim-cmp'
+    Plug 'hrsh7th/cmp-buffer'
+    Plug 'hrsh7th/cmp-nvim-lsp'
+    Plug 'hrsh7th/cmp-path'
+    Plug 'hrsh7th/cmp-nvim-lua'
+    Plug 'SirVer/ultisnips'
+    Plug 'honza/vim-snippets'
+    Plug 'quangnguyen30192/cmp-nvim-ultisnips'
+    Plug 'folke/trouble.nvim'
+    Plug 'w0rp/ale'
+    Plug 'jubnzv/virtual-types.nvim'
+endif
 " Utils
 
 Plug 'mhinz/vim-startify'
@@ -143,7 +144,7 @@ set termguicolors
 set background=dark
 
 " Load lua plugins config
-if ! &readonly
+if ! &readonly && has('python3')
     lua require('config')
 endif
 
