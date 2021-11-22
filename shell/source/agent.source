@@ -1,8 +1,10 @@
 #!/bin/bash
 
+export SSH_AUTH_SOCK=~/.cache/ssh-agent.sock
+
 function launch_ssh_agent ()
 {
-    ssh_agent_cmd="ssh-agent -s -t 36000"
+    ssh_agent_cmd="ssh-agent -s -t 36000 -a ${SSH_AUTH_SOCK}"
 
     if [[ -f ~/.ssh-agent ]]; then
         eval "$(<~/.ssh-agent)" >/dev/null
@@ -20,7 +22,7 @@ function launch_ssh_agent ()
     # Seems no ssh-agent running
     if [[ $rc -eq 2 ]]; then
         # Try to export ssh-agent env
-        (umask 066; ssh-agent -s -t 36000 > ~/.ssh-agent)
+        (umask 066; ssh-agent -s -t 36000 -a ${SSH_AUTH_SOCK} > ~/.ssh-agent)
         eval "$(<~/.ssh-agent)" >/dev/null
         ssh-add 2> /dev/null
     elif [[ $rc -eq 1 ]]; then
