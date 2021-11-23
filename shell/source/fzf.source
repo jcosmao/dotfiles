@@ -1,11 +1,19 @@
 # vim: set ft=sh:
 
-# fuzzysearch
-if [[ $SHELL =~ 'zsh' ]]; then
-    [ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
-else
-    [ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.bash ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.bash
+# Setup fzf
+# ---------
+if [[ ! "$PATH" == *.fzf/bin* ]]; then
+  export PATH="${PATH:+${PATH}:}${HOME}/.fzf/bin"
 fi
+
+# Auto-completion
+# ---------------
+[[ $- == *i* ]] && source "${HOME}/.fzf/shell/completion.zsh" 2> /dev/null
+
+# Key bindings
+# ------------
+source "${HOME}/.fzf/shell/key-bindings.zsh" 2> /dev/null
+
 
 # ctrl-r : history
 # ctrl-t : file search

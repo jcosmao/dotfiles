@@ -21,7 +21,11 @@ alias pip3="python3 -m pip"
 
 function os {
     export CLIFF_MAX_TERM_WIDTH=$(tput cols)
-    openstack $* -f json 2> /dev/null | jq .
+    if [[ "$*" =~ (show|list) ]]; then
+        openstack $* -f json | jq .
+    else
+        openstack $*
+    fi
 }
 
 alias oss="os server"

@@ -12,7 +12,8 @@ source ~/.znap/zsh-snap/znap.zsh  # Start Znap
 znap source ohmyzsh/ohmyzsh plugins/wd lib/{history,completion,key-bindings,clipboard}
 znap source zsh-users/zsh-completions
 znap source zsh-users/zsh-autosuggestions
-znap source zdharma/fast-syntax-highlighting
+znap source zsh-users/zsh-syntax-highlighting
+# znap source zdharma/fast-syntax-highlighting
 znap source 3v1n0/zsh-bash-completions-fallback
 znap install bigH/git-fuzzy
 
