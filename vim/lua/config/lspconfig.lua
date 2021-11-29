@@ -1,6 +1,6 @@
 local vim = vim
 local lspconfig = require('lspconfig')
-local lspinstall = require('lspinstall')
+local lsp_installer = require("nvim-lsp-installer")
 
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
@@ -69,39 +69,19 @@ end
 
 -- vim.lsp.handlers["textDocument/definition"] = goto_definition_ctag_fallback
 
--- https://langserver.org/
--- Install langserver with :LspInstall xxx
-local function setup_servers()
-    lspinstall.setup()
-    local servers = lspinstall.installed_servers()
+-- setup_servers()
 
-    -- Replace pyright by pylsp
-    -- for i, s in ipairs(servers) do
-    --     if s == 'python' then
-    --     	table.remove(servers, i)
-    --     end
+-- Register a handler that will be called for all installed servers.
+-- Alternatively, you may also register handlers on specific server instances instead (see example below).
+lsp_installer.on_server_ready(function(server)
+    local opts = {}
+
+    -- (optional) Customize the options passed to the server
+    -- if server.name == "tsserver" then
+    --     opts.root_dir = function() ... end
     -- end
 
-    -- Enable pylsp if found in PATH
-    r, s, t = os.execute("which pylsp > /dev/null")
-    if r == 0 or t == 0 then
-        table.insert(servers, 'pylsp')
-    end
-
-    for _, server in pairs(servers) do
-        lspconfig[server].setup{
-            on_attach = on_attach,
-            flags = {
-                debounce_text_changes = 150,
-            }
-        }
-    end
-end
-
-setup_servers()
-
--- Automatically reload after `:LspInstall <server>` so we don't have to restart neovim
-lspinstall.post_install_hook = function ()
-    setup_servers() -- reload installed servers
-    vim.cmd("bufdo e") -- this triggers the FileType autocmd that starts the server
-end
+    -- This setup() function is exactly the same as lspconfig's setup function.
+    -- Refer to https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
+    server:setup(opts)
+end)

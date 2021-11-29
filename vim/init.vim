@@ -16,7 +16,7 @@ call plug#begin('~/.vim/plug')
 
 if has('python3')
     Plug 'neovim/nvim-lspconfig'
-    Plug 'kabouzeid/nvim-lspinstall'
+    Plug 'williamboman/nvim-lsp-installer'
     Plug 'onsails/lspkind-nvim'
     Plug 'hrsh7th/nvim-cmp'
     Plug 'hrsh7th/cmp-buffer'
