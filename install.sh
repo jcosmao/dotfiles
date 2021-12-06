@@ -5,7 +5,9 @@ SCRIPT=$(readlink -f $0)
 SCRIPTPATH=$(dirname $SCRIPT)
 IS_SSH=$(env | grep -c SSH_TTY)
 cd $SCRIPTPATH
+TMPDIR=$SCRIPTPATH/tmp
 
+mkdir $TMPDIR
 mkdir -p ~/.config
 mkdir -p ~/.local/bin
 
@@ -21,19 +23,17 @@ fi
 function install_neovim {
     release=$1
     echo "- Update neovim from $release"
-    wget https://github.com/neovim/neovim/releases/download/$release/nvim.appimage -O /tmp/nvim.appimage 2>/dev/null || \
-        cp nvim/nvim.appimage /tmp
-    chmod +x /tmp/nvim.appimage
+    wget https://github.com/neovim/neovim/releases/download/$release/nvim.appimage -O $TMPDIR/nvim.appimage 2>/dev/null || \
+        cp nvim/nvim.appimage $TMPDIR
+    chmod +x $TMPDIR/nvim.appimage
     echo "  - install neovim under ~/.local/bin/nvim"
     (
         cd ~/.local/bin
         rm -rf .nvim
-        /tmp/nvim.appimage --appimage-extract
+        $TMPDIR/nvim.appimage --appimage-extract
         mv squashfs-root .nvim
         ln -s ~/.local/bin/.nvim/usr/bin/nvim ~/.local/bin/nvim
         ln -s ~/.local/bin/.nvim/usr/bin/nvim ~/.local/bin/vim
-        ln -sf ~/.local/bin/.nvim/usr/bin/nvim /usr/local/bin/vim
-        ln -sf ~/.local/bin/.nvim/usr/bin/nvim /usr/local/bin/vi
         [[ $INSTALL_ROOT_BIN -eq 1 ]] && ln -sf ~/.local/bin/.nvim/usr/bin/nvim /usr/local/bin/vim && \
                                          ln -sf /usr/local/bin/vim /usr/local/bin/vi
     ) &> /dev/null
@@ -43,16 +43,16 @@ function install_neovim {
             # - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
             version=$(
                 basename $(curl -si https://github.com/BurntSushi/ripgrep/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
-            wget "https://github.com/BurntSushi/ripgrep/releases/download/$version/ripgrep_${version}_amd64.deb" -O /tmp/ripgrep.deb
-            dpkg -x /tmp/ripgrep.deb /tmp/deb
+            wget "https://github.com/BurntSushi/ripgrep/releases/download/$version/ripgrep_${version}_amd64.deb" -O $TMPDIR/ripgrep.deb
+            dpkg -x $TMPDIR/ripgrep.deb $TMPDIR/deb
 
             # - Install fd: https://github.com/sharkdp/fd/releases/latest
             version=$(basename $(curl -si https://github.com/sharkdp/fd/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
-            wget "https://github.com/sharkdp/fd/releases/download/${version}/fd_${version:1}_amd64.deb" -O /tmp/fd.deb
-            dpkg -x /tmp/fd.deb /tmp/deb
+            wget "https://github.com/sharkdp/fd/releases/download/${version}/fd_${version:1}_amd64.deb" -O $TMPDIR/fd.deb
+            dpkg -x $TMPDIR/fd.deb $TMPDIR/deb
 
             # save binary
-            cp /tmp/deb/usr/bin/* $SCRIPTPATH/bin && rm -rf /tmp/deb
+            cp $TMPDIR/deb/usr/bin/* $SCRIPTPATH/bin && rm -rf $TMPDIR/deb
             chmod +x $SCRIPTPATH/bin/*
         fi
     fi
@@ -228,6 +228,8 @@ function main {
             * ) [[ $arg =~ \-+.* ]] && print_help "$arg unknown"
         esac
     done
+
+    [[ -d $TMPDIR ]] && rm -rf $TMPDIR
 
     echo "Install dotfiles done !"
 }
