@@ -38,7 +38,7 @@ Plug 'kyazdani42/nvim-web-devicons'
 Plug 'kyazdani42/nvim-tree.lua'
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', {'dir': '~/.fzf',
-\                     'do': './install --no-update-rc --key-bindings --completion --xdg; cd  ~/.vim/plug/fzf.vim; patch -p1 -stNr /dev/null < ~/.vim/plugin_patch/fzf.vim.patch; true'}
+\                     'do': './install --no-update-rc --key-bindings --completion --xdg; cd  ~/.vim/plug/fzf.vim; patch -p1 -stNr /dev/null < ~/.config/nvim/plugin_patch/fzf.vim.patch; true'}
 Plug 'chengzeyi/fzf-preview.vim'
 Plug 'itchyny/lightline.vim'
 Plug 'maximbaz/lightline-ale'
@@ -71,7 +71,7 @@ Plug 'rodjek/vim-puppet', {'for': 'puppet'}
 
 " ctags / cscope
 
-Plug 'ludovicchabant/vim-gutentags', {'do': 'cd  ~/.vim/plug/vim-gutentags; patch -p1 -stNr /dev/null < ~/.vim/plugin_patch/vim-gutentags.patch; true'}
+Plug 'ludovicchabant/vim-gutentags', {'do': 'cd  ~/.vim/plug/vim-gutentags; patch -p1 -stNr /dev/null < ~/.config/nvim/plugin_patch/vim-gutentags.patch; true'}
 Plug 'liuchengxu/vista.vim'
 
 " git
