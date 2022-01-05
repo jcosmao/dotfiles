@@ -1,29 +1,27 @@
 export PATH="$HOME/.local/bin:/usr/local/bin:$PATH"
 
-# Download Znap, if it's not there yet.
-if [[ ! -f ~/.znap/zsh-snap/znap.zsh ]]; then
-    mkdir -p ~/.znap
-    git clone https://github.com/marlonrichert/zsh-snap.git ~/.znap/zsh-snap
+if [[ ! -f ~/.zpm/zpm.zsh ]]; then
+  git clone --recursive https://github.com/zpm-zsh/zpm ~/.zpm
 fi
+source ~/.zpm/zpm.zsh
 
-source ~/.znap/zsh-snap/znap.zsh  # Start Znap
 
-# `znap source` automatically downloads and installs your plugins.
-znap source ohmyzsh/ohmyzsh plugins/wd lib/{history,completion,key-bindings,clipboard}
-znap source zsh-users/zsh-completions
-znap source zsh-users/zsh-autosuggestions
-znap source zsh-users/zsh-syntax-highlighting
-# znap source zdharma/fast-syntax-highlighting
-znap source 3v1n0/zsh-bash-completions-fallback
-znap install bigH/git-fuzzy
+zpm load @omz
+zpm load @omz/wd,apply:source:path:fpath
+zpm load @omz-lib/{history,completion,key-bindings,clipboard}
+zpm load zsh-users/zsh-completions
+zpm load zsh-users/zsh-autosuggestions
+zpm load 3v1n0/zsh-bash-completions-fallback
+zpm load zsh-users/zsh-syntax-highlighting,apply:fpath
+source ~/.zpm/plugins/zsh-users---zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 for f in $(find ~/.shell/zsh -name '*.zsh'); do
     . $f
 done
 
-znap prompt jcosmao/blox-zsh-theme
+zpm load jcosmao/blox-zsh-theme,source:blox.zsh-theme
 
-# ssh-agent ~/.bash/functions
+# ssh-agent ~/.shell/functions
 if declare -f launch_ssh_agent &> /dev/null; then
     launch_ssh_agent
 fi
@@ -33,7 +31,6 @@ fi
 
 # completion color
 zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"
-fpath=($fpath ~/.znap/ohmyzsh/plugins/wd)
 
 # if we SSH then autolaunch default tmux session
 #if [[ -n $SSH_TTY && -z $TMUX ]]; then
