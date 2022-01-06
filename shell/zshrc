@@ -16,10 +16,11 @@ zpm load zsh-users/zsh-syntax-highlighting,apply:fpath
 source ~/.zpm/plugins/zsh-users---zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 for f in $(find ~/.shell/zsh -name '*.zsh'); do
-    . $f
+    source $f
 done
 
-zpm load jcosmao/blox-zsh-theme,source:blox.zsh-theme
+zpm load jcosmao/blox-zsh-theme
+source ~/.zpm/plugins/jcosmao---blox-zsh-theme/blox.zsh
 
 # ssh-agent ~/.shell/functions
 if declare -f launch_ssh_agent &> /dev/null; then
