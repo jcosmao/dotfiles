@@ -48,7 +48,7 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
 
 local function goto_definition_ctag_fallback(_, method, result)
     if result == nil or vim.tbl_isempty(result) then
-        vim.fn.GoToDef(vim.fn.expand('<cword>'), vim.fn.getline('.'))
+        vim.fn.GoToDef(vim.fn.expand('<cword>'), vim.fn.getline('.'), 1)
         return
     end
 

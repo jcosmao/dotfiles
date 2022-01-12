@@ -123,17 +123,27 @@ command! -bang -nargs=* FZFCtags
   \         --preview "bat --color always --highlight-line {5} {2}"'
   \ }))
 
-function! GoToDef(tag, ctx_line)
+function! GoToDef(tag, ctx_line, from_lsp)
     let l:tag = a:tag
     let l:ctx_line = a:ctx_line
+    let l:from_lsp = a:from_lsp
 
-    " if &filetype == 'python'
-    "     let r = execute(":call jedi#goto()")
-    "     if r !~# "jedi-vim: Couldn't find any definitions"
-    "         echo "GoToDef: jedi#goto()"
-    "         return
-    "     endif
-    " endif
+    " GoToDef called from local mapping
+    if l:from_lsp == 0
+        if &filetype == 'python'
+            let r = execute(":call jedi#goto()")
+            if r !~# "jedi-vim: Couldn't find any definitions"
+                echo "GoToDef: jedi#goto()"
+                return
+            endif
+        elseif &filetype == 'go'
+            let r = execute(":GoDef")
+            if r !~# "vim-go: no identifier found"
+                echo "GoToDef: vim-go :GoDef"
+                return
+            endif
+        endif
+    endif
 
     if !exists("b:gutentags_files")
         echohl WarningMsg
@@ -178,7 +188,7 @@ endfunction
 " puppet class like xxx::yyy
 autocmd FileType puppet set iskeyword+=:
 " map <silent> <leader>] :execute 'tag' expand('<cword>')<CR>
-map <silent> <C-]> :call GoToDef(expand('<cword>'), getline('.'))<cr>
+map <silent> <C-]> :call GoToDef(expand('<cword>'), getline('.'), 0)<cr>
 map <silent> <leader>] :execute 'FZFCtags' '^'.expand('<cword>').'$'<cr>
 map <silent> <leader>[ :execute 'tselect' expand('<cword>')<cr>
 
