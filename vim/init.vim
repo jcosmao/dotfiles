@@ -29,7 +29,12 @@ if has('python3')
     Plug 'folke/trouble.nvim'
     Plug 'w0rp/ale'
     Plug 'jubnzv/virtual-types.nvim'
+    " nvim-go + deps
+    Plug 'crispgm/nvim-go'
+    Plug 'nvim-lua/plenary.nvim'
+    Plug 'nvim-lua/popup.nvim'
 endif
+
 " Utils
 
 Plug 'mhinz/vim-startify'
@@ -66,7 +71,6 @@ Plug 'airblade/vim-rooter', {'commit': 'd64f3e04df9914e784508019a1a1f291cbb40bd4
 " Plug 'jcosmao/jedi-vim-pyversion', {'for': 'python'}
 " python syntax hilight
 Plug 'numirias/semshi', {'for': 'python', 'do': ':UpdateRemotePlugins'}
-Plug 'fatih/vim-go', {'for': 'go'}
 Plug 'rodjek/vim-puppet', {'for': 'puppet'}
 
 " ctags / cscope

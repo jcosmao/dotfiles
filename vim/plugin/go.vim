@@ -15,3 +15,9 @@ let g:go_highlight_generate_tags = 1
 
 " guru, godef, gopls
 let g:go_def_mode = 'gopls'
+
+
+augroup NvimGo
+  autocmd!
+  autocmd User NvimGoLintPopupPost wincmd c
+augroup END
