@@ -64,14 +64,11 @@
     l = log --stat
     lol = log --graph --decorate --pretty=oneline --abbrev-commit
     ls = ls-files
-    trackshow = !git rev-parse --abbrev-ref --symbolic-full-name @{u}
-    trackset = !git branch -u origin/$(git symbolic-ref --short HEAD)
+    tshow = !git rev-parse --abbrev-ref --symbolic-full-name @{u}
+    tset = "!f() { rb=${1:-dev/USERNAME/$(git symbolic-ref --short HEAD)}; git branch -u origin/$rb; }; f"
     # Show the diff between the latest commit and the current state
     d = !"git diff-index --quiet HEAD -- || clear; git --no-pager diff --patch-with-stat"
     st = status --short
-    cl = clone --recursive
-    co = "!f() { git fetch; git checkout \"$1\" 2> /dev/null || (git checkout -b \"$1\" && git trackset); }; f"
-    cm = commit
     ca = commit -a --amend --reuse-message=HEAD
     pushorigin = !git push --set-upstream origin $(git symbolic-ref --short HEAD)
     pushdev = !git push --set-upstream origin $(git symbolic-ref --short HEAD):dev/USERNAME/$(git symbolic-ref --short HEAD)
