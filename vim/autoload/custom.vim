@@ -30,10 +30,12 @@ endfunction
 function! custom#HieraEncrypt()
     let git_root = split(system('git -C '.shellescape(expand("%:p:h")).' rev-parse --show-toplevel'), '\n')[0]
     if filereadable(git_root.'/ovh-hiera-encrypt')
+        redir => message
         execute ':silent !'.git_root.'/ovh-hiera-encrypt -f '.shellescape(expand("%:p")) | execute 'redraw!'
+        redir END
         execute ':silent edit!'
         echohl WarningMsg
-        echo 'HieraEncrypt(): done'
+        echo 'custom#HieraEncrypt: ' . message
         echohl None
     endif
 endfunction
