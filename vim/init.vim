@@ -10,30 +10,32 @@
 " PlugDiff 	Examine changes from the previous update and the pending changes
 " PlugSnapshot[!] [output path] 	Generate script for restoring the current snapshot of the plugins<Paste>
 
+if !has('python3')
+    echohl WarningMsg
+    echo 'Missing python3 support - need to pip install pynvim'
+    echohl None
+endif
+
 call plug#begin('~/.vim/plug')
 
 " completion / linter
 
-if has('python3')
-    Plug 'neovim/nvim-lspconfig'
-    Plug 'williamboman/nvim-lsp-installer'
-    Plug 'onsails/lspkind-nvim'
-    Plug 'hrsh7th/nvim-cmp'
-    Plug 'hrsh7th/cmp-buffer'
-    Plug 'hrsh7th/cmp-nvim-lsp'
-    Plug 'hrsh7th/cmp-path'
-    Plug 'hrsh7th/cmp-nvim-lua'
-    Plug 'SirVer/ultisnips'
-    Plug 'honza/vim-snippets'
-    Plug 'quangnguyen30192/cmp-nvim-ultisnips'
-    Plug 'folke/trouble.nvim'
-    Plug 'w0rp/ale'
-    Plug 'jubnzv/virtual-types.nvim'
-    " nvim-go + deps
-    Plug 'crispgm/nvim-go'
-    Plug 'nvim-lua/plenary.nvim'
-    Plug 'nvim-lua/popup.nvim'
-endif
+Plug 'neovim/nvim-lspconfig'
+Plug 'williamboman/nvim-lsp-installer'
+Plug 'onsails/lspkind-nvim'
+Plug 'hrsh7th/nvim-cmp'
+Plug 'hrsh7th/cmp-buffer'
+Plug 'hrsh7th/cmp-nvim-lsp'
+Plug 'hrsh7th/cmp-path'
+Plug 'hrsh7th/cmp-nvim-lua'
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
+Plug 'quangnguyen30192/cmp-nvim-ultisnips'
+Plug 'folke/trouble.nvim'
+Plug 'w0rp/ale'
+Plug 'jubnzv/virtual-types.nvim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-lua/popup.nvim'
 
 " Utils
 
@@ -60,6 +62,7 @@ Plug 'roxma/vim-paste-easy'
 Plug 'junegunn/rainbow_parentheses.vim'
 " breaking change - does not detect root pattern with priority
 Plug 'airblade/vim-rooter', {'commit': 'd64f3e04df9914e784508019a1a1f291cbb40bd4'}
+Plug 'ellisonleao/glow.nvim'  " markdown render
 
 " Language Specific
 
@@ -72,6 +75,8 @@ Plug 'airblade/vim-rooter', {'commit': 'd64f3e04df9914e784508019a1a1f291cbb40bd4
 " python syntax hilight
 Plug 'numirias/semshi', {'for': 'python', 'do': ':UpdateRemotePlugins'}
 Plug 'rodjek/vim-puppet', {'for': 'puppet'}
+" nvim-go + deps
+Plug 'crispgm/nvim-go'
 
 " ctags / cscope
 
@@ -179,6 +184,7 @@ map <silent> <F2> :Vista!! <cr>
 map <silent> <F3> :IndentLinesToggle <cr>
 map <silent> <F4> :set number! <cr>
 map <silent> <F5> :SignifyToggle <cr>
+map <silent> <F8> :Glow <cr>
 map <silent> <F10> :set paste! <cr>
 map <silent> <F11> :2,$s/^\s*pick/fixup/g <cr>
 map <silent> <F12> :call custom#ToggleMouse() <cr>

@@ -1,6 +1,7 @@
+require("nvim-treesitter.install").prefer_git = false
 require'nvim-treesitter.configs'.setup {
   ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
-  ignore_install = {}, -- List of parsers to ignore installing
+  ignore_install = {"cuda", "dart", "eex", "fennel", "foam", "fusion", "heex", "hocon", "julia", "ledger", "llvm", "pascal", "pioasm", "prisma", "pug", "rasl", "supercollider", "surface", "svelte", "teal", "tlaplus", "turtle", "vala", "verilog", "zig"}, -- List of parsers to ignore installing
   highlight = {
     enable = true,              -- false will disable the whole extension
     disable = {},  -- list of language that will be disabled
