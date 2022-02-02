@@ -18,7 +18,7 @@ function __get_host_color
 
 # Layout
 BLOX_SEG__UPPER_LEFT=(docker openstack host cwd git exec_time)
-BLOX_SEG__UPPER_RIGHT=(nodejs virtualenv git_repo_name)
+BLOX_SEG__UPPER_RIGHT=(nodejs virtualenv pyenv git_repo_name)
 BLOX_SEG__LOWER_LEFT=(bgjobs symbol)
 BLOX_SEG__LOWER_RIGHT=()
 
