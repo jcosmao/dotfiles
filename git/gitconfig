@@ -72,7 +72,7 @@
     ca = commit -a --amend --reuse-message=HEAD
     pushorigin = !git push --set-upstream origin $(git symbolic-ref --short HEAD)
     pushdev = !git push --set-upstream origin $(git symbolic-ref --short HEAD):dev/USERNAME/$(git symbolic-ref --short HEAD)
-    pf = push --force
+    pf = pushdev --force
     pick = cherry-pick -s -x --allow-empty
     retag = "!r() { git tag -d $1 && git push origin :refs/tags/$1 && git tag $1; }; r"
     # Remove branches that have already been merged with master
