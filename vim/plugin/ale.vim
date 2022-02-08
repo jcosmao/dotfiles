@@ -8,6 +8,7 @@ let g:ale_linters = {
 \   'python': ['flake8'],
 \   'yaml': ['yamllint'],
 \   'go': ['gometalinter', 'gofmt'],
+\   'markdown': ['mdl'],
 \}
 " Ale autofix
 let g:ale_fix_on_save = 1

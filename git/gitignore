@@ -1,2 +1,4 @@
 .ctags.gutentags
 .cscope.gutentags
+.project/
+.python-version
