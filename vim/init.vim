@@ -10,6 +10,8 @@
 " PlugDiff 	Examine changes from the previous update and the pending changes
 " PlugSnapshot[!] [output path] 	Generate script for restoring the current snapshot of the plugins<Paste>
 
+let g:python3_host_prog = $HOME . '/.pyenv/versions/nvim/bin/python'
+
 if !has('python3')
     echohl WarningMsg
     echo 'Missing python3 support - need to pip install pynvim'
@@ -75,6 +77,8 @@ Plug 'ellisonleao/glow.nvim'  " markdown render
 " python syntax hilight
 Plug 'numirias/semshi', {'for': 'python', 'do': ':UpdateRemotePlugins'}
 Plug 'rodjek/vim-puppet', {'for': 'puppet'}
+Plug 'psf/black',  {'for': 'python', 'do': ':UpdateRemotePlugins'}
+Plug 'averms/black-nvim', {'do': ':UpdateRemotePlugins'}
 " nvim-go + deps
 Plug 'crispgm/nvim-go'
 
