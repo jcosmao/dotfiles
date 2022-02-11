@@ -3,14 +3,16 @@
 [core]
 	excludesfile = ~/.gitignore
     attributesfile = ~/.gitattributes
-    hooksPath = ~/.git/hooks
+
+[init]
+    templatedir = ~/.git/hooks
 
 [user]
     name = USERNAME
     email = MAIL
 
 [gitreview]
-    name = USERNAME
+    username = USERNAME
 
 [credential]
 	helper = store
