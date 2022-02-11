@@ -10,7 +10,9 @@
 " PlugDiff 	Examine changes from the previous update and the pending changes
 " PlugSnapshot[!] [output path] 	Generate script for restoring the current snapshot of the plugins<Paste>
 
-let g:python3_host_prog = $HOME . '/.pyenv/versions/nvim/bin/python'
+if filereadable($HOME . '/.pyenv/versions/nvim/bin/python')
+    let g:python3_host_prog = $HOME . '/.pyenv/versions/nvim/bin/python'
+endif
 
 if !has('python3')
     echohl WarningMsg
