@@ -77,7 +77,7 @@ Plug 'ellisonleao/glow.nvim'  " markdown render
 " is both python2/3 in system)
 " Plug 'jcosmao/jedi-vim-pyversion', {'for': 'python'}
 " python syntax hilight
-Plug 'numirias/semshi', {'for': 'python', 'do': ':UpdateRemotePlugins'}
+Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
 Plug 'rodjek/vim-puppet', {'for': 'puppet'}
 Plug 'psf/black',  {'for': 'python', 'do': ':UpdateRemotePlugins'}
 Plug 'averms/black-nvim', {'do': ':UpdateRemotePlugins'}
