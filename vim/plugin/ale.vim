@@ -5,7 +5,7 @@ let g:ale_echo_msg_error_str = 'Error'
 let g:ale_echo_msg_warning_str = 'Warning'
 let g:ale_echo_msg_format = '[%linter%] [%code%] %s [%severity%]'
 let g:ale_linters = {
-\   'python': ['flake8'],
+\   'python': ['pflake8'],
 \   'yaml': ['yamllint'],
 \   'go': ['gometalinter', 'gofmt'],
 \   'markdown': ['mdl'],
