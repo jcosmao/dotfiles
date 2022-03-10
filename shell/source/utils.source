@@ -43,7 +43,20 @@ function open
     nohup xdg-open $* </dev/null >/tmp/open.log 2>&1 &
 }
 
-function ssl_infos ()
+function ssl_info
+{
+    [[ -z $1 ]] && echo "need domain" && return
+
+    echo -e "== brief info =="
+    echo | openssl s_client -connect $1 -brief
+
+    echo -e "\n== Chain Info =="
+    echo | openssl s_client -showcerts -connect $1 2>&1 | \
+        sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p;/-END CERTIFICATE-/a\\x0' | \
+        sed -e '$ d' | xargs -0rl -I% sh -c "echo '%' | openssl x509 -subject -issuer  -fingerprint -sha1 -dates -noout"
+}
+
+function ssl_get
 {
     [[ -z $1 ]] && echo "need domain" && return
 
