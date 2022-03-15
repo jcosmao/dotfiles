@@ -78,6 +78,7 @@ Plug 'ellisonleao/glow.nvim'  " markdown render
 " Plug 'jcosmao/jedi-vim-pyversion', {'for': 'python'}
 " python syntax hilight
 Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
+Plug 'heavenshell/vim-pydocstring', {'do': 'pip3 install doq', 'for': 'python'}
 Plug 'rodjek/vim-puppet', {'for': 'puppet'}
 Plug 'psf/black',  {'for': 'python', 'do': ':UpdateRemotePlugins'}
 Plug 'averms/black-nvim', {'do': ':UpdateRemotePlugins'}
