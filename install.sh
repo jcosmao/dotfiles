@@ -77,25 +77,14 @@ function install_vim_requirements {
         fi
     done
 
-    pip_freeze=$(python3 -m pip freeze --user)
-    if [[ $? -ne 0 ]]; then
+    source ~/.pyenv/versions/nvim/bin/activate || return
 
-        [[ $INSTALL_PIP -eq 0 ]] && echo "Skip pip deps" && return
-
-        if which pacman 2>&1 > /dev/null ; then
-            sudo pacman -S --noconfirm python-pip
-        elif which apt-get 2>&1 > /dev/null ; then
-            sudo apt-get install -y python3-pip
-        fi
-    fi
-
-    pip_require=(python-lsp-server pynvim yamllint)
+    pip_require=(python-lsp-server pynvim yamllint jedi pyproject-flake8 black)
     pip_installed=$(echo "$pip_freeze" | grep -P "(^$(echo ${pip_require[@]} | sed -e 's/ /|^/g'))" | wc -l)
 
     if [[ ${#pip_require[@]} -ne $pip_installed ]]; then
-        python3 -m pip install --user --upgrade  \
-            pip setuptools \
-            ${pip_require[@]}
+        pip install --upgrade pip setuptools
+        pip install --upgrade ${pip_require[@]}
     fi
 }
 
