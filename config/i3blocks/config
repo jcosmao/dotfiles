@@ -72,6 +72,11 @@ signal=10
 [battery]
 interval=10
 
+[utc_hour]
+label=UTC
+command=date -u '+%0H:%0M'
+interval=5
+
 [canada_hour]
 label=
 command=TZ=America/Montreal date '+%0H:%0M'
