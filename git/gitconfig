@@ -21,6 +21,9 @@
     autosetupmerge = true
     autosetuprebase = always
 
+[diff]
+    ignoreSubmodules = dirty
+
 [color]
     ui = auto
 
