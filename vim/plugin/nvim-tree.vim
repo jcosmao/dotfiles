@@ -1,4 +1,3 @@
-let g:nvim_tree_indent_markers = 1 "0 by default, this option shows indent markers when folders are open
 let g:nvim_tree_highlight_opened_files = 1 "0 by default, will enable folder and file icon highlight for opened files/directories.
 let g:nvim_tree_root_folder_modifier = ':~' "This is the default. See :help filename-modifiers for more options
 let g:nvim_tree_add_trailing = 1 "0 by default, append a trailing slash to folder names
@@ -124,6 +123,11 @@ require'nvim-tree'.setup {
   trash = {
     cmd = "trash",
     require_confirm = true
+  },
+  renderer = {
+    indent_markers = {
+      enable = true
+    },
   },
   actions = {
     change_dir = {
