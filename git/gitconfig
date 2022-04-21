@@ -75,6 +75,7 @@
     d = !"git diff-index --quiet HEAD -- || clear; git --no-pager diff --patch-with-stat"
     st = status --short
     ca = commit -a --amend --reuse-message=HEAD
+    co = checkout
     pushorigin = !git push --set-upstream origin $(git symbolic-ref --short HEAD)
     pushdev = !git push --set-upstream origin $(git symbolic-ref --short HEAD):dev/USERNAME/$(git symbolic-ref --short HEAD)
     pf = pushdev --force
