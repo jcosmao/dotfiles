@@ -1,4 +1,5 @@
-.ctags.gutentags
-.cscope.gutentags
+.ctags.gutentags*
+.cscope.gutentags*
 .project/
 .python-version
+.git-hooks/*
