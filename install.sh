@@ -104,11 +104,13 @@ function install_shell {
     rm -f ~/.shell
     ln -sf $SCRIPTPATH/shell ~/.shell
 
-    # bash
-    ln -sf $SCRIPTPATH/shell/bashrc ~/.bashrc
+    # global
     ln -sf $SCRIPTPATH/shell/dir_colors ~/.dir_colors
-    echo "source ~/.bashrc" > ~/.bash_profile
     mkdir -p ~/.bash_custom
+
+    # bash - disabled
+    # ln -sf $SCRIPTPATH/shell/bashrc ~/.bashrc
+    #echo "source ~/.bashrc" > ~/.bash_profile
 
     # zsh
     ln -sf $SCRIPTPATH/shell/zshrc ~/.zshrc
