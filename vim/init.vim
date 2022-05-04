@@ -226,6 +226,7 @@ map <silent> <leader>, <Plug>(ale_previous_wrap)
 map <silent> <leader>. <Plug>(ale_next_wrap)
 map <silent> <leader>< <Plug>(signify-prev-hunk)
 map <silent> <leader>> <Plug>(signify-next-hunk)
+map <silent> <leader>p "0p
 
 " comfortable motion mapping
 noremap <silent> <ScrollWheelDown> :call comfortable_motion#flick(40)<CR>
