@@ -40,10 +40,11 @@ end
 -- disable diagnostic
 -- vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
-    vim.lsp.diagnostic.on_publish_diagnostics, {
-        virtual_text = false,
-        underline = false,
-    }
+  vim.lsp.diagnostic.on_publish_diagnostics, {
+    signs = true,
+    underline = false,
+    virtual_text = false,
+  }
 )
 
 local function goto_definition_ctag_fallback(_, method, result)
