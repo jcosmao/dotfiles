@@ -1,7 +1,8 @@
 require("nvim-treesitter.install").prefer_git = false
 require'nvim-treesitter.configs'.setup {
-  ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
-  ignore_install = {"cuda", "dart", "eex", "fennel", "foam", "fusion", "heex", "hocon", "julia", "ledger", "llvm", "pascal", "pioasm", "prisma", "pug", "rasl", "supercollider", "surface", "svelte", "teal", "tlaplus", "turtle", "vala", "verilog", "zig", "astro", "beancount", "bibtex", "cooklang", "elm", "elvish", "fortran", "gdscript", "gleam", "glimmer", "glsl", "hack", "haskell", "lalrpop", "ninja", "pioasm", "rego", "solidity", "swift", "wgsl", "yang"}, -- List of parsers to ignore installing
+  ensure_installed = {"dockerfile", "c", "php", "embedded_template", "jsonc", "python", "rust", "latex", "yaml", "perl", "godot_resource", "gowork", "markdown", "go", "make", "scss", "http", "hjson", "comment", "css", "json5", "java", "javascript", "help", "vim", "cmake", "devicetree", "ruby", "json", "query", "typescript", "c_sharp", "regex", "lua", "cpp", "html", "rst", "hcl", "gomod", "erlang", "bash", "fish", "todotxt", "toml"},
+   -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+  ignore_install = {},
   highlight = {
     enable = true,              -- false will disable the whole extension
     disable = {},  -- list of language that will be disabled

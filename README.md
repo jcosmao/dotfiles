@@ -1,9 +1,10 @@
 # dotfiles
 
-    git clone --recursive https://github.com/jcosmao/dotfiles.git
+    git clone https://github.com/jcosmao/dotfiles.git
     cd dotfiles
     ./install.sh --help
 
 ## vim
 
-check youcompleteme doc to install
+    pyenv virtualenv nvim
+    ./install.sh --vim nightly
