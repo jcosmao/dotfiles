@@ -21,7 +21,9 @@ case "$select" in
         i3-msg exit
         ;;
     suspend)
-        lock && systemctl suspend
+        nmcli radio wifi off && \
+        lock && \
+        systemctl suspend
         ;;
     reboot)
         systemctl reboot
