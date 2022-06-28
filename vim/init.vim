@@ -150,6 +150,7 @@ set hidden                          " Allow modified hidden buffers
 set autowriteall
 set nofoldenable                    " Folding makes things unreadable.
 set noautochdir
+set keymodel=startsel               " shift+arrow selection
 
 " Autocompletion
 set shortmess+=c
