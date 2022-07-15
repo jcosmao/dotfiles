@@ -57,6 +57,7 @@ if [[ -d $PYENV_ROOT ]]; then
     if [[ ! -f $PYENV_ROOT/bin/pyenv ]]; then
         git clone https://github.com/pyenv/pyenv.git $PYENV_ROOT
         git clone https://github.com/pyenv/pyenv-virtualenv.git $PYENV_ROOT/plugins/pyenv-virtualenv
+        git clone https://github.com/jcosmao/pyenv-pyright.git $PYENV_ROOT/plugins/pyenv-pyright
     fi
 
     if [[ -f $PYENV_ROOT/bin/pyenv ]]; then
@@ -70,7 +71,7 @@ if [[ -d $PYENV_ROOT ]]; then
     alias penv="pyenv activate"
 fi
 
-function pyenv-isntall-requirements
+function pyenv-install-requirements
 {
     apt-get install -y build-essential libssl-dev zlib1g-dev
     echo "
