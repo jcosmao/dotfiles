@@ -8,7 +8,7 @@ source ~/.zpm/zpm.zsh
 
 zpm load @omz
 zpm load @omz/wd,apply:source:path:fpath
-zpm load @omz-lib/{history,completion,key-bindings,clipboard}
+zpm load @omz/lib/{history,completion,key-bindings,clipboard}
 zpm load zsh-users/zsh-completions
 zpm load zsh-users/zsh-autosuggestions
 zpm load 3v1n0/zsh-bash-completions-fallback
