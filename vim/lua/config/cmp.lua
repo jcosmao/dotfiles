@@ -1,21 +1,39 @@
 local cmp = require('cmp')
-
-local t = function(str)
-    return vim.api.nvim_replace_termcodes(str, true, true, true)
-end
-
-local check_back_space = function()
-    local col = vim.fn.col(".") - 1
-    return col == 0 or vim.fn.getline("."):sub(col, col):match("%s") ~= nil
-end
+local lspconfig = require('lspconfig')
 
 cmp.setup {
-
+    completion = {
+        completeopt = 'menu,menuone,noinsert,noselect'
+    },
+    snippet = {
+        expand = function(args)
+            -- vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+            -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+            -- require'snippy'.expand_snippet(args.body) -- For `snippy` users.
+            vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+        end,
+    },
+    window = {
+        -- completion = cmp.config.window.bordered(),
+        -- documentation = cmp.config.window.bordered(),
+    },
+    sources = cmp.config.sources(
+        {
+            { name = 'nvim_lsp' },
+            -- { name = 'vsnip' }, -- For vsnip users.
+            -- { name = 'luasnip' }, -- For luasnip users.
+            -- { name = 'snippy' }, -- For snippy users.
+            { name = 'ultisnips' }, -- For ultisnips users.
+        },
+        {
+            { name = 'buffer' },
+        }
+    ),
     formatting = {
         format = function(entry, vim_item)
             -- fancy icons and a name of kind
             vim_item.kind = require("lspkind").presets.default[vim_item.kind] ..
-                                " " .. vim_item.kind
+            " " .. vim_item.kind
             -- set a name for each source
             vim_item.menu = ({
                 buffer = "[Buffer]",
@@ -29,12 +47,12 @@ cmp.setup {
         end
     },
     mapping = {
-        ['<C-p>'] = cmp.mapping.select_prev_item(),
-        ['<C-n>'] = cmp.mapping.select_next_item(),
+        ['<C-n>'] = cmp.mapping(cmp.mapping.select_next_item(), {'i','c'}),
+        ['<C-p>'] = cmp.mapping(cmp.mapping.select_prev_item(), {'i','c'}),
         ['<Up>'] = cmp.mapping.select_prev_item(),
         ['<Down>'] = cmp.mapping.select_next_item(),
-        ['<C-d>'] = cmp.mapping.scroll_docs(-4),
-        ['<C-f>'] = cmp.mapping.scroll_docs(4),
+        ['<C-Up>'] = cmp.mapping.scroll_docs(-4),
+        ['<C-Down>'] = cmp.mapping.scroll_docs(4),
         ['<C-Space>'] = cmp.mapping.complete(),
         ['<C-e>'] = cmp.mapping.close(),
         ['<CR>'] = cmp.mapping.confirm({
@@ -56,17 +74,29 @@ cmp.setup {
             end
         end,
     },
-    snippet = {expand = function(args) vim.fn["UltiSnips#Anon"](args.body) end},
-    sources = {
-        {name = 'nvim_lsp'}, {name = 'buffer'}, {name = "ultisnips"},
-        {name = "nvim_lua"}, {name = "look"}, {name = "path"}
-    },
-    completion = {completeopt = 'menu,menuone,noinsert,noselect'}
 }
 
--- -- Autopairs
--- require("nvim-autopairs.completion.cmp").setup({
---     map_cr = true,
---     map_complete = true,
---     auto_select = true
--- })
+-- `/` cmdline setup.
+cmp.setup.cmdline('/', {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = {
+        { name = 'buffer' }
+    }
+})
+-- `:` cmdline setup.
+cmp.setup.cmdline(':', {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = cmp.config.sources({
+        { name = 'path' }
+    }, {
+            { name = 'cmdline' }
+        })
+})
+
+-- -- Setup lspconfig.
+local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+for _, lspobj in pairs(vim.lsp.get_active_clients()) do
+    lspconfig[lspobj.name].setup {
+        capabilities = capabilities
+    }
+end
