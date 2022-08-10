@@ -37,7 +37,6 @@ Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 Plug 'quangnguyen30192/cmp-nvim-ultisnips'
 Plug 'folke/trouble.nvim'
-Plug 'w0rp/ale'
 Plug 'jubnzv/virtual-types.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-lua/popup.nvim'
@@ -53,7 +52,7 @@ Plug 'junegunn/fzf', {'dir': '~/.fzf',
 \                     'do': './install --no-update-rc --key-bindings --completion --xdg; cd  ~/.vim/plug/fzf.vim; patch -p1 -stNr /dev/null < ~/.config/nvim/plugin_patch/fzf.vim.patch; true'}
 Plug 'chengzeyi/fzf-preview.vim'
 Plug 'itchyny/lightline.vim'
-Plug 'maximbaz/lightline-ale'
+Plug 'josa42/nvim-lightline-lsp'
 Plug 'Yggdroot/indentLine'
 Plug 'Raimondi/delimitMate'
 Plug 'tpope/vim-sensible'
@@ -83,7 +82,12 @@ Plug 'rodjek/vim-puppet', {'for': 'puppet'}
 Plug 'psf/black',  {'for': 'python', 'do': ':UpdateRemotePlugins'}
 Plug 'averms/black-nvim', {'do': ':UpdateRemotePlugins'}
 " nvim-go + deps
-Plug 'crispgm/nvim-go'
+
+Plug 'ray-x/go.nvim', {'for': 'go'}
+Plug 'ray-x/guihua.lua', {'for': 'go'}
+
+
+
 
 " ctags / cscope
 
@@ -255,3 +259,9 @@ autocmd BufNewFile,BufRead *.source set filetype=sh
 autocmd BufNewFile,BufRead *.pp set filetype=puppet
 autocmd BufNewFile,BufRead *.inc set filetype=perl
 autocmd FileType yaml setlocal ts=4 sts=4 sw=4 expandtab
+
+augroup indentlinesdisable
+    autocmd!
+    autocmd TermOpen * execute 'IndentLinesDisable'
+    autocmd FileType markdown,json,yaml execute 'IndentLinesDisable'
+augroup end
