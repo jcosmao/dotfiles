@@ -6,7 +6,7 @@ let g:gruvbox_material_menu_selection_background = 'green'
 " available: material / mix / original
 let g:gruvbox_material_palette = 'mix'
 " available: soft / medium / hard
-let g:gruvbox_material_background = 'soft'
+let g:gruvbox_material_background = 'medium'
 
 colorscheme gruvbox-material
 

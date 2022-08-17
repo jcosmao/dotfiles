@@ -30,6 +30,19 @@ if which go &> /dev/null; then
     export GOPATH="$HOME/go"
     export GOBIN="$GOPATH/bin"
     export PATH="$PATH:$GOROOT/bin:$GOBIN"
+
+    function gotest
+    {
+        func=${1:-.*}
+        if [[ $func == *'/'* ]]; then
+            suite=$(echo $func | cut -d/ -f1)
+            func=$(echo $func | cut -d/ -f2)
+        else
+            suite=".*"
+        fi
+        go test -run ^${suite}$ -testify.m ^(${func})$ -v . | ccze -A
+    }
+
 fi
 
 # Ruby path

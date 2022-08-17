@@ -65,16 +65,10 @@ Plug 'Valloric/ListToggle'
 Plug 'junegunn/rainbow_parentheses.vim'
 " breaking change - does not detect root pattern with priority
 Plug 'airblade/vim-rooter', {'commit': 'd64f3e04df9914e784508019a1a1f291cbb40bd4'}
-Plug 'ellisonleao/glow.nvim'  " markdown render
+Plug 'akinsho/toggleterm.nvim'
 
 " Language Specific
 
-" python completion
-" Plug 'davidhalter/jedi-vim', {'for': 'python'}
-" create .python{version} at the root project dir to force jedi to use
-" this python version (useful to jump module from python path when there
-" is both python2/3 in system)
-" Plug 'jcosmao/jedi-vim-pyversion', {'for': 'python'}
 " python syntax hilight
 Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
 Plug 'heavenshell/vim-pydocstring', {'do': 'pip3 install doq', 'for': 'python'}
@@ -82,10 +76,8 @@ Plug 'rodjek/vim-puppet', {'for': 'puppet'}
 Plug 'psf/black',  {'for': 'python', 'do': ':UpdateRemotePlugins'}
 Plug 'averms/black-nvim', {'do': ':UpdateRemotePlugins'}
 " nvim-go + deps
-
 Plug 'ray-x/go.nvim', {'for': 'go'}
 Plug 'ray-x/guihua.lua', {'for': 'go'}
-
 
 
 
@@ -102,7 +94,6 @@ Plug 'rhysd/git-messenger.vim'
 " Colorscheme
 
 Plug 'sainnhe/gruvbox-material'
-" Plug 'EdenEast/nightfox.nvim'
 
 call plug#end()
 
@@ -196,7 +187,7 @@ map <silent> <F2> :Vista!! <cr>
 map <silent> <F3> :IndentLinesToggle <cr>
 map <silent> <F4> :set number! <cr>
 map <silent> <F5> :SignifyToggle <cr>
-map <silent> <F8> :Glow <cr>
+map <silent> <F9> :set mouse=a \| :ToggleTerm dir=%:p:h <cr>
 map <silent> <F10> :set paste! <cr>
 map <silent> <F11> :2,$s/^\s*pick/fixup/g <cr>
 map <silent> <F12> :call custom#ToggleMouse() <cr>
@@ -227,10 +218,7 @@ map <silent> <leader><Left> :wincmd h<cr>
 map <silent> <leader><leader> :noh <cr>
 map <silent> <leader><ENTER> :ZoomWinTabToggle <cr>
 map <silent> <leader>k :TroubleToggle <cr>
-map <silent> <leader>, <Plug>(ale_previous_wrap)
-map <silent> <leader>. <Plug>(ale_next_wrap)
-map <silent> <leader>< <Plug>(signify-prev-hunk)
-map <silent> <leader>> <Plug>(signify-next-hunk)
+" paste last yank (not from dd)
 map <silent> <leader>p "0p
 
 " comfortable motion mapping
@@ -260,8 +248,17 @@ autocmd BufNewFile,BufRead *.pp set filetype=puppet
 autocmd BufNewFile,BufRead *.inc set filetype=perl
 autocmd FileType yaml setlocal ts=4 sts=4 sw=4 expandtab
 
+augroup gomapping
+    autocmd!
+    autocmd FileType go nnoremap <silent> <leader><BS> :GoCodeLenAct<cr>
+    autocmd FileType go nnoremap <silent> <leader>= :GoIfErr<cr>
+augroup end
+
 augroup indentlinesdisable
     autocmd!
     autocmd TermOpen * execute 'IndentLinesDisable'
     autocmd FileType markdown,json,yaml execute 'IndentLinesDisable'
 augroup end
+
+" trim whitespace
+autocmd BufWritePre * :%s/\s\+$//e

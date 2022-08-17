@@ -2,17 +2,17 @@ local fn = vim.fn
 
 vim.api.nvim_create_augroup('bufcheck', {clear = true})
 
+-- Always quit nvimtree window when leaving tab by switching to previous file.
+vim.api.nvim_create_autocmd('TabLeave', {
+    group    = 'bufcheck',
+    pattern  = 'NvimTree*',
+    command  = 'wincmd p'})
+
 -- reload config file on change
 vim.api.nvim_create_autocmd('BufWritePost', {
     group    = 'bufcheck',
     pattern  = vim.env.MYVIMRC,
     command  = 'silent source %'})
-
--- start terminal in insert mode
-vim.api.nvim_create_autocmd('TermOpen',     {
-    group    = 'bufcheck',
-    pattern  = '*',
-    command  = 'startinsert | set winfixheight'})
 
 -- start git messages in insert mode
 vim.api.nvim_create_autocmd('FileType',     {
