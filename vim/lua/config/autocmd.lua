@@ -1,4 +1,4 @@
-local fn = vim.fn
+local vim = vim
 
 vim.api.nvim_create_augroup('bufcheck', {clear = true})
 
@@ -7,12 +7,6 @@ vim.api.nvim_create_autocmd('TabLeave', {
     group    = 'bufcheck',
     pattern  = 'NvimTree*',
     command  = 'wincmd p'})
-
--- reload config file on change
-vim.api.nvim_create_autocmd('BufWritePost', {
-    group    = 'bufcheck',
-    pattern  = vim.env.MYVIMRC,
-    command  = 'silent source %'})
 
 -- start git messages in insert mode
 vim.api.nvim_create_autocmd('FileType',     {
@@ -27,15 +21,18 @@ vim.api.nvim_create_autocmd('FileType',     {
     callback = function()
       vim.keymap.set('n', '<enter>'    , 'K'    , {buffer=true})
       vim.keymap.set('n', '<backspace>', '<c-o>', {buffer=true})
-      end })
+    end
+})
 
 -- Return to last edit position when opening files
 vim.api.nvim_create_autocmd('BufReadPost',  {
     group    = 'bufcheck',
     pattern  = '*',
     callback = function()
-      if fn.line("'\"") > 0 and fn.line("'\"") <= fn.line("$") then
-         fn.setpos('.', fn.getpos("'\""))
-         -- vim.cmd('normal zz') -- how do I center the buffer in a sane way??
-         vim.cmd('silent! foldopen')
-         end end })
+        if vim.fn.line("'\"") > 0 and vim.fn.line("'\"") <= vim.fn.line("$") then
+            vim.fn.setpos('.', vim.fn.getpos("'\""))
+            -- vim.cmd('normal zz') -- how do I center the buffer in a sane way??
+            vim.cmd('silent! foldopen')
+        end
+    end
+})

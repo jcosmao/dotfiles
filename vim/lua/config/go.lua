@@ -1,3 +1,5 @@
+local vim = vim
+
 -- NOTE: all LSP and formatting related options are disabeld.
 -- NOTE: LSP is handled by lsp.lua and formatting is handled by null-ls.lua
 -- NOTE: via `lsp_on_attach` the custom callback used by all other LSPs is called
@@ -13,7 +15,7 @@ require("go").setup({
   comment_placeholder = "", -- comment_placeholder your cool placeholder e.g. ﳑ       
   icons = { breakpoint = "🧘", currentpos = "🏃" },
   verbose = false, -- output loginf in messages
-  lsp_cfg = true, -- true: use non-default gopls setup specified in go/lsp.lua
+  lsp_cfg = false, -- true: use non-default gopls setup specified in go/lsp.lua
   -- false: do nothing
   -- if lsp_cfg is a table, merge table with with non-default gopls setup in go/lsp.lua, e.g.
   --   lsp_cfg = {settings={gopls={matcher='CaseInsensitive', ['local'] = 'your_local_module_path', gofumpt = true }}}

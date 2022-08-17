@@ -1,7 +1,3 @@
-" Vim rooter
-let g:rooter_patterns = ['.project/', '.project', '.git']
-let g:rooter_resolve_links = 1
-
 " Gutentag / ctags/cscope
 "
 " create .project dir in project root dir to build tags automatically
@@ -53,17 +49,6 @@ let g:gutentags_ctags_exclude = [
 " debug
 " let g:gutentags_trace = 1
 " let g:gutentags_debug = 1
-
-" tagbar
-let g:tagbar_map_showproto = '\'
-let g:tagbar_sort = 0
-let g:tagbar_compact = 1
-let g:tagbar_autoshowtag = 1
-let g:tagbar_previewwin_pos = "aboveleft"
-let g:tagbar_autopreview = 0
-let g:tagbar_ctags_bin = '~/.local/bin/ctags'
-
-" autocmd BufWinEnter * if exists("b:gutentags_files") | call tagbar#autoopen(0) | endif
 
 function s:sink_ctags(line)
     if empty(a:line)

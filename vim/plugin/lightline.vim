@@ -1,7 +1,6 @@
 let g:lightline_git_info = ''
 au BufEnter * call custom#GitInfo()
 au BufEnter * call custom#LightlineToggleBuffer()
-au VimEnter * call vista#RunForNearestMethodOrFunction()
 
 " lightline
 let g:lightline = {
@@ -17,9 +16,6 @@ let g:lightline = {
 \           [ 'percent' ],
 \           [ 'fileformat', 'fileencoding', 'filetype' ],
 \       ],
-\   },
-\   'component_function': {
-\       'method': 'custom#NearestMethodOrFunction',
 \   },
 \   'component': {
 \       'gitrepo': '%{g:lightline_git_info}',

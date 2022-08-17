@@ -10,3 +10,7 @@ command! -bang -nargs=* Rg
   \ 1,
   \ fzf#vim#with_preview(),
   \ <bang>0)
+
+autocmd! FileType fzf
+autocmd  FileType fzf set laststatus=0 noshowmode noruler
+  \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler

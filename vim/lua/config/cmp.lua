@@ -1,3 +1,4 @@
+local vim = vim
 local cmp = require('cmp')
 local lspconfig = require('lspconfig')
 

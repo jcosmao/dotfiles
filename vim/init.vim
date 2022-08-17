@@ -24,8 +24,9 @@ call plug#begin('~/.vim/plug')
 
 " completion / linter
 
+Plug 'williamboman/mason.nvim'
+Plug 'williamboman/mason-lspconfig.nvim'
 Plug 'neovim/nvim-lspconfig'
-Plug 'williamboman/nvim-lsp-installer'
 Plug 'onsails/lspkind-nvim'
 Plug 'ojroques/nvim-lspfuzzy'
 Plug 'hrsh7th/nvim-cmp'
@@ -48,8 +49,7 @@ Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'kyazdani42/nvim-web-devicons'
 Plug 'kyazdani42/nvim-tree.lua'
 Plug 'junegunn/fzf.vim'
-Plug 'junegunn/fzf', {'dir': '~/.fzf',
-\                     'do': './install --no-update-rc --key-bindings --completion --xdg; cd  ~/.vim/plug/fzf.vim; patch -p1 -stNr /dev/null < ~/.config/nvim/plugin_patch/fzf.vim.patch; true'}
+Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --no-update-rc --key-bindings --completion --xdg; true'}
 Plug 'chengzeyi/fzf-preview.vim'
 Plug 'itchyny/lightline.vim'
 Plug 'josa42/nvim-lightline-lsp'
@@ -59,12 +59,13 @@ Plug 'tpope/vim-sensible'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-eunuch'
-Plug 'yuttie/comfortable-motion.vim'
+Plug 'psliwka/vim-smoothie'
 Plug 'troydm/zoomwintab.vim'
 Plug 'Valloric/ListToggle'
 Plug 'junegunn/rainbow_parentheses.vim'
 " breaking change - does not detect root pattern with priority
 Plug 'airblade/vim-rooter', {'commit': 'd64f3e04df9914e784508019a1a1f291cbb40bd4'}
+" Plug 'airblade/vim-rooter'
 Plug 'akinsho/toggleterm.nvim'
 
 " Language Specific
@@ -84,7 +85,7 @@ Plug 'ray-x/guihua.lua', {'for': 'go'}
 " ctags / cscope
 
 Plug 'ludovicchabant/vim-gutentags', {'do': 'cd  ~/.vim/plug/vim-gutentags; patch -p1 -stNr /dev/null < ~/.config/nvim/plugin_patch/vim-gutentags.patch; true'}
-Plug 'liuchengxu/vista.vim'
+Plug 'stevearc/aerial.nvim'
 
 " git
 
@@ -105,6 +106,7 @@ set nocompatible
 filetype off
 filetype plugin indent on
 syntax on
+set mouse=
 set ttyfast                         " Indicate fast terminal conn for faster redraw
 set lazyredraw                      " Wait to redraw
 set magic
@@ -183,11 +185,11 @@ map <silent> <leader>S :source $MYVIMRC \| :echo $MYVIMRC 'reloaded' <cr>
 map <silent> <leader><ESC> :set nonumber \| :IndentLinesDisable \| :SignifyDisable \| :set signcolumn=no <cr>
 map <silent> <leader><F1> :set number \| :IndentLinesEnable \| :SignifyEnable \| :set signcolumn=auto <cr>
 map <silent> <F1> :NvimTreeToggle <cr>
-map <silent> <F2> :Vista!! <cr>
+map <silent> <F2> :AerialToggle <cr>
 map <silent> <F3> :IndentLinesToggle <cr>
 map <silent> <F4> :set number! <cr>
 map <silent> <F5> :SignifyToggle <cr>
-map <silent> <F9> :set mouse=a \| :ToggleTerm dir=%:p:h <cr>
+map <silent> <F9> :ToggleTerm dir=%:p:h <cr>
 map <silent> <F10> :set paste! <cr>
 map <silent> <F11> :2,$s/^\s*pick/fixup/g <cr>
 map <silent> <F12> :call custom#ToggleMouse() <cr>
@@ -196,7 +198,6 @@ map <silent> <leader>s :Rg <cr>
 map <silent> <leader>f :Files <cr>
 map <silent> <leader>b :Buffers <cr>
 map <silent> <leader>d :Lines <cr>
-map <silent> <leader>D :BLines <cr>
 map <silent> <leader>t :FZFCtags <cr>
 map <silent> <leader>c :BCommits <cr>
 map <silent> <leader>h :History <cr>
@@ -216,16 +217,15 @@ map <silent> <leader><Down> :wincmd j<cr>
 map <silent> <leader><Right> :wincmd l<cr>
 map <silent> <leader><Left> :wincmd h<cr>
 map <silent> <leader><leader> :noh <cr>
-map <silent> <leader><ENTER> :ZoomWinTabToggle <cr>
+map <silent> <leader><ENTER> <C-w>o
 map <silent> <leader>k :TroubleToggle <cr>
 " paste last yank (not from dd)
 map <silent> <leader>p "0p
 
-" comfortable motion mapping
-noremap <silent> <ScrollWheelDown> :call comfortable_motion#flick(40)<CR>
-noremap <silent> <ScrollWheelUp>   :call comfortable_motion#flick(-40)<CR>
-nnoremap <silent> <M-Down> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * 2)<CR>
-nnoremap <silent> <M-Up> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * -2)<CR>
+nnoremap <silent> <M-Up> <cmd>call smoothie#do("\<C-U>") <CR>
+vnoremap <silent> <M-Up> <cmd>call smoothie#do("\<C-U>") <CR>
+nnoremap <silent> <M-Down> <cmd>call smoothie#do("\<C-D>") <CR>
+vnoremap <silent> <M-Down> <cmd>call smoothie#do("\<C-D>") <CR>
 
 " Always forward with n / backward with N
 noremap <expr> n (v:searchforward ? 'n' : 'N')

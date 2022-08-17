@@ -18,9 +18,7 @@ function! custom#GitInfo()
 endfunction
 
 function! custom#LightlineToggleBuffer()
-    let disable_on_buffer = ["NvimTree", "__Tagbar__.1"]
-    let current_buffer = bufname()
-    if index(disable_on_buffer, current_buffer) >= 0
+    if bufname() =~# '^\v(NvimTree|term://|Trouble|OUTLINE)'
         call lightline#disable()
     else
         call lightline#enable()
@@ -51,8 +49,4 @@ function! custom#ToggleMouse()
         " enable mouse everywhere
         set mouse=a
     endif
-endfunction
-
-function! custom#NearestMethodOrFunction() abort
-  return get(b:, 'vista_nearest_method_or_function', '')
 endfunction

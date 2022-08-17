@@ -2,9 +2,11 @@ let g:gruvbox_material_disable_italic_comment = 0
 let g:gruvbox_material_enable_bold = 1
 let g:gruvbox_material_enable_italic = 1
 let g:gruvbox_material_visual = 'grey background'
-let g:gruvbox_material_menu_selection_background = 'green'
+let g:gruvbox_material_menu_selection_background = 'orange'
+let g:gruvbox_material_statusline_style = 'mix'
+let g:gruvbox_material_better_performance = 1
 " available: material / mix / original
-let g:gruvbox_material_palette = 'mix'
+let g:gruvbox_material_palette = 'material'
 " available: soft / medium / hard
 let g:gruvbox_material_background = 'medium'
 
@@ -26,16 +28,10 @@ hi semshiParameter  ctermfg=109 guifg=#83a598
 hi semshiImported   ctermfg=210 guifg=#ff9741
 hi semshiGlobal     ctermfg=214 guifg=#ffc649
 
-" override tagbar colorscheme
-hi default TagbarAccessPublic    guifg=Green     ctermfg=Green
-hi default TagbarAccessProtected guifg=White     ctermfg=White
-hi default TagbarAccessPrivate   guifg=Red       ctermfg=Red
-
 hi NvimTreeNormal    guibg=#262626
 hi NvimTreeVertSplit guibg=#262626 guifg=#262626
 hi NvimTreeStatuslineNc guibg=#262626 guifg=#262626
 hi NvimTreeEndOfBuffer guibg=#262626 guifg=#262626
-hi TagbarHighlight guibg=#262626 guifg=#262626
 
 " Fix missing tree-sitter binding on colorscheme (gruvbox_material)
 autocmd FileType sh :highlight! link TSVariable Blue

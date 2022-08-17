@@ -3,7 +3,7 @@ require("trouble").setup {
   -- or leave it empty to use the default settings
   -- refer to the configuration section below
     position = "bottom", -- position of the list can be: bottom, top, left, right
-    height = 10, -- height of the trouble list when position is top or bottom
+    height = 12, -- height of the trouble list when position is top or bottom
     width = 50, -- width of the list when position is left or right
     icons = true, -- use devicons for filenames
     mode = "document_diagnostics", -- "lsp_workspace_diagnostics", "lsp_document_diagnostics", "quickfix", "lsp_references", "loclist"
@@ -22,7 +22,7 @@ require("trouble").setup {
         jump_close = {"o"}, -- jump to the diagnostic and close the list
         toggle_mode = "m", -- toggle between "workspace" and "document" diagnostics mode
         toggle_preview = "P", -- toggle auto_preview
-        hover = "K", -- opens a small popup with the full multiline message
+        hover = "?", -- opens a small popup with the full multiline message
         preview = "p", -- preview the diagnostic location
         close_folds = {"zM", "zm"}, -- close all folds
         open_folds = {"zR", "zr"}, -- open all folds
@@ -31,7 +31,7 @@ require("trouble").setup {
         next = "j" -- next item
     },
     indent_lines = true, -- add an indent guide below the fold icons
-    auto_open = true, -- automatically open the list when you have diagnostics
+    auto_open = false, -- automatically open the list when you have diagnostics
     auto_close = false, -- automatically close the list when you have no diagnostics
     auto_preview = true, -- automatically preview the location of the diagnostic. <esc> to close preview and go back to last window
     auto_fold = false, -- automatically fold a file trouble list at creation
