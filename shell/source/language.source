@@ -15,6 +15,8 @@ if [[ -d $NVM_DIR ]]; then
 
         nvm install --lts
         nvm alias default node
+        # sometimes node is installed with unknown user
+        chown -R ${USER}: $NVM_DIR
     fi
 
     if [[ -f "$NVM_DIR/nvm.sh" ]]; then
@@ -70,7 +72,6 @@ if [[ -d $PYENV_ROOT ]]; then
     if [[ ! -f $PYENV_ROOT/bin/pyenv ]]; then
         git clone https://github.com/pyenv/pyenv.git $PYENV_ROOT
         git clone https://github.com/pyenv/pyenv-virtualenv.git $PYENV_ROOT/plugins/pyenv-virtualenv
-        git clone https://github.com/jcosmao/pyenv-pyright.git $PYENV_ROOT/plugins/pyenv-pyright
     fi
 
     if [[ -f $PYENV_ROOT/bin/pyenv ]]; then
@@ -81,7 +82,6 @@ if [[ -d $PYENV_ROOT ]]; then
     fi
 
     export PYENV_VIRTUALENV_DISABLE_PROMPT=1
-    alias penv="pyenv activate"
 fi
 
 function pyenv-install-requirements

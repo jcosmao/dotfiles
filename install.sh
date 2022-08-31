@@ -41,8 +41,7 @@ function install_neovim {
     if which apt-get 2>&1 > /dev/null ; then
         if [[ $IS_SSH -eq 0 ]]; then
             # - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
-            version=$(
-                basename $(curl -si https://github.com/BurntSushi/ripgrep/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
+            version=$(basename $(curl -si https://github.com/BurntSushi/ripgrep/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
             wget "https://github.com/BurntSushi/ripgrep/releases/download/$version/ripgrep_${version}_amd64.deb" -O $TMPDIR/ripgrep.deb
             dpkg -x $TMPDIR/ripgrep.deb $TMPDIR/deb
 
@@ -78,14 +77,18 @@ function install_vim_requirements {
     done
 
     source ~/.pyenv/versions/nvim/bin/activate || return
+    which npm 2> /dev/null || return
 
-    pip_require=(python-lsp-server pynvim yamllint jedi pyproject-flake8 black)
+    pip_require=(pynvim yamllint pyproject-flake8 black)
     pip_installed=$(echo "$pip_freeze" | grep -P "(^$(echo ${pip_require[@]} | sed -e 's/ /|^/g'))" | wc -l)
 
     if [[ ${#pip_require[@]} -ne $pip_installed ]]; then
         pip install --upgrade pip setuptools
         pip install --upgrade ${pip_require[@]}
     fi
+
+    # npm tree-sitter deps (>0.19 require glibc > ubuntu18)
+    npm install --location=global tree-sitter@0.19 tree-sitter-cli@0.19.0
 }
 
 function install_vim_config {
@@ -107,10 +110,6 @@ function install_shell {
     # global
     ln -sf $SCRIPTPATH/shell/dir_colors ~/.dir_colors
     mkdir -p ~/.bash_custom
-
-    # bash - disabled
-    # ln -sf $SCRIPTPATH/shell/bashrc ~/.bashrc
-    #echo "source ~/.bashrc" > ~/.bash_profile
 
     # zsh
     ln -sf $SCRIPTPATH/shell/zshrc ~/.zshrc
@@ -176,10 +175,13 @@ function install_config {
 
     [[ $IS_SSH -eq 1 ]] && return
 
-    # build i3 config
-    $HOME/.config/i3/i3_build_conf.sh
     cp $HOME/.config/termite/config.base $HOME/.config/termite/config
     cp $HOME/.config/alacritty/alacritty.base.yml $HOME/.config/alacritty/alacritty.yml
+
+    # build i3 config
+    if which i3 2>&1 > /dev/null ; then
+        $HOME/.config/i3/i3_build_conf.sh
+    fi
 }
 
 function print_help {
