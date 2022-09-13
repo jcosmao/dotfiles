@@ -26,14 +26,6 @@ require("aerial").setup({
     placement = "edge",
   },
 
-  -- Enum: persist, close, auto, global
-  --   persist - aerial window will stay open until closed
-  --   close   - aerial window will close when original file is no longer visible
-  --   auto    - aerial window will stay open as long as there is a visible
-  --             buffer to attach to
-  --   global  - same as 'persist', and will always show symbols for the current buffer
-  close_behavior = "auto",
-
   -- Set to false to remove the default keybindings for the aerial buffer
   default_bindings = true,
 

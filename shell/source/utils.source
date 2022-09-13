@@ -38,6 +38,22 @@ function jqlines
     jq -Rr '. as $line | (fromjson?) // $line'
 }
 
+# same as jqlines, but interpret \n \t to display properly json value like long stacktrace
+function jqlines_format
+{
+    jq -CRr '. as $line | (fromjson?) // $line' | sed -e 's/\\n/\n/g' -e 's/\\t/    /g'
+}
+
+function jqmap2csv
+{
+    jq -r '(.[0] | keys_unsorted) as $keys | ([$keys] + map([.[ $keys[] ]])) [] | @csv'
+}
+
+# csv to table display
+function pretty_csv {
+    column -t -s, -n "$@" | less -F -S -X -K
+}
+
 function open
 {
     nohup xdg-open $* </dev/null >/tmp/open.log 2>&1 &
