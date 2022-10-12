@@ -203,7 +203,7 @@ function main {
         arg="$1"; shift
         case "$arg" in
             --reset) export RESET=1;;
-            --vim)  [[ $1 =~ ^(stable|nightly)$ ]] && \
+            --vim)  [[ $1 =~ ^(stable|nightly|v) ]] && \
                         release=$1 && shift && \
                         install_neovim $release;
                     install_vim_requirements;
