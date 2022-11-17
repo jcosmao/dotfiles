@@ -20,6 +20,11 @@ if [[ $(hostname -s) =~ ^admin ]]; then
     INSTALL_PIP=0
 fi
 
+function install_vim_lite {
+    rm -rf ~/.vim && ln -sf $SCRIPTPATH/vim ~/.vim
+    ln -sf ~/.vim/vimrc_lite.vim ~/.vimrc
+}
+
 function install_neovim {
     release=$1
     echo "- Update neovim from $release"
@@ -94,7 +99,7 @@ function install_vim_requirements {
 function install_vim_config {
     echo "- Install neovim"
 
-    rm -rf ~/.config/nvim && ln -sf $SCRIPTPATH/vim ~/.config/nvim
+    rm -rf ~/.config/nvim && ln -sf $SCRIPTPATH/neovim ~/.config/nvim
     [[ $RESET -eq 1 ]] && rm -rf ~/.config/nvim/plug
     $HOME/.local/bin/nvim --headless +PlugUpgrade +PlugClean! +PlugInstall +PlugUpdate! +qall 2> /dev/null
 }
@@ -203,7 +208,8 @@ function main {
         arg="$1"; shift
         case "$arg" in
             --reset) export RESET=1;;
-            --vim)  [[ $1 =~ ^(stable|nightly|v) ]] && \
+            --vim) install_vim_lite ;;
+            --nvim)  [[ $1 =~ ^(stable|nightly|v) ]] && \
                         release=$1 && shift && \
                         install_neovim $release;
                     install_vim_requirements;
