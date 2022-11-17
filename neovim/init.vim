@@ -85,7 +85,7 @@ Plug 'ray-x/guihua.lua', {'for': 'go'}
 " ctags / cscope
 
 Plug 'ludovicchabant/vim-gutentags', {'do': 'cd  ~/.vim/plug/vim-gutentags; patch -p1 -stNr /dev/null < ~/.config/nvim/plugin_patch/vim-gutentags.patch; true'}
-Plug 'stevearc/aerial.nvim'
+Plug 'stevearc/aerial.nvim', {'branch': 'nvim-0.5'}
 
 " git
 
