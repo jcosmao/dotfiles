@@ -93,7 +93,8 @@ function install_vim_requirements {
     fi
 
     # npm tree-sitter deps (>0.19 require glibc > ubuntu18)
-    npm install --location=global tree-sitter@0.19 tree-sitter-cli@0.19.0
+    # npm install --location=global tree-sitter@0.19 tree-sitter-cli@0.19.0
+    npm install --location=global tree-sitter tree-sitter-cli
 }
 
 function install_vim_config {

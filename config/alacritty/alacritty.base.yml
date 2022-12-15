@@ -315,7 +315,7 @@ schemes:
 
 colors:
   primary:
-    background: '0x282828'
+    background: '0x181818'
     foreground: '0xdfbf8e'
 
   normal:
