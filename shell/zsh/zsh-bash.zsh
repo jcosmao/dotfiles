@@ -26,8 +26,9 @@ fi
 
 # Not versionned
 if [[ -e ~/.bash_custom ]]; then
-    # copy locally profiles.d
+    # copy locally profiles.d to avoid create .zwc file
     [[ ! -e ~/.bash_custom/profile.d ]] && cp -r /etc/profile.d ~/.bash_custom 2> /dev/null
+    rsync -qu /etc/profile.d ~/.bash_custom/profile.d 2> /dev/null
     for src in $(find ~/.bash_custom -type f -follow -regextype posix-extended -regex '.*\.(source|sh)'); do
         source $src
     done

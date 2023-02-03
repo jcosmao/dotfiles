@@ -1,3 +1,4 @@
 vim/plug/
 vim/autoload/plug.vim.old
 *.zwc
+.uuid

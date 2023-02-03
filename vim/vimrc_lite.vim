@@ -112,7 +112,6 @@ autocmd BufNewFile,BufRead *.lib set filetype=sh
 autocmd BufNewFile,BufRead *.source set filetype=sh
 autocmd BufNewFile,BufRead *.pp set filetype=puppet
 autocmd BufNewFile,BufRead *.inc set filetype=perl
-autocmd FileType yaml setlocal ts=4 sts=4 sw=4 expandtab
 
 " trim whitespace
 autocmd BufWritePre * :%s/\s\+$//e
