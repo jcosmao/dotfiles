@@ -71,6 +71,7 @@ map <silent> <leader>V :tabedit $MYVIMRC <cr>
 map <silent> <leader>S :source $MYVIMRC \| :echo $MYVIMRC 'reloaded' <cr>
 map <silent> <leader><ESC> :set nonumber \|  :set signcolumn=no <cr>
 map <silent> <leader><F1> :set number \| :set signcolumn=auto <cr>
+map <silent> <F2> :Lexplore <cr>
 map <silent> <F4> :set number! <cr>
 map <silent> <F10> :set paste! <cr>
 map <silent> <F12> :call custom#ToggleMouse() <cr>
@@ -92,6 +93,11 @@ map <silent> <leader><leader> :noh <cr>
 map <silent> <leader><ENTER> <C-w>o
 " paste last yank (not from dd)
 map <silent> <leader>p "0p
+
+nnoremap <silent> <M-Up> :-10 <CR>
+vnoremap <silent> <M-Up> :-10 <CR>
+nnoremap <silent> <M-Down> :+10 <CR>
+vnoremap <silent> <M-Down> :+10 <CR>
 
 " Always forward with n / backward with N
 noremap <expr> n (v:searchforward ? 'n' : 'N')
