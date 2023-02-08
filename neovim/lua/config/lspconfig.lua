@@ -29,9 +29,6 @@ local on_attach = function(client, bufnr)
     vim.keymap.set('n', '<space>y', vim.lsp.buf.declaration, bufopts)
     vim.keymap.set('n', '<space>u', vim.lsp.buf.references, bufopts)
     vim.keymap.set('n', '<space>i', vim.lsp.buf.implementation, bufopts)
-
-    -- lsp symbols
-    require("aerial").on_attach(client, bufnr)
 end
 
 local signs = {
