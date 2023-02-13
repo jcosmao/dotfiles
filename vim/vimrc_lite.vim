@@ -121,3 +121,5 @@ autocmd BufNewFile,BufRead *.inc set filetype=perl
 
 " trim whitespace
 autocmd BufWritePre * :%s/\s\+$//e
+
+let g:netrw_winsize = 25
