@@ -106,6 +106,8 @@ function install_vim_config {
 }
 
 function install_shell {
+    version=${1:-full}
+
     echo "- Install bash/zsh"
     rm -f ~/.shell
     ln -sf $SCRIPTPATH/shell ~/.shell
@@ -115,7 +117,22 @@ function install_shell {
     mkdir -p ~/.bash_custom
 
     # zsh
-    ln -sf $SCRIPTPATH/shell/zshrc ~/.zshrc
+    if [[ $version == 'light' ]]; then
+        ln -sf $SCRIPTPATH/shell/zshrc.lite ~/.zshrc
+    else
+        ln -sf $SCRIPTPATH/shell/zshrc ~/.zshrc
+    fi
+}
+
+function install_local_bin {
+    # install local bin
+    for bin in $(ls bin); do
+        # check ldd
+        if [[ $(ldd bin/$bin | grep -c 'not found') -eq 0 ]]; then
+            bin_name=$(echo $bin | cut -d. -f1)
+            ln -sf $SCRIPTPATH/bin/$bin ~/.local/bin/$bin_name
+        fi
+    done
 }
 
 function install_tmux {
@@ -189,12 +206,7 @@ function install_config {
 
 function print_help {
     echo "
-    $0 [--vim|--conf|--help]
-
-    # Require:
-        - bash: python-yaml, python-json, jq
-        - i3: i3-wm i3lock xautolock dunst i3blocks rofi sysstat acpi
-        - vim: silversearcher-ag / fd (https://github.com/sharkdp/fd)
+    $0 [--minimal|--nvim|--conf|--help]
     "
 
     exit
@@ -209,7 +221,10 @@ function main {
         arg="$1"; shift
         case "$arg" in
             --reset) export RESET=1;;
-            --vim) install_vim_lite ;;
+            --minimal) install_vim_light;
+                       install_shell light;
+                       install_tmux;
+                       install_local_bin ;;
             --nvim)  [[ $1 =~ ^(stable|nightly|v) ]] && \
                         release=$1 && shift && \
                         install_neovim $release;

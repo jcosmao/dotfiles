@@ -48,8 +48,8 @@ Plug 'mhinz/vim-startify'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'kyazdani42/nvim-web-devicons'
 Plug 'kyazdani42/nvim-tree.lua'
+Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
-Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --no-update-rc --key-bindings --completion --xdg; true'}
 Plug 'chengzeyi/fzf-preview.vim'
 Plug 'itchyny/lightline.vim'
 Plug 'josa42/nvim-lightline-lsp'

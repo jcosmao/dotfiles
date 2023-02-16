@@ -16,13 +16,11 @@ setopt NO_NOMATCH
 # source bash aliases/completion/functions
 [[ -e ~/.bash_aliases ]] && source ~/.bash_aliases
 
-
 if [[ -e ~/.shell ]]; then
     for src in $(find ~/.shell -type f -follow -name '*.source' ); do
         source $src
     done
 fi
-
 
 # Not versionned
 if [[ -e ~/.bash_custom ]]; then

@@ -1,0 +1,26 @@
+export PATH="$HOME/.local/bin:/usr/local/bin:$PATH"
+
+[[ ! -d ~/.zsh ]] && mkdir ~/.zsh
+[[ ! -d ~/.zsh/myzsh ]] && git clone https://github.com/jcosmao/myzsh.git ~/.zsh/myzsh
+[[ ! -d ~/.zsh/blox-zsh-theme ]] && git clone https://github.com/jcosmao/blox-zsh-theme.git ~/.zsh/blox-zsh-theme
+
+function zsh_update
+{
+    for module in $(ls ~/.zsh); do
+        (cd ~/.zsh/$module; git fetch; git reset --hard origin/master)
+    done
+}
+
+fpath=(~/.zsh/myzsh/lib $fpath)
+for l in $(ls ~/.zsh/myzsh/lib/); do
+    source ~/.zsh/myzsh/lib/$l
+done
+source ~/.zsh/myzsh/plugins/wd/*.zsh
+source ~/.zsh/blox-zsh-theme/blox.zsh
+
+autoload -U +X compinit && compinit
+autoload -U +X bashcompinit && bashcompinit
+
+for f in $(find ~/.shell/zsh -name '*.zsh'); do
+    source $f
+done
