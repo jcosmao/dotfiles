@@ -84,6 +84,7 @@
     # Remove branches that have already been merged with master
     dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
     rst = "!f() { git clean -xfd && git reset --hard; }; f"
+    rh = "!f() { git fetch && git reset --hard origin/$(git symbolic-ref --short HEAD); }; f"
     # List contributors with number of commits
     contributors = shortlog --summary --numbered
     # https://stackoverflow.com/questions/3161204/how-to-find-the-nearest-parent-of-a-git-branch

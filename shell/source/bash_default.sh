@@ -3,6 +3,9 @@
 # Repository: https://github.com/mrzool/bash-sensible
 # Version: 0.2.2
 
+# disable lock terminal (ctrl-s behavior)
+stty -ixon
+
 if [[ -z $BASH ]]
 then
     # "Not in shell bash..."

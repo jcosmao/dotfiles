@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 
 SCRIPT=$(readlink -f $0)
 SCRIPTPATH=$(dirname $SCRIPT)
@@ -7,27 +6,14 @@ IS_SSH=$(env | grep -c SSH_TTY)
 cd $SCRIPTPATH
 TMPDIR=$SCRIPTPATH/tmp
 
-mkdir $TMPDIR
+mkdir -p $TMPDIR
 mkdir -p ~/.config
 mkdir -p ~/.local/bin
-
-if [[ $(id -u) -eq 0 && $(echo $PATH | grep -c "$HOME/.local/bin") -eq 0 ]]; then
-    INSTALL_ROOT_BIN=1
-fi
-
-if [[ $(hostname -s) =~ ^admin ]]; then
-    INSTALL_ROOT_BIN=0
-    INSTALL_PIP=0
-fi
-
-function install_vim_lite {
-    rm -rf ~/.vim && ln -sf $SCRIPTPATH/vim ~/.vim
-    ln -sf ~/.vim/vimrc_lite.vim ~/.vimrc
-}
 
 function install_neovim {
     release=$1
     echo "- Update neovim from $release"
+    set -xv
     wget https://github.com/neovim/neovim/releases/download/$release/nvim.appimage -O $TMPDIR/nvim.appimage 2>/dev/null || \
         cp nvim/nvim.appimage $TMPDIR
     chmod +x $TMPDIR/nvim.appimage
@@ -39,11 +25,75 @@ function install_neovim {
         mv squashfs-root .nvim
         ln -s ~/.local/bin/.nvim/usr/bin/nvim ~/.local/bin/nvim
         ln -s ~/.local/bin/.nvim/usr/bin/nvim ~/.local/bin/vim
-        [[ $INSTALL_ROOT_BIN -eq 1 ]] && ln -sf ~/.local/bin/.nvim/usr/bin/nvim /usr/local/bin/vim && \
-                                         ln -sf /usr/local/bin/vim /usr/local/bin/vi
     ) &> /dev/null
+}
 
-    if which apt-get 2>&1 > /dev/null ; then
+function install_vim_requirements {
+    echo "- Install vim requirements"
+
+    if [[ ! -e ~/.local/bin/nvim ]]; then
+        install_neovim 'stable'
+    fi
+
+    install_local_bin
+
+    rm -rf ~/.ctags.d && ln -sf $SCRIPTPATH/ctags/ctags.d ~/.ctags.d
+
+    source ~/.pyenv/versions/nvim/bin/activate || return
+    which npm 2> /dev/null || return
+
+    pip_require=(pynvim yamllint pyproject-flake8 black)
+    pip_installed=$(echo "$pip_freeze" | grep -P "(^$(echo ${pip_require[@]} | sed -e 's/ /|^/g'))" | wc -l)
+
+    if [[ ${#pip_require[@]} -ne $pip_installed ]]; then
+        pip install --upgrade pip setuptools
+        pip install --upgrade ${pip_require[@]}
+    fi
+
+    # npm tree-sitter deps (>0.19 require glibc > ubuntu18)
+    # npm install --location=global tree-sitter@0.19 tree-sitter-cli@0.19.0
+    npm install --global tree-sitter tree-sitter-cli
+}
+
+function install_vim_config {
+    echo "- Install neovim"
+
+    rm -rf ~/.config/nvim && ln -sf $SCRIPTPATH/neovim ~/.config/nvim
+    $HOME/.local/bin/nvim --headless +PlugUpgrade +PlugClean! +PlugInstall +PlugUpdate! +qall 2> /dev/null
+}
+
+function install_vim_light {
+    rm -rf ~/.vim && ln -sf $SCRIPTPATH/vim ~/.vim
+    ln -sf ~/.vim/vimrc_lite.vim ~/.vimrc
+}
+
+function install_shell {
+    version=${1:-full}
+
+    echo "- Install bash/zsh"
+
+    rm -f ~/.shell
+    ln -sf $SCRIPTPATH/shell ~/.shell
+
+    # global
+    ln -sf $SCRIPTPATH/shell/dir_colors ~/.dir_colors
+    mkdir -p ~/.bash_custom
+
+    # zsh
+    if [[ $version == 'light' ]]; then
+        ln -sf $SCRIPTPATH/shell/zshrc.lite ~/.zshrc
+        [[ -n $LC_BASTION ]] && ln -sf $SCRIPTPATH/shell/bashrc.lite ~/.bashrc-$LC_BASTION
+    else
+        ln -sf $SCRIPTPATH/shell/zshrc.lite ~/.zshrc
+        ln -sf $SCRIPTPATH/shell/bashrc ~/.bashrc
+    fi
+}
+
+function install_local_bin {
+    echo "- Install ~/.local/bin"
+
+    # Update bin from deb pkg
+    if which apt-get &> /dev/null ; then
         if [[ $IS_SSH -eq 0 ]]; then
             # - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
             version=$(basename $(curl -si https://github.com/BurntSushi/ripgrep/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
@@ -60,75 +110,12 @@ function install_neovim {
             chmod +x $SCRIPTPATH/bin/*
         fi
     fi
-}
-
-function install_vim_requirements {
-    echo "- Install vim requirements"
-
-    if [[ ! -e ~/.local/bin/nvim ]]; then
-        install_neovim 'stable'
-    fi
-
-    rm -rf ~/.ctags.d && ln -sf $SCRIPTPATH/ctags/ctags.d ~/.ctags.d
 
     # install local bin
     for bin in $(ls bin); do
         # check ldd
-        if [[ $(ldd bin/$bin | grep -c 'not found') -eq 0 ]]; then
-            bin_name=$(echo $bin | cut -d. -f1)
-            ln -sf $SCRIPTPATH/bin/$bin ~/.local/bin/$bin_name
-            [[ $INSTALL_ROOT_BIN -eq 1 ]] && ln -sf $SCRIPTPATH/bin/$bin /usr/local/bin/$bin_name
-        fi
-    done
-
-    source ~/.pyenv/versions/nvim/bin/activate || return
-    which npm 2> /dev/null || return
-
-    pip_require=(pynvim yamllint pyproject-flake8 black)
-    pip_installed=$(echo "$pip_freeze" | grep -P "(^$(echo ${pip_require[@]} | sed -e 's/ /|^/g'))" | wc -l)
-
-    if [[ ${#pip_require[@]} -ne $pip_installed ]]; then
-        pip install --upgrade pip setuptools
-        pip install --upgrade ${pip_require[@]}
-    fi
-
-    # npm tree-sitter deps (>0.19 require glibc > ubuntu18)
-    # npm install --location=global tree-sitter@0.19 tree-sitter-cli@0.19.0
-    npm install --location=global tree-sitter tree-sitter-cli
-}
-
-function install_vim_config {
-    echo "- Install neovim"
-
-    rm -rf ~/.config/nvim && ln -sf $SCRIPTPATH/neovim ~/.config/nvim
-    [[ $RESET -eq 1 ]] && rm -rf ~/.config/nvim/plug
-    $HOME/.local/bin/nvim --headless +PlugUpgrade +PlugClean! +PlugInstall +PlugUpdate! +qall 2> /dev/null
-}
-
-function install_shell {
-    version=${1:-full}
-
-    echo "- Install bash/zsh"
-    rm -f ~/.shell
-    ln -sf $SCRIPTPATH/shell ~/.shell
-
-    # global
-    ln -sf $SCRIPTPATH/shell/dir_colors ~/.dir_colors
-    mkdir -p ~/.bash_custom
-
-    # zsh
-    if [[ $version == 'light' ]]; then
-        ln -sf $SCRIPTPATH/shell/zshrc.lite ~/.zshrc
-    else
-        ln -sf $SCRIPTPATH/shell/zshrc ~/.zshrc
-    fi
-}
-
-function install_local_bin {
-    # install local bin
-    for bin in $(ls bin); do
-        # check ldd
-        if [[ $(ldd bin/$bin | grep -c 'not found') -eq 0 ]]; then
+        echo "    > $bin"
+        if [[ $(ldd bin/$bin 2>&1 |grep -c 'not found') -eq 0 ]]; then
             bin_name=$(echo $bin | cut -d. -f1)
             ln -sf $SCRIPTPATH/bin/$bin ~/.local/bin/$bin_name
         fi
@@ -166,11 +153,12 @@ function install_git {
 }
 
 function install_fonts {
+    [[ $IS_SSH -eq 1 ]] && return
     echo "- Install fonts"
     font_dir="$HOME/.fonts"
     rm -rf $font_dir && ln -sf $SCRIPTPATH/fonts $font_dir
     if [[ -f $(which fc-cache 2>/dev/null) ]]; then
-        echo "  - Resetting font cache..."
+        echo "    > Resetting font cache..."
         fc-cache -f $font_dir
     fi
 }
@@ -183,8 +171,9 @@ function install_icons {
 }
 
 function install_config {
+    [[ $IS_SSH -eq 1 ]] && return
     echo '- Install .config'
-    mkdir ~/.config.backup
+    mkdir -p ~/.config.backup
 
     for cfg in $(ls config); do
         if [[ ! -L $HOME/.config/$cfg ]]; then
@@ -200,13 +189,14 @@ function install_config {
 
     # build i3 config
     if which i3 2>&1 > /dev/null ; then
-        $HOME/.config/i3/i3_build_conf.sh
+        echo "    > build i3 conf"
+        $HOME/.config/i3/i3_build_conf.sh > /dev/null
     fi
 }
 
 function print_help {
     echo "
-    $0 [--minimal|--nvim|--conf|--help]
+    $0 [$(declare -f main | grep -oP '\-\-\w+' | paste -d '|' -s)]
     "
 
     exit
@@ -220,7 +210,6 @@ function main {
     while [[ $# -ne 0 ]]; do
         arg="$1"; shift
         case "$arg" in
-            --reset) export RESET=1;;
             --minimal) install_vim_light;
                        install_shell light;
                        install_tmux;

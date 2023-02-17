@@ -5,33 +5,14 @@ if [[ ! -f ~/.zpm/zpm.zsh ]]; then
 fi
 source ~/.zpm/zpm.zsh
 
-zpm load @omz
-zpm load @omz/wd,apply:source:path:fpath
-zpm load @omz/lib/{history,completion,key-bindings,clipboard}
-zpm load zsh-users/zsh-completions
-zpm load zsh-users/zsh-syntax-highlighting,apply:fpath
-source ~/.zpm/plugins/zsh-users---zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+ZPM_PLUGINS=~/.zpm/plugins/jcosmao---
 
-for f in $(find ~/.shell/zsh -name '*.zsh'); do
-    source $f
-done
-
+zpm load jcosmao/myzsh
+zpm load jcosmao/zsh-completions
+zpm load jcosmao/zsh-syntax-highlighting,apply:fpath
+for f in $(find ${ZPM_PLUGINS}myzsh/ -name '*.zsh'); do source $f; done
+for f in $(find ~/.shell/ -name '*.zsh'); do source $f; done
 zpm load jcosmao/zsh-bash-completions-fallback
 zpm load jcosmao/blox-zsh-theme
-source ~/.zpm/plugins/jcosmao---blox-zsh-theme/blox.zsh
-
-# ssh-agent ~/.shell/functions
-if declare -f launch_ssh_agent &> /dev/null; then
-    launch_ssh_agent
-fi
-
-# Set LS_COLORS
-[[ -x $(which dircolors) ]] && eval $(dircolors -b $HOME/.dir_colors)
-
-# completion color
-zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"
-
-# if we SSH then autolaunch default tmux session
-#if [[ -n $SSH_TTY && -z $TMUX ]]; then
-#    tm default
-#fi
+source ${ZPM_PLUGINS}blox-zsh-theme/blox.zsh
+source ${ZPM_PLUGINS}zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

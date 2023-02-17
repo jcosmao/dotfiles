@@ -1,8 +1,12 @@
+# vim: set ft=zsh:
+
 export PATH="$HOME/.local/bin:/usr/local/bin:$PATH"
 
 [[ ! -d ~/.zsh ]] && mkdir ~/.zsh
 [[ ! -d ~/.zsh/myzsh ]] && git clone https://github.com/jcosmao/myzsh.git ~/.zsh/myzsh
 [[ ! -d ~/.zsh/blox-zsh-theme ]] && git clone https://github.com/jcosmao/blox-zsh-theme.git ~/.zsh/blox-zsh-theme
+[[ ! -d ~/.zsh/zsh-syntax-highlighting ]] && git clone https://github.com/jcosmao/zsh-syntax-highlighting.git ~/.zsh/zsh-syntax-highlighting
+[[ ! -d ~/.zsh/zsh-bash-completions-fallback ]] && git clone https://github.com/jcosmao/zsh-bash-completions-fallback.git ~/.zsh/zsh-bash-completions-fallback
 
 function zsh_update
 {
@@ -11,16 +15,11 @@ function zsh_update
     done
 }
 
-fpath=(~/.zsh/myzsh/lib $fpath)
-for l in $(ls ~/.zsh/myzsh/lib/); do
-    source ~/.zsh/myzsh/lib/$l
-done
+fpath=(~/.zsh/myzsh/lib ~/.zsh/zsh-syntax-highlighting ~/.shell/completions $fpath)
+
+for l in $(ls ~/.zsh/myzsh/lib/); do source ~/.zsh/myzsh/lib/$l; done
+for f in $(find ~/.shell/ -name '*.zsh'); do source $f; done
 source ~/.zsh/myzsh/plugins/wd/*.zsh
 source ~/.zsh/blox-zsh-theme/blox.zsh
-
-autoload -U +X compinit && compinit
-autoload -U +X bashcompinit && bashcompinit
-
-for f in $(find ~/.shell/zsh -name '*.zsh'); do
-    source $f
-done
+source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source ~/.zsh/zsh-bash-completions-fallback/zsh-bash-completions-fallback.plugin.zsh

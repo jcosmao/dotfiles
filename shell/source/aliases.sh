@@ -6,7 +6,6 @@ export EDITOR=vim
 # tmux disable retitle
 export DISABLE_AUTO_TITLE=true
 export XDG_CONFIG_HOME=$HOME/.config
-export CLIFF_FIT_WIDTH=1
 
 # fucking keyboard
 alias vi=vim
@@ -15,22 +14,5 @@ alias bim=vim
 alias gti=git
 
 alias vimdiff="nvim -d"
-
 alias pip="python3 -m pip"
 alias pip3="python3 -m pip"
-
-
-function os {
-    if [[ "$*" =~ (show|list|create) ]]; then
-        openstack $* -f json | jq .
-    else
-        openstack $*
-    fi
-}
-
-alias oss="os server"
-alias osc="os compute"
-alias osn="os network"
-alias osb="os baremetal"
-alias osv="os volume"
-alias osi="os image"

@@ -1,0 +1,9 @@
+# vim: ft=sh
+
+export PATH="$HOME/.local/bin:/usr/local/bin:$PATH"
+
+# source bashrc extend
+[ -f ~/.bash_aliases ] && source ~/.bash_aliases
+[ -d ~/.bash_custom ] && for source in $(find ~/.bash_custom -type f); do source $source; done
+[ -e ~/.shell ] && for source in $(find ~/.shell/ -type f -name '*.sh' -or -name '*.bash'); do source $source; done
+[ -d ~/.shell/completions ] && source ~/.shell/completions/*

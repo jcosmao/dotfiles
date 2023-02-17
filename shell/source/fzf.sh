@@ -1,5 +1,3 @@
-# vim: set ft=sh:
-
 # ctrl-r : history
 # ctrl-t : file search
 # alt-c  : cd directory

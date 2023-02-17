@@ -1,8 +1,3 @@
-#!/bin/bash
-
-# disable lock terminal (ctrl-s behavior)
-stty -ixon
-
 function display_256_colors ()
 {
     for i in `seq 1 256`

@@ -35,3 +35,5 @@ function launch_ssh_agent ()
         return
     fi
 }
+
+launch_ssh_agent
