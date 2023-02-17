@@ -53,6 +53,22 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
 }
 )
 
+local signature_config = {
+    log_path = vim.fn.expand("$HOME") .. "/.cache/vim_lsp_signature.log",
+    debug = false,
+    hint_enable = false,
+    handler_opts = { border = "single" },
+    max_width = 80,
+    doc_lines = 0,
+    bind = true, -- This is mandatory, otherwise border config won't get registered.
+    handler_opts = {
+        border = "none"
+    },
+    padding = ' ',
+}
+
+require("lsp_signature").setup(signature_config)
+
 require("mason").setup()
 require("mason-lspconfig").setup()
 require("mason-lspconfig").setup_handlers {
