@@ -111,7 +111,7 @@ def parse_line(line):
              '([0-9]+):? ' # process
              '([A-Z]+) ' # level
              '([^ ]+) ' # name
-             '(\[[^\]]+\]) ' # context
+             '(\[[^\]]+\])* ' # context
              '(.+)') # text
 
     result = re.match(regex, line)
@@ -121,7 +121,7 @@ def parse_line(line):
           'process': result.group(3),
           'level': result.group(4),
           'name': result.group(5),
-          'req': result.group(6),
+          'req': [] if not result.group(6) else result.group(6),
           'text': result.group(7),
           '_type': 'default',
         }

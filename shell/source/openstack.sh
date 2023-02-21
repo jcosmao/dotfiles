@@ -1,8 +1,9 @@
 export CLIFF_FIT_WIDTH=1
 
 function os {
+    JQ=0
     [[ "$*" =~ (show|list|create) ]] && JQ=1
-    [[ "$*" =~ (console log) ]] && JQ=0
+    [[ "$*" =~ (console log show) ]] && JQ=0
     if [[ $JQ == 1 ]]; then
         openstack $* -f json | jq .
     else
