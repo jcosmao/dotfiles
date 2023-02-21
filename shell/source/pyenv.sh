@@ -6,7 +6,7 @@ function pyenv-load
     if [[ -d $PYENV_ROOT ]]; then
         if [[ -f $PYENV_ROOT/bin/pyenv ]]; then
             export PATH="$PYENV_ROOT/bin:$PATH"
-            eval "$(pyenv init --path)"
+            # eval "$(pyenv init --path)"
             eval "$(pyenv init -)"
             eval "$(pyenv virtualenv-init -)"
         fi
@@ -15,6 +15,8 @@ function pyenv-load
         echo "pyenv not installed. > pyenv-update"
     fi
 }
+
+[[ -d $PYENV_ROOT ]] && pyenv-load
 
 function pyenv-build-requirements
 {
