@@ -14,6 +14,8 @@ if filereadable($HOME . '/.pyenv/versions/nvim/bin/python')
     let g:python3_host_prog = $HOME . '/.pyenv/versions/nvim/bin/python'
 endif
 
+let g:node_host_prog = $HOME . '/.local/bin/npm'
+
 if !has('python3')
     echohl WarningMsg
     echo 'Missing python3 support - need to pip install pynvim'

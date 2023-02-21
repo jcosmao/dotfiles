@@ -11,7 +11,7 @@ let g:startify_session_before_save = [
 \ ]
 let g:startify_bookmarks = []
 let g:startify_lists = [
-\ { 'type': 'sessions',  'header': ['   Sessions']       },
 \ { 'type': 'files',     'header': ['   Files']            },
+\ { 'type': 'sessions',  'header': ['   Sessions']       },
 \ { 'type': 'bookmarks', 'header': ['   Bookmarks']      },
 \ ]

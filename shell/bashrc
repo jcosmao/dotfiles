@@ -26,8 +26,8 @@ PROMPT_COMMAND=prompt
 function prompt
 {
     history -a
-    triangle='❯'
-    PS1=$(printf " %s %s\n ${triangle} " "$(prompt_left)" "$(prompt_add)")
+    triangle='❭'
+    PS1=$(printf "\n %s %s\n ${green}${triangle}${normal} " "$(prompt_left)" "$(prompt_add)")
 }
 
 function prompt_add ()
@@ -38,7 +38,7 @@ function prompt_add ()
     fi
 
     if test -n "$VIRTUAL_ENV" ; then
-        add="$(set_virtualenv) ${add}"
+        add="${add} $(set_virtualenv)"
     fi
 
     echo $add
@@ -53,26 +53,32 @@ function prompt_left
     [[ "`id -u`" -eq 0 ]] && left_color=${b_red}
 
     if [[ -n $SSH_TTY ]]; then
-        PROMPT_LEFT="${yellow}\u${grey}@${left_color}\H${normal}"
+        PROMPT_LEFT="${yellow}\u${b_black}@${left_color}\H${normal}"
     else
         PROMPT_LEFT="${left_color}\u:${normal}"
     fi
 
-    echo "${PROMPT_LEFT} ${grey}\w${normal}"
+    echo "${PROMPT_LEFT} ${b_black}\w${normal}"
 }
 
 function set_git
 {
+    repo=$(basename -s .git $(git config --get remote.origin.url) 2> /dev/null)
     branch=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
+    commit_id=$(git rev-parse --short HEAD 2> /dev/null)
     modified=$( git status --porcelain | grep -c '^ M')
     removed=$( git status --porcelain | grep -c '^ D')
     commit=''
-    [[ $removed -ne 0 || $modified -ne 0 ]] && commit=${yellow}$'\342\234\230'${normal}
+    if [[ $removed -ne 0 || $modified -ne 0 ]]; then
+        commit=${yellow}${normal}
+    else
+        commit=${green}${normal}
+    fi
 
-    echo "${mkbold}git(${magenta}${branch}${normal}${mkbold})${normal}${commit}"
+    echo "$(tput setaf 204)[ $repo] ${b_black}${branch}${magenta}[${commit_id}]${normal} ${commit}  "
 }
 
 function set_virtualenv
 {
-    echo "${mkbold}venv(${b_yellow}$(basename $VIRTUAL_ENV)${normal})"
+    echo "${b_yellow}[ $(basename $VIRTUAL_ENV)]${normal}"
 }

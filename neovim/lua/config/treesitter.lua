@@ -1,6 +1,6 @@
 require("nvim-treesitter.install").prefer_git = false
 require'nvim-treesitter.configs'.setup {
-  ensure_installed = {"dockerfile", "c", "php", "embedded_template", "jsonc", "python", "rust", "latex", "yaml", "perl", "godot_resource", "gowork", "markdown", "go", "make", "scss", "http", "hjson", "comment", "css", "json5", "java", "javascript", "help", "vim", "cmake", "devicetree", "ruby", "json", "query", "typescript", "c_sharp", "regex", "lua", "cpp", "html", "rst", "hcl", "gomod", "erlang", "bash", "fish", "todotxt", "toml"},
+  ensure_installed = {"dockerfile", "c", "php", "jsonc", "python", "rust", "latex", "yaml", "perl", "markdown", "go", "make", "http", "hjson", "comment", "css", "json5", "java", "javascript", "help", "vim", "cmake", "ruby", "json", "typescript", "c_sharp", "regex", "lua", "cpp", "html", "rst", "hcl", "gomod", "bash", "toml", "diff", "terraform", "ini"},
    -- one of "all", "maintained" (parsers with maintainers), or a list of languages
   ignore_install = {},
   highlight = {

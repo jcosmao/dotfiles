@@ -3,9 +3,7 @@
 [core]
 	excludesfile = ~/.gitignore
     attributesfile = ~/.gitattributes
-
-[init]
-    templatedir = ~/.git/hooks
+    hooksPath = ~/.git/hooks
 
 [user]
     name = USERNAME

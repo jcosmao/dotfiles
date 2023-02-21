@@ -20,11 +20,13 @@ function install_neovim {
     echo "  - install neovim under ~/.local/bin/nvim"
     (
         cd ~/.local/bin
+        rm -f nvim vim
         rm -rf .nvim
         $TMPDIR/nvim.appimage --appimage-extract
         mv squashfs-root .nvim
-        ln -s ~/.local/bin/.nvim/usr/bin/nvim ~/.local/bin/nvim
-        ln -s ~/.local/bin/.nvim/usr/bin/nvim ~/.local/bin/vim
+
+        ln -sf .nvim/usr/bin/nvim .
+        ln -sf nvim vim
     ) &> /dev/null
 }
 
@@ -39,8 +41,7 @@ function install_vim_requirements {
 
     rm -rf ~/.ctags.d && ln -sf $SCRIPTPATH/ctags/ctags.d ~/.ctags.d
 
-    source ~/.pyenv/versions/nvim/bin/activate || return
-    which npm 2> /dev/null || return
+    source ~/.pyenv/versions/nvim/bin/activate || exit 1
 
     pip_require=(pynvim yamllint pyproject-flake8 black)
     pip_installed=$(echo "$pip_freeze" | grep -P "(^$(echo ${pip_require[@]} | sed -e 's/ /|^/g'))" | wc -l)
@@ -50,16 +51,30 @@ function install_vim_requirements {
         pip install --upgrade ${pip_require[@]}
     fi
 
-    # npm tree-sitter deps (>0.19 require glibc > ubuntu18)
-    # npm install --location=global tree-sitter@0.19 tree-sitter-cli@0.19.0
-    npm install --global tree-sitter tree-sitter-cli
+    source $SCRIPTPATH/shell/source/nvm.sh
+    nodejs.load
+    which npm 2> /dev/null || exit 1
+
+    if [[ $(lsb_release -rs) == "18.04" ]]; then
+        # npm tree-sitter deps (>0.19 require glibc > ubuntu18)
+        nvm install 16.17.0
+        nvm use 16.17.0
+        nvm alias default v16.17.0
+        npm install --location=global tree-sitter@0.19 tree-sitter-cli@0.19.0
+    else
+        npm install --global tree-sitter tree-sitter-cli
+    fi
+
+    # Path used in vim config
+    ln -sf $(which npm) $HOME/.local/bin/npm
+    ln -sf $(which node) $HOME/.local/bin/node
 }
 
 function install_vim_config {
     echo "- Install neovim"
 
     rm -rf ~/.config/nvim && ln -sf $SCRIPTPATH/neovim ~/.config/nvim
-    $HOME/.local/bin/nvim --headless +PlugUpgrade +PlugClean! +PlugInstall +PlugUpdate! +qall 2> /dev/null
+    $HOME/.local/bin/.nvim/usr/bin/nvim --headless +PlugUpgrade +PlugClean! +PlugInstall +PlugUpdate! +qall 2> /dev/null
 }
 
 function install_vim_light {

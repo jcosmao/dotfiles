@@ -1,7 +1,7 @@
 # Node JS
 export NVM_DIR="$HOME/.nvm"
 
-function nodejs-update
+function nodejs.install
 {
     # mkdir ~/.nvm  to auto install nodejs
     mkdir -p $NVM_DIR
@@ -23,10 +23,8 @@ function nodejs-update
     chown -R ${USER}: $NVM_DIR
 }
 
-function nodejs-load
+function nodejs.load
 {
-    if [[ -f "$NVM_DIR/nvm.sh" ]]; then
-        [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"  # This loads nvm
-        [ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-    fi
+    [[ -d $NVM_DIR ]] || return
+    [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
 }

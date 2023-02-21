@@ -35,3 +35,15 @@ mkbold="\033[0;1m"          # make bold
 undrln="\033[0;4m"          # underline
 mkblnk="\033[0;5m"          # make blink
 revers="\033[0;7m"          # reverse
+
+
+function colors.display_256_colors ()
+{
+    for i in `seq 1 256`
+    do
+        tput setaf $i
+        echo -n "$i "
+    done
+}
+
+

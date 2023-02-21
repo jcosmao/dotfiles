@@ -2,6 +2,7 @@ set nocompatible
 filetype off
 filetype plugin indent on
 syntax on
+
 set mouse=
 set ttyfast                         " Indicate fast terminal conn for faster redraw
 set lazyredraw                      " Wait to redraw
@@ -85,10 +86,11 @@ map <silent> <C-S-Up> :wincmd k<cr>
 map <silent> <C-S-Down> :wincmd j<cr>
 map <silent> <C-S-Right> :wincmd l<cr>
 map <silent> <C-S-Left> :wincmd h<cr>
-map <silent> <leader><Up> :wincmd k<cr>
-map <silent> <leader><Down> :wincmd j<cr>
-map <silent> <leader><Right> :wincmd l<cr>
-map <silent> <leader><Left> :wincmd h<cr>
+" https://vim.fandom.com/wiki/Fix_arrow_keys_that_display_A_B_C_D_on_remote_shell
+map <silent> <leader><ESC>OA :wincmd k<cr>
+map <silent> <leader><ESC>OB :wincmd j<cr>
+map <silent> <leader><ESC>OC :wincmd l<cr>
+map <silent> <leader><ESC>OD :wincmd h<cr>
 map <silent> <leader><leader> :noh <cr>
 map <silent> <leader><ENTER> <C-w>o
 " paste last yank (not from dd)

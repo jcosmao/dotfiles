@@ -1,14 +1,16 @@
 # https://github.com/pyenv/pyenv-installer
 export PYENV_ROOT="$HOME/.pyenv"
 
-function pyenv-load
+function pyenv.load
 {
     if [[ -d $PYENV_ROOT ]]; then
         if [[ -f $PYENV_ROOT/bin/pyenv ]]; then
             export PATH="$PYENV_ROOT/bin:$PATH"
+            # not needed ?
             # eval "$(pyenv init --path)"
             eval "$(pyenv init -)"
-            eval "$(pyenv virtualenv-init -)"
+            # https://github.com/pyenv/pyenv-virtualenv/issues/259#issuecomment-1096144748
+            eval "$(pyenv virtualenv-init - | sed s/precmd/chpwd/g)"
         fi
         export PYENV_VIRTUALENV_DISABLE_PROMPT=1
     else
@@ -16,18 +18,24 @@ function pyenv-load
     fi
 }
 
-[[ -d $PYENV_ROOT ]] && pyenv-load
+[[ -d $PYENV_ROOT ]] && pyenv.load
 
-function pyenv-build-requirements
+function pyenv.help
 {
-    apt-get install -y build-essential libssl-dev zlib1g-dev
     echo "
+        # Install a specific python version + build virtualenv with it
+        $ apt-get install -y build-essential libssl-dev zlib1g-dev
+        $ pyenv install -l
         $ pyenv install 3.9.0
         $ pyenv virtualenv 3.9.0 nvim
+
+        # init working dir to autoload proper env
+        $ mkdir nvim && echo nvim > nvim/.python-version
+        $ pyenv versions
     "
 }
 
-function pyenv-update
+function pyenv.install
 {
     if [[ ! -f $PYENV_ROOT/bin/pyenv ]]; then
         git clone https://github.com/pyenv/pyenv.git $PYENV_ROOT
@@ -38,3 +46,7 @@ function pyenv-update
     fi
 }
 
+function pyenv.update
+{
+    pyenv.install
+}
