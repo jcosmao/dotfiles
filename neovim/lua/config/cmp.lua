@@ -77,24 +77,6 @@ cmp.setup {
     },
 }
 
--- `/` cmdline setup.
-cmp.setup.cmdline('/', {
-    mapping = cmp.mapping.preset.cmdline(),
-    sources = {
-        { name = 'buffer' }
-    }
-})
-
-cmp.setup.cmdline(':', {
-  sources = {
-    {
-      name = 'cmdline',
-      option = {
-        ignore_cmds = {}
-      }
-    }
-  }
-})
 
 -- -- Setup lspconfig.
 local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
