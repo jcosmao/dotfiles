@@ -53,14 +53,13 @@ case "$BLOCK_BUTTON" in
             | sed "s#\b${day_number// /}\b#<span bgcolor='\#2b83a6' color='\#ffffff'>${day_number// /}</span>#" \
             | rofi \
                 -dmenu \
-                -width '-23' \
                 -lines "$cal_lines" \
-                -font 'Monospace 10' \
+                -font 'Monospace 12' \
                 -location '3' \
                 -xoffset '-15' \
                 -yoffset '30' \
                 -theme-str 'configuration { show-icons: false; }' \
-                -theme-str 'window { fullscreen: false; } inputbar { children: [ prompt ]; } listview { scrollbar: false; }' \
+                -theme-str 'window { fullscreen: false; width: 250px; height: 250px; } inputbar { children: [ prompt ]; } listview { scrollbar: false; }' \
                 -theme-str 'element normal.normal, element selected.normal, element alternate.normal { background-color: #212121; text-color: #c4cad4; }' \
                 -theme-str 'element normal.active, element selected.active, element alternate.active { background-color: #363636; text-color: #f9f9f9; }' \
                 -p "$the_date" \

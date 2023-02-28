@@ -23,6 +23,7 @@ cat "$i3_config_base" \
     "$i3_family_config" \
     "$i3_layout_config" > ${i3_dir}/config
 
+sed -ri "s/<LAYOUT_NAME>/$layout/g" ${i3_dir}/config
 sed -ri "s/<HDMI_1>/$screen_hdmi_1/g" ${i3_dir}/config
 sed -ri "s/<HDMI_2>/$screen_hdmi_2/g" ${i3_dir}/config
 sed -ri "s/<eDP>/$screen_laptop/g" ${i3_dir}/config

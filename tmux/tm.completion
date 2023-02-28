@@ -1,3 +1,5 @@
+# vim: ft=sh
+
 # tmux functions
 function _complete_tm_session
 {

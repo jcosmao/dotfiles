@@ -30,7 +30,7 @@ set wildmode=full                   " vim bar autocomplete
 set wildmenu
 set smartindent
 set autoread                        " Set vim to update autmatically when a file's read-only state is changed
-set undodir=~/.cache/vim/undodir
+set undodir=~/.cache/vim.lite/undodir
 set undofile                        " Persistent undo
 set undolevels=10000                " maximum number of changes that can be undone
 set undoreload=100000               " maximum number lines to save for undo on a buffer reload
