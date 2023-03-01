@@ -238,6 +238,7 @@ function main {
                     install_tmux;
                     install_git;
                     install_config;
+                    install_local_bin;
                     install_icons ;
                     install_fonts ;;
             --help) print_help ;;
