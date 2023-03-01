@@ -13,6 +13,9 @@ export FZF_CTRL_T_OPTS="--height 50% --preview '(bat --style=numbers --color=alw
 alias pac="pacman -Slq | fzf -m --preview 'pacman -Si {1}' | xargs -r sudo pacman -S --noconfirm"
 alias apts='apt-cache search . | awk "{print \$1}" | fzf -m --preview "apt-cache show {1}" | xargs -r sudo apt install -y'
 
+# pass
+alias pass='PASSWORD_STORE_ENABLE_EXTENSIONS=true pass fzf'
+
 # select background jobs
 function job
 {

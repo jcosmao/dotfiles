@@ -102,6 +102,10 @@ function install_shell {
         ln -sf $SCRIPTPATH/shell/zshrc.lite ~/.zshrc
         ln -sf $SCRIPTPATH/shell/bashrc ~/.bashrc
     fi
+
+    # fzf pass
+    mkdir -p ~/.password-store/.extensions/
+    ln -sf ~/.shell/fzf/fzf.bash.password-store ~/.password-store/.extensions/fzf.bash
 }
 
 function install_local_bin {
