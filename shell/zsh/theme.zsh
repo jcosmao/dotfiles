@@ -1,12 +1,3 @@
-# theme
-
-# enable color support
-autoload -Uz colors && colors
-if [ -x /usr/bin/dircolors ]; then
-    alias ls='ls --color=auto'
-    eval "`dircolors -b`"
-fi
-
 function __get_host_color
 {
   HOST_COLOR_ARRAY=(5 11 12 13 14 39 45 69 99 123 135 159 202)

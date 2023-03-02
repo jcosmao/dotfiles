@@ -2,6 +2,8 @@ if [[ "$TERM" == "xterm" ]]; then
     export TERM=xterm-256color
 fi
 
+eval $(dircolors -b ~/.dir_colors)
+
 alias ls='ls --color=auto'
 alias dir='dir --color=auto'
 

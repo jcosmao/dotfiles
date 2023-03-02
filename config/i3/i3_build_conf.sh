@@ -35,5 +35,8 @@ SCRIPT=$(readlink -f $0)
 SCRIPTPATH=$(dirname $SCRIPT)
 bash $SCRIPTPATH/scripts/term_font_size.sh
 
+setxkbmap -layout us -variant altgr-intl
+/usr/bin/feh --bg-fill --no-fehbg --randomize ~/.wallpapers/*
+
 # Then reload/restart i3
 i3-msg $action

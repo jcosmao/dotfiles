@@ -52,7 +52,7 @@ set pumheight=20
 " colorscheme
 set notermguicolors                  " this fix mosh/tmux color
 set background=dark
-colorscheme gruvbox8
+colorscheme gruvbox8_hard
 
 " Remap some common typos
 command! -bang E e<bang>
@@ -72,7 +72,7 @@ map <silent> <leader>V :tabedit $MYVIMRC <cr>
 map <silent> <leader>S :source $MYVIMRC \| :echo $MYVIMRC 'reloaded' <cr>
 map <silent> <leader><ESC> :set nonumber \|  :set signcolumn=no <cr>
 map <silent> <leader><F1> :set number \| :set signcolumn=auto <cr>
-map <silent> <F2> :Lexplore <cr>
+map <silent> <F1> :Lexplore <cr>
 map <silent> <F4> :set number! <cr>
 map <silent> <F10> :set paste! <cr>
 map <silent> <F12> :call custom#ToggleMouse() <cr>
@@ -124,4 +124,8 @@ autocmd BufNewFile,BufRead *.inc set filetype=perl
 " trim whitespace
 autocmd BufWritePre * :%s/\s\+$//e
 
-let g:netrw_winsize = 25
+" Enable Omnicomplete features - vim-auto-popmenu
+set completeopt=longest,menuone,noinsert,noselect
+let g:apc_enable_ft = {'text':1, 'markdown':1, 'sh':1, 'python':1, 'perl':1, 'puppet':1, 'ansible':1}    " enable filetypes
+let g:apc_min_length = 2   " minimal length to open popup
+let g:apc_key_ignore =  []  " ignore keywords
