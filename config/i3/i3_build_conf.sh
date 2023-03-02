@@ -30,5 +30,10 @@ sed -ri "s/<eDP>/$screen_laptop/g" ${i3_dir}/config
 sed -ri "s/<DP_1>/$screen_display_port_1/g" ${i3_dir}/config
 sed -ri "s/<DP_2>/$screen_display_port_2/g" ${i3_dir}/config
 
+# Term font size
+SCRIPT=$(readlink -f $0)
+SCRIPTPATH=$(dirname $SCRIPT)
+bash $SCRIPTPATH/scripts/term_font_size.sh
+
 # Then reload/restart i3
 i3-msg $action
