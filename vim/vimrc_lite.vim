@@ -50,7 +50,7 @@ set shortmess+=c
 set pumheight=20
 
 " colorscheme
-set termguicolors
+set notermguicolors                  " this fix mosh/tmux color
 set background=dark
 colorscheme gruvbox8
 
