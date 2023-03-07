@@ -1,3 +1,8 @@
+local has, _ = pcall(require, 'nvim-treesitter')
+if not has then
+    return nil
+end
+
 require("nvim-treesitter.install").prefer_git = false
 require'nvim-treesitter.configs'.setup {
   ensure_installed = {"dockerfile", "c", "php", "jsonc", "python", "rust", "latex", "yaml", "perl", "markdown", "go", "make", "http", "hjson", "comment", "css", "json5", "java", "javascript", "help", "vim", "cmake", "ruby", "json", "typescript", "c_sharp", "regex", "lua", "cpp", "html", "rst", "hcl", "gomod", "bash", "toml", "diff", "terraform", "ini"},

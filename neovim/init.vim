@@ -47,8 +47,11 @@ Plug 'nvim-lua/popup.nvim'
 
 " Utils
 
+if executable('gcc')
+    Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+endif
+
 Plug 'mhinz/vim-startify'
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'kyazdani42/nvim-web-devicons'
 Plug 'kyazdani42/nvim-tree.lua'
 Plug 'junegunn/fzf'
@@ -68,17 +71,16 @@ Plug 'Valloric/ListToggle'
 Plug 'junegunn/rainbow_parentheses.vim'
 " breaking change - does not detect root pattern with priority
 Plug 'airblade/vim-rooter', {'commit': 'd64f3e04df9914e784508019a1a1f291cbb40bd4'}
-" Plug 'airblade/vim-rooter'
 Plug 'akinsho/toggleterm.nvim'
 
 " Language Specific
 
 " python syntax hilight
-Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
-Plug 'heavenshell/vim-pydocstring', {'do': 'pip3 install doq', 'for': 'python'}
+Plug 'numirias/semshi', {'for': 'python', 'do': ':UpdateRemotePlugins'}
+Plug 'heavenshell/vim-pydocstring', {'for': 'python', 'do': 'pip install doq'}
 Plug 'rodjek/vim-puppet', {'for': 'puppet'}
 Plug 'psf/black',  {'for': 'python', 'do': ':UpdateRemotePlugins'}
-Plug 'averms/black-nvim', {'do': ':UpdateRemotePlugins'}
+Plug 'averms/black-nvim', {'for': 'python', 'do': ':UpdateRemotePlugins'}
 " nvim-go + deps
 Plug 'ray-x/go.nvim', {'for': 'go'}
 Plug 'ray-x/guihua.lua', {'for': 'go'}
