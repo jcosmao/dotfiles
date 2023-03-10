@@ -76,7 +76,7 @@ Plug 'akinsho/toggleterm.nvim'
 " Language Specific
 
 " python syntax hilight
-Plug 'numirias/semshi', {'for': 'python', 'do': ':UpdateRemotePlugins'}
+Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
 Plug 'heavenshell/vim-pydocstring', {'for': 'python', 'do': 'pip install doq'}
 Plug 'rodjek/vim-puppet', {'for': 'puppet'}
 Plug 'psf/black',  {'for': 'python', 'do': ':UpdateRemotePlugins'}

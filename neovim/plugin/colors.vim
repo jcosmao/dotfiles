@@ -8,13 +8,13 @@ let g:gruvbox_material_better_performance = 1
 " available: material / mix / original
 let g:gruvbox_material_palette = 'material'
 " available: soft / medium / hard
-let g:gruvbox_material_background = 'medium'
+let g:gruvbox_material_background = 'hard'
 
 colorscheme gruvbox-material
 
 " override colorscheme config
 hi WildMenu         ctermbg=208 ctermfg=16
-" hi CursorLine       ctermbg=233 term=bold       cterm=bold              guibg=#121212   gui=bold
+hi CursorLine       ctermbg=233 term=bold       cterm=bold              guibg=#2a373a   gui=bold
 hi DiffAdd          ctermbg=235 ctermfg=108     cterm=reverse           guibg=#262626   guifg=#87AF87   gui=reverse
 hi DiffChange       ctermbg=235 ctermfg=103     cterm=reverse           guibg=#262626   guifg=#8787AF   gui=reverse
 hi DiffDelete       ctermbg=235 ctermfg=131     cterm=reverse           guibg=#262626   guifg=#AF5F5F   gui=reverse
