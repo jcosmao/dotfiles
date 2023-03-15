@@ -23,11 +23,17 @@ function os_log_color
     cmd=${1:-tail}; shift
     opts=("$@")
 
+    tail_opts=()
     os_files=()
     for f in ${opts[@]}; do
         if [[ -e $f ]]; then
             os_files+=($f)
             shift
+        else
+            if [[ ${#os_files[@]} == 0 ]]; then
+                tail_opts+=($f)
+                shift
+            fi
         fi
     done
 
@@ -39,8 +45,7 @@ function os_log_color
     os_opts=$*
 
     [[ $cmd == "less" ]] && cat ${os_files[@]} | ~/.local/bin/os-log-color $os_opts | less -R
-    [[ $cmd == "tail" ]] && tail -F ${os_files[@]} | ~/.local/bin/os-log-color $os_opts
-
+    [[ $cmd == "tail" ]] && tail ${tail_opts[@]} -F ${os_files[@]} | ~/.local/bin/os-log-color $os_opts
 )}
 
 function otail
