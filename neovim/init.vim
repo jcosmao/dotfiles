@@ -78,27 +78,23 @@ Plug 'akinsho/toggleterm.nvim'
 " python syntax hilight
 Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
 Plug 'heavenshell/vim-pydocstring', {'for': 'python', 'do': 'pip install doq'}
-Plug 'rodjek/vim-puppet', {'for': 'puppet'}
 Plug 'psf/black',  {'for': 'python', 'do': ':UpdateRemotePlugins'}
 Plug 'averms/black-nvim', {'for': 'python', 'do': ':UpdateRemotePlugins'}
 " nvim-go + deps
 Plug 'ray-x/go.nvim', {'for': 'go'}
 Plug 'ray-x/guihua.lua', {'for': 'go'}
-
-
+" puppet
+Plug 'rodjek/vim-puppet', {'for': 'puppet'}
 
 " ctags / cscope
-
 Plug 'ludovicchabant/vim-gutentags', {'do': 'cd  ~/.vim/plug/vim-gutentags; patch -p1 -stNr /dev/null < ~/.config/nvim/plugin_patch/vim-gutentags.patch; true'}
 Plug 'stevearc/aerial.nvim'
 
 " git
-
 Plug 'mhinz/vim-signify'
 Plug 'rhysd/git-messenger.vim'
 
 " Colorscheme
-
 Plug 'sainnhe/gruvbox-material'
 
 call plug#end()
@@ -189,7 +185,7 @@ map <silent> <leader>V :tabedit $MYVIMRC <cr>
 map <silent> <leader>S :source $MYVIMRC \| :echo $MYVIMRC 'reloaded' <cr>
 map <silent> <leader><ESC> :set nonumber \| :IndentLinesDisable \| :SignifyDisable \| :set signcolumn=no <cr>
 map <silent> <leader><F1> :set number \| :IndentLinesEnable \| :SignifyEnable \| :set signcolumn=auto <cr>
-map <silent> <F1> :NvimTreeToggle <cr>
+map <silent> <F1> :NvimTreeFindFileToggle! <cr>
 map <silent> <F2> :AerialToggle <cr>
 map <silent> <F3> :IndentLinesToggle <cr>
 map <silent> <F4> :set number! <cr>
@@ -245,6 +241,10 @@ for i in range(1, 9)
     execute "map <leader>" . i . " " . i . "gt"
 endfor
 map <leader>0 :tablast <cr>
+
+"
+nmap <leader>> <plug>(signify-next-hunk)
+nmap <leader>< <plug>(signify-prev-hunk)
 
 " Specific filetype
 autocmd BufNewFile,BufRead *.lib set filetype=sh

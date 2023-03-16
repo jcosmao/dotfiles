@@ -83,3 +83,9 @@ function utils.ssl_get
         openssl s_client -showcerts -connect $1 </dev/null | \
         openssl x509 -text
 }
+
+function utils.randpass
+{
+    size=${1:-32}
+    openssl rand -base64 $size | tr -d '\n'
+}
