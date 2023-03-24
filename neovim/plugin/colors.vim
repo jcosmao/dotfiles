@@ -8,30 +8,41 @@ let g:gruvbox_material_better_performance = 1
 " available: material / mix / original
 let g:gruvbox_material_palette = 'material'
 " available: soft / medium / hard
-let g:gruvbox_material_background = 'hard'
+let g:gruvbox_material_background = 'medium'
 
 colorscheme gruvbox-material
 
 " override colorscheme config
-hi WildMenu         ctermbg=208 ctermfg=16
-hi CursorLine       ctermbg=233 term=bold       cterm=bold              guibg=#2a373a   gui=bold
-hi DiffAdd          ctermbg=235 ctermfg=108     cterm=reverse           guibg=#262626   guifg=#87AF87   gui=reverse
-hi DiffChange       ctermbg=235 ctermfg=103     cterm=reverse           guibg=#262626   guifg=#8787AF   gui=reverse
-hi DiffDelete       ctermbg=235 ctermfg=131     cterm=reverse           guibg=#262626   guifg=#AF5F5F   gui=reverse
-hi DiffText         ctermbg=235 ctermfg=208     cterm=reverse           guibg=#262626   guifg=#FF8700   gui=reverse
-hi Directory        ctermfg=12  guifg=#83A598
-hi NERDTreeOpenable ctermfg=88  guifg=#870000
-hi NERDTreeClosable ctermfg=9   guifg=#FB4934
+hi CursorLine       guibg=#2a373a   gui=bold
+hi DiffAdd          guibg=#262626   guifg=#87AF87   gui=reverse
+hi DiffChange       guibg=#262626   guifg=#8787AF   gui=reverse
+hi DiffDelete       guibg=#262626   guifg=#AF5F5F   gui=reverse
+hi DiffText         guibg=#262626   guifg=#FF8700   gui=reverse
+hi Directory        guifg=#83A598
 
-" " override semshi colorscheme
-hi semshiParameter  ctermfg=109 guifg=#83a598
-hi semshiImported   ctermfg=210 guifg=#ff9741
-hi semshiGlobal     ctermfg=214 guifg=#ffc649
+hi MatchParen guibg=#3e6478
 
-hi NvimTreeNormal    guibg=#262626
-hi NvimTreeVertSplit guibg=#262626 guifg=#262626
+" Search, signature current, ...
+hi Search  guibg=#d69a22
+
+" Remove floating background color
+hi ErrorFloat   guibg=None
+hi WarningFloat guibg=None
+hi InfoFloat    guibg=None
+hi NormalFloat  guibg=None
+hi FloatBorder  guifg=None guibg=None
+
+hi WinBarActive gui=reverse guifg=#a9b665 guibg=#141617
+
+" override semshi colorscheme
+hi semshiParameter  guifg=#83a598
+hi semshiImported   guifg=#ff9741
+hi semshiGlobal     guifg=#ffc649
+
+hi NvimTreeNormal       guibg=#262626
+hi NvimTreeVertSplit    guibg=#262626 guifg=#262626
 hi NvimTreeStatuslineNc guibg=#262626 guifg=#262626
-hi NvimTreeEndOfBuffer guibg=#262626 guifg=#262626
+hi NvimTreeEndOfBuffer  guibg=#262626 guifg=#262626
 
 " Fix missing tree-sitter binding on colorscheme (gruvbox_material)
 autocmd FileType sh :highlight! link TSVariable Blue

@@ -52,7 +52,7 @@ set pumheight=20
 " colorscheme
 set notermguicolors                  " this fix mosh/tmux color
 set background=dark
-colorscheme gruvbox8_hard
+colorscheme gruvbox8
 
 " Remap some common typos
 command! -bang E e<bang>

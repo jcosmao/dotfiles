@@ -22,7 +22,7 @@ if !has('python3')
     echohl None
 endif
 
-call plug#begin('~/.vim/plug')
+call plug#begin('~/.config/nvim/.plug')
 
 " completion / linter
 
@@ -37,13 +37,10 @@ Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/cmp-nvim-lua'
-Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
-Plug 'quangnguyen30192/cmp-nvim-ultisnips'
+Plug 'saadparwaiz1/cmp_luasnip'
+Plug 'L3MON4D3/LuaSnip', {'do': 'make install_jsregexp'}
+Plug 'rafamadriz/friendly-snippets'
 Plug 'folke/trouble.nvim'
-Plug 'jubnzv/virtual-types.nvim'
-Plug 'nvim-lua/plenary.nvim'
-Plug 'nvim-lua/popup.nvim'
 
 " Utils
 
@@ -52,8 +49,8 @@ if executable('gcc')
 endif
 
 Plug 'mhinz/vim-startify'
-Plug 'kyazdani42/nvim-web-devicons'
-Plug 'kyazdani42/nvim-tree.lua'
+Plug 'nvim-tree/nvim-web-devicons'
+Plug 'nvim-tree/nvim-tree.lua'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'chengzeyi/fzf-preview.vim'
@@ -67,8 +64,6 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-eunuch'
 Plug 'psliwka/vim-smoothie'
 Plug 'troydm/zoomwintab.vim'
-Plug 'Valloric/ListToggle'
-Plug 'junegunn/rainbow_parentheses.vim'
 " breaking change - does not detect root pattern with priority
 Plug 'airblade/vim-rooter', {'commit': 'd64f3e04df9914e784508019a1a1f291cbb40bd4'}
 Plug 'akinsho/toggleterm.nvim'
@@ -77,7 +72,6 @@ Plug 'akinsho/toggleterm.nvim'
 
 " python syntax hilight
 Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
-Plug 'heavenshell/vim-pydocstring', {'for': 'python', 'do': 'pip install doq'}
 Plug 'psf/black',  {'for': 'python', 'do': ':UpdateRemotePlugins'}
 Plug 'averms/black-nvim', {'for': 'python', 'do': ':UpdateRemotePlugins'}
 " nvim-go + deps
@@ -85,6 +79,8 @@ Plug 'ray-x/go.nvim', {'for': 'go'}
 Plug 'ray-x/guihua.lua', {'for': 'go'}
 " puppet
 Plug 'rodjek/vim-puppet', {'for': 'puppet'}
+" annotations (require nvim-treesitter)
+Plug 'danymat/neogen'
 
 " ctags / cscope
 Plug 'ludovicchabant/vim-gutentags', {'do': 'cd  ~/.vim/plug/vim-gutentags; patch -p1 -stNr /dev/null < ~/.config/nvim/plugin_patch/vim-gutentags.patch; true'}
@@ -190,19 +186,20 @@ map <silent> <F2> :AerialToggle <cr>
 map <silent> <F3> :IndentLinesToggle <cr>
 map <silent> <F4> :set number! <cr>
 map <silent> <F5> :SignifyToggle <cr>
+map <silent> <F6> :set paste! <cr>
 map <silent> <F9> :ToggleTerm dir=%:p:h <cr>
-map <silent> <F10> :set paste! <cr>
-map <silent> <F11> :2,$s/^\s*pick/fixup/g <cr>
+map <silent> <F10> :Startify <cr>
 map <silent> <F12> :call custom#ToggleMouse() <cr>
 map <silent> <leader>a :execute 'Rg' expand('<cword>') <cr>
 map <silent> <leader>s :Rg <cr>
 map <silent> <leader>f :Files <cr>
+map <silent> <leader>d :Neogen <cr>
 map <silent> <leader>b :Buffers <cr>
-map <silent> <leader>d :Lines <cr>
 map <silent> <leader>t :FZFCtags <cr>
 map <silent> <leader>c :BCommits <cr>
 map <silent> <leader>h :History <cr>
 map <silent> <leader>g :GitMessenger <cr>
+map <silent> <leader>m :Snippets <cr>
 map <silent> <C-a> ^
 map <silent> <C-e> $
 map <silent> <C-Right> e

@@ -50,26 +50,44 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
     signs = true,
     underline = false,
     virtual_text = false,
-}
+})
+
+
+-- Add border
+local _border = "rounded"
+
+vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
+    vim.lsp.handlers.hover, {
+        border = _border
+    }
 )
+
+vim.diagnostic.config{
+    float = {
+        border = _border
+    }
+}
 
 local signature_config = {
     log_path = vim.fn.expand("$HOME") .. "/.cache/vim_lsp_signature.log",
     debug = false,
     hint_enable = false,
-    handler_opts = { border = "single" },
     max_width = 80,
     doc_lines = 0,
     bind = true, -- This is mandatory, otherwise border config won't get registered.
     handler_opts = {
-        border = "none"
+        border = _border
     },
     padding = ' ',
 }
 
 require("lsp_signature").setup(signature_config)
 
-require("mason").setup()
+require("mason").setup({
+    ui = {
+        border = _border
+    }
+})
 require("mason-lspconfig").setup()
 require("mason-lspconfig").setup_handlers {
     -- The first entry (without a key) will be the default handler
