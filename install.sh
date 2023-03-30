@@ -13,7 +13,6 @@ mkdir -p ~/.local/bin
 function install_neovim {
     release=$1
     echo "- Update neovim from $release"
-    set -xv
     wget https://github.com/neovim/neovim/releases/download/$release/nvim.appimage -O $TMPDIR/nvim.appimage 2>/dev/null || \
         cp nvim/nvim.appimage $TMPDIR
     chmod +x $TMPDIR/nvim.appimage
@@ -108,27 +107,32 @@ function install_shell {
     ln -sf ~/.shell/fzf/fzf.bash.password-store ~/.password-store/.extensions/fzf.bash
 }
 
+function update_bin_from_deb {
+    echo "- Update bin from deb pkg"
+
+    # fzf: deb from debian 11
+    # rofi: ubuntu 22.04
+    # ctags: compiled from https://github.com/universal-ctags/ctags.git
+
+    if which apt-get &> /dev/null ; then
+        # - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
+        version=$(basename $(curl -si https://github.com/BurntSushi/ripgrep/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
+        wget "https://github.com/BurntSushi/ripgrep/releases/download/$version/ripgrep_${version}_amd64.deb" -O $TMPDIR/ripgrep.deb
+        dpkg -x $TMPDIR/ripgrep.deb $TMPDIR/deb
+
+        # - Install fd: https://github.com/sharkdp/fd/releases/latest
+        version=$(basename $(curl -si https://github.com/sharkdp/fd/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
+        wget "https://github.com/sharkdp/fd/releases/download/${version}/fd_${version:1}_amd64.deb" -O $TMPDIR/fd.deb
+        dpkg -x $TMPDIR/fd.deb $TMPDIR/deb
+
+        # save binary
+        cp $TMPDIR/deb/usr/bin/* $SCRIPTPATH/bin && rm -rf $TMPDIR/deb
+        chmod +x $SCRIPTPATH/bin/*
+    fi
+}
+
 function install_local_bin {
     echo "- Install ~/.local/bin"
-
-    # Update bin from deb pkg
-    if which apt-get &> /dev/null ; then
-        if [[ $IS_SSH -eq 0 ]]; then
-            # - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
-            version=$(basename $(curl -si https://github.com/BurntSushi/ripgrep/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
-            wget "https://github.com/BurntSushi/ripgrep/releases/download/$version/ripgrep_${version}_amd64.deb" -O $TMPDIR/ripgrep.deb
-            dpkg -x $TMPDIR/ripgrep.deb $TMPDIR/deb
-
-            # - Install fd: https://github.com/sharkdp/fd/releases/latest
-            version=$(basename $(curl -si https://github.com/sharkdp/fd/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
-            wget "https://github.com/sharkdp/fd/releases/download/${version}/fd_${version:1}_amd64.deb" -O $TMPDIR/fd.deb
-            dpkg -x $TMPDIR/fd.deb $TMPDIR/deb
-
-            # save binary
-            cp $TMPDIR/deb/usr/bin/* $SCRIPTPATH/bin && rm -rf $TMPDIR/deb
-            chmod +x $SCRIPTPATH/bin/*
-        fi
-    fi
 
     # install local bin
     for bin in $(ls bin); do
@@ -215,7 +219,7 @@ function install_config {
 
 function print_help {
     echo "
-    $0 [$(declare -f main | grep -oP '\-\-\w+' | paste -d '|' -s)]
+    $0 [$(declare -f main | grep ')$' | grep -oP '\-*\-\w+' | paste -d '|' -s)]
     "
 
     exit
@@ -229,24 +233,36 @@ function main {
     while [[ $# -ne 0 ]]; do
         arg="$1"; shift
         case "$arg" in
-            --minimal) install_vim_light;
-                       install_shell light;
-                       install_tmux;
-                       install_local_bin ;;
-            --nvim)  [[ $1 =~ ^(stable|nightly|v) ]] && \
-                        release=$1 && shift && \
-                        install_neovim $release;
-                    install_vim_requirements;
-                    install_vim_config;;
-            --conf) install_shell;
-                    install_tmux;
-                    install_git;
-                    install_config;
-                    install_local_bin;
-                    install_icons ;
-                    install_fonts ;;
-            --help) print_help ;;
-            * ) [[ $arg =~ \-+.* ]] && print_help "$arg unknown"
+            --minimal|-m)
+                install_vim_light;
+                install_shell light;
+                install_tmux;
+                install_local_bin ;;
+
+            --nvim|--neovim|-v)
+                [[ $1 =~ ^(stable|nightly) ]] && \
+                    release=$1 && shift && \
+                    install_neovim $release;
+                install_vim_requirements;
+                install_vim_config;;
+
+            --conf|-c)
+                install_shell;
+                install_tmux;
+                install_git;
+                install_config;
+                install_local_bin;
+                install_icons ;
+                install_fonts ;;
+
+            --updatebin|-u)
+                update_bin_from_deb;;
+
+            --help|-h)
+                print_help ;;
+
+            *)
+                [[ $arg =~ \-+.* ]] && print_help "$arg unknown"
         esac
     done
 

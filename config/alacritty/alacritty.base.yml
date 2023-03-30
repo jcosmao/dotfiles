@@ -11,6 +11,7 @@ env:
   # check the local terminfo database and use `alacritty` if it is
   # available, otherwise `xterm-256color` is used.
   TERM: xterm-256color
+  WINIT_X11_SCALE_FACTOR: "1"
 
 window:
   # Window dimensions (changes require restart)
@@ -103,7 +104,8 @@ scrolling:
 font:
   normal:
     # Font family
-    family: JetBrains Mono
+    # family: JetBrains Mono
+    family: Cascadia Code
     # family: Hack
     # family: FiraMono Nerd Font
     # family: DejaVu Sans Mono
@@ -116,7 +118,7 @@ font:
     style: Italic
 
   bold_italic:
-    style: Italic
+    style: Bold Italic
 
   # Point size
   size: 10

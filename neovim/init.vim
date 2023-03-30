@@ -22,7 +22,9 @@ if !has('python3')
     echohl None
 endif
 
-call plug#begin('~/.config/nvim/.plug')
+let g:plug_root = $HOME . '/.config/nvim/.plug'
+
+call plug#begin(g:plug_root)
 
 " completion / linter
 
@@ -83,7 +85,10 @@ Plug 'rodjek/vim-puppet', {'for': 'puppet'}
 Plug 'danymat/neogen'
 
 " ctags / cscope
-Plug 'ludovicchabant/vim-gutentags', {'do': 'cd  ~/.vim/plug/vim-gutentags; patch -p1 -stNr /dev/null < ~/.config/nvim/plugin_patch/vim-gutentags.patch; true'}
+if executable('ctags')
+    Plug 'ludovicchabant/vim-gutentags', {'do': 'cd ' . g:plug_root . '/vim-gutentags; patch -p1 -stNr /dev/null < ~/.config/nvim/plugin_patch/vim-gutentags.patch; true'}
+endif
+
 Plug 'stevearc/aerial.nvim'
 
 " git
@@ -150,10 +155,6 @@ set keymodel=startsel               " shift+arrow selection
 set shortmess+=c
 set pumheight=20
 
-" colorscheme
-set termguicolors
-set background=dark
-
 " Load lua plugins config
 if ! &readonly && has('python3')
     lua require('config')
@@ -190,6 +191,7 @@ map <silent> <F6> :set paste! <cr>
 map <silent> <F9> :ToggleTerm dir=%:p:h <cr>
 map <silent> <F10> :Startify <cr>
 map <silent> <F12> :call custom#ToggleMouse() <cr>
+map <silent><expr> <leader>q empty(filter(getwininfo(), 'v:val.quickfix')) ? ":copen<cr>" : ":cclose<cr>"
 map <silent> <leader>a :execute 'Rg' expand('<cword>') <cr>
 map <silent> <leader>s :Rg <cr>
 map <silent> <leader>f :Files <cr>
@@ -200,6 +202,7 @@ map <silent> <leader>c :BCommits <cr>
 map <silent> <leader>h :History <cr>
 map <silent> <leader>g :GitMessenger <cr>
 map <silent> <leader>m :Snippets <cr>
+map <silent> <leader>l :LspDiagnosticsAll <cr>
 map <silent> <C-a> ^
 map <silent> <C-e> $
 map <silent> <C-Right> e

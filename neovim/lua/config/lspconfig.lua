@@ -56,6 +56,8 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
 -- Add border
 local _border = "rounded"
 
+require('lspconfig.ui.windows').default_options.border = _border
+
 vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
     vim.lsp.handlers.hover, {
         border = _border
