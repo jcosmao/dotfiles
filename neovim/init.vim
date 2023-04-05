@@ -11,7 +11,9 @@
 " PlugSnapshot[!] [output path] 	Generate script for restoring the current snapshot of the plugins<Paste>
 
 if filereadable($HOME . '/.pyenv/versions/nvim/bin/python')
-    let g:python3_host_prog = $HOME . '/.pyenv/versions/nvim/bin/python'
+    let g:nvim_python_path = $HOME . '/.pyenv/versions/nvim/bin'
+    let g:python3_host_prog = g:nvim_python_path . '/python'
+    let $PATH =  g:nvim_python_path . ':' . $PATH
 endif
 
 let g:node_host_prog = $HOME . '/.local/bin/npm'
@@ -74,8 +76,6 @@ Plug 'akinsho/toggleterm.nvim'
 
 " python syntax hilight
 Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
-Plug 'psf/black',  {'for': 'python', 'do': ':UpdateRemotePlugins'}
-Plug 'averms/black-nvim', {'for': 'python', 'do': ':UpdateRemotePlugins'}
 " nvim-go + deps
 Plug 'ray-x/go.nvim', {'for': 'go'}
 Plug 'ray-x/guihua.lua', {'for': 'go'}
@@ -179,7 +179,7 @@ command! -bang WQ wq<bang>
 let mapleader = " "   " Leader key set to <space bar>
 map <silent> <leader>? :exec printf('view %s/help.md', fnamemodify(expand($MYVIMRC), ':p:h'))<cr>
 map <silent> <leader>V :tabedit $MYVIMRC <cr>
-map <silent> <leader>S :source $MYVIMRC \| :echo $MYVIMRC 'reloaded' <cr>
+map <silent> <leader>VV :source $MYVIMRC \| :echo $MYVIMRC 'reloaded' <cr>
 map <silent> <leader><ESC> :set nonumber \| :IndentLinesDisable \| :SignifyDisable \| :set signcolumn=no <cr>
 map <silent> <leader><F1> :set number \| :IndentLinesEnable \| :SignifyEnable \| :set signcolumn=auto <cr>
 map <silent> <F1> :NvimTreeFindFileToggle! <cr>
@@ -188,12 +188,13 @@ map <silent> <F3> :IndentLinesToggle <cr>
 map <silent> <F4> :set number! <cr>
 map <silent> <F5> :SignifyToggle <cr>
 map <silent> <F6> :set paste! <cr>
-map <silent> <F9> :ToggleTerm dir=%:p:h <cr>
 map <silent> <F10> :Startify <cr>
 map <silent> <F12> :call custom#ToggleMouse() <cr>
 map <silent><expr> <leader>q empty(filter(getwininfo(), 'v:val.quickfix')) ? ":copen<cr>" : ":cclose<cr>"
-map <silent> <leader>a :execute 'Rg' expand('<cword>') <cr>
-map <silent> <leader>s :Rg <cr>
+map <silent> <leader>a :execute 'RgWithFilePath' expand('<cword>') <cr>
+map <silent> <leader>A :execute 'Rg' expand('<cword>') <cr>
+map <silent> <leader>s :RgWithFilePath <cr>
+map <silent> <leader>S :Rg <cr>
 map <silent> <leader>f :Files <cr>
 map <silent> <leader>d :Neogen <cr>
 map <silent> <leader>b :Buffers <cr>
@@ -208,7 +209,7 @@ map <silent> <C-e> $
 map <silent> <C-Right> e
 map <silent> <C-Left> b
 map <silent> <leader><bar> :vsplit<cr>
-map <silent> <leader>\ :split <cr>
+map <silent> <leader>_ :split <cr>
 map <silent> <C-S-Up> :wincmd k<cr>
 map <silent> <C-S-Down> :wincmd j<cr>
 map <silent> <C-S-Right> :wincmd l<cr>
@@ -246,11 +247,18 @@ map <leader>0 :tablast <cr>
 nmap <leader>> <plug>(signify-next-hunk)
 nmap <leader>< <plug>(signify-prev-hunk)
 
+map <silent> <C-g> :ToggleTerm dir=%:p:h <cr>
+
 " Specific filetype
 autocmd BufNewFile,BufRead *.lib set filetype=sh
 autocmd BufNewFile,BufRead *.source set filetype=sh
 autocmd BufNewFile,BufRead *.pp set filetype=puppet
 autocmd BufNewFile,BufRead *.inc set filetype=perl
+
+" remove auto<fucking>indent on colon :
+autocmd FileType python,yaml setlocal indentkeys-=<:>
+autocmd FileType python,yaml setlocal indentkeys-=:
+
 
 augroup gomapping
     autocmd!

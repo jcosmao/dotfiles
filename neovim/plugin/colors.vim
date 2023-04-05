@@ -1,5 +1,4 @@
 set termguicolors
-set background=dark
 
 let g:gruvbox_material_disable_italic_comment = 0
 let g:gruvbox_material_enable_bold = 1
@@ -8,15 +7,27 @@ let g:gruvbox_material_visual = 'grey background'
 let g:gruvbox_material_menu_selection_background = 'orange'
 let g:gruvbox_material_statusline_style = 'mix'
 let g:gruvbox_material_better_performance = 1
-" available: material / mix / original
-let g:gruvbox_material_palette = 'material'
-" available: soft / medium / hard
-let g:gruvbox_material_background = 'medium'
+
+if $THEME == "light"
+    " available: material / mix / original
+    let g:gruvbox_material_palette = 'original'
+    " available: soft / medium / hard
+    let g:gruvbox_material_background = 'hard'
+    let $BAT_THEME = 'gruvbox-light'
+    set background=light
+else
+    " available: material / mix / original
+    let g:gruvbox_material_palette = 'material'
+    " available: soft / medium / hard
+    let g:gruvbox_material_background = 'medium'
+    let $BAT_THEME = 'gruvbox-dark'
+    set background=dark
+endif
 
 colorscheme gruvbox-material
 
 " override colorscheme config
-hi CursorLine       guibg=#2a373a   gui=bold
+" hi CursorLine       guibg=#2a373a   gui=bold
 hi DiffAdd          guibg=#262626   guifg=#87AF87   gui=reverse
 hi DiffChange       guibg=#262626   guifg=#8787AF   gui=reverse
 hi DiffDelete       guibg=#262626   guifg=#AF5F5F   gui=reverse

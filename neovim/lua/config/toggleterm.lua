@@ -3,13 +3,14 @@ local toggleterm = require("toggleterm")
 
 toggleterm.setup{
     size = 20,
+    cmd = "tm nvim_term",
     open_mapping = [[<c-g>]],
     insert_mappings = true, -- whether or not the open mapping applies in insert mode
     terminal_mappings = true,
     start_in_insert = true,
     close_on_exit = true, -- close the terminal window when the process exits
     winbar = {
-        enabled = true,
+        enabled = false,
         name_formatter = function(term) --  term: Terminal
             return  string.format("  Term %s  ", term.id)
         end,
@@ -31,7 +32,6 @@ vim.api.nvim_create_autocmd("TermOpen", {
     group = toggletermGrp,
     callback = function()
         local opts = {buffer = 0}
-        vim.keymap.set('t', '<F9>', [[<Cmd>ToggleTerm <cr>]], opts)
         vim.keymap.set('t', '<leader><ENTER>', [[<Cmd>ZoomWinTabToggle <cr>]], opts)
         vim.keymap.set('t', '<leader><Up>', [[<Cmd>wincmd k <cr>]], opts)
         vim.keymap.set('t', '<leader><Left>', [[<Cmd>wincmd h <cr>]], opts)
