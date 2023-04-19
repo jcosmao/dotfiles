@@ -15,6 +15,19 @@ if $THEME == "light"
     let g:gruvbox_material_background = 'hard'
     let $BAT_THEME = 'gruvbox-light'
     set background=light
+
+    let g:gruvbox_material_colors_override = {
+    \   'red':              ['#b20007',   '88'],
+    \   'orange':           ['#ce4200',   '130'],
+    \   'yellow':           ['#c88214',   '136'],
+    \   'green':            ['#7c9413',   '100'],
+    \   'aqua':             ['#51986d',   '165'],
+    \   'blue':             ['#09859c',   '24'],
+    \   'purple':           ['#af528c',   '96'],
+    \ }
+
+    let s:match_paren = ['#dacc94', '229']
+
 else
     " available: material / mix / original
     let g:gruvbox_material_palette = 'material'
@@ -22,9 +35,18 @@ else
     let g:gruvbox_material_background = 'medium'
     let $BAT_THEME = 'gruvbox-dark'
     set background=dark
+
+    let g:gruvbox_material_colors_override = {
+    \ }
+
+    let s:match_paren = ['#3e6478',   '232']
 endif
 
+let g:color_palette = gruvbox_material#get_palette(g:gruvbox_material_background, g:gruvbox_material_palette, g:gruvbox_material_colors_override)
+
 colorscheme gruvbox-material
+
+call gruvbox_material#highlight('MatchParen', g:color_palette.none, s:match_paren)
 
 " override colorscheme config
 " hi CursorLine       guibg=#2a373a   gui=bold
@@ -33,8 +55,6 @@ hi DiffChange       guibg=#262626   guifg=#8787AF   gui=reverse
 hi DiffDelete       guibg=#262626   guifg=#AF5F5F   gui=reverse
 hi DiffText         guibg=#262626   guifg=#FF8700   gui=reverse
 hi Directory        guifg=#83A598
-
-hi MatchParen guibg=#3e6478
 
 " Search, signature current, ...
 hi Search  guibg=#d69a22
@@ -63,5 +83,5 @@ autocmd FileType sh :highlight! link TSVariable Blue
 autocmd FileType sh :highlight! link TSConstant Blue
 
 let s:palette = g:lightline#colorscheme#gruvbox_material#palette
-let s:palette.tabline.tabsel = [ [ '#282828', '#98971a', 238, 10, 'bold' ] ]
+let s:palette.tabline.tabsel = [ [ '#282828', g:color_palette.green[0] , 238, 10, 'bold' ] ]
 unlet s:palette
