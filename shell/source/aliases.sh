@@ -7,6 +7,8 @@ export EDITOR=vim
 export DISABLE_AUTO_TITLE=true
 export XDG_CONFIG_HOME=$HOME/.config
 
+alias lvim="THEME=light vim"
+
 # fucking keyboard
 alias vi=vim
 alias vun=vim

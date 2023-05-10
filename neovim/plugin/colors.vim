@@ -44,6 +44,11 @@ endif
 
 let g:color_palette = gruvbox_material#get_palette(g:gruvbox_material_background, g:gruvbox_material_palette, g:gruvbox_material_colors_override)
 
+let g:terminal_color_0 = g:color_palette.bg5[0]
+let g:terminal_color_7 = g:color_palette.fg0[0]
+let g:terminal_color_8 = g:color_palette.bg5[0]
+let g:terminal_color_15 = g:color_palette.fg0[0]
+
 colorscheme gruvbox-material
 
 call gruvbox_material#highlight('MatchParen', g:color_palette.none, s:match_paren)

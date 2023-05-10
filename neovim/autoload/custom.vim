@@ -38,6 +38,8 @@ function! custom#HieraEncrypt()
     endif
 endfunction
 
+autocmd FileType yaml command! -nargs=0 HieraEncrypt :call custom#HieraEncrypt()
+
 " autocmd BufWritePost *.yaml call custom#HieraEncrypt()
 
 function! custom#ToggleMouse()
