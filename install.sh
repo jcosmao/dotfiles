@@ -240,7 +240,7 @@ function main {
                 install_local_bin ;;
 
             --nvim|--neovim|-v)
-                [[ $1 =~ ^(stable|nightly) ]] && \
+                [[ $1 =~ ^(stable|nightly|v[0-9]) ]] && \
                     release=$1 && shift && \
                     install_neovim $release;
                 install_vim_requirements;

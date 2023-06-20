@@ -10,7 +10,7 @@ let g:gutentags_exclude_filetypes = [
 \   'no ft', 'systemd',
 \   'gitcommit', 'git', 'gitconfig', 'gitrebase', 'gitsendemail',
 \   'cfg', 'conf', 'rst', 'dosini',
-\   'sh', 'yaml', 'json', 'text'
+\   'sh', 'yaml', 'json', 'text', 'markdown'
 \]
 let g:gutentags_add_default_project_roots = 0
 let g:gutentags_generate_on_empty_buffer = 0

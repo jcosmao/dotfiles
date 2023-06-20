@@ -1,5 +1,8 @@
 # vim: set ft=zsh:
 
+# uncomment for profiling
+# zmodload zsh/zprof
+
 export PATH="$HOME/.local/bin:/usr/local/bin:$PATH"
 
 [[ ! -d ~/.zsh ]] && mkdir ~/.zsh
@@ -16,3 +19,6 @@ source ~/.zsh/myzsh/plugins/wd/*.zsh
 source ~/.zsh/blox-zsh-theme/blox.zsh
 source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source ~/.zsh/zsh-bash-completions-fallback/zsh-bash-completions-fallback.plugin.zsh
+
+# uncomment for profiling
+# zprof
