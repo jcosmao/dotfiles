@@ -86,6 +86,7 @@ Plug 'danymat/neogen'
 
 " ctags / cscope
 if executable('ctags')
+    Plug 'dhananjaylatkar/cscope_maps.nvim'
     Plug 'ludovicchabant/vim-gutentags', {'do': 'cd ' . g:plug_root . '/vim-gutentags; patch -p1 -stNr /dev/null < ~/.config/nvim/plugin_patch/vim-gutentags.patch; true'}
 endif
 

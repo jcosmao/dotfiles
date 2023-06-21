@@ -1,9 +1,25 @@
+diff --git a/autoload/gutentags/cscope.vim b/autoload/gutentags/cscope.vim
+index 47f6bdf..dfa99aa 100644
+--- a/autoload/gutentags/cscope.vim
++++ b/autoload/gutentags/cscope.vim
+@@ -1,10 +1,5 @@
+ " Cscope module for Gutentags
+
+-if !has('cscope')
+-    throw "Can't enable the cscope module for Gutentags, this Vim has ".
+-                \"no support for cscope files."
+-endif
+-
+ " Global Options {{{
+
+ if !exists('g:gutentags_cscope_executable')
+
 diff --git a/plat/unix/update_scopedb.sh b/plat/unix/update_scopedb.sh
 index 0338599..18a8936 100755
 --- a/plat/unix/update_scopedb.sh
 +++ b/plat/unix/update_scopedb.sh
 @@ -59,13 +59,13 @@ echo $$ > "$DB_FILE.lock"
- 
+
  # Remove lock and temp file if script is stopped unexpectedly.
  CleanUp() {
 -    rm -f "$DB_FILE.lock" "$DB_FILE.files" "$DB_FILE.temp"
@@ -12,21 +28,21 @@ index 0338599..18a8936 100755
          rm -f "$DB_FILE.temp.in" "$DB_FILE.temp.po"
      fi
  }
- 
+
 -trap CleanUp INT QUIT TERM EXIT
 +trap CleanUp INT QUIT TERM EXIT KILL
- 
+
  PREVIOUS_DIR=$(pwd)
  if [ -d "$PROJECT_ROOT" ]; then
 @@ -101,8 +101,8 @@ if [ "$BUILD_INVERTED_INDEX" -eq 1 ]; then
  fi
- 
+
  echo "Running cscope"
 -echo "$CSCOPE_EXE $CSCOPE_ARGS -b -k -f \"$DB_FILE.temp\""
 -"$CSCOPE_EXE" $CSCOPE_ARGS -v -b -k -f "$DB_FILE.temp"
 +echo "$CSCOPE_EXE $CSCOPE_ARGS -b -k -f \"$DB_FILE\""
 +"$CSCOPE_EXE" $CSCOPE_ARGS -v -b -k -f "$DB_FILE"
- 
+
  if [ -d "$PROJECT_ROOT" ]; then
      cd "$PREVIOUS_DIR"
 @@ -115,8 +115,8 @@ if [ "$BUILD_INVERTED_INDEX" -eq 1 ]; then
@@ -37,6 +53,6 @@ index 0338599..18a8936 100755
 -mv -f "$DB_FILE.temp" "$DB_FILE"
 +# echo "mv -f \"$DB_FILE.temp\" \"$DB_FILE\""
 +# mv -f "$DB_FILE.temp" "$DB_FILE"
- 
+
  echo "Unlocking cscope DB file..."
  rm -f "$DB_FILE.lock"

@@ -130,7 +130,6 @@ function! GotoCscope(tag, ctx_line)
         return
     endif
 
-    set csto=0
     execute 'FZFCscope' '^'.l:tag.'$'
     echo "[GotoCscope] FZFCscope"
 endfunction
