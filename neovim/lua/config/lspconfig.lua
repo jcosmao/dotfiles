@@ -52,7 +52,6 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
         virtual_text = false,
     })
 
-
 -- Add border
 local _border = "rounded"
 
@@ -100,4 +99,26 @@ require("mason-lspconfig").setup_handlers {
             on_attach = on_attach,
         }
     end,
+}
+
+--
+-- pylsp configuration
+--
+
+require("lspconfig").pylsp.setup {
+    on_attach = on_attach,
+    cmd = { "pylsp" },
+    filetypes = { "python" },
+    settings = {
+        pylsp = {
+            configurationSources = { "flake8" },
+            plugins = {
+                flake8 = { enabled = true },
+                mccabe = { enabled = false },
+                pycodestyle = { enabled = true },
+                pyflakes = { enabled = true },
+                yapf = { enabled = true },
+            },
+        },
+    },
 }

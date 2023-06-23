@@ -97,7 +97,7 @@ function! GotoCtags(tag, ctx_line)
         let l:tag = substitute(expand(a:tag), '.*::\(.*\)', '\1', 'g')
     endif
 
-    set csto=1
+    " set csto=1
     execute 'FZFCtags' '^'.l:tag.'$'
     echo "[GotoCtags] FZFCtags"
 endfunction
