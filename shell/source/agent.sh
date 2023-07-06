@@ -5,7 +5,7 @@ export GPG_TTY=$(tty)
 
 function launch_ssh_agent
 {
-    if [[ -n $SSH_TTY && -n $SSH_AUTH_SOCK ]]; then
+    if [[ -n $SSH_AUTH_SOCK && -S $SSH_AUTH_SOCK  ]]; then
         # SSH agent forwarded, nothing to spawn
         return
     fi
