@@ -7,7 +7,7 @@ export EDITOR=vim
 export DISABLE_AUTO_TITLE=true
 export XDG_CONFIG_HOME=$HOME/.config
 
-if which nvim > /dev/null ; then
+if [[ -f $HOME/.local/bin/nvim ]]; then
     alias lvim="THEME=light nvim"
     alias dvim="THEME=dark nvim"
     alias vim="lvim"

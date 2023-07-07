@@ -89,3 +89,14 @@ function utils.randpass
     size=${1:-32}
     openssl rand -base64 $size | tr -d '\n'
 }
+
+
+alias dotup="utils.dotfiles_update"
+alias zup="utils.zsh_update"
+alias open="utils.open"
+alias json="utils.json"
+alias ssl_info="utils.ssl_info"
+alias ssl_get="utils.ssl_get"
+alias randpass="utils.randpass"
+alias genpasswd="utils.randpass"
+alias uuid="utils.uuid"

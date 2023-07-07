@@ -48,4 +48,6 @@ function colors.display_256_colors ()
     done
 }
 
+alias dcolors="colors.display_256_colors"
+
 
