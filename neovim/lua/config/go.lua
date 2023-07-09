@@ -71,6 +71,11 @@ require("go").setup({
   test_runner = "go", -- richgo, go test, richgo, dlv, ginkgo
   run_in_floaterm = true, -- set to true to run in float window.
   -- float term recommended if you use richgo/ginkgo with terminal color
+  floaterm = {   -- position
+    posititon = 'bottom', -- one of {`top`, `bottom`, `left`, `right`, `center`, `auto`}
+    width = 1, -- width of float window if not auto
+    height = 0.3, -- height of float window if not auto
+  },
   luasnip = false,
 })
 

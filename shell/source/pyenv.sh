@@ -24,9 +24,10 @@ function pyenv.help
 {
     echo "
         # Install a specific python version + build virtualenv with it
-        $ apt-get install -y build-essential libssl-dev zlib1g-dev
+        $ apt-get install -y clang build-essential zlib1g-dev libffi-dev libssl-dev libbz2-dev libreadline-dev libsqlite3-dev liblzma-dev
         $ pyenv install -l
-        $ pyenv install 3.9.0
+        # use clang compiler if it raise error
+        $ pyenv install 3.9.0  || CC=clang pyenv install 3.9.0
         $ pyenv virtualenv 3.9.0 nvim
 
         # init working dir to autoload proper env

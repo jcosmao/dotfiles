@@ -1,22 +1,20 @@
-[[ -n $KUBECONFIG ]] || return
-
-k8s.set_namespace () {
+function k8s.set_namespace {
     kubectl config set-context --current --namespace $1
     [[ $? -ne 0 ]] && export KUBENS=$1
     export _KUBENS=$1
 }
 
-k8s.kubectl () {
+function k8s.kubectl {
     local OPT
     [[ -n $KUBENS ]] && OPT="-n$KUBENS"
     kubectl ${OPT} $*
 }
 
-k8s.list_containers_by_pod () {
-    kubectl get pods -o="custom-columns=NAME:.metadata.name,INIT-CONTAINERS:.spec.initContainers[*].name,CONTAINERS:.spec.containers[*].name" $*
+function k8s.list_containers_by_pod {
+    kubectl get pods -o="custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,INIT-CONTAINERS:.spec.initContainers[*].name,CONTAINERS:.spec.containers[*].name" $*
 }
 
-k8s.exec () {
+function k8s.exec {
     pod=$1
     container=$2
 
@@ -24,7 +22,7 @@ k8s.exec () {
         echo "kx <pod> <container>"
         echo
 
-        k8s.list_containers_by_pod
+        k8s.list_containers_by_pod -A
         return
     fi
 
