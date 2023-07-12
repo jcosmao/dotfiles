@@ -17,20 +17,24 @@ endfunction
 
 function! AutoColorColumn()
     if &filetype ==# 'python'
-        let l:gitroot = trim(system('git -C ' . expand('%:h') . ' rev-parse --show-toplevel 2> /dev/null'))
+        let l:project_root = FindRootDirectory()
+        let l:git_root = trim(system('git -C ' . expand('%:h') . ' rev-parse --show-toplevel 2> /dev/null'))
 
-        if l:gitroot != ''
-            let l:maxlinelen = trim(system('cd '.l:gitroot. "; grep max-line-length pyproject.toml tox.ini 2> /dev/null | awk -F= '{print $2}' | tail -1"))
-            if l:maxlinelen != ''
-                exe 'set colorcolumn='.l:maxlinelen
-                return
-            endif
+        if empty(l:project_root) && empty(l:git_root)
+            return
+        endif
 
-            " Force 79 char max for openstack projects
-            if filereadable(l:gitroot . '/.gitreview')
-                set colorcolumn=79
-                return
-            endif
+        let l:maxlinelen = trim(system('grep max-line-length $(find '.l:project_root.' '.l:git_root.' -maxdepth 1 -name pyproject.toml -o -name tox.ini) | awk -F= "{print \$2}" | tail -1'))
+
+        if !empty(l:maxlinelen)
+            exe 'set colorcolumn='.l:maxlinelen
+            return
+        endif
+
+        " Force 79 char max for openstack projects
+        if filereadable(l:git_root . '/.gitreview')
+            set colorcolumn=79
+            return
         endif
     endif
 

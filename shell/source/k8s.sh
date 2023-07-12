@@ -11,7 +11,7 @@ function k8s.kubectl {
 }
 
 function k8s.list_containers_by_pod {
-    kubectl get pods -o="custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,INIT-CONTAINERS:.spec.initContainers[*].name,CONTAINERS:.spec.containers[*].name" $*
+    k8s.kubectl get pods -o="custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,INIT-CONTAINERS:.spec.initContainers[*].name,CONTAINERS:.spec.containers[*].name" $*
 }
 
 function k8s.exec {
@@ -26,7 +26,7 @@ function k8s.exec {
         return
     fi
 
-    kubectl exec -it $pod -c $container -- bash
+    k8s.kubectl exec -it $pod -c $container -- bash
 }
 
 alias kns="k8s.set_namespace"

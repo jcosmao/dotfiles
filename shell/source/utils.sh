@@ -10,7 +10,7 @@ function utils.zsh_update
 {
     [[ ! -d ~/.zsh ]] && return 1
     for module in $(ls ~/.zsh); do
-        (cd ~/.zsh/$module; git fetch; git reset --hard origin/master)
+        (cd ~/.zsh/$module; echo -n "[$module] "; git fetch; git reset --hard origin/master)
     done
     source ~/.zshrc &> /dev/null
 }
