@@ -4,10 +4,15 @@ function os {
     JQ=0
     [[ "$*" =~ (show|list|create) ]] && JQ=1
     [[ "$*" =~ (console log show) ]] && JQ=0
+
+    EXTRA_OPTS=""
+    # Require at least 2.24 to get migration id + abort
+    [[ "$*" =~ (server migration) ]] && EXTRA_OPTS="--os-compute-api-version 2.24"
+
     if [[ $JQ == 1 ]]; then
-        openstack $* -f json | jq .
+        eval $(echo openstack $EXTRA_OPTS $* -f json | tr -s "  " " ") | jq .
     else
-        openstack $*
+        eval $(echo openstack $EXTRA_OPTS $* | tr -s "  " " ")
     fi
 }
 
@@ -17,6 +22,7 @@ alias osn="os network"
 alias osb="os baremetal"
 alias osv="os volume"
 alias osi="os image"
+alias osl="os loadbalancer"
 
 function os_log_color
 {(

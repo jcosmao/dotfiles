@@ -116,7 +116,8 @@ def parse_line(line):
 
     result = re.match(regex, line)
     if result is not None:
-        return { 'date': result.group(1),
+        return {
+          'date': result.group(1),
           'time': result.group(2),
           'process': result.group(3),
           'level': result.group(4),
@@ -124,6 +125,31 @@ def parse_line(line):
           'req': "" if not result.group(6) else result.group(6),
           'text': result.group(7),
           '_type': 'default',
+        }
+
+    regex = (r'^([^ ]+) ' # pod
+              '([^ ]+) ' # container
+              '([0-9]+-[0-9]+-[0-9]+) ' # date
+              '([0-9]+:[0-9]+:[0-9]+\.[0-9]+) ' # time
+              '([0-9]+):? ' # process
+              '([A-Z]+) ' # level
+              '([^ ]+) ' # name
+              '(\[[^\]]+\])*\s*' # context
+              '(.+)*') # text
+
+    result = re.match(regex, line)
+    if result is not None:
+        return {
+          'pod': result.group(1),
+          'container': result.group(2),
+          'date': result.group(3),
+          'time': result.group(4),
+          'process': result.group(5),
+          'level': result.group(6),
+          'name': result.group(7),
+          'req': "" if not result.group(8) else result.group(8),
+          'text': result.group(9),
+          '_type': 'stern',
         }
 
     # Line example : Openstack without date and time
@@ -199,6 +225,24 @@ def colorize(line):
                                    blue(line['name']),
                                    grey(line['req']),
                                    colored_text,)
+
+    # openstack logs with stern (k8s logs)
+    elif line.get('_type') == 'stern':
+        if line.get('level') == 'TRACE':
+            colored_text=grey(line['text'])
+        else:
+            colored_text=white(line['text'])
+        return '%s %s %s %s %s: %s %s %s %s' % (
+                                   magenta(line['pod']),
+                                   magenta(line['container']),
+                                   grey(line['date']),
+                                   grey(line['time']),
+                                   grey(line['process']),
+                                   colored_level(line['level']),
+                                   blue(line['name']),
+                                   grey(line['req']),
+                                   colored_text,)
+
     # Default parsed line without date and time
     elif line.get('_type') == 'default_without_datatime':
         if line.get('level') == 'TRACE':
