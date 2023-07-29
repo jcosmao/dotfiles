@@ -206,6 +206,25 @@ def parse_line(line):
           '_type': 'ovs.log',
         }
 
+    # rabbit
+    # 2023-07-30 12:39:41.230254+00:00 [error]
+    regex = (r'^([0-9]+-[0-9]+-[0-9]+) ' # date
+             '([0-9]+:[0-9]+:[0-9]+\.[0-9]+[^ ]+) ' # time
+             '\[([a-z\?]+)\] ' # level
+             '(<[^>]+>) ' # <0.9417.870>
+             '(.+)') # text
+
+    result = re.match(regex, line)
+    if result is not None:
+        return { 'date': result.group(1),
+          'time': result.group(2),
+          'level': result.group(3),
+          'pid': result.group(4),
+          'text': result.group(5),
+          '_type': 'rabbit',
+        }
+
+
     return {'text': line, '_type': None}
 
 
@@ -267,6 +286,14 @@ def colorize(line):
                                  grey(line['serial']),
                                  blue(line['name']),
                                  colored_level(line['level']),
+                                 white(line['text']),)
+
+    # ovs.log
+    elif line.get('_type') == 'rabbit':
+        return '%s %s %s %s %s' % ( grey(line['date']),
+                                 grey(line['time']),
+                                 colored_level(line['level']),
+                                 blue(line['pid']),
                                  white(line['text']),)
 
     # Unparsed line (without level)

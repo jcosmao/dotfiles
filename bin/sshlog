@@ -1,0 +1,175 @@
+#!/bin/bash
+
+TAILOPTS=""
+
+current_pgid=$(ps -o pgid= $$)
+trap "sudo pkill -g $current_pgid" INT TERM QUIT
+
+LOG_MAP='{
+    "host": {
+        "vrack": "/var/log/neutron/neutron-ovh-vrack-agent.log",
+        "bgp": "/var/log/neutron/neutron-ovh-bgp-agent.log",
+        "l3": "/var/log/neutron/neutron-ovh-l3-agent.log",
+        "metadata": "/var/log/neutron/neutron-ovh-metadata-agent.log",
+        "nova": "/var/log/nova/nova-compute.log"
+    },
+    "snat": {
+        "vrack": "/var/log/neutron/neutron-ovh-vrack-agent.log",
+        "bgp": "/var/log/neutron/neutron-ovh-bgp-agent.log",
+        "l3": "/var/log/neutron/neutron-ovh-l3-agent.log",
+        "dhcp": "/var/log/neutron/neutron-dhcp-agent.log",
+        "metadata": "/var/log/neutron/neutron-ovh-metadata-agent.log"
+    },
+    "neutron": {
+        "api": "/var/log/neutron/neutron-api.log /var/log/apache2/neutron-api*log",
+        "rpc": "/var/log/neutron/neutron-rpc.log"
+    },
+    "nova": {
+        "api": "/var/log/apache2/neutron-api*log /var/log/nova/nova-api.log",
+        "conductor": "/var/log/nova/nova-conductor.log",
+        "scheduler": "/var/log/nova/nova-scheduler.log",
+        "placement": "/var/log/placement/placement-api.log"
+    },
+    "ironic": {
+        "api": "/var/log/ironic/ironic-api.log",
+        "conductor": "/var/log/ironic/ironic-ovh-conductor.log",
+        "metadata": "/var/log/ironic/ironic-ovh-metadata-server.log",
+        "neutron": "/var/log/neutron/*.log",
+        "nova": "/var/log/nova/*log"
+    },
+    "rabbit": {
+        "default": "/var/log/rabbitmq/*.log"
+    },
+    "rabbit-nova": {
+        "default": "/var/log/rabbitmq/*.log"
+    },
+    "rabbit-neutron": {
+        "default": "/var/log/rabbitmq/*.log"
+    }
+}'
+
+
+function sshlog {
+    HOST_GROUP="$1"
+    LOG_KEYS=(${2:-default})
+
+    # max 10 (host group for ex)
+    find_hosts=$(cat /etc/hosts | awk '{print $2}' | grep -Pv '^(#|$|::1|ff|fe|127.0.0.1)' | grep -Pi ${OS_REGION_NAME:-'.*'} | grep -P "^($HOST_GROUP|$HOST_GROUP[0-9]+.*)$" | head -n 10 | xargs)
+
+    len=$(echo $find_hosts | wc -w)
+
+    if [[ $len == 0 ]]; then
+        echo no host found
+        exit 1
+    elif [[ $len == 1 ]]; then
+        group_name=$(echo $find_hosts | cut -d. -f1 | tr -d '[0-9]')
+    else
+        group_name=$HOST_GROUP
+    fi
+
+    echo "GROUP: $group_name"
+
+    find_group_map=$(echo $LOG_MAP | jq -r 'keys[]' | grep -P "^$group_name$")
+    if [[ -z $find_group_map ]]; then
+        echo "$HOST_GROUP does not match any key in $(echo $LOG_MAP | jq -r 'keys[]')"
+        exit 1
+    fi
+
+    echo "GROUP_KEY: $find_group_map"
+
+    log_files=()
+
+    for key in ${LOG_KEYS[@]}; do
+
+        find_log_key=$(echo $LOG_MAP | jq .\"$find_group_map\" | jq -r 'keys[]' | grep -P "^$key$")
+        if  [[ -z $find_log_key ]]; then
+            echo "[$key] does not match any of $(echo $LOG_MAP | jq .\"$find_group_map\" | jq 'keys[]')"
+            exit 1
+        fi
+
+        echo "LOG_KEY: $find_log_key"
+
+        log_files+=($(echo $LOG_MAP | jq -r .\"$find_group_map\".\"$find_log_key\"))
+    done
+
+    echo "#########################################################################"
+    echo "# Host: $find_hosts"
+    echo "# Files: ${log_files[@]}"
+    echo "#########################################################################"
+
+    if [[ $NOCOLOR == 1 ]]; then
+        color_cmd="tee"
+    else
+        color_cmd="os-log-color"
+    fi
+
+    for h in $(echo $find_hosts); do
+        sudo ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -l admin $h tail $TAILOPTS -f ${log_files[@]} &
+    done | $color_cmd
+
+    wait
+}
+
+function sshlog_completion
+{
+    local cur first
+
+    cur=${COMP_WORDS[COMP_CWORD]}
+    first=${COMP_WORDS[1]}
+
+    case ${COMP_CWORD} in
+        1) COMPREPLY=($(compgen -W "$(sshlog -s | jq -r 'keys[]'| xargs) $(cat /etc/hosts | awk '{print $2}' | grep -Pv '^(#|$|::1|ff|fe|127.0.0.1)' | grep -Pi ${OS_REGION_NAME:-'.*'} | xargs)" -- ${first})) ;;
+        *) group=$(echo $first | cut -d. -f1 | tr -d "[0-9]");
+           COMPREPLY=($(compgen -W "$(sshlog -s | jq -r .\"${group}\" | jq 'keys[]'| xargs)" -- ${cur})) ;;
+    esac
+}
+
+
+function print_help {
+    echo "
+Options:
+
+$(declare -f main | \
+    grep -P '(help=|--|-[a-z]\))' | \
+    xargs | \
+    sed -e 's/; /\n/g' -e 's/help=/#/g' | \
+    column -t -s '#')
+"
+    exit
+}
+
+
+function main {
+    [[ $# == 0 ]] && print_help
+
+    while [[ $# -ne 0 ]]; do
+        arg="$1"; shift
+        case "$arg" in
+            -s|--show)
+                help="display log map"
+                echo $LOG_MAP ; exit ;;
+            -n)
+                help="NB: nb lines. tail option"
+                export TAILOPTS="$TAILOPTS -n $1" && shift;;
+            -c)
+                help="no color"
+                export NOCOLOR=1 ;;
+            --completion)
+                help='completion function (eval "$(sshlog --completion)")'
+                declare -f sshlog_completion
+                echo complete -F sshlog_completion sshlog
+                exit ;;
+            --help|-h)
+                help="this help"
+                print_help ;;
+            *) POSITIONNAL_ARGS+=($arg)
+        esac
+    done
+
+    HOST_GROUP=${POSITIONNAL_ARGS[0]}
+    LOG_KEYS=${POSITIONNAL_ARGS[@]:1}
+
+    sshlog "$HOST_GROUP" "${LOG_KEYS[@]}"
+}
+
+main "$@"

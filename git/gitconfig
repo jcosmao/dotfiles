@@ -87,3 +87,12 @@
     contributors = shortlog --summary --numbered
     # https://stackoverflow.com/questions/3161204/how-to-find-the-nearest-parent-of-a-git-branch
     base = "!f() { git show-branch -a 2> /dev/null | grep '\\*' | grep -v $(git rev-parse --abbrev-ref HEAD) | head -n1 | sed -e 's/.*\\[\\(.*\\)\\].*/\\1/' -e 's/[\\^~].*//' -e 's,origin/,,'; }; f"
+    root = "rev-parse --show-toplevel"
+    ref = "ls-remote --ref"
+    review = "!f() { \
+        target_branch=${1:-$(cat $(git rev-parse --show-toplevel)/.gitreview | grep defaultbranch= | cut -d= -f2)}; \
+        target_remote=$(git config branch.$(git name-rev --name-only HEAD).remote); \
+        test -n \"$target_branch\" && \
+            git push ${target_remote:-origin} HEAD:refs/for/${target_branch}%topic=$(git symbolic-ref --short HEAD) || \
+            echo 'ERROR: missing target_branch';\
+    }; f"

@@ -10,6 +10,8 @@ mkdir -p $TMPDIR
 mkdir -p ~/.config
 mkdir -p ~/.local/bin
 
+ln -sf $SCRIPT ~/.local/bin/dotfiles
+
 function install_neovim {
     release=$1
     echo "- Update neovim from $release"
@@ -94,11 +96,11 @@ function install_shell {
     mkdir -p ~/.bash_custom
 
     # zsh
+    ln -sf $SCRIPTPATH/shell/zshrc ~/.zshrc
+
     if [[ $version == 'light' ]]; then
-        ln -sf $SCRIPTPATH/shell/zshrc.lite ~/.zshrc
         [[ -n $LC_BASTION ]] && ln -sf $SCRIPTPATH/shell/bashrc.lite ~/.bashrc-$LC_BASTION
     else
-        ln -sf $SCRIPTPATH/shell/zshrc.lite ~/.zshrc
         ln -sf $SCRIPTPATH/shell/bashrc ~/.bashrc
     fi
 
@@ -218,28 +220,38 @@ function install_config {
 }
 
 function print_help {
+
+    [[ $# -ne 0 ]] && echo "$(tput setaf 1)[ERROR] $*"
+
     echo "
-    $0 [$(declare -f main | grep ')$' | grep -oP '\-*\-\w+' | paste -d '|' -s)]
-    "
+    Options:
+
+$(declare -f main | \
+    grep -P '(help=|--|-[a-z]\))' | \
+    xargs | \
+    sed -e 's/; /\n/g' -e 's/help=/#/g' | \
+    column -t -s '#')"
 
     exit
 }
 
 function main {
-    echo "Install dotfiles for user $USER"
-
     [[ $# -eq 0 ]] && print_help
+
+    echo "Install dotfiles for user $USER"
 
     while [[ $# -ne 0 ]]; do
         arg="$1"; shift
         case "$arg" in
             --minimal|-m)
+                help="Vim 8 config without plugin, shell (bash+zsh), bin, tmux"
                 install_vim_light;
                 install_shell light;
                 install_tmux;
                 install_local_bin ;;
 
             --nvim|--neovim|-v)
+                help="Neovim (optional: stable|nightly|v[0-9])"
                 [[ $1 =~ ^(stable|nightly|v[0-9]) ]] && \
                     release=$1 && shift && \
                     install_neovim $release;
@@ -247,6 +259,7 @@ function main {
                 install_vim_config;;
 
             --conf|-c)
+                help="shell (bash+zsh), tmux, git, i3 cfg, bin, icons, fonts"
                 install_shell;
                 install_tmux;
                 install_git;
@@ -256,9 +269,11 @@ function main {
                 install_fonts ;;
 
             --updatebin|-u)
+                help="update bin (pull from github)"
                 update_bin_from_deb;;
 
             --help|-h)
+                help="this"
                 print_help ;;
 
             *)

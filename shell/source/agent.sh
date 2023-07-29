@@ -22,7 +22,7 @@ function launch_ssh_agent
         fi
     fi
 
-    eval "$(<~/.ssh-agent)" >/dev/null
+    eval "$(cat ~/.ssh-agent 2> /dev/null)" >/dev/null
     if [[ -n $SSH_AGENT_PID ]]; then
         cmd=$(ps --no-headers -o cmd $SSH_AGENT_PID)
         if [[ $ssh_agent_cmd != $cmd ]]; then

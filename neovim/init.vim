@@ -224,6 +224,11 @@ map <silent> <leader><ENTER> <C-w>o
 map <silent> <leader>k :TroubleToggle <cr>
 " paste last yank (not from dd)
 map <silent> <leader>p "0p
+" vim surround
+map <silent> <leader>" ysiw"
+map <silent> <leader>: ysiW"
+map <silent> <leader>' ysiw'
+map <silent> <leader>; ysiW'
 
 nnoremap <silent> <M-Up> <cmd>call smoothie#do("\<C-U>") <CR>
 vnoremap <silent> <M-Up> <cmd>call smoothie#do("\<C-U>") <CR>
@@ -255,6 +260,9 @@ autocmd BufNewFile,BufRead *.lib set filetype=sh
 autocmd BufNewFile,BufRead *.source set filetype=sh
 autocmd BufNewFile,BufRead *.pp set filetype=puppet
 autocmd BufNewFile,BufRead *.inc set filetype=perl
+
+" display full file path
+autocmd BufEnter * echo expand('%:p')
 
 " remove auto<fucking>indent on colon :
 autocmd FileType python,yaml setlocal indentkeys-=<:>

@@ -1,19 +1,18 @@
 export CLIFF_FIT_WIDTH=1
 
 function os {
-    JQ=0
-    [[ "$*" =~ (show|list|create) ]] && JQ=1
-    [[ "$*" =~ (console log show) ]] && JQ=0
+    APPEND_OPTS=()
+    [[ "$*" =~ (show|list|create) ]] && APPEND_OPTS+=("-f" "json")
+    [[ "$*" =~ (console log show) ]] && APPEND_OPTS=()
+    [[ "$*" =~ (server list) ]] && APPEND_OPTS+=("-n")
 
-    EXTRA_OPTS=""
+    [[ $(echo ${APPEND_OPTS[@]} | grep -qw '\-f json') ]] && PIPE_CMD="jq" || PIPE_CMD="tee"
+
+    EXTRA_OPTS=()
     # Require at least 2.24 to get migration id + abort
-    [[ "$*" =~ (server migration) ]] && EXTRA_OPTS="--os-compute-api-version 2.24"
+    [[ "$*" =~ (server migration) ]] && EXTRA_OPTS+=("--os-compute-api-version" "2.24")
 
-    if [[ $JQ == 1 ]]; then
-        eval $(echo openstack $EXTRA_OPTS $* -f json | tr -s "  " " ") | jq .
-    else
-        eval $(echo openstack $EXTRA_OPTS $* | tr -s "  " " ")
-    fi
+    openstack "${EXTRA_OPTS[@]}" $* "${APPEND_OPTS[@]}" | $PIPE_CMD
 }
 
 alias oss="os server"
@@ -24,7 +23,18 @@ alias osv="os volume"
 alias osi="os image"
 alias osl="os loadbalancer"
 
-function os_log_color
+function openstack.list_ports
+{
+    if [[ $1 =~ ^([0-9]+\.){3} ]] ; then
+        os port list --fixed-ip ip-address=$1
+    else
+        os port list --device-id $1
+    fi
+}
+
+alias osport="openstack.list_ports"
+
+function openstack.log_color
 {(
     cmd=${1:-tail}; shift
     opts=("$@")
@@ -54,12 +64,5 @@ function os_log_color
     [[ $cmd == "tail" ]] && tail ${tail_opts[@]} -F ${os_files[@]} | ~/.local/bin/os-log-color $os_opts
 )}
 
-function otail
-{
-    os_log_color "tail" $*
-}
-
-function oless
-{
-    os_log_color "less" $*
-}
+alias otail="openstack.log_color tail"
+alias olog="openstack.log_color less"
