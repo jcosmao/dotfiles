@@ -116,21 +116,19 @@ function update_bin_from_deb {
     # rofi: ubuntu 22.04
     # ctags: compiled from https://github.com/universal-ctags/ctags.git
 
-    if which apt-get &> /dev/null ; then
-        # - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
-        version=$(basename $(curl -si https://github.com/BurntSushi/ripgrep/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
-        wget "https://github.com/BurntSushi/ripgrep/releases/download/$version/ripgrep_${version}_amd64.deb" -O $TMPDIR/ripgrep.deb
-        dpkg -x $TMPDIR/ripgrep.deb $TMPDIR/deb
+    # - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
+    version=$(basename $(curl -si https://github.com/BurntSushi/ripgrep/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
+    wget "https://github.com/BurntSushi/ripgrep/releases/download/$version/ripgrep_${version}_amd64.deb" -O $TMPDIR/ripgrep.deb
+    (cd $TMPDIR; ar x $TMPDIR/ripgrep.deb && tar xf data.tar.xz)
 
-        # - Install fd: https://github.com/sharkdp/fd/releases/latest
-        version=$(basename $(curl -si https://github.com/sharkdp/fd/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
-        wget "https://github.com/sharkdp/fd/releases/download/${version}/fd_${version:1}_amd64.deb" -O $TMPDIR/fd.deb
-        dpkg -x $TMPDIR/fd.deb $TMPDIR/deb
+    # - Install fd: https://github.com/sharkdp/fd/releases/latest
+    version=$(basename $(curl -si https://github.com/sharkdp/fd/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
+    wget "https://github.com/sharkdp/fd/releases/download/${version}/fd_${version:1}_amd64.deb" -O $TMPDIR/fd.deb
+    (cd $TMPDIR; ar x $TMPDIR/fd.deb && tar xf data.tar.xz)
 
-        # save binary
-        cp $TMPDIR/deb/usr/bin/* $SCRIPTPATH/bin && rm -rf $TMPDIR/deb
-        chmod +x $SCRIPTPATH/bin/*
-    fi
+    # save binary
+    cp $TMPDIR/usr/bin/* $SCRIPTPATH/bin && rm -rf $TMPDIR/deb
+    chmod +x $SCRIPTPATH/bin/*
 }
 
 function install_local_bin {
