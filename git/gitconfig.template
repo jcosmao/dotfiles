@@ -61,6 +61,12 @@
 	# Automatically correct and execute mistyped commands
     autocorrect = 1
 
+[trailer "sign"]
+    key = "Signed-off-by: "
+    command = 'echo "$(git config user.name) <$(git config user.email)>"'
+    ifexists = doNothing
+    ifmissing = doNothing
+
 [alias]
     aliases = config --get-regexp alias
     br = branch -vv
@@ -90,9 +96,14 @@
     root = "rev-parse --show-toplevel"
     ref = "ls-remote --ref"
     review = "!f() { \
-        target_branch=${1:-$(cat $(git rev-parse --show-toplevel)/.gitreview | grep defaultbranch= | cut -d= -f2)}; \
-        target_remote=$(git config branch.$(git name-rev --name-only HEAD).remote); \
-        test -n \"$target_branch\" && \
-            git push ${target_remote:-origin} HEAD:refs/for/${target_branch}%topic=$(git symbolic-ref --short HEAD) || \
-            echo 'ERROR: missing target_branch';\
+        target_branch=$(grep defaultbranch= $(git rev-parse --show-toplevel)/.gitreview | cut -d= -f2); \
+        test -z \"$target_branch\" && target_branch=$(git tshow | cut -d/ -f2- ); \
+        `# validate remote branch exist`; \
+        validate=$(git branch -r --format='%(refname:strip=2)' | grep -P \"^[a-z]+/$target_branch$\"); \
+        remote=$(echo $validate | cut -d/ -f1); \
+        branch=$(echo $validate | cut -d/ -f2-); \
+        test -n \"$branch\" -a -n \"$remote\" && \
+            (echo CMD: git push $remote HEAD:refs/for/${branch}%topic=$(git symbolic-ref --short HEAD) $*;\
+             git push $remote HEAD:refs/for/${branch}%topic=$(git symbolic-ref --short HEAD) $* ) || \
+            echo ERROR: missing branch=$branch or remote=$remote;\
     }; f"

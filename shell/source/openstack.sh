@@ -6,7 +6,7 @@ function os {
     [[ "$*" =~ (console log show) ]] && APPEND_OPTS=()
     [[ "$*" =~ (server list) ]] && APPEND_OPTS+=("-n")
 
-    [[ $(echo ${APPEND_OPTS[@]} | grep -qw '\-f json') ]] && PIPE_CMD="jq" || PIPE_CMD="tee"
+    echo "${APPEND_OPTS[@]}" | grep -qw '\-f json' && PIPE_CMD="jq" || PIPE_CMD="tee"
 
     EXTRA_OPTS=()
     # Require at least 2.24 to get migration id + abort
@@ -23,7 +23,7 @@ alias osv="os volume"
 alias osi="os image"
 alias osl="os loadbalancer"
 
-function openstack.list_ports
+function openstack.port_list
 {
     if [[ $1 =~ ^([0-9]+\.){3} ]] ; then
         os port list --fixed-ip ip-address=$1
@@ -32,7 +32,7 @@ function openstack.list_ports
     fi
 }
 
-alias osport="openstack.list_ports"
+alias osport="openstack.port_list"
 
 function openstack.log_color
 {(

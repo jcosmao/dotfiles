@@ -262,7 +262,7 @@ autocmd BufNewFile,BufRead *.pp set filetype=puppet
 autocmd BufNewFile,BufRead *.inc set filetype=perl
 
 " display full file path
-autocmd BufEnter * echo expand('%:p')
+autocmd BufNewFile,BufRead * echo expand('%:p')
 
 " remove auto<fucking>indent on colon :
 autocmd FileType python,yaml setlocal indentkeys-=<:>

@@ -84,8 +84,6 @@ function install_vim_light {
 }
 
 function install_shell {
-    version=${1:-full}
-
     echo "- Install bash/zsh"
 
     rm -f ~/.shell
@@ -98,11 +96,8 @@ function install_shell {
     # zsh
     ln -sf $SCRIPTPATH/shell/zshrc ~/.zshrc
 
-    if [[ $version == 'light' ]]; then
-        [[ -n $LC_BASTION ]] && ln -sf $SCRIPTPATH/shell/bashrc.lite ~/.bashrc-$LC_BASTION
-    else
-        ln -sf $SCRIPTPATH/shell/bashrc ~/.bashrc
-    fi
+    [[ -n $LC_BASTION ]] && bashrc_path=$HOME/.bashrc-$LC_BASTION || bashrc_path=$HOME/.bashrc
+    ln -sf $SCRIPTPATH/shell/bashrc $bashrc_path
 
     # fzf pass
     mkdir -p ~/.password-store/.extensions/
@@ -164,15 +159,15 @@ function install_git {
     echo "- Install git"
     git_username=$(git config --get user.name 2> /dev/null || echo $GIT_USER)
     git_mail=$(git config --get user.email 2> /dev/null || echo $GIT_MAIL)
-    rm -rf ~/.git && cp -r git ~/.git
-    ln -sf ~/.git/gitconfig ~/.gitconfig
+    [[ ! -L ~/.git ]] && rm -rf ~/.git.backup && mv ~/.git ~/.git.backup
+    [[ ! -L ~/.git ]] && ln -sf $SCRIPTPATH/git ~/.git
+    cp ~/.git/gitconfig.template ~/.git/gitconfig
     ln -sf ~/.git/gitignore ~/.gitignore
+    ln -sf ~/.git/gitconfig ~/.gitconfig
     [[ -z $git_username ]] && read -p 'git username : ' git_username
     [[ -z $git_mail ]] && read -p 'git mail : ' git_mail
     [[ -n $git_username ]] && sed -i "s/USERNAME/$git_username/g" ~/.git/gitconfig
     [[ -n $git_mail ]] && sed -i "s/MAIL/$git_mail/g" ~/.git/gitconfig
-    # Do not duplicate --signoff - config file ?
-    git config --global trailer.sign.ifexists replace
 }
 
 function install_fonts {
@@ -217,6 +212,17 @@ function install_config {
     fi
 }
 
+function uninstall {
+    echo "- Uninstall"; set -x
+    rm -rf $HOME/.local/bin/.nvim
+    rm -rf $HOME/.zsh
+    for dir in $HOME $HOME/.config $HOME/.local/bin; do
+        find $dir -maxdepth 1 -lname '*dotfiles*' -delete
+        find $dir -maxdepth 1 -xtype l -delete
+    done
+    set +x
+}
+
 function print_help {
 
     [[ $# -ne 0 ]] && echo "$(tput setaf 1)[ERROR] $*"
@@ -244,7 +250,7 @@ function main {
             --minimal|-m)
                 help="Vim 8 config without plugin, shell (bash+zsh), bin, tmux"
                 install_vim_light;
-                install_shell light;
+                install_shell;
                 install_tmux;
                 install_local_bin ;;
 
@@ -269,6 +275,10 @@ function main {
             --updatebin|-u)
                 help="update bin (pull from github)"
                 update_bin_from_deb;;
+
+            --uninstall|-d)
+                help="uninstall dotfiles"
+                uninstall;;
 
             --help|-h)
                 help="this"
