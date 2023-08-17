@@ -260,6 +260,7 @@ autocmd BufNewFile,BufRead *.lib set filetype=sh
 autocmd BufNewFile,BufRead *.source set filetype=sh
 autocmd BufNewFile,BufRead *.pp set filetype=puppet
 autocmd BufNewFile,BufRead *.inc set filetype=perl
+autocmd BufNewFile,BufRead *.tf set filetype=terraform
 
 " display full file path
 autocmd BufNewFile,BufRead * echo expand('%:p')

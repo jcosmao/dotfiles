@@ -15,6 +15,10 @@ function os {
     openstack "${EXTRA_OPTS[@]}" $* "${APPEND_OPTS[@]}" | $PIPE_CMD
 }
 
+function openstack.unset_env {
+    unset $(env | grep ^OS_ | cut -d= -f1) 2> /dev/null
+}
+
 alias oss="os server"
 alias osc="os compute"
 alias osn="os network"
@@ -22,6 +26,14 @@ alias osb="os baremetal"
 alias osv="os volume"
 alias osi="os image"
 alias osl="os loadbalancer"
+
+if [[ -d ~/.os_openrc ]]; then
+    for openrc in $(ls ~/.os_openrc | grep '.openrc'); do
+        name=$(echo $openrc | sed -e 's/.openrc$//')
+        region=$(echo $openrc | cut -d: -f1)
+        alias cr_${name}="openstack.unset_env; source ~/.os_openrc/$openrc; export OS_REGION_NAME=${region}"
+    done
+fi
 
 function openstack.port_list
 {

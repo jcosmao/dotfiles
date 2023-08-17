@@ -1,5 +1,4 @@
-.ctags.gutentags*
-.cscope.gutentags*
+*.gutentags
 .project/
 .python-version
 pyrightconfig.json
