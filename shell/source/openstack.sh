@@ -46,6 +46,13 @@ function openstack.port_list
 
 alias osport="openstack.port_list"
 
+function openstack.get_snat
+{
+    os network agent list --long --router $*
+}
+
+alias osnat="openstack.get_snat"
+
 function openstack.log_color
 {(
     cmd=${1:-tail}; shift
