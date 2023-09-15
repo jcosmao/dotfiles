@@ -99,7 +99,7 @@
         target_branch=$(grep defaultbranch= $(git rev-parse --show-toplevel)/.gitreview | cut -d= -f2); \
         test -z \"$target_branch\" && target_branch=$(git tshow | cut -d/ -f2- ); \
         `# validate remote branch exist`; \
-        validate=$(git branch -r --format='%(refname:strip=2)' | grep -P \"^[a-z]+/$target_branch$\"); \
+        validate=$(git branch -r --format='%(refname:strip=2)' | grep -P \"^[a-z]+/$target_branch$\" | head -1); \
         remote=$(echo $validate | cut -d/ -f1); \
         branch=$(echo $validate | cut -d/ -f2-); \
         test -n \"$branch\" -a -n \"$remote\" && \
