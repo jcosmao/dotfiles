@@ -28,7 +28,23 @@ alias osi="os image"
 alias osl="os loadbalancer"
 
 if [[ -d ~/.os_openrc ]]; then
-    for openrc in $(ls ~/.os_openrc | grep '.openrc'); do
+
+    function openstack.make_symlink_from_catalog
+    {(
+        file=${1:-openrc\..*}
+        cd ~/.os_openrc
+        for openrc in $(ls | grep -P "^$file$")
+        do
+            source $openrc
+            name=$(echo $openrc | sed -e 's/openrc\.//')
+            openstack catalog list -f json | jq -r '.[] | select(.Name == "nova") | .Endpoints| .[].region' | while read REGION
+            do
+                ln -sf $openrc ${REGION}:${name}.openrc
+            done
+        done
+    )}
+
+    for openrc in $(ls ~/.os_openrc | grep -P '.openrc$'); do
         name=$(echo $openrc | sed -e 's/.openrc$//')
         region=$(echo $openrc | cut -d: -f1)
         alias cr_${name}="openstack.unset_env; source ~/.os_openrc/$openrc; export OS_REGION_NAME=${region}"
