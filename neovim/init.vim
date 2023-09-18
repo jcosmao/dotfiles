@@ -95,6 +95,7 @@ Plug 'stevearc/aerial.nvim'
 " git
 Plug 'mhinz/vim-signify'
 Plug 'rhysd/git-messenger.vim'
+Plug 'FabijanZulj/blame.nvim'
 
 " Colorscheme
 Plug 'sainnhe/gruvbox-material'
@@ -202,7 +203,8 @@ map <silent> <leader>b :Buffers <cr>
 map <silent> <leader>t :FZFCtags <cr>
 map <silent> <leader>c :BCommits <cr>
 map <silent> <leader>h :History <cr>
-map <silent> <leader>g :GitMessenger <cr>
+map <silent> <leader>g :execute 'ToggleBlame virtual' <cr>
+map <silent> <leader>G :GitMessenger <cr>
 map <silent> <leader>m :Snippets <cr>
 map <silent> <leader>l :LspDiagnosticsAll <cr>
 map <silent> <C-a> ^
