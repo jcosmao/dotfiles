@@ -26,6 +26,7 @@ alias osb="os baremetal"
 alias osv="os volume"
 alias osi="os image"
 alias osl="os loadbalancer"
+alias op="openstack"
 
 if [[ -d ~/.os_openrc ]]; then
 
