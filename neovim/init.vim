@@ -95,7 +95,7 @@ Plug 'stevearc/aerial.nvim'
 " git
 Plug 'mhinz/vim-signify'
 Plug 'rhysd/git-messenger.vim'
-Plug 'FabijanZulj/blame.nvim'
+Plug 'jcosmao/blame.nvim'
 
 " Colorscheme
 Plug 'sainnhe/gruvbox-material'
