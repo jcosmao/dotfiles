@@ -90,6 +90,28 @@ function utils.randpass
     openssl rand -base64 $size | tr -d '\n'
 }
 
+function help.ssh-rdp
+{
+    echo "https://github.com/kokoko3k/ssh-rdp"
+    echo
+    echo "Software requirements:
+    * Local and Remote: bash,ffmpeg,openssh,netevent
+    * Local: wmctrl, mpv >=0.29, taskset
+    * Remote: xdpyinfo,pulseaudio
+
+    yay -S netevent-git mpv wmctrl tevent vid.stab libvdpau-va-gl"
+
+    echo
+    echo "Reinit config:
+    * rm ~/.config/ssh-rdp*config
+        and ssh-rdp -u user -s remote"
+
+    echo
+    echo "Ex: without fwd audio
+        ssh-rdp -u ju -s desk  --audioenc null
+    "
+}
+
 
 alias dotup="utils.dotfiles_update"
 alias zup="utils.zsh_update"
