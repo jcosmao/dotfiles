@@ -286,3 +286,6 @@ augroup end
 
 " trim whitespace
 autocmd BufWritePre * :%s/\s\+$//e
+" save without trim
+imap <silent> <C-s> <Esc>:noautocmd w <cr>
+map <silent> <C-s> :noautocmd w <cr>

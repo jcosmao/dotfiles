@@ -40,15 +40,15 @@ if [[ -d ~/.os_openrc ]]; then
             name=$(echo $openrc | sed -e 's/openrc\.//')
             openstack catalog list -f json | jq -r '.[] | select(.Name == "nova") | .Endpoints| .[].region' | while read REGION
             do
-                ln -sf $openrc ${REGION}:${name}.openrc
+                ln -sf $openrc ${REGION}__${name}.openrc
             done
         done
     )}
 
     for openrc in $(ls ~/.os_openrc | grep -P '.openrc$'); do
         name=$(echo $openrc | sed -e 's/.openrc$//')
-        region=$(echo $openrc | cut -d: -f1)
-        alias cr_${name}="openstack.unset_env; source ~/.os_openrc/$openrc; export OS_REGION_NAME=${region}"
+        region=$(echo $openrc | sed -re 's/(.*)__.*/\1/')
+        alias cr_$(echo "$name" |  tr '[:upper:]' '[:lower:]')="openstack.unset_env; source ~/.os_openrc/$openrc; export OS_REGION_NAME=${region}"
     done
 fi
 

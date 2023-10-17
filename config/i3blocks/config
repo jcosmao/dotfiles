@@ -47,25 +47,16 @@ separator_block_width=10
 [memory]
 label=
 interval=30
-separator=false
-separator_block_width=10
 
-[disk-slash]
+[disk]
 label=
-command=echo / $(df -h -l --output='avail' "/" | grep -E -o '[0-9]+(G|M)')
-interval=30
-separator=false
-separator_block_width=10
-
-[disk-home]
-label=
-command=echo /home $(df -h -l --output='avail' "/home" | grep -E -o '[0-9]+(G|M)')
+command=echo " /: $(df -h -l --output='avail' / | grep -E -o '[0-9]+(G|M)')  /home: $(df -h -l --output='avail' /home | grep -E -o '[0-9]+(G|M)')"
 interval=30
 
 # Common
 
 [volume]
-label=
+label= 
 interval=10
 signal=10
 
@@ -74,12 +65,12 @@ interval=10
 
 [utc_hour]
 label=UTC
-command=date -u '+%0H:%0M'
+command=echo " $(date -u '+%0H:%0M')"
 interval=5
 
 [canada_hour]
 label=
-command=TZ=America/Montreal date '+%0H:%0M'
+command=echo " $(TZ=America/Montreal date '+%0H:%0M')"
 interval=5
 
 [calendar]

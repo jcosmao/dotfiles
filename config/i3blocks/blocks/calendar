@@ -69,4 +69,4 @@ case "$BLOCK_BUTTON" in
         ;;
 esac
 
-echo "${full_date:11:17} "
+echo " ${full_date:11:17} "
