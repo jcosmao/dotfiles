@@ -28,6 +28,7 @@ function pyenv.help
         $ pyenv install -l
         # use clang compiler if it raise error
         $ pyenv install 3.9.0  || CC=clang pyenv install 3.9.0
+        $ env PYTHON_CONFIGURE_OPTS='--enable-shared' pyenv install --verbose 3.9.13
         $ pyenv virtualenv 3.9.0 nvim
 
         # init working dir to autoload proper env
