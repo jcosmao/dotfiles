@@ -34,10 +34,9 @@ fi
 if [[ "${charging_state}" = "Discharging" ]]; then
     echo "${icon} ${power}% |$time_remaining|"
     echo "${icon} ${power}%"
-    echo $color
+    [[ -n $color ]] && echo $color
 else
     [[ $power -eq 100 ]] && echo " ${power}%" || \
         echo " ${power}% |$time_remaining|"
     echo " ${power}%"
-    echo ""
 fi

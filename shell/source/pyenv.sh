@@ -5,6 +5,7 @@ function pyenv.load
 {
     if [[ -d $PYENV_ROOT ]]; then
         if [[ -f $PYENV_ROOT/bin/pyenv ]]; then
+            [[ $PATH =~ .*${PYENV_ROOT}.* ]] && return
             export PATH="$PYENV_ROOT/bin:$PATH"
             # not needed ?
             # eval "$(pyenv init --path)"

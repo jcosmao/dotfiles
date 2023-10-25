@@ -120,6 +120,7 @@ set showcmd                         " Show current command.
 set laststatus=2
 set number
 set cursorline
+set cmdheight=2
 set signcolumn=auto
 set encoding=utf-8
 set fileencoding=utf-8
@@ -264,8 +265,15 @@ autocmd BufNewFile,BufRead *.pp set filetype=puppet
 autocmd BufNewFile,BufRead *.inc set filetype=perl
 autocmd BufNewFile,BufRead *.tf set filetype=terraform
 
-" display full file path
-autocmd BufNewFile,BufRead * echo expand('%:p')
+fun! DisplayFilePath()
+    if index(['', 'NvimTree', 'aerial', 'startify', 'fzf'], &ft) >= 0
+        return
+    else
+        echo printf("File: %s", expand('%:p'))
+    endif
+endfun
+
+autocmd WinEnter,BufWinEnter * call DisplayFilePath()
 
 " remove auto<fucking>indent on colon :
 autocmd FileType python,yaml setlocal indentkeys-=<:>

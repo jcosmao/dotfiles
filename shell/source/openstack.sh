@@ -47,8 +47,8 @@ if [[ -d ~/.os_openrc ]]; then
 
     for openrc in $(ls ~/.os_openrc | grep -P '.openrc$'); do
         name=$(echo $openrc | sed -e 's/.openrc$//')
-        region=$(echo $openrc | sed -re 's/(.*)__.*/\1/')
-        alias cr_$(echo "$name" |  tr '[:upper:]' '[:lower:]')="openstack.unset_env; source ~/.os_openrc/$openrc; export OS_REGION_NAME=${region}"
+        region=$(echo $openrc | sed -re 's/(.*)__.*/\1/' | tr '[:lower:]' '[:upper:]')
+        alias cr_${name}="openstack.unset_env; source ~/.os_openrc/$openrc; export OS_REGION_NAME=${region}"
     done
 fi
 

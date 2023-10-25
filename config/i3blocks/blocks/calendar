@@ -54,12 +54,12 @@ case "$BLOCK_BUTTON" in
             | rofi \
                 -dmenu \
                 -lines "$cal_lines" \
-                -font 'Monospace 12' \
+                -font 'Monospace 11' \
                 -location '3' \
-                -xoffset '-15' \
-                -yoffset '30' \
+                -xoffset '-50' \
+                -yoffset '35' \
                 -theme-str 'configuration { show-icons: false; }' \
-                -theme-str 'window { fullscreen: false; width: 250px; height: 250px; } inputbar { children: [ prompt ]; } listview { scrollbar: false; }' \
+                -theme-str 'window { fullscreen: false; width: 220px; height: 200px; } inputbar { children: [ prompt ]; } listview { scrollbar: false; }' \
                 -theme-str 'element normal.normal, element selected.normal, element alternate.normal { background-color: #212121; text-color: #c4cad4; }' \
                 -theme-str 'element normal.active, element selected.active, element alternate.active { background-color: #363636; text-color: #f9f9f9; }' \
                 -p "$the_date" \
@@ -69,4 +69,4 @@ case "$BLOCK_BUTTON" in
         ;;
 esac
 
-echo " ${full_date:11:17} "
+echo "  ${full_date:11:17} "

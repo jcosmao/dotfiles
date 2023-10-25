@@ -21,7 +21,12 @@ fi
 # build final i3 config
 cat "$i3_config_base" \
     "$i3_family_config" \
-    "$i3_layout_config" > ${i3_dir}/config
+    "$i3_layout_config" > ${i3_dir}/config 2> /dev/null
+
+min_version=4.22
+# return 0 if current version is >= min_version
+(echo $min_version; echo $(i3 -v | sed -re 's/i3 version ([^ ]+).*/\1/')) | sort -CV
+[[ $? == 0 ]] && sed -i 's/#i3-min-version-check# //' ${i3_dir}/config
 
 sed -ri "s/<LAYOUT_NAME>/$layout/g" ${i3_dir}/config
 sed -ri "s/<HDMI_1>/$screen_hdmi_1/g" ${i3_dir}/config
@@ -36,7 +41,7 @@ SCRIPTPATH=$(dirname $SCRIPT)
 bash $SCRIPTPATH/scripts/term_font_size.sh
 
 setxkbmap -layout us -variant altgr-intl
-/usr/bin/feh --bg-fill --no-fehbg --randomize ~/.wallpapers/*
+[[ -d ~/.wallpapers ]] && /usr/bin/feh --bg-fill --no-fehbg --randomize ~/.wallpapers/*
 
 # Then reload/restart i3
 i3-msg $action

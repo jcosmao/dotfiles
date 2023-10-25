@@ -10,9 +10,9 @@ signal=11
 
 # Network
 
-[bandwidth]
-command=~/.config/i3blocks/blocks/$BLOCK_NAME -o ' ' -i ' '
-interval=5
+# [bandwidth]
+# command=~/.config/i3blocks/blocks/$BLOCK_NAME -o ' ' -i ' '
+# interval=5
 
 [vpn]
 interval=5
@@ -56,7 +56,7 @@ interval=30
 # Common
 
 [volume]
-label= 
+label=
 interval=10
 signal=10
 
@@ -64,7 +64,7 @@ signal=10
 interval=10
 
 [utc_hour]
-label=UTC
+label=
 command=echo " $(date -u '+%0H:%0M')"
 interval=5
 
