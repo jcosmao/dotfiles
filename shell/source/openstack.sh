@@ -25,8 +25,12 @@ alias osn="os network"
 alias osb="os baremetal"
 alias osv="os volume"
 alias osi="os image"
-alias osl="os loadbalancer"
 alias op="openstack"
+# nova
+alias ossall="os server list --all --host"
+# octavia
+alias osl="os loadbalancer"
+alias osla="os loadbalancer amphora list --loadbalancer"
 
 if [[ -d ~/.os_openrc ]]; then
 

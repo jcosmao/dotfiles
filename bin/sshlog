@@ -30,6 +30,15 @@ LOG_MAP='{
         "scheduler": "/var/log/nova/nova-scheduler.log",
         "placement": "/var/log/placement/placement-api.log"
     },
+    "cinder": {
+        "api": "/var/log/apache2/cinder-api*log /var/log/cinder/cinder-api.log",
+        "scheduler": "/var/log/cinder/cinder-scheduler.log",
+        "volume": "/var/log/cinder/cinder-volume.log",
+        "backup": "/var/log/cinder/cinder-backup.log"
+    },
+    "glance": {
+        "default": "/var/log/glance/*.log"
+    },
     "ironic": {
         "api": "/var/log/ironic/ironic-api.log",
         "conductor": "/var/log/ironic/ironic-ovh-conductor.log",
@@ -78,6 +87,11 @@ function sshlog {
     echo "GROUP_KEY: $find_group_map"
 
     log_files=()
+
+    # as default, tail all known logs
+    if [[ ${LOG_KEYS[@]} == default ]]; then
+        LOG_KEYS=($(echo $LOG_MAP | jq .\"$find_group_map\" | jq -r 'keys[]'))
+    fi
 
     for key in ${LOG_KEYS[@]}; do
 
