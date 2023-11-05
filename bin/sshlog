@@ -11,21 +11,24 @@ LOG_MAP='{
         "bgp": "/var/log/neutron/neutron-ovh-bgp-agent.log",
         "l3": "/var/log/neutron/neutron-ovh-l3-agent.log",
         "metadata": "/var/log/neutron/neutron-ovh-metadata-agent.log",
-        "nova": "/var/log/nova/nova-compute.log"
+        "nova": "/var/log/nova/nova-compute.log",
+        "libvirt": "/var/log/libvirt/libvirtd.log",
+        "ovs": "/var/log/openvswitch/*.log"
     },
     "snat": {
         "vrack": "/var/log/neutron/neutron-ovh-vrack-agent.log",
         "bgp": "/var/log/neutron/neutron-ovh-bgp-agent.log",
         "l3": "/var/log/neutron/neutron-ovh-l3-agent.log",
         "dhcp": "/var/log/neutron/neutron-dhcp-agent.log",
-        "metadata": "/var/log/neutron/neutron-ovh-metadata-agent.log"
+        "metadata": "/var/log/neutron/neutron-ovh-metadata-agent.log",
+        "ovs": "/var/log/openvswitch/*.log"
     },
     "neutron": {
         "api": "/var/log/neutron/neutron-api.log /var/log/apache2/neutron-api*log",
         "rpc": "/var/log/neutron/neutron-rpc.log"
     },
     "nova": {
-        "api": "/var/log/apache2/neutron-api*log /var/log/nova/nova-api.log",
+        "api": "/var/log/apache2/nova-api*log /var/log/nova/nova-api.log",
         "conductor": "/var/log/nova/nova-conductor.log",
         "scheduler": "/var/log/nova/nova-scheduler.log",
         "placement": "/var/log/placement/placement-api.log"
@@ -118,7 +121,9 @@ function sshlog {
     fi
 
     for h in $(echo $find_hosts); do
-        sudo ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -l admin $h tail $TAILOPTS -f ${log_files[@]} &
+        short=$(echo $h | sed -e 's/\.cloud.ovh.*//')
+        sudo ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -l root $h tail $TAILOPTS -v -f ${log_files[@]} | \
+            awk -v host=$short '/^==>/{size=split($2,splitted,"/"); filename=splitted[size];next} !/^==>/{print host,filename,$0}' &
     done | $color_cmd
 
     wait
