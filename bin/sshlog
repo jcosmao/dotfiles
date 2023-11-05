@@ -3,7 +3,7 @@
 TAILOPTS=""
 
 current_pgid=$(ps -o pgid= $$)
-trap "sudo pkill -g $current_pgid" INT TERM QUIT
+trap "sudo pkill -9 -f sshlog -g $current_pgid" INT TERM QUIT
 
 LOG_MAP='{
     "host": {
@@ -122,8 +122,9 @@ function sshlog {
 
     for h in $(echo $find_hosts); do
         short=$(echo $h | sed -e 's/\.cloud.ovh.*//')
-        sudo ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -l root $h tail $TAILOPTS -v -f ${log_files[@]} | \
-            awk -v host=$short '/^==>/{size=split($2,splitted,"/"); filename=splitted[size];next} !/^==>/{print host,filename,$0}' &
+        sudo ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -l admin $h \
+            tail $TAILOPTS -v -f ${log_files[@]} 2> /dev/null | \
+            stdbuf -o0 awk -v host=$short '/^==>/{size=split($2,splitted,"/");filename=splitted[size] ;next} !/^==>/{print host,filename,$0}' &
     done | $color_cmd
 
     wait

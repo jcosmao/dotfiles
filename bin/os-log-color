@@ -22,19 +22,19 @@ import argparse
 
 PARSER = argparse.ArgumentParser()
 PARSER.add_argument("-l", "--level",
-            help="Set log level you want display",
-            metavar='level',
-            type=str)
+                    help="Set log level you want display",
+                    metavar='level',
+                    type=str)
 PARSER.add_argument("-e", "--exclude",
-            help="Set log level you want exclude",
-            metavar='level',
-            type=str,
-            nargs='+')
+                    help="Set log level you want exclude",
+                    metavar='level',
+                    type=str,
+                    nargs='+')
 PARSER.add_argument("-i", "--include",
-            help="Set log level you only want display",
-            metavar='level',
-            type=str,
-            nargs='+')
+                    help="Set log level you only want display",
+                    metavar='level',
+                    type=str,
+                    nargs='+')
 ARGS = PARSER.parse_args()
 
 LOG_LEVEL = {
@@ -52,9 +52,10 @@ LOG_LEVEL = {
     'notset': 100,
 }
 
+
 class colors:
     grey = '\033[1;30m'
-    red =  '\033[1;31m'
+    red = '\033[1;31m'
     green = '\033[1;32m'
     yellow = '\033[1;33m'
     blue = '\033[1;34m'
@@ -63,29 +64,38 @@ class colors:
     white = '\033[0;37m'
     end = '\033[1;m'
 
+
 def grey(text):
     return '%s%s%s' % (colors.grey, text, colors.end)
+
 
 def red(text):
     return '%s%s%s' % (colors.red, text, colors.end)
 
+
 def green(text):
     return '%s%s%s' % (colors.green, text, colors.end)
+
 
 def yellow(text):
     return '%s%s%s' % (colors.yellow, text, colors.end)
 
+
 def blue(text):
     return '%s%s%s' % (colors.blue, text, colors.end)
+
 
 def magenta(text):
     return '%s%s%s' % (colors.magenta, text, colors.end)
 
+
 def cyan(text):
     return '%s%s%s' % (colors.cyan, text, colors.end)
 
+
 def white(text):
     return '%s%s%s' % (colors.white, text, colors.end)
+
 
 def colored_level(level):
     "Return level text with selected color tag"
@@ -106,124 +116,108 @@ def parse_line(line):
     "Parse line and return dict of each elements"
     # Line example : Openstack
     # 2014-08-14 18:43:58.950 4092 INFO neutron.plugins.openvswitch.agent.ovs_neutron_agent [-]
-    regex = (r'^([0-9]+-[0-9]+-[0-9]+) ' # date
-             '([0-9]+:[0-9]+:[0-9]+\.[0-9]+) ' # time
-             '([0-9]+):? ' # process
-             '([A-Z]+) ' # level
-             '([^ ]+) ' # name
-             '(\[[^\]]+\])*\s*' # context
-             '(.+)') # text
+    regex = (
+        r'(.*)'
+        r'([0-9]{4}-[0-9]+-[0-9]+) '   # date
+        r'([0-9]+:[0-9]+:[0-9]+\.[0-9]+) '   # time
+        r'([0-9]+):? '   # process
+        r'([A-Z]+) '   # level
+        r'([^ ]+) '   # name
+        r'(\[[^\]]+\])*\s*'   # context
+        r'(.+)'  # text
+    )
 
     result = re.match(regex, line)
     if result is not None:
         return {
-          'date': result.group(1),
-          'time': result.group(2),
-          'process': result.group(3),
-          'level': result.group(4),
-          'name': result.group(5),
-          'req': "" if not result.group(6) else result.group(6),
-          'text': result.group(7),
-          '_type': 'default',
+            'header': "" if not result.group(1) else result.group(1),
+            'date': result.group(2),
+            'time': result.group(3),
+            'process': result.group(4),
+            'level': result.group(5),
+            'name': result.group(6),
+            'req': "" if not result.group(7) else result.group(7),
+            'text': result.group(8),
+            '_type': 'openstack',
         }
 
-    regex = (r'^([^ ]+) ' # pod
-              '([^ ]+) ' # container
-              '([0-9]+-[0-9]+-[0-9]+) ' # date
-              '([0-9]+:[0-9]+:[0-9]+\.[0-9]+) ' # time
-              '([0-9]+):? ' # process
-              '([A-Z]+) ' # level
-              '([^ ]+) ' # name
-              '(\[[^\]]+\])*\s*' # context
-              '(.+)*') # text
+    regex = (
+        r'(.*)'
+        r'([0-9]{4}-[0-9]+-[0-9]+) '  # date
+        r'([0-9]+:[0-9]+:[0-9]+) '  # time
+        r'(.+)'
+    )
 
     result = re.match(regex, line)
     if result is not None:
+        key_val = {}
+        text = result.group(4)
+        keys = re.findall(r"[^ ]+:", text)
+        for i in range(0, len(keys)):
+            if i == len(keys) - 1:
+                next_key = ""
+            else:
+                next_key = keys[i+1]
+
+            match = re.match(rf".*{keys[i]} (.*){next_key}.*", text)
+            if match:
+                key_val[keys[i]] = match.group(1)
+
         return {
-          'pod': result.group(1),
-          'container': result.group(2),
-          'date': result.group(3),
-          'time': result.group(4),
-          'process': result.group(5),
-          'level': result.group(6),
-          'name': result.group(7),
-          'req': "" if not result.group(8) else result.group(8),
-          'text': result.group(9),
-          '_type': 'stern',
-        }
-
-    # Line example : Openstack without date and time
-    # 4092 INFO neutron.plugins.openvswitch.agent.ovs_neutron_agent
-    regex = (r'([0-9]+):? ' # process
-             '([A-Z]+) ' # level
-             '([^ ]+) ' # name
-             '(.+)') # text
-
-    result = re.match(regex, line)
-    if result is not None:
-        return { 'process': result.group(1),
-          'level': result.group(2),
-          'name': result.group(3),
-          'text': result.group(4),
-          '_type': 'default_without_datatime',
-        }
-
-    # Line example : Ceph.log
-    # 2014-11-17 18:27:11.731721 mon.0 10.142.63.18:6789/0 2005 : [INF]
-    regex = (r'^([0-9]+-[0-9]+-[0-9]+) ' # date
-             '([0-9]+:[0-9]+:[0-9]+\.[0-9]+) ' # time
-             '([^\[]+) ' # who
-             '\[([A-Z\?]+)\] ' # level
-             '(.+)') # text
-
-    result = re.match(regex, line)
-    if result is not None:
-        return { 'date': result.group(1),
-          'time': result.group(2),
-          'who': result.group(3),
-          'level': result.group(4),
-          'text': result.group(5),
-          '_type': 'ceph.log',
-        }
-
-    # Line example : ovs.log
-    #2014-11-21T06:25:09.549Z|00012|vlog|INFO|opened log file /var/log/op...
-    regex = (r'^([0-9]+-[0-9]+-[0-9]+)T' # date
-             '([0-9]+:[0-9]+:[0-9]+\.[0-9]+)Z\|' # time
-             '([0-9]+)\|' # serial
-             '([^\|]+)\|' # name
-             '([^\|]+)\|' # level
-             '(.+)') # text
-
-    result = re.match(regex, line)
-    if result is not None:
-        return { 'date': result.group(1),
-          'time': result.group(2),
-          'serial': result.group(3),
-          'name': result.group(4),
-          'level': result.group(5),
-          'text': result.group(6),
-          '_type': 'ovs.log',
+            'header': "" if not result.group(1) else result.group(1),
+            'date': result.group(2),
+            'time': result.group(3),
+            'key_val': key_val,
+            '_type': 'apache',
         }
 
     # rabbit
     # 2023-07-30 12:39:41.230254+00:00 [error]
-    regex = (r'^([0-9]+-[0-9]+-[0-9]+) ' # date
-             '([0-9]+:[0-9]+:[0-9]+\.[0-9]+[^ ]+) ' # time
-             '\[([a-z\?]+)\] ' # level
-             '(<[^>]+>) ' # <0.9417.870>
-             '(.+)') # text
+    regex = (
+        r'(.*)'
+        r'([0-9]{4}-[0-9]+-[0-9]+) '  # date
+        r'([0-9]+:[0-9]+:[0-9]+\.[0-9]+[^ ]+) '  # time
+        r'\[([a-z\?]+)\] '  # level
+        r'(<[^>]+>) '  # <0.9417.870>
+        r'(.+)'
+    )
 
     result = re.match(regex, line)
     if result is not None:
-        return { 'date': result.group(1),
-          'time': result.group(2),
-          'level': result.group(3),
-          'pid': result.group(4),
-          'text': result.group(5),
-          '_type': 'rabbit',
+        return {
+            'header': "" if not result.group(1) else result.group(1),
+            'date': result.group(2),
+            'time': result.group(3),
+            'level': result.group(4),
+            'pid': result.group(5),
+            'text': result.group(6),
+            '_type': 'rabbit',
         }
 
+    # Line example : ovs.log
+    # 2014-11-21T06:25:09.549Z|00012|vlog|INFO|opened log file /var/log/op...
+    regex = (
+        r'(.*)'
+        r'([0-9]{4}-[0-9]+-[0-9]+)T'  # date
+        r'([0-9]+:[0-9]+:[0-9]+\.[0-9]+)Z\|'  # time
+        r'([0-9]+)\|'  # serial
+        r'([^\|]+)\|'  # name
+        r'([^\|]+)\|'  # level
+        r'(.+)'
+    )
+
+    result = re.match(regex, line)
+    if result is not None:
+        return {
+            'header': "" if not result.group(1) else result.group(1),
+            'date': result.group(2),
+            'time': result.group(3),
+            'serial': result.group(4),
+            'name': result.group(5),
+            'level': result.group(6),
+            'text': result.group(7),
+            '_type': 'ovs',
+        }
 
     return {'text': line, '_type': None}
 
@@ -231,74 +225,68 @@ def parse_line(line):
 def colorize(line):
     "Apply color tag on line"
 
-    # Default parsed line
-    if line.get('_type') == 'default':
+    if line.get('_type') == 'openstack':
         if line.get('level') == 'TRACE':
-            colored_text=grey(line['text'])
+            colored_text = grey(line['text'])
         else:
-            colored_text=white(line['text'])
-        return '%s %s %s: %s %s %s %s' % ( grey(line['date']),
-                                   grey(line['time']),
-                                   grey(line['process']),
-                                   colored_level(line['level']),
-                                   blue(line['name']),
-                                   grey(line['req']),
-                                   colored_text,)
+            colored_text = white(line['text'])
+        return '%s%s %s %s: %s %s %s %s' % (
+            magenta(line['header']),
+            grey(line['date']),
+            grey(line['time']),
+            grey(line['process']),
+            colored_level(line['level']),
+            blue(line['name']),
+            grey(line['req']),
+            colored_text
+        )
 
-    # openstack logs with stern (k8s logs)
-    elif line.get('_type') == 'stern':
-        if line.get('level') == 'TRACE':
-            colored_text=grey(line['text'])
-        else:
-            colored_text=white(line['text'])
-        return '%s %s %s %s %s: %s %s %s %s' % (
-                                   magenta(line['pod']),
-                                   magenta(line['container']),
-                                   grey(line['date']),
-                                   grey(line['time']),
-                                   grey(line['process']),
-                                   colored_level(line['level']),
-                                   blue(line['name']),
-                                   grey(line['req']),
-                                   colored_text,)
+    elif line.get('_type') == 'ovs':
+        return '%s%s %s %s %s %s %s' % (
+            magenta(line['header']),
+            grey(line['date']),
+            grey(line['time']),
+            grey(line['serial']),
+            blue(line['name']),
+            colored_level(line['level']),
+            white(line['text'])
+        )
 
-    # Default parsed line without date and time
-    elif line.get('_type') == 'default_without_datatime':
-        if line.get('level') == 'TRACE':
-            colored_text=grey(line['text'])
-        else:
-            colored_text=white(line['text'])
-        return '%s: %s %s %s' % ( grey(line['process']),
-                                 colored_level(line['level']),
-                                 blue(line['name']),
-                                 colored_text,)
-    # Ceph.log
-    elif line.get('_type') == 'ceph.log':
-        return '%s %s %s [%s] %s' % ( grey(line['date']),
-                                 grey(line['time']),
-                                 blue(line['who']),
-                                 colored_level(line['level']),
-                                 white(line['text']),)
-    # ovs.log
-    elif line.get('_type') == 'ovs.log':
-        return '%s %s %s %s %s %s' % ( grey(line['date']),
-                                 grey(line['time']),
-                                 grey(line['serial']),
-                                 blue(line['name']),
-                                 colored_level(line['level']),
-                                 white(line['text']),)
-
-    # ovs.log
     elif line.get('_type') == 'rabbit':
-        return '%s %s %s %s %s' % ( grey(line['date']),
-                                 grey(line['time']),
-                                 colored_level(line['level']),
-                                 blue(line['pid']),
-                                 white(line['text']),)
+        return '%s%s %s %s %s %s' % (
+            magenta(line['header']),
+            grey(line['date']),
+            grey(line['time']),
+            colored_level(line['level']),
+            blue(line['pid']),
+            white(line['text'])
+        )
 
-    # Unparsed line (without level)
+    elif line.get('_type') == 'apache':
+        formatted = '%s%s %s' % (
+            magenta(line['header']),
+            grey(line['date']),
+            grey(line['time']),
+        )
+
+        for k, v in line['key_val'].items():
+            val = white(v)
+            try:
+                if k == "status:" and int(v) >= 500:
+                    val = red(v)
+                elif k == "status:" and int(v) >= 400:
+                    val = yellow(v)
+                elif k == "time:" and float(v) >= 3000:
+                    val = red(v)
+            except:
+                pass
+            formatted = f"{formatted} {blue(k)} {val}"
+
+        return formatted
+
     else:
         return '%s' % (line.get('text'))
+
 
 def check_args():
     # Just allow one arg
@@ -309,6 +297,7 @@ def check_args():
         return False
     return True
 
+
 def level_filter(line):
     "Return true if line must be filtered. Never filter line without level"
     level = ARGS.level.lower()
@@ -317,6 +306,7 @@ def level_filter(line):
         return True
     else:
         return False
+
 
 def include_filter(line):
     "Return true if line must be filtered. Never filter line without level"
@@ -328,6 +318,7 @@ def include_filter(line):
         return False
     return True
 
+
 def exclude_filter(line):
     "Return true if line must be filtered. Never filter line without level"
     excludes = [e.lower() for e in ARGS.exclude]
@@ -335,6 +326,7 @@ def exclude_filter(line):
     if line_level in excludes:
         return True
     return False
+
 
 def line_is_filtered(line):
     "Skip the line ?"
