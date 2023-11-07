@@ -6,6 +6,11 @@ IS_SSH=$(env | grep -c SSH_TTY)
 cd $SCRIPTPATH
 TMPDIR=$SCRIPTPATH/tmp
 
+if [[ $SCRIPTPATH != $HOME/.dotfiles ]]; then
+    echo mv $SCRIPTPATH to $HOME/.dotfiles
+    exit 1
+fi
+
 mkdir -p $TMPDIR
 mkdir -p ~/.config
 mkdir -p ~/.local/bin

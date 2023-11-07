@@ -1,9 +1,9 @@
 function utils.dotfiles_update
 {
-    [[ ! -e ~/.shell ]] && return 1
-    (cd ~/.shell; git fetch; git stash save "$(date +"%m/%d/%Y") - $0"; git reset --hard origin/master)
-    [[ $SHELL =~ zsh ]] && source ~/.zshrc
-    [[ $SHELL =~ bash ]] && source ~/.bashrc
+    [[ ! -e ~/.dotfiles ]] && return 1
+    (cd ~/.dotfiles; git fetch; git stash save "$(date +"%m/%d/%Y") - $0"; git reset --hard origin/master)
+    [[ $SHELL =~ zsh ]] && exec zsh
+    [[ $SHELL =~ bash ]] && exec bash
 }
 
 function utils.zsh_update
@@ -12,7 +12,7 @@ function utils.zsh_update
     for module in $(ls ~/.zsh); do
         (cd ~/.zsh/$module; echo -n "[$module] "; git fetch; git reset --hard origin/master)
     done
-    source ~/.zshrc &> /dev/null
+    exec zsh
 }
 
 function utils.json ()
