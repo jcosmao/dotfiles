@@ -279,7 +279,6 @@ autocmd WinEnter,BufWinEnter * call DisplayFilePath()
 autocmd FileType python,yaml setlocal indentkeys-=<:>
 autocmd FileType python,yaml setlocal indentkeys-=:
 
-
 augroup gomapping
     autocmd!
     autocmd FileType go nnoremap <silent> <leader><BS> :GoCodeLenAct<cr>

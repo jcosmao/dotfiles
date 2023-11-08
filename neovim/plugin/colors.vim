@@ -78,15 +78,10 @@ hi semshiParameter  guifg=#83a598
 hi semshiImported   guifg=#ff9741
 hi semshiGlobal     guifg=#ffc649
 
-hi NvimTreeNormal       guibg=#262626
-hi NvimTreeVertSplit    guibg=#262626 guifg=#262626
-hi NvimTreeStatuslineNc guibg=#262626 guifg=#262626
-hi NvimTreeEndOfBuffer  guibg=#262626 guifg=#262626
-
 " Fix missing tree-sitter binding on colorscheme (gruvbox_material)
 autocmd FileType sh :highlight! link TSVariable Blue
 autocmd FileType sh :highlight! link TSConstant Blue
 
 let s:palette = g:lightline#colorscheme#gruvbox_material#palette
-let s:palette.tabline.tabsel = [ [ '#282828', g:color_palette.green[0] , 238, 10, 'bold' ] ]
+let s:palette.tabline.tabsel = [ [ g:color_palette.bg0[0], g:color_palette.green[0] , 238, 10, 'bold' ] ]
 unlet s:palette

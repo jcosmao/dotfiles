@@ -18,7 +18,7 @@ function! custom#GitInfo()
 endfunction
 
 function! custom#LightlineToggleBuffer()
-    if bufname() =~# '^\v(NvimTree|term://|Trouble|OUTLINE)'
+    if bufname() =~# '^\v(NvimTree|term://|Trouble|OUTLINE|aerial)'
         call lightline#disable()
     else
         call lightline#enable()
