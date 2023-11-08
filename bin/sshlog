@@ -125,6 +125,7 @@ function sshlog {
         sudo ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -l admin $h \
             tail $TAILOPTS -v -f ${log_files[@]} 2> /dev/null | \
             stdbuf -o0 awk -v host=$short '/^==>/{size=split($2,splitted,"/");filename=splitted[size] ;next} !/^==>/{print host,filename,$0}' &
+        sleep 0.1
     done | $color_cmd
 
     wait

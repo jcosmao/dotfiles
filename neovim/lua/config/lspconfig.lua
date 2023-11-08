@@ -32,9 +32,9 @@ end
 require('lspfuzzy').setup {}
 
 local signs = {
-    Error = " ",
-    Warning = " ",
-    Hint = " ",
+    Error = " ",
+    Warning = " ",
+    Hint = " ",
     Information = " "
 }
 
