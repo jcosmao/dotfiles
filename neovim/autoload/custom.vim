@@ -52,3 +52,22 @@ function! custom#ToggleMouse()
         set mouse=a
     endif
 endfunction
+
+
+function! custom#backgroundToggle()
+    if $THEME == "light"
+        let $THEME = "dark"
+    else
+        let $THEME = "light"
+    endif
+
+    let l:config_dir = $HOME."/.config/nvim/"
+    let l:theme_dir = g:plugs['gruvbox-material']['dir']
+    exec 'source '. l:config_dir .'/plugin/colors.vim'
+    exec 'source '. l:theme_dir .'/autoload/lightline/colorscheme/gruvbox_material.vim'
+    exec 'source '. l:config_dir .'/plugin/lightline.vim'
+    exec 'NvimTreeClose'
+    exec 'call lightline#colorscheme() | call lightline#update()'
+endfunction
+
+autocmd FileType * command! -nargs=0 BackgroundToggle :call custom#backgroundToggle()

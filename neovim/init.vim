@@ -191,6 +191,7 @@ map <silent> <F3> :IndentLinesToggle <cr>
 map <silent> <F4> :set number! <cr>
 map <silent> <F5> :SignifyToggle <cr>
 map <silent> <F6> :set paste! <cr>
+map <silent> <F9> :BackgroundToggle <cr>
 map <silent> <F10> :Startify <cr>
 map <silent> <F12> :call custom#ToggleMouse() <cr>
 map <silent><expr> <leader>q empty(filter(getwininfo(), 'v:val.quickfix')) ? ":copen<cr>" : ":cclose<cr>"
