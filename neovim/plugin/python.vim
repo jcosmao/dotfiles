@@ -44,3 +44,5 @@ endfunction
 
 autocmd FileType python command! -nargs=0 Black :call PythonBlack()
 autocmd BufReadPost * call AutoColorColumn()
+" Fix semshi color
+autocmd BufWritePost,BufRead python execute 'Semshi enable'

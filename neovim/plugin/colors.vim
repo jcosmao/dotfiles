@@ -1,4 +1,5 @@
 set termguicolors
+exec 'set background='.$THEME
 
 let g:gruvbox_material_disable_italic_comment = 0
 let g:gruvbox_material_enable_bold = 1
@@ -14,8 +15,6 @@ if $THEME == "light"
     " available: soft / medium / hard
     let g:gruvbox_material_background = 'hard'
     let $BAT_THEME = 'gruvbox-light'
-    set background=light
-
     let g:gruvbox_material_colors_override = {
     \   'red':              ['#b20007',   '88'],
     \   'orange':           ['#ce4200',   '130'],
@@ -25,20 +24,14 @@ if $THEME == "light"
     \   'blue':             ['#09859c',   '24'],
     \   'purple':           ['#af528c',   '96'],
     \ }
-
     let s:match_paren = ['#dacc94', '229']
-
 else
     " available: material / mix / original
     let g:gruvbox_material_palette = 'material'
     " available: soft / medium / hard
     let g:gruvbox_material_background = 'medium'
     let $BAT_THEME = 'gruvbox-dark'
-    set background=dark
-
-    let g:gruvbox_material_colors_override = {
-    \ }
-
+    let g:gruvbox_material_colors_override = {}
     let s:match_paren = ['#3e6478',   '232']
 endif
 
@@ -72,11 +65,6 @@ hi NormalFloat  guibg=None
 hi FloatBorder  guifg=None guibg=None
 
 hi WinBarActive gui=reverse guifg=#a9b665 guibg=#141617
-
-" override semshi colorscheme
-hi semshiParameter  guifg=#83a598
-hi semshiImported   guifg=#ff9741
-hi semshiGlobal     guifg=#ffc649
 
 " Fix missing tree-sitter binding on colorscheme (gruvbox_material)
 autocmd FileType sh :highlight! link TSVariable Blue

@@ -306,10 +306,10 @@ require("aerial").setup({
       ["<CR>"] = "actions.jump",
       ["<2-LeftMouse>"] = "actions.jump",
       ["<C-v>"] = "actions.jump_vsplit",
-      ["<C-s>"] = "actions.jump_split",
+      ["<C-x>"] = "actions.jump_split",
       ["h"] = "actions.left",
       ["l"] = "actions.right",
-      ["<C-c>"] = "actions.close",
+      ["q"] = "actions.close",
     },
   },
 

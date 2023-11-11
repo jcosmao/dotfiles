@@ -75,7 +75,7 @@ Plug 'akinsho/toggleterm.nvim'
 " Language Specific
 
 " python syntax hilight
-Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
+Plug 'wookayin/semshi', {'do': ':UpdateRemotePlugins'}
 " nvim-go + deps
 Plug 'ray-x/go.nvim', {'for': 'go'}
 Plug 'ray-x/guihua.lua', {'for': 'go'}
@@ -208,7 +208,6 @@ map <silent> <leader>h :History <cr>
 map <silent> <leader>g :execute 'ToggleBlame virtual' <cr>
 map <silent> <leader>G :GitMessenger <cr>
 map <silent> <leader>m :Snippets <cr>
-map <silent> <leader>l :LspDiagnosticsAll <cr>
 map <silent> <C-a> ^
 map <silent> <C-e> $
 map <silent> <C-Right> e
@@ -225,7 +224,8 @@ map <silent> <leader><Right> :wincmd l<cr>
 map <silent> <leader><Left> :wincmd h<cr>
 map <silent> <leader><leader> :noh <cr>
 map <silent> <leader><ENTER> <C-w>o
-map <silent> <leader>k :TroubleToggle <cr>
+map <silent> <leader>k :TroubleToggle document_diagnostics<cr>
+map <silent> <leader>l :TroubleToggle workspace_diagnostics <cr>
 " paste last yank (not from dd)
 map <silent> <leader>p "0p
 " vim surround
@@ -266,10 +266,9 @@ autocmd BufNewFile,BufRead *.pp set filetype=puppet
 autocmd BufNewFile,BufRead *.inc set filetype=perl
 autocmd BufNewFile,BufRead *.tf set filetype=terraform
 
+
 fun! DisplayFilePath()
-    if index(['', 'NvimTree', 'aerial', 'startify', 'fzf'], &ft) >= 0
-        return
-    else
+    if ! custom#isSpecialFiletype()
         echo printf("File: %s", expand('%:p'))
     endif
 endfun
@@ -289,7 +288,7 @@ augroup end
 augroup indentlinesdisable
     autocmd!
     autocmd TermOpen * execute 'IndentLinesDisable'
-    autocmd FileType markdown,json,yaml execute 'IndentLinesDisable'
+    autocmd FileType markdown,json,yaml,fzf,mason,aerial,startify,Trouble execute 'IndentLinesDisable'
 augroup end
 
 " trim whitespace

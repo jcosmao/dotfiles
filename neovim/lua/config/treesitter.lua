@@ -5,7 +5,7 @@ end
 
 require("nvim-treesitter.install").prefer_git = false
 require'nvim-treesitter.configs'.setup {
-  ensure_installed = {"dockerfile", "c", "php", "jsonc", "python", "rust", "latex", "yaml", "perl", "markdown", "go", "make", "http", "hjson", "comment", "css", "json5", "java", "javascript", "vim", "cmake", "ruby", "json", "typescript", "c_sharp", "regex", "lua", "cpp", "html", "rst", "hcl", "gomod", "bash", "toml", "diff", "terraform", "ini"},
+  ensure_installed = {"dockerfile", "c", "python", "rust", "latex", "yaml", "perl", "markdown", "go", "make", "http", "comment", "css", "javascript", "vim", "cmake", "ruby", "json", "regex", "lua", "cpp", "html", "rst", "hcl", "gomod", "bash", "toml", "diff", "terraform", "ini"},
    -- one of "all", "maintained" (parsers with maintainers), or a list of languages
   ignore_install = {},
   highlight = {
@@ -18,5 +18,13 @@ require'nvim-treesitter.configs'.setup {
     additional_vim_regex_highlighting = false,
   },
   indent = { enable = true },
-  incremental_selection = { enable = true },
+  incremental_selection = {
+    enable = true,
+    keymaps = {
+      init_selection = '<CR>',
+      scope_incremental = '<CR>',
+      node_incremental = '<TAB>',
+      node_decremental = '<S-TAB>',
+    },
+  },
 }

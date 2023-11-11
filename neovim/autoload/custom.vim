@@ -66,8 +66,20 @@ function! custom#backgroundToggle()
     exec 'source '. l:config_dir .'/plugin/colors.vim'
     exec 'source '. l:theme_dir .'/autoload/lightline/colorscheme/gruvbox_material.vim'
     exec 'source '. l:config_dir .'/plugin/lightline.vim'
-    exec 'NvimTreeClose'
+    exec 'NvimTreeToggle'
+    exec 'NvimTreeToggle'
     exec 'call lightline#colorscheme() | call lightline#update()'
 endfunction
 
 autocmd FileType * command! -nargs=0 BackgroundToggle :call custom#backgroundToggle()
+
+
+let g:special_filtetypes = ['', 'NvimTree', 'aerial', 'startify', 'fzf', 'Trouble', 'Mason']
+
+function custom#isSpecialFiletype() abort
+    if index(g:special_filtetypes, &ft) >= 0
+        return 1
+    else
+        return 0
+    endif
+endfunction

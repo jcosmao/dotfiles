@@ -22,12 +22,6 @@ require("go").setup({
     lsp_gofumpt = false, -- true: set default gofmt in gopls format to gofumpt
     lsp_codelens = true, -- set to false to disable codelens, true by default
     lsp_keymaps = true, -- set to false to disable gopls/lsp keymap
-    diagnostic = {
-        hdlr = false, -- hook lsp diag handler
-        virtual_text = { space = 0, prefix = "" }, -- virtual text setup
-        signs = true,
-    },
-    lsp_diag_update_in_insert = true,
     lsp_document_formatting = true,
     -- set to true: use gopls to format
     -- false if you want to use other formatter tool(e.g. efm, nulls)
