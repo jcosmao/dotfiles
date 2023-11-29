@@ -50,7 +50,7 @@ function set_git
         commit=${green}${normal}
     fi
 
-    echo "$(tput setaf 204)[ $repo] ${b_black}${branch}${magenta}[${commit_id}]${normal} ${commit}  "
+    echo "$(tput setaf 204)[󰊢 $repo] ${b_black}${branch}${magenta}[${commit_id}]${normal} ${commit}  "
 }
 
 function set_virtualenv
