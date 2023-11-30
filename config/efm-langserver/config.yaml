@@ -260,6 +260,10 @@ tools:
           - '-i'
           - '${INPUT}'
 
+  isort-action-format: &isort-action-format
+    format-command: 'isort --quiet --profile open_stack -'
+    format-stdin: true
+
   pydocstyle-lint: &pydocstyle-lint
     prefix: pydocstyle
     lint-command: 'pydocstyle ${INPUT}'
@@ -583,11 +587,12 @@ languages:
 
   python:
     - <<: *flake8-lint
+    - <<: *pydocstyle-lint
+    - <<: *isort-action-format
     # - <<: *pylint-lint
     # - <<: *mypy-lint
     # - <<: *black-action-format
     # - <<: *yapf-action-format
-    - <<: *pydocstyle-lint
 
   ruby:
     - <<: *rubocop-lint

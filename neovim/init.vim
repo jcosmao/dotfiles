@@ -212,8 +212,8 @@ map <silent> <C-a> ^
 map <silent> <C-e> $
 map <silent> <C-Right> e
 map <silent> <C-Left> b
-map <silent> <leader><bar> :vsplit<cr>
-map <silent> <leader>_ :split <cr>
+map <silent> <leader>+ :vsplit<cr>
+map <silent> <leader>= :split <cr>
 map <silent> <C-S-Up> :wincmd k<cr>
 map <silent> <C-S-Down> :wincmd j<cr>
 map <silent> <C-S-Right> :wincmd l<cr>

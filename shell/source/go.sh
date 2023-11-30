@@ -1,10 +1,8 @@
+unset GOROOT
+export PATH="$PATH:$HOME/.local/go/bin"
 which go &> /dev/null || return
 
-GOROOT=$(go env GOROOT)
-export GOROOT=${GOROOT:-/usr/local/go}
-export GOPATH="$HOME/go"
-export GOBIN="$GOPATH/bin"
-export PATH="$PATH:$GOROOT/bin:$GOBIN"
+export PATH="$PATH:$HOME/go/bin"
 
 function go.test
 {

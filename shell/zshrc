@@ -1,9 +1,9 @@
-# vim: set ft=zsh:
+# vim: set ft=sh:
 
 # uncomment for profiling
 # zmodload zsh/zprof
 
-export PATH="$HOME/.local/bin:/usr/local/bin:$PATH"
+export PATH="$HOME/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin"
 
 [[ ! -d ~/.zsh ]] && mkdir ~/.zsh
 [[ ! -d ~/.zsh/myzsh ]] && git clone https://github.com/jcosmao/myzsh.git ~/.zsh/myzsh

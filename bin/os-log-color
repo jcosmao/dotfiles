@@ -122,9 +122,9 @@ def parse_line(line):
         r'([0-9]+:[0-9]+:[0-9]+\.[0-9]+) '   # time
         r'([0-9]+):? '   # process
         r'([A-Z]+) '   # level
-        r'([^ ]+) '   # name
-        r'(\[[^\]]+\])*\s*'   # context
-        r'(.+)'  # text
+        r'([^ ]+)* '   # name
+        r"(\[(?!'Traceback)[^\]]+\])*\s*"   # context
+        r'(.+)*'  # text
     )
 
     result = re.match(regex, line)
@@ -135,9 +135,27 @@ def parse_line(line):
             'time': result.group(3),
             'process': result.group(4),
             'level': result.group(5),
-            'name': result.group(6),
+            'name': "" if not result.group(6) else result.group(6),
             'req': "" if not result.group(7) else result.group(7),
-            'text': result.group(8),
+            'text': "" if not result.group(8) else result.group(8),
+            '_type': 'openstack',
+        }
+
+    regex = (
+        r'(.*)'
+        r"(\['Traceback.*)"
+    )
+    result = re.match(regex, line)
+    if result is not None:
+        return {
+            'header': "" if not result.group(1) else result.group(1),
+            'date': "",
+            'time': "",
+            'process': "",
+            'level': "TRACE",
+            'name': "" ,
+            'req': "",
+            'text': "" if not result.group(2) else result.group(2),
             '_type': 'openstack',
         }
 
@@ -226,11 +244,16 @@ def colorize(line):
     "Apply color tag on line"
 
     if line.get('_type') == 'openstack':
+        if line.get('level') in ['TRACE', 'ERROR']:
+            if "['Traceback" in line.get('text'):
+                line['text'] = line['text'].replace('\\n', '\n')
+
         if line.get('level') == 'TRACE':
             colored_text = grey(line['text'])
         else:
             colored_text = white(line['text'])
-        return '%s%s %s %s: %s %s %s %s' % (
+
+        return '%s%s %s %s %s %s %s %s' % (
             magenta(line['header']),
             grey(line['date']),
             grey(line['time']),
