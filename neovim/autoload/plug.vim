@@ -1311,7 +1311,7 @@ function! s:update_finish()
         let branch = s:git_origin_branch(spec)
         call s:log4(name, 'Merging origin/'.s:esc(branch))
         let out = s:system('git checkout -q '.plug#shellescape(branch).' -- 2>&1'
-              \. (has_key(s:update.new, name) ? '' : ('&& git merge --ff-only '.plug#shellescape('origin/'.branch).' 2>&1')), spec.dir)
+              \. (has_key(s:update.new, name) ? '' : ('&& git merge '.plug#shellescape('origin/'.branch).' 2>&1')), spec.dir)
       endif
       if !v:shell_error && filereadable(spec.dir.'/.gitmodules') &&
             \ (s:update.force || has_key(s:update.new, name) || s:is_updated(spec.dir))
