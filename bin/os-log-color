@@ -237,7 +237,20 @@ def parse_line(line):
             '_type': 'ovs',
         }
 
-    return {'text': line, '_type': None}
+    regex = (
+        r'([^ ]+ [^ ]+)'
+        r'(.+)*'
+    )
+
+    result = re.match(regex, line)
+    if result is not None:
+        return {
+            'header': '' if not result.group(1) else result.group(1),
+            'text': '' if not result.group(2) else result.group(2),
+            '_type': None,
+        }
+
+    return {'header': '', 'text': line, '_type': None}
 
 
 def colorize(line):
@@ -308,7 +321,7 @@ def colorize(line):
         return formatted
 
     else:
-        return '%s' % (line.get('text'))
+        return '%s %s' % (magenta(line['header']), line.get('text'))
 
 
 def check_args():

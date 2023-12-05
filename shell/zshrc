@@ -2,8 +2,10 @@
 
 # uncomment for profiling
 # zmodload zsh/zprof
-
-export PATH="$HOME/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin"
+source ~/.shell/source/utils.sh
+for p in $HOME/.local/bin /usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin; do
+    utils.add_to_PATH $p
+done
 
 [[ ! -d ~/.zsh ]] && mkdir ~/.zsh
 [[ ! -d ~/.zsh/myzsh ]] && git clone https://github.com/jcosmao/myzsh.git ~/.zsh/myzsh

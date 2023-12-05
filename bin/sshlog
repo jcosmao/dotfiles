@@ -7,6 +7,7 @@ trap "sudo pkill -9 -f sshlog -g $current_pgid" INT TERM QUIT
 
 LOG_MAP='{
     "host": {
+        "journal": "journalctl",
         "vrack": "/var/log/neutron/neutron-ovh-vrack-agent.log",
         "bgp": "/var/log/neutron/neutron-ovh-bgp-agent.log",
         "l3": "/var/log/neutron/neutron-ovh-l3-agent.log",
@@ -16,6 +17,7 @@ LOG_MAP='{
         "ovs": "/var/log/openvswitch/*.log"
     },
     "snat": {
+        "journal": "journalctl",
         "vrack": "/var/log/neutron/neutron-ovh-vrack-agent.log",
         "bgp": "/var/log/neutron/neutron-ovh-bgp-agent.log",
         "l3": "/var/log/neutron/neutron-ovh-l3-agent.log",
@@ -24,11 +26,13 @@ LOG_MAP='{
         "ovs": "/var/log/openvswitch/*.log"
     },
     "neutron": {
+        "journal": "journalctl",
         "apache": "/var/log/apache2/neutron-api*log",
         "api": "/var/log/neutron/neutron-api.log",
         "rpc": "/var/log/neutron/neutron-rpc.log"
     },
     "nova": {
+        "journal": "journalctl",
         "apache": "/var/log/apache2/nova-api*log",
         "api": "/var/log/nova/nova-api.log",
         "conductor": "/var/log/nova/nova-conductor.log",
@@ -36,6 +40,7 @@ LOG_MAP='{
         "placement": "/var/log/placement/placement-api.log"
     },
     "cinder": {
+        "journal": "journalctl",
         "apache": "/var/log/apache2/cinder-api*log",
         "api": "/var/log/cinder/cinder-api.log",
         "scheduler": "/var/log/cinder/cinder-scheduler.log",
@@ -43,9 +48,11 @@ LOG_MAP='{
         "backup": "/var/log/cinder/cinder-backup.log"
     },
     "glance": {
+        "journal": "journalctl",
         "default": "/var/log/glance/*.log"
     },
     "ironic": {
+        "journal": "journalctl",
         "api": "/var/log/ironic/ironic-api.log",
         "conductor": "/var/log/ironic/ironic-ovh-conductor.log",
         "metadata": "/var/log/ironic/ironic-ovh-metadata-server.log",
@@ -53,12 +60,15 @@ LOG_MAP='{
         "nova": "/var/log/nova/*log"
     },
     "rabbit": {
+        "journal": "journalctl",
         "default": "/var/log/rabbitmq/*.log"
     },
     "rabbit-nova": {
+        "journal": "journalctl",
         "default": "/var/log/rabbitmq/*.log"
     },
     "rabbit-neutron": {
+        "journal": "journalctl",
         "default": "/var/log/rabbitmq/*.log"
     }
 }'
@@ -112,9 +122,16 @@ function sshlog {
         log_files+=($(echo $LOG_MAP | jq -r .\"$find_group_map\".\"$find_log_key\"))
     done
 
+    if [[ $find_log_key == "journal" ]]; then
+        LOGCMD="echo '==> journalctl <==' ; timeout 86400 journalctl --output cat $TAILOPTS"
+    else
+        LOGCMD="timeout 86400 tail -v $TAILOPTS ${log_files[@]}"
+    fi
+
     echo "#########################################################################"
     echo "# Host: $find_hosts"
     echo "# Files: ${log_files[@]}"
+    echo "# Cmd: $LOGCMD"
     echo "#########################################################################"
 
     if [[ $NOCOLOR == 1 ]]; then
@@ -125,10 +142,16 @@ function sshlog {
 
     for h in $(echo $find_hosts); do
         short=$(echo $h | sed -e 's/\.cloud.ovh.*//')
-        sudo ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -l admin $h \
-            timeout 86400 tail $TAILOPTS -v -f ${log_files[@]} 2> /dev/null | \
-            stdbuf -o0 awk -v host=$short '/^==>/{size=split($2,splitted,"/");filename=splitted[size] ;next} !/^==>/{print host,filename,$0}' &
-        sleep 0.5
+        if [[ $CAT == 1 ]]; then
+            sudo ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -l admin $h \
+                $LOGCMD 2> /dev/null | \
+                stdbuf -o0 awk -v host=$short '/^==>/{size=split($2,splitted,"/");filename=splitted[size] ;next} !/^==>/{print host,filename,$0}'
+        else
+            sudo ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -l admin $h \
+                $LOGCMD 2> /dev/null | \
+                stdbuf -o0 awk -v host=$short '/^==>/{size=split($2,splitted,"/");filename=splitted[size] ;next} !/^==>/{print host,filename,$0}' &
+            sleep $(echo "${TAILLINES:-1} * .00001" | bc -l)
+        fi
     done | $color_cmd
 
     wait
@@ -174,10 +197,13 @@ function main {
                 echo $LOG_MAP ; exit ;;
             -n)
                 help="NB: nb lines. tail option"
-                export TAILOPTS="$TAILOPTS -n $1" && shift;;
+                export TAILLINES=$1 && shift;;
             -c)
                 help="no color"
                 export NOCOLOR=1 ;;
+            --cat)
+                help="cat instead tail -f"
+                export CAT=1 ;;
             --completion)
                 help='completion function (eval "$(sshlog --completion)")'
                 declare -f sshlog_completion
@@ -189,6 +215,13 @@ function main {
             *) POSITIONNAL_ARGS+=($arg)
         esac
     done
+
+    if [[ -n $TAILLINES ]]; then
+        export TAILOPTS="$TAILOPTS -n $TAILLINES"
+    fi
+    if [[ $CAT != 1 ]]; then
+        export TAILOPTS="$TAILOPTS -f"
+    fi
 
     HOST_GROUP=${POSITIONNAL_ARGS[0]}
     LOG_KEYS=${POSITIONNAL_ARGS[@]:1}

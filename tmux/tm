@@ -38,11 +38,19 @@ function tmux_attach_or_new ()
 
     if [[ $( tmux_ls | grep -Ec "^$session_name$") == 1 ]]; then
         my_session=$(tmux display-message -p '#S' 2> /dev/null)
-        _debug "$tmux_cmd attach-session -t $session_name"
-        [[ "$my_session" != "$session_name" ]] && $tmux_cmd attach-session -t "$session_name"
+        if [[ -n $TMUX ]]; then
+            _debug "$tmux_cmd switch-client -t $session_name"
+            $tmux_cmd switch-client -t $session_name
+        else
+            _debug "$tmux_cmd attach-session -t $session_name"
+            $tmux_cmd attach-session -t "$session_name"
+        fi
     else
-        _debug "$tmux_cmd new -s $session_name"
-        $tmux_cmd new -s "$session_name"
+        _debug "$tmux_cmd new -s $session_name -d"
+        $tmux_cmd new -s "$session_name" -d
+        [[ $? -ne 0 ]] && echo "Unable to create session $session_name" && return
+
+        tmux_attach_or_new $session_name
     fi
 }
 
@@ -79,6 +87,50 @@ function tmux_kill ()
     fi
 }
 
+function dump() {
+    local d=$'\t'
+    $tmux_cmd list-windows -a -F "#S${d}#W${d}#{pane_current_path}"
+}
+
+function save() {
+    dump > ~/.tmux-session
+}
+
+function terminal_size() {
+    stty size 2>/dev/null | awk '{ printf "-x%d -y%d", $2, $1 }'
+}
+
+function session_exists() {
+    $tmux_cmd has-session -t "$1" 2>/dev/null
+}
+
+function add_window() {
+    $tmux_cmd new-window -d -t "$1:" -n "$2" -c "$3"
+}
+
+function new_session() {
+    cd "$3" && $tmux_cmd new-session -d -s "$1" -n "$2" $4
+}
+
+function restore() {
+    $tmux_cmd start-server
+    local count=0
+    local dimensions="$(terminal_size)"
+
+    while IFS=$'\t' read session_name window_name dir; do
+        if [[ -d "$dir" && $window_name != "log" && $window_name != "man" ]]; then
+            if session_exists "$session_name"; then
+                add_window "$session_name" "$window_name" "$dir"
+            else
+                new_session "$session_name" "$window_name" "$dir" "$dimensions"
+                count=$(( count + 1 ))
+            fi
+        fi
+    done < ~/.tmux-session
+
+    echo "restored $count sessions"
+}
+
 function print_help ()
 {
     bin=$(basename "$0")
@@ -97,6 +149,8 @@ function print_help ()
      options:
         --exec <cmd>                exec cmd on all session windows
         --kill <session_name|all>   kill session
+        --save                      save sessions layout in ~/.tmux-session
+        --restore                   restore sessions from ~/.tmux-session
         --help                      this help
 
      Ex: $bin                           > list opened sessions
@@ -117,6 +171,8 @@ function main ()
         case "$arg" in
             --exec ) cmd="$1"; shift ;;
             --kill ) kill=1;;
+            --save ) save ; exit ;;
+            --restore ) restore ; exit ;;
             --debug ) export DEBUG=1 ;;
             --help ) print_help ;;
             * ) [[ $arg =~ ^--+.* ]] && print_help "$arg unknown"

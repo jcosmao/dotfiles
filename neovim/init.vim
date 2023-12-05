@@ -275,7 +275,7 @@ fun! DisplayFilePath()
     endif
 endfun
 
-autocmd WinEnter,BufWinEnter * call DisplayFilePath()
+autocmd WinEnter,BufWinEnter,FileWritePost,BufWritePost * call DisplayFilePath()
 
 " remove auto<fucking>indent on colon :
 autocmd FileType python,yaml setlocal indentkeys-=<:>

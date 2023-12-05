@@ -55,7 +55,7 @@ hi DiffText         guibg=#262626   guifg=#FF8700   gui=reverse
 hi Directory        guifg=#83A598
 
 " Search, signature current, ...
-hi Search  guibg=#d69a22
+hi Search   guibg=#FF8700    gui=reverse,bold
 
 " Remove floating background color
 hi ErrorFloat   guibg=None

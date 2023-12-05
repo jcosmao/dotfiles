@@ -1,8 +1,8 @@
 unset GOROOT
-export PATH="$PATH:$HOME/.local/go/bin"
+utils.add_to_PATH $HOME/.local/go/bin
 which go &> /dev/null || return
 
-export PATH="$PATH:$HOME/go/bin"
+utils.add_to_PATH $HOME/go/bin
 
 function go.test
 {
