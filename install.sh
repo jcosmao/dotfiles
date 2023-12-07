@@ -47,7 +47,8 @@ function install_vim_requirements {
 
     rm -rf ~/.ctags.d && ln -sf $SCRIPTPATH/ctags/ctags.d ~/.ctags.d
 
-    source ~/.pyenv/versions/nvim/bin/activate || exit 1
+    source ~/.pyenv/versions/nvim/bin/activate
+    [[ $? -ne 0 ]] && echo "Unable to load 'nvim' pyenv virtualenv. run pyenv.install; pyenv virtualenv nvim" && exit 1
 
     pip_require=(pynvim yamllint pyproject-flake8 black)
     pip_installed=$(echo "$pip_freeze" | grep -P "(^$(echo ${pip_require[@]} | sed -e 's/ /|^/g'))" | wc -l)
@@ -59,7 +60,8 @@ function install_vim_requirements {
 
     source $SCRIPTPATH/shell/source/nvm.sh
     nodejs.load
-    which npm 2> /dev/null || exit 1
+    which npm 2> /dev/null
+    [[ $? -ne 0 ]] && echo "Node JS not available; run nodejs.install" && exit 1
 
     if [[ $(lsb_release -rs) == "18.04" ]]; then
         # npm tree-sitter deps (>0.19 require glibc > ubuntu18)
@@ -154,7 +156,7 @@ function install_tmux {
     version=$(tmux -V | grep -Po '(\d|\.)+' 2> /dev/null)
     if [[ $version > 2.8 ]]; then
         rm ~/.tmux.conf
-        python tmux/tmux-migrate-options.py tmux/tmux.conf > ~/.tmux.conf
+        python3 tmux/tmux-migrate-options.py tmux/tmux.conf > ~/.tmux.conf
     else
         ln -sf $SCRIPTPATH/tmux/tmux.conf ~/.tmux.conf
     fi
@@ -194,7 +196,6 @@ function install_icons {
 }
 
 function install_config {
-    [[ $IS_SSH -eq 1 ]] && return
     echo '- Install .config'
     mkdir -p ~/.config.backup
 

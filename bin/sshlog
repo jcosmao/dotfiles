@@ -6,6 +6,9 @@ current_pgid=$(ps -o pgid= $$)
 trap "sudo pkill -9 -f sshlog -g $current_pgid" INT TERM QUIT
 
 LOG_MAP='{
+    "default": {
+        "journal": "journalctl"
+    },
     "host": {
         "journal": "journalctl",
         "vrack": "/var/log/neutron/neutron-ovh-vrack-agent.log",
@@ -79,57 +82,53 @@ function sshlog {
     LOG_KEYS=(${2:-default})
 
     # max 10 (host group for ex)
-    find_hosts=$(cat /etc/hosts | awk '{print $2}' | grep -Pv '^(#|$|::1|ff|fe|127.0.0.1)' | grep -Pi ${OS_REGION_NAME:-'.*'} | grep -P "^($HOST_GROUP|$HOST_GROUP[0-9]+.*)$" | head -n 10 | xargs)
+    found_hosts=$(cat /etc/hosts | \
+        awk '{print $2}' | \
+        grep -Pv '^(#|$|::1|ff|fe|127.0.0.1)' | \
+        grep -Pi ${OS_REGION_NAME:-'.*'} | \
+        grep -P "^($HOST_GROUP|$HOST_GROUP[0-9]+.*)$" | head -n 10 | xargs
+    )
 
-    len=$(echo $find_hosts | wc -w)
-
+    len=$(echo $found_hosts | wc -w)
     if [[ $len == 0 ]]; then
         echo no host found
         exit 1
     elif [[ $len == 1 ]]; then
-        group_name=$(echo $find_hosts | cut -d. -f1 | tr -d '[0-9]')
+        group_name=$(echo $found_hosts | cut -d. -f1 | tr -d '[0-9]')
     else
         group_name=$HOST_GROUP
     fi
 
-    echo "GROUP: $group_name"
-
-    find_group_map=$(echo $LOG_MAP | jq -r 'keys[]' | grep -P "^$group_name$")
-    if [[ -z $find_group_map ]]; then
-        echo "$HOST_GROUP does not match any key in $(echo $LOG_MAP | jq -r 'keys[]')"
-        exit 1
+    # echo "Search GROUP=$group_name in json keys"
+    found_group=$(echo $LOG_MAP | jq -r 'keys[]' | grep -P "^$group_name$")
+    if [[ -z $found_group ]]; then
+        # fallback on default group
+        group_name="default"
     fi
 
-    echo "GROUP_KEY: $find_group_map"
-
     log_files=()
-
-    # as default, tail all known logs
     if [[ ${LOG_KEYS[@]} == default ]]; then
-        LOG_KEYS=($(echo $LOG_MAP | jq .\"$find_group_map\" | jq -r 'keys[]'))
+        LOG_KEYS=($(echo $LOG_MAP | jq .\"$group_name\" | jq -r 'keys[]'))
     fi
 
     for key in ${LOG_KEYS[@]}; do
-
-        find_log_key=$(echo $LOG_MAP | jq .\"$find_group_map\" | jq -r 'keys[]' | grep -P "^$key$")
-        if  [[ -z $find_log_key ]]; then
-            echo "[$key] does not match any of $(echo $LOG_MAP | jq .\"$find_group_map\" | jq 'keys[]')"
+        found_log=$(echo $LOG_MAP | jq .\"$group_name\" | jq -r 'keys[]' | grep -P "^$key$")
+        if  [[ -z $found_log ]]; then
+            echo "[$key] does not match any of $(echo $LOG_MAP | jq .\"$group_name\" | jq 'keys[]')"
             exit 1
         fi
 
-        echo "LOG_KEY: $find_log_key"
-
-        log_files+=($(echo $LOG_MAP | jq -r .\"$find_group_map\".\"$find_log_key\"))
+        log_files+=($(echo $LOG_MAP | jq -r .\"$group_name\".\"$found_log\"))
     done
 
-    if [[ $find_log_key == "journal" ]]; then
+    if [[ ${log_files[1]} == "journal" ]]; then
         LOGCMD="echo '==> journalctl <==' ; timeout 86400 journalctl --output cat $TAILOPTS"
     else
         LOGCMD="timeout 86400 tail -v $TAILOPTS ${log_files[@]}"
     fi
 
     echo "#########################################################################"
-    echo "# Host: $find_hosts"
+    echo "# Host: $found_hosts"
     echo "# Files: ${log_files[@]}"
     echo "# Cmd: $LOGCMD"
     echo "#########################################################################"
@@ -140,7 +139,7 @@ function sshlog {
         color_cmd="os-log-color"
     fi
 
-    for h in $(echo $find_hosts); do
+    for h in $(echo $found_hosts); do
         short=$(echo $h | sed -e 's/\.cloud.ovh.*//')
         if [[ $CAT == 1 ]]; then
             sudo ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -l admin $h \
@@ -192,19 +191,19 @@ function main {
     while [[ $# -ne 0 ]]; do
         arg="$1"; shift
         case "$arg" in
-            -s|--show)
-                help="display log map"
-                echo $LOG_MAP ; exit ;;
             -n)
                 help="NB: nb lines. tail option"
                 export TAILLINES=$1 && shift;;
-            -c)
+            -l)
                 help="no color"
                 export NOCOLOR=1 ;;
-            --cat)
+            --cat|-c)
                 help="cat instead tail -f"
                 export CAT=1 ;;
-            --completion)
+            --show|-s)
+                help="display log map"
+                echo $LOG_MAP ; exit ;;
+            --completion|--bash-completion|-b)
                 help='completion function (eval "$(sshlog --completion)")'
                 declare -f sshlog_completion
                 echo complete -F sshlog_completion sshlog
@@ -212,13 +211,14 @@ function main {
             --help|-h)
                 help="this help"
                 print_help ;;
-            *) POSITIONNAL_ARGS+=($arg)
+            *) [[ ! $arg =~ ^\-+.* ]] && POSITIONNAL_ARGS+=($arg) || EXTRA_ARGS+=($arg)
         esac
     done
 
     if [[ -n $TAILLINES ]]; then
         export TAILOPTS="$TAILOPTS -n $TAILLINES"
     fi
+
     if [[ $CAT != 1 ]]; then
         export TAILOPTS="$TAILOPTS -f"
     fi

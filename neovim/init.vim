@@ -247,7 +247,9 @@ noremap <expr> N (v:searchforward ? 'N' : 'n')
 
 " Tab
 map <C-PageDown> :tabprevious<CR>
+map <S-PageDown> :tabprevious<CR>
 map <C-PageUp>   :tabnext<CR>
+map <S-PageUp>   :tabnext<CR>
 map <C-t>        :tabnew<CR>
 
 for i in range(1, 9)

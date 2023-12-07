@@ -2,7 +2,7 @@ export CLIFF_FIT_WIDTH=1
 
 function os {
     APPEND_OPTS=()
-    [[ "$*" =~ (show|list|create) ]] && APPEND_OPTS+=("-f" "json")
+    [[ "$*" =~ (show|list|create|issue) ]] && APPEND_OPTS+=("-f" "json")
     [[ "$*" =~ (console log show) ]] && APPEND_OPTS=()
     [[ "$*" =~ (server list) ]] && APPEND_OPTS+=("-n")
 
@@ -19,6 +19,10 @@ function openstack.unset_env {
     unset $(env | grep ^OS_ | cut -d= -f1) 2> /dev/null
 }
 
+function openstack.token {
+    export OSTOKEN=$(os token issue | jq -r .id)
+}
+
 alias oss="os server"
 alias osc="os compute"
 alias osn="os network"
@@ -31,6 +35,7 @@ alias ossall="os server list --all --host"
 # octavia
 alias osl="os loadbalancer"
 alias osla="os loadbalancer amphora list --loadbalancer"
+alias ostoken="openstack.token"
 
 if [[ -d ~/.os_openrc ]]; then
 
