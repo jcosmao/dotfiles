@@ -98,9 +98,11 @@ Plug 'stevearc/aerial.nvim'
 Plug 'mhinz/vim-signify'
 Plug 'rhysd/git-messenger.vim'
 Plug 'jcosmao/blame.nvim'
+Plug 'sindrets/diffview.nvim'
 
 " Colorscheme
 Plug 'sainnhe/gruvbox-material'
+Plug 'norcalli/nvim-colorizer.lua'
 
 call plug#end()
 
@@ -160,6 +162,8 @@ set keymodel=startsel               " shift+arrow selection
 set shortmess+=c
 set pumheight=20
 
+let mapleader = " "   " Leader key set to <space bar>
+
 " Load lua plugins config
 if ! &readonly && has('python3')
     lua require('config')
@@ -181,7 +185,6 @@ command! -bang Wq wq<bang>
 command! -bang WQ wq<bang>
 
 " Mapping
-let mapleader = " "   " Leader key set to <space bar>
 map <silent> <leader>? :exec printf('view %s/help.md', fnamemodify(expand($MYVIMRC), ':p:h'))<cr>
 map <silent> <leader>V :tabedit $MYVIMRC <cr>
 map <silent> <leader>VV :source $MYVIMRC \| :echo $MYVIMRC 'reloaded' <cr>

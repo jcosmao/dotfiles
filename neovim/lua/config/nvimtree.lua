@@ -24,6 +24,13 @@ require("nvim-tree").setup({
         update_root = true,
         ignore_list = {},
     },
+    tab = {
+        sync = {
+            open = true,
+            close = true,
+            ignore = {},
+        },
+    },
 })
 
 vim.api.nvim_create_autocmd("BufEnter", {

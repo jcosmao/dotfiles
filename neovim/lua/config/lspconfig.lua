@@ -8,18 +8,6 @@ require("mason").setup({
     }
 })
 
-vim.diagnostic.config({
-    update_in_insert = true,
-    float = {
-        focusable = true,
-        style = "minimal",
-        border = _border,
-        source = "always",
-        header = "",
-        prefix = "",
-    },
-})
-
 require('lspconfig.ui.windows').default_options.border = _border
 
 vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
@@ -27,18 +15,6 @@ vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
         border = _border
     }
 )
-
-local signs = {
-    Error = " ",
-    Warn = " ",
-    Hint = " ",
-    Info = " "
-}
-
-for type, icon in pairs(signs) do
-    local hl = "DiagnosticSign" .. type
-    vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-end
 
 -- display result in FZF
 require('lspfuzzy').setup {}
@@ -58,10 +34,58 @@ local signature_config = {
 
 require("lsp_signature").setup(signature_config)
 
+
+local virtual_text_default = {
+        prefix = "■",
+        spacing = 10
+    }
+
+vim.diagnostic.config({
+    update_in_insert = true,
+    float = {
+        focusable = true,
+        style = "minimal",
+        border = _border,
+        source = "always",
+        header = "",
+        prefix = "",
+    },
+    virtual_text = virtual_text_default,
+})
+
+-- display config
+-- :lua = vim.diagnostic.config()
+function lspconfig_diagnostic_virtual_text_toggle()
+    if not vim.diagnostic.config().virtual_text then
+        vim.diagnostic.config({virtual_text = virtual_text_default})
+        vim.notify("diagnostic.virtual_text enabled")
+    else
+        vim.diagnostic.config({virtual_text = false})
+        vim.notify("diagnostic.virtual_text disabled")
+    end
+end
+
+local signs = {
+    Error = " ",
+    Warn = " ",
+    Hint = " ",
+    Info = " "
+}
+
+for type, icon in pairs(signs) do
+    local hl = "DiagnosticSign" .. type
+    vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+end
+
+
+
+
+
 local opts = { noremap = true, silent = true }
-vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
-vim.keymap.set('n', '<space>,', vim.diagnostic.goto_prev, opts)
-vim.keymap.set('n', '<space>.', vim.diagnostic.goto_next, opts)
+vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, opts)
+vim.keymap.set('n', '<leader>,', vim.diagnostic.goto_prev, opts)
+vim.keymap.set('n', '<leader>.', vim.diagnostic.goto_next, opts)
+vim.keymap.set("n", "<leader>j", function() lspconfig_diagnostic_virtual_text_toggle() end)
 
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
