@@ -390,8 +390,11 @@ if __name__ == '__main__':
         if not line:
             break
 
-        # get parsed line
-        parsed_line = parse_line(line.rstrip('\n'))
+        try:
+            # get parsed line
+            parsed_line = parse_line(line.rstrip('\n'))
+        except Exception:
+            parsed_line = {'header': '', 'text': line.rstrip('\n'), '_type': None}
 
         # Skip line if filtred (never skip line without log level)
         if line_is_filtered(parsed_line):

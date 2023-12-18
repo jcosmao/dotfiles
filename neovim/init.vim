@@ -113,7 +113,7 @@ call plug#end()
 set nocompatible
 filetype off
 filetype plugin indent on
-syntax on
+syntax off
 set mouse=
 set ttyfast                         " Indicate fast terminal conn for faster redraw
 set lazyredraw                      " Wait to redraw

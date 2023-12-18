@@ -1,7 +1,7 @@
 set termguicolors
 exec 'set background='.$THEME
 
-lua require'colorizer'.setup()
+lua require'colorizer'.setup({'css'; 'javascript'; 'vim';})
 
 let g:gruvbox_material_disable_italic_comment = 0
 let g:gruvbox_material_enable_bold = 1
@@ -50,15 +50,15 @@ call gruvbox_material#highlight('MatchParen', g:color_palette.none, s:match_pare
 
 " override colorscheme config
 " vimdiff
-hi DiffAdd          guibg=#262626   guifg=#87AF87   gui=reverse
-hi DiffChange       guibg=#262626   guifg=#8787AF   gui=reverse
-hi DiffDelete       guibg=#262626   guifg=#AF5F5F   gui=reverse
-hi DiffText         guibg=#262626   guifg=#FF8700   gui=reverse
+hi DiffAdd          guibg=#262626   guifg=#a9d1a9   gui=reverse
+hi DiffDelete       guibg=#262626   guifg=#e09b9b   gui=reverse
+hi DiffChange       guibg=#262626   guifg=#b6b6d9   gui=reverse
+hi DiffText         guibg=#262626   guifg=#dec5d5   gui=reverse
 
 " Search, signature current, ...
 hi Search       guibg=#FF8700    gui=reverse,bold
-hi CurSearch    guibg=#FF8700    guifg=#FFFFFF      gui=bold
-hi IncSearch    guibg=#FF8700    guifg=#FFFFFF      gui=bold
+hi CurSearch    guibg=#FF8700    guifg=#f5edca      gui=bold
+hi IncSearch    guibg=#FF8700    guifg=#f5edca      gui=bold
 hi Substitute   guibg=#FF8700    gui=reverse,bold
 
 " Remove floating background color

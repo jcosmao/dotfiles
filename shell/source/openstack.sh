@@ -3,7 +3,7 @@ export CLIFF_FIT_WIDTH=1
 function os {
     APPEND_OPTS=()
     [[ "$*" =~ (show|list|create|issue) ]] && APPEND_OPTS+=("-f" "json")
-    [[ "$*" =~ (console log show) ]] && APPEND_OPTS=()
+    [[ "$*" =~ (console log show|--help|-h|help) ]] && APPEND_OPTS=()
     [[ "$*" =~ (server list) ]] && APPEND_OPTS+=("-n")
 
     echo "${APPEND_OPTS[@]}" | grep -qw '\-f json' && PIPE_CMD="jq" || PIPE_CMD="tee"
@@ -36,6 +36,7 @@ alias ossall="os server list --all --host"
 alias osl="os loadbalancer"
 alias osla="os loadbalancer amphora list --loadbalancer"
 alias ostoken="openstack.token"
+alias osfip="os floating ip"
 
 if [[ -d ~/.os_openrc ]]; then
 
