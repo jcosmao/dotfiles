@@ -1,11 +1,3 @@
-function utils.add_to_PATH
-{
-    case ":$PATH:" in
-        *":$1:"*) :;; # already there
-        *) PATH="$1:$PATH";; # or PATH="$PATH:$1"
-    esac
-}
-
 function utils.dotfiles_update
 {
     [[ ! -e ~/.dotfiles ]] && return 1

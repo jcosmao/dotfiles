@@ -11,5 +11,5 @@ export GEM_HOME=$HOME/.gem
 if [[ -d $HOME/.gem/ruby ]]; then
     v=$(ls $HOME/.gem/ruby | sort -rn | head -1)
     GEM_PATH="$HOME/.gem/ruby/${v}/bin"
-    [[ -d $GEM_PATH ]] && utils.add_to_PATH $GEM_PATH
+    [[ -d $GEM_PATH ]] && path.append $GEM_PATH
 fi

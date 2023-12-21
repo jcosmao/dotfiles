@@ -5,7 +5,7 @@ function pyenv.load
 {
     if [[ -d $PYENV_ROOT ]]; then
         if [[ -f $PYENV_ROOT/bin/pyenv ]]; then
-            [[ $PATH =~ .*${PYENV_ROOT}.* ]] || export PATH="$PYENV_ROOT/bin:$PATH"
+            [[ $PATH =~ .*${PYENV_ROOT}.* ]] || path.prepend $PYENV_ROOT/bin
             eval "$(pyenv init -)"
             # https://github.com/pyenv/pyenv-virtualenv/issues/259#issuecomment-1096144748
             eval "$(pyenv virtualenv-init - | sed s/precmd/chpwd/g)"

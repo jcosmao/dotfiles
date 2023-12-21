@@ -1,8 +1,8 @@
 unset GOROOT
-utils.add_to_PATH $HOME/.local/go/bin
+path.append $HOME/.local/go/bin
 which go &> /dev/null || return
 
-utils.add_to_PATH $HOME/go/bin
+path.append $HOME/go/bin
 
 function go.test
 {

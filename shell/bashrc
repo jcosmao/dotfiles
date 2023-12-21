@@ -1,7 +1,4 @@
-source ~/.shell/source/utils.sh
-for p in $HOME/.local/bin /usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin; do
-    utils.add_to_PATH $p
-done
+source ~/.shell/source/path.sh
 
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
