@@ -51,4 +51,13 @@ function colors.display_256_colors ()
 
 alias dcolors="colors.display_256_colors"
 
-
+function colors.print {
+    # colors.print 42 plop
+    code=$1; shift;
+    color_code=$(tput setaf $code)
+    color_reset=$(tput sgr0)
+    # https://unix.stackexchange.com/questions/158412/are-the-terminal-color-escape-sequences-defined-anywhere-for-bash
+    prompt_escaped_color="\[$color_code\]"
+    prompt_escaped_reset="\[$color_reset\]"
+    echo -e ${prompt_escaped_color}$*${prompt_escaped_reset}
+}

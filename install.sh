@@ -137,7 +137,7 @@ function install_local_bin {
     echo "- Install ~/.local/bin"
 
     # install local bin
-    for bin in $(ls bin); do
+    for bin in $(ls bin | grep -v README.md); do
         # check ldd
         echo "    > $bin"
         if [[ $(ldd bin/$bin 2>&1 |grep -c 'not found') -eq 0 ]]; then

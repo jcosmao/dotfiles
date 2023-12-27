@@ -1,3 +1,8 @@
+which kubectl &> /dev/null || return
+
+which kubecolor &> /dev/null && \
+    alias kubectl=kubecolor
+
 function k8s.set_namespace {
     kubectl config set-context --current --namespace $1 2> /dev/null
     [[ $? -ne 0 ]] && export KUBENS=$1
@@ -7,6 +12,11 @@ function k8s.set_namespace {
 function k8s.kubectl {
     local OPT
     [[ -n $KUBENS ]] && OPT="-n$KUBENS"
+
+    if [[ $1 =~ (d|desc) ]]; then
+        shift; set -- "describe" "${@:1}"
+    fi
+
     kubectl ${OPT} $*
 }
 
@@ -51,6 +61,10 @@ function k8s.get_log {
 
     echo "CMD: stern -n ${_KUBENS:-default} $default_selector $* | os-log-color"
     stern -n ${_KUBENS:-default} $default_selector $* | os-log-color
+}
+
+function k8s.get_port_forwarding {
+    kubectl get svc -o json -A | jq '.items[] | {name:.metadata.name, p:.spec.ports[] } | select( .p.nodePort != null ) | "\(.name): localhost:\(.p.nodePort) -> \(.p.port) -> \(.p.targetPort)"'
 }
 
 alias kns="k8s.set_namespace"

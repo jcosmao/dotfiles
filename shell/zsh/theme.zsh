@@ -8,7 +8,7 @@ function __get_host_color
 }
 
 # Layout
-BLOX_SEG__UPPER_LEFT=(docker openstack kube host cwd git exec_time)
+BLOX_SEG__UPPER_LEFT=(time netns docker openstack kube host cwd git exec_time)
 BLOX_SEG__UPPER_RIGHT=(nodejs virtualenv pyenv git_repo_name)
 BLOX_SEG__LOWER_LEFT=(bgjobs symbol)
 BLOX_SEG__LOWER_RIGHT=()
@@ -34,3 +34,4 @@ BLOX_BLOCK__GIT_STASHED_SYMBOL=""
 BLOX_BLOCK__GIT_TAG_DISABLED=1
 BLOX_BLOCK__VIRTUALENV_COLOR='220'
 BLOX_BLOCK__BGJOBS_COLOR='110'
+BLOX_BLOCK__TIME_COLOR='239'

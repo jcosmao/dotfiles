@@ -90,7 +90,7 @@ function utils.randpass
     openssl rand -base64 $size | tr -d '\n'
 }
 
-function help.ssh-rdp
+function ssh-rdp.help
 {
     echo "https://github.com/kokoko3k/ssh-rdp"
     echo
@@ -112,6 +112,22 @@ function help.ssh-rdp
     "
 }
 
+function utils.wireguard_toggle
+{
+    iface=$(ip --json link show | jq -r '.[] | select(.ifname | test("^wg")) | .ifname')
+    if [[ -n $iface ]]; then
+        wg-quick down $iface
+    else
+        broadcast=$(ip --json a show  | jq -r '.[] | select(.operstate == "UP") | .addr_info.[0].broadcast' | head -1)
+        if [[ $broadcast == 192.168.1.255 ]]; then
+            # Do not route 192.168.1.0/24 in tunnel
+            wg-quick up wg1
+        else
+            wg-quick up wg0
+        fi
+    fi
+}
+
 
 alias dotup="utils.dotfiles_update"
 alias zup="utils.zsh_update"
@@ -122,3 +138,4 @@ alias ssl_get="utils.ssl_get"
 alias randpass="utils.randpass"
 alias genpasswd="utils.randpass"
 alias uuid="utils.uuid"
+alias wg-toggle="utils.wireguard_toggle"

@@ -1,39 +1,47 @@
 function prompt.display
 {
     history -a
-    triangle='❭'
-    PS1=$(printf "\n %s %s\n ${green}${triangle}${normal} " "$(prompt_left)" "$(prompt_add)")
+    PS1=$(echo -e "\n $(prompt_prefix)$(prompt) $(prompt_add)\n $(colors.print 6 ❭) ")
+}
+
+function prompt_prefix
+{
+    prompt="$(set_date)"
+
+    NETNS=$(netns.current)
+    if [[ -n $NETNS ]]; then
+        prompt="$prompt $(set_netns $NETNS)"
+    fi
+
+    echo "$prompt "
 }
 
 function prompt_add
 {
-    add=''
+    prompt=''
     if git branch > /dev/null 2>&1 ; then
-        add=$(set_git)
+        prompt=$(set_git)
     fi
 
-    if test -n "$VIRTUAL_ENV" ; then
-        add="${add} $(set_virtualenv)"
+    if [[ -n "$VIRTUAL_ENV" ]] ; then
+        prompt="${prompt} $(set_virtualenv)"
     fi
 
-    echo $add
+    echo $prompt
 }
 
-function prompt_left
+function prompt
 {
-    PROMPT_LEFT=''
-    PROMPT_COLOR=$b_blue
-    left_color=$PROMPT_COLOR
-
-    [[ "`id -u`" -eq 0 ]] && left_color=${b_red}
+    prompt=''
+    [[ "`id -u`" -eq 0 ]] && color=204 || color=36
 
     if [[ -n $SSH_TTY ]]; then
-        PROMPT_LEFT="${yellow}\u${b_black}@${left_color}\H${normal}"
+        prompt="$(colors.print 181 '\u')$(colors.print 8 @)$(colors.print ${color} '\H')"
     else
-        PROMPT_LEFT="${left_color}\u:${normal}"
+        prompt="$(colors.print ${color} '\u:')"
     fi
 
-    echo "${PROMPT_LEFT} ${b_black}\w${normal}"
+    echo "${prompt} $(colors.print 8 '\w')"
 }
 
 function set_git
@@ -45,15 +53,26 @@ function set_git
     removed=$( git status --porcelain | grep -c '^ D')
     commit=''
     if [[ $removed -ne 0 || $modified -ne 0 ]]; then
-        commit=${yellow}${normal}
+        commit=$(colors.print 11 )
     else
-        commit=${green}${normal}
+        commit=$(colors.print 2 )
     fi
 
-    echo "$(tput setaf 204)[󰊢 $repo] ${b_black}${branch}${magenta}[${commit_id}]${normal} ${commit}  "
+    echo "$(colors.print 204 [󰊢 $repo]) $(colors.print 8 ${branch})$(colors.print 5 [${commit_id}]) ${commit}  "
 }
 
 function set_virtualenv
 {
-    echo "${b_yellow}[ $(basename $VIRTUAL_ENV)]${normal}"
+    echo "$(colors.print 11 [ $(basename $VIRTUAL_ENV)])"
+}
+
+function set_netns
+{
+    echo "$(colors.print 198 [' ' $1])"
+}
+
+function set_date
+{
+    # strftime format
+    echo "$(colors.print 239 '[\D{%H:%M}]')"
 }

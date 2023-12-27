@@ -1,4 +1,4 @@
-type path.append 2>&1 > /dev/null && return
+type path.append &> /dev/null && return
 
 function path.append
 {
