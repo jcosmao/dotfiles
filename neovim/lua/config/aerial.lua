@@ -43,7 +43,7 @@ require("aerial").setup({
   --   unfocus       - close aerial when you leave the original source window
   --   switch_buffer - close aerial when you change buffers in the source window
   --   unsupported   - close aerial when attaching to a buffer that has no symbol source
-  close_automatic_events = {},
+  close_automatic_events = {"unsupported"},
 
   -- Keymaps in aerial window. Can be any value that `vim.keymap.set` accepts OR a table of keymap
   -- options with a `callback` (e.g. { callback = function() ... end, desc = "", nowait = true })
@@ -87,7 +87,7 @@ require("aerial").setup({
 
   -- When true, don't load aerial until a command or function is called
   -- Defaults to true, unless `on_attach` is provided, then it defaults to false
-  lazy_load = true,
+  lazy_load = false,
 
   -- Disable aerial on files with this many lines
   disable_max_lines = 10000,
@@ -198,7 +198,7 @@ require("aerial").setup({
 
   -- Automatically open aerial when entering supported buffers.
   -- This can be a function (see :help aerial-open-automatic)
-  open_automatic = true,
+  open_automatic = false,
 
   -- Run this command after jumping to a symbol (false will disable)
   post_jump_cmd = "normal! zz",

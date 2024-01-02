@@ -13,7 +13,7 @@ function k8s.kubectl {
     local OPT
     [[ -n $KUBENS ]] && OPT="-n$KUBENS"
 
-    if [[ $1 =~ (d|desc) ]]; then
+    if [[ $1 =~ ^(d|desc)$ ]]; then
         shift; set -- "describe" "${@:1}"
     fi
 
@@ -67,9 +67,14 @@ function k8s.get_port_forwarding {
     kubectl get svc -o json -A | jq '.items[] | {name:.metadata.name, p:.spec.ports[] } | select( .p.nodePort != null ) | "\(.name): localhost:\(.p.nodePort) -> \(.p.port) -> \(.p.targetPort)"'
 }
 
+function k8s.get_all_resources {
+    kubectl get $(kubectl api-resources --verbs=list --namespaced -o name | grep -v events | paste -d, -s)
+}
+
 alias kns="k8s.set_namespace"
 alias k="k8s.kubectl"
 alias klc="k8s.list_running_containers_by_pod"
 alias klac="k8s.list_all_containers_by_pod"
 alias kx="k8s.exec"
 alias klog="k8s.get_log"
+alias kall="k8s.get_all_resources"

@@ -17,8 +17,8 @@ function path.prepend
 }
 
 
-for p in $HOME/.local/bin /usr/local/sbin /usr/local/bin /snap/bin /usr/sbin /usr/bin /sbin /bin; do
-    path.append $p
+for p in /bin /usr/bin /usr/sbin /snap/bin /usr/local/bin $HOME/.local/bin; do
+    path.prepend $p
 done
 
 

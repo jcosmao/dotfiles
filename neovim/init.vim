@@ -157,6 +157,7 @@ set autowriteall
 set nofoldenable                    " Folding makes things unreadable.
 set noautochdir
 set keymodel=startsel               " shift+arrow selection
+set diffopt+=vertical               " start :diffsplit in vertical mode
 
 " Autocompletion
 set shortmess+=c
