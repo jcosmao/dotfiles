@@ -197,7 +197,7 @@ def parse_line(line):
         r'([0-9]+:[0-9]+:[0-9]+\.[0-9]+[^ ]+) '  # time
         r'\[([a-z\?]+)\] '  # level
         r'(<[^>]+>) '  # <0.9417.870>
-        r'(.+)'
+        r'(.+)*'
     )
 
     result = re.match(regex, line)

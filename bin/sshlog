@@ -108,7 +108,7 @@ function sshlog {
 
     log_files=()
     if [[ ${LOG_KEYS[@]} == default ]]; then
-        LOG_KEYS=($(echo $LOG_MAP | jq .\"$group_name\" | jq -r 'keys[]'))
+        LOG_KEYS=($(echo $LOG_MAP | jq .\"$group_name\" | jq -r 'keys[]' | grep -v 'journal'))
     fi
 
     for key in ${LOG_KEYS[@]}; do

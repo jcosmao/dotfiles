@@ -36,3 +36,13 @@ vim.api.nvim_create_autocmd('BufReadPost',  {
         end
     end
 })
+
+-- Close nvimtree and aerial when diffview mode is opened
+vim.api.nvim_create_autocmd("BufEnter", {
+  group = vim.api.nvim_create_augroup("DiffviewOpen", {clear = true}),
+  pattern = "Diffview*",
+  callback = function()
+    vim.cmd(":NvimTreeClose")
+    vim.cmd(":AerialClose")
+  end
+})

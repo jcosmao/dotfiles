@@ -41,6 +41,7 @@ Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/cmp-nvim-lua'
+Plug 'ray-x/cmp-treesitter'
 Plug 'saadparwaiz1/cmp_luasnip'
 Plug 'L3MON4D3/LuaSnip', {'do': 'make install_jsregexp'}
 Plug 'rafamadriz/friendly-snippets'
@@ -158,6 +159,7 @@ set nofoldenable                    " Folding makes things unreadable.
 set noautochdir
 set keymodel=startsel               " shift+arrow selection
 set diffopt+=vertical               " start :diffsplit in vertical mode
+set conceallevel=0                  " Do not interpret markdown for ex
 
 " Autocompletion
 set shortmess+=c
@@ -189,8 +191,7 @@ command! -bang WQ wq<bang>
 map <silent> <leader>? :exec printf('view %s/help.md', fnamemodify(expand($MYVIMRC), ':p:h'))<cr>
 map <silent> <leader>V :tabedit $MYVIMRC <cr>
 map <silent> <leader>VV :source $MYVIMRC \| :echo $MYVIMRC 'reloaded' <cr>
-map <silent> <leader><ESC> :set nonumber \| :IndentLinesDisable \| :SignifyDisable \| :set signcolumn=no <cr>
-map <silent> <leader><F1> :set number \| :IndentLinesEnable \| :SignifyEnable \| :set signcolumn=auto <cr>
+map <silent> <leader><ESC> :call custom#lineInfosToggle() <cr>
 map <silent> <F1> :NvimTreeFindFileToggle! <cr>
 map <silent> <F2> :AerialToggle <cr>
 map <silent> <F3> :IndentLinesToggle <cr>
@@ -250,18 +251,22 @@ noremap <expr> n (v:searchforward ? 'n' : 'N')
 noremap <expr> N (v:searchforward ? 'N' : 'n')
 
 " Tab
-map <C-PageDown> :tabprevious<CR>
-map <S-PageDown> :tabprevious<CR>
-map <C-PageUp>   :tabnext<CR>
-map <S-PageUp>   :tabnext<CR>
-map <C-t>        :tabnew<CR>
+lua << EOF
+
+local opts = { noremap = true, silent = true }
+vim.keymap.set({'n', 'i'}, '<C-PageDown>', '<C-o>:tabprevious<CR>', opts)
+vim.keymap.set({'n', 'i'}, '<S-PageDown>', '<C-o>:tabprevious<CR>', opts)
+vim.keymap.set({'n', 'i'}, '<C-PageUp>', '<C-o>:tabnext<CR>', opts)
+vim.keymap.set({'n', 'i'}, '<S-PageUp>', '<C-o>:tabnext<CR>', opts)
+vim.keymap.set({'n', 'i'}, '<C-t>', '<C-o>:tabnew<CR>', opts)
+
+EOF
 
 for i in range(1, 9)
     execute "map <leader>" . i . " " . i . "gt"
 endfor
 map <leader>0 :tablast <cr>
 
-"
 nmap <leader>> <plug>(signify-next-hunk)
 nmap <leader>< <plug>(signify-prev-hunk)
 
@@ -274,14 +279,7 @@ autocmd BufNewFile,BufRead *.pp set filetype=puppet
 autocmd BufNewFile,BufRead *.inc set filetype=perl
 autocmd BufNewFile,BufRead *.tf set filetype=terraform
 
-
-fun! DisplayFilePath()
-    if ! custom#isSpecialFiletype()
-        echo printf("File: %s", expand('%:p'))
-    endif
-endfun
-
-autocmd WinEnter,BufWinEnter,FileWritePost,BufWritePost * call DisplayFilePath()
+autocmd WinEnter,BufWinEnter,FileWritePost,BufWritePost * call custom#displayFilePath()
 
 " remove auto<fucking>indent on colon :
 autocmd FileType python,yaml setlocal indentkeys-=<:>
@@ -296,7 +294,7 @@ augroup end
 augroup indentlinesdisable
     autocmd!
     autocmd TermOpen * execute 'IndentLinesDisable'
-    autocmd FileType markdown,json,yaml,fzf,mason,aerial,startify,Trouble execute 'IndentLinesDisable'
+    autocmd FileType markdown,json,yaml,join(g:custom_special_filtetypes, ",") execute 'IndentLinesDisable'
 augroup end
 
 " trim whitespace

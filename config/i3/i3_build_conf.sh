@@ -45,3 +45,7 @@ setxkbmap -layout us -variant altgr-intl
 
 # Then reload/restart i3
 i3-msg $action
+
+# exec commands on reload/restart (redshift issue)
+sleep 0.5
+cat ${i3_dir}/config | grep "^# CMD:" | sed -e 's/# CMD://g' | bash

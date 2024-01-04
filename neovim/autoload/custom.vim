@@ -74,12 +74,39 @@ endfunction
 autocmd FileType * command! -nargs=0 BackgroundToggle :call custom#backgroundToggle()
 
 
-let g:special_filtetypes = ['', 'NvimTree', 'aerial', 'startify', 'fzf', 'Trouble', 'Mason']
+let g:custom_special_filtetypes = ['', 'NvimTree*', 'aerial', 'startify', 'fzf', 'Trouble', 'Mason', 'DiffviewFiles', 'toggleterm*']
 
 function custom#isSpecialFiletype() abort
-    if index(g:special_filtetypes, &ft) >= 0
+    let l:regexp = join(g:custom_special_filtetypes, '\|')
+    if match(&ft, '^('.l:regexp.')$') == 0
         return 1
     else
         return 0
+    endif
+endfunction
+
+function! custom#displayFilePath()
+    if ! custom#isSpecialFiletype()
+        echo printf("File (%s): %s", &ft, expand('%:p'))
+    endif
+endfunction
+
+function! custom#lineInfosToggle()
+    if ! exists("g:custom_line_infos_status")
+        let g:custom_line_infos_status = 1
+    endif
+
+    if g:custom_line_infos_status == 0
+        set number
+        execute ':IndentLinesEnable'
+        execute ':SignifyEnable'
+        set signcolumn=auto
+        let g:custom_line_infos_status = 1
+    else
+        set nonumber
+        execute ':IndentLinesDisable'
+        execute ':SignifyDisable'
+        set signcolumn=no
+        let g:custom_line_infos_status = 0
     endif
 endfunction

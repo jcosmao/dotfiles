@@ -15,15 +15,6 @@ cmp.setup {
         -- completion = cmp.config.window.bordered(),
         documentation = cmp.config.window.bordered(),
     },
-    sources = cmp.config.sources(
-        {
-            { name = 'nvim_lsp' },
-            { name = 'luasnip' }, -- For luasnip users.
-        },
-        {
-            { name = 'buffer' },
-        }
-    ),
     formatting = {
         format = function(entry, vim_item)
             -- fancy icons and a name of kind
@@ -37,6 +28,8 @@ cmp.setup {
                 nvim_lua = "[Lua]",
                 look = "[Look]",
                 path = "[Path]",
+                treesitter = "[treesitter]",
+                cmp_tabnine = "[Tab9]"
             })[entry.source.name]
             return vim_item
         end
@@ -73,8 +66,21 @@ cmp.setup {
             end
         end,
     },
+    sources = {
+        { name = 'nvim_lsp' },
+        -- { name = 'cmp_tabnine' },
+        { name = 'luasnip' },
+        { name = 'path' },
+        { name = 'treesitter' },
+        { name = 'buffer' },
+    },
+    cmp.setup.cmdline('/', {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = {
+            { name = 'buffer' }
+        }
+    }),
 }
-
 
 -- -- Setup lspconfig.
 local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
