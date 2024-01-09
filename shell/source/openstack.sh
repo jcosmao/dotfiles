@@ -16,7 +16,7 @@ function os {
 }
 
 function openstack.unset_env {
-    unset $(env | grep ^OS_ | cut -d= -f1) 2> /dev/null
+    unset $(env | grep '^OS_' | cut -d= -f1) 2> /dev/null
 }
 
 function openstack.token {

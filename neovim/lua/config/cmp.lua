@@ -71,7 +71,7 @@ cmp.setup {
         -- { name = 'cmp_tabnine' },
         { name = 'luasnip' },
         { name = 'path' },
-        { name = 'treesitter' },
+        -- { name = 'treesitter' },
         { name = 'buffer' },
     },
     cmp.setup.cmdline('/', {

@@ -1,6 +1,3 @@
-set termguicolors
-exec 'set background='.$THEME
-
 lua require'colorizer'.setup({'css'; 'javascript'; 'vim';})
 
 let g:gruvbox_material_disable_italic_comment = 0
@@ -11,7 +8,7 @@ let g:gruvbox_material_menu_selection_background = 'orange'
 let g:gruvbox_material_statusline_style = 'mix'
 let g:gruvbox_material_better_performance = 1
 
-if $THEME == "light"
+if &background ==# "light"
     " available: material / mix / original
     let g:gruvbox_material_palette = 'original'
     " available: soft / medium / hard
@@ -37,6 +34,7 @@ else
     let s:match_paren = ['#3e6478',   '232']
 endif
 
+" for i in [0, 1, 2, 3, 4, 5, 6, 7 ,8 ,9 , 10, 11, 12, 13, 14, 15] | exec 'let g:terminal_color_' . i | endfor
 let g:color_palette = gruvbox_material#get_palette(g:gruvbox_material_background, g:gruvbox_material_palette, g:gruvbox_material_colors_override)
 
 let g:terminal_color_0 = g:color_palette.bg5[0]

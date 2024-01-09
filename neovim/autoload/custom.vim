@@ -57,13 +57,16 @@ endfunction
 function! custom#backgroundToggle()
     if $THEME == "light"
         let $THEME = "dark"
+        set background=dark
     else
         let $THEME = "light"
+        set background=light
     endif
 
     let l:config_dir = $HOME."/.config/nvim/"
     let l:theme_dir = g:plugs['gruvbox-material']['dir']
     exec 'source '. l:config_dir .'/plugin/colors.vim'
+    exec 'source '. l:config_dir .'/lua/config/toggleterm.lua'
     exec 'source '. l:theme_dir .'/autoload/lightline/colorscheme/gruvbox_material.vim'
     exec 'source '. l:config_dir .'/plugin/lightline.vim'
     exec 'NvimTreeToggle'
@@ -74,11 +77,12 @@ endfunction
 autocmd FileType * command! -nargs=0 BackgroundToggle :call custom#backgroundToggle()
 
 
-let g:custom_special_filtetypes = ['', 'NvimTree*', 'aerial', 'startify', 'fzf', 'Trouble', 'Mason', 'DiffviewFiles', 'toggleterm*']
+let g:custom_special_filtetypes = ['NvimTree', 'NvimTree_*', 'aerial', 'startify', 'fzf', 'Trouble',
+    \                              'Mason', 'DiffviewFiles', 'toggleterm', 'toggleterm*']
 
 function custom#isSpecialFiletype() abort
     let l:regexp = join(g:custom_special_filtetypes, '\|')
-    if match(&ft, '^('.l:regexp.')$') == 0
+    if match(&ft, '^('.l:regexp.')$') == 0 || empty(&ft)
         return 1
     else
         return 0

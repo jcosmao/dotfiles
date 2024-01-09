@@ -165,6 +165,13 @@ set conceallevel=0                  " Do not interpret markdown for ex
 set shortmess+=c
 set pumheight=20
 
+set termguicolors
+if !empty("$THEME")
+    exec 'set background='.$THEME
+else
+    set background=light
+endif
+
 let mapleader = " "   " Leader key set to <space bar>
 
 " Load lua plugins config

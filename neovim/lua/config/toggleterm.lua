@@ -1,9 +1,13 @@
 local vim = vim
 local toggleterm = require("toggleterm")
 
+local shading_factor = "-25"
+if vim.o.background == "light" then
+    shading_factor = "-3"
+end
+
 toggleterm.setup{
     size = 20,
-    cmd = "tm nvim_term",
     open_mapping = [[<c-g>]],
     insert_mappings = true, -- whether or not the open mapping applies in insert mode
     terminal_mappings = true,
@@ -15,6 +19,8 @@ toggleterm.setup{
             return  string.format("  Term %s  ", term.id)
         end,
     },
+    shade_terminals = true,
+    shading_factor = shading_factor,
 }
 
 local toggletermGrp = vim.api.nvim_create_augroup("ToggleTermGrp", { clear = true })
