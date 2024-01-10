@@ -73,7 +73,12 @@ function k8s.get_port_forwarding {
 }
 
 function k8s.get_all_resources {
-    kubectl get deploy,pod,pvc,cm,secret,svc,$(kubectl api-resources --verbs=list --namespaced -o name | grep -v events | sort | paste -d, -s)
+    if [[ $1 == all ]]; then
+        shift
+        kubectl get deploy,replicaset,statefulset,pod,pvc,cm,secret,svc,$(kubectl api-resources --verbs=list --namespaced -o name | grep -v events | sort | paste -d, -s) $*
+    else
+        kubectl get deploy,replicaset,statefulset,pod,pvc,cm,secret,svc,$(kubectl api-resources --verbs=list --namespaced -o name | grep ingress | sort | paste -d, -s) $*
+    fi
 }
 
 function k8s.get_decrypted_secret {
@@ -95,7 +100,7 @@ function k8s.pod_netns_enter {
     [[ -z $pod ]] && echo "Missing pod" && return 1
     [[ $pod =~ ^pod/ ]] && pod=$(echo $pod | cut -d'/' -f2-)
 
-    pod_id=$(crictl ps -o json | jq -r --arg pod $pod '.containers.[] | select(.labels."io.kubernetes.pod.name" == $pod) | .podSandboxId')
+    pod_id=$(crictl ps -o json | jq -r --arg pod $pod '.containers.[] | select(.labels."io.kubernetes.pod.name" == $pod) | .podSandboxId' | uniq)
     netns=$(basename $(crictl inspectp $pod_id | jq -r '.info.runtimeSpec.linux.namespaces[] | select(.type=="network") | .path'))
 
     netns.enter $netns
@@ -111,7 +116,7 @@ alias klc="k8s.list_running_containers_by_pod"
 alias ks="k8s.exec shell"
 alias kx="k8s.exec cmd"
 alias klog="k8s.get_ns_logs"
-alias kall="k8s.get_all_resources"
+alias kg="k8s.get_all_resources"
 alias ksec="k8s.get_decrypted_secret"
 alias knet="k8s.pod_netns_enter"
 

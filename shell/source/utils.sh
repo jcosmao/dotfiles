@@ -87,7 +87,14 @@ function utils.ssl_get
 function utils.randpass
 {
     size=${1:-32}
-    openssl rand -base64 $size | tr -d '\n'
+    tr -cd '[:alnum:]' < /dev/urandom | fold -w $size | head -n1 | tr -d '\n'
+}
+
+function utils.randpass_b64
+{
+    password=$(utils.randpass $1)
+    echo "password: $password"
+    echo "base64: $(echo -n $password | base64 -w0)"
 }
 
 function ssh-rdp.help
@@ -136,6 +143,8 @@ alias json="utils.json"
 alias ssl_info="utils.ssl_info"
 alias ssl_get="utils.ssl_get"
 alias randpass="utils.randpass"
-alias genpasswd="utils.randpass"
+alias randpass64="utils.randpass_b64"
+alias passgen="utils.randpass"
+alias passgen64="utils.randpass_b64"
 alias uuid="utils.uuid"
 alias wg-toggle="utils.wireguard_toggle"
