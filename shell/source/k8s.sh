@@ -120,7 +120,9 @@ alias kg="k8s.get_all_resources"
 alias ksec="k8s.get_decrypted_secret"
 alias knet="k8s.pod_netns_enter"
 
-# get zsh complete kubectl
-source <(kubectl completion zsh)
-compdef k=kubectl
-compdef kubecolor=kubectl
+if [[ $(basename $SHELL) == zsh ]]; then
+    # get zsh complete kubectl
+    source <(kubectl completion zsh)
+    compdef k=kubectl
+    compdef kubecolor=kubectl
+fi

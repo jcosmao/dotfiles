@@ -223,7 +223,9 @@ map <silent> <leader>g :execute 'ToggleBlame virtual' <cr>
 map <silent> <leader>G :GitMessenger <cr>
 map <silent> <leader>m :Snippets <cr>
 map <silent> <C-a> ^
+imap <silent> <C-a> <C-o>^
 map <silent> <C-e> $
+imap <silent> <C-e> <C-o>$
 map <silent> <C-Right> e
 map <silent> <C-Left> b
 map <silent> <leader>+ :vsplit<cr>
@@ -243,10 +245,10 @@ map <silent> <leader>l :TroubleToggle workspace_diagnostics <cr>
 " paste last yank (not from dd)
 map <silent> <leader>p "0p
 " vim surround
-map <silent> <leader>" ysiw"
-map <silent> <leader>: ysiW"
-map <silent> <leader>' ysiw'
-map <silent> <leader>; ysiW'
+map <silent> <leader>" ysiW"
+map <silent> <leader>: ysiw"
+map <silent> <leader>' ysiW'
+map <silent> <leader>; ysiw'
 
 nnoremap <silent> <M-Up> <cmd>call smoothie#do("\<C-U>") <CR>
 vnoremap <silent> <M-Up> <cmd>call smoothie#do("\<C-U>") <CR>
