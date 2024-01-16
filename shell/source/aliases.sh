@@ -24,5 +24,11 @@ alias gti=git
 alias pip="python3 -m pip"
 alias pip3="python3 -m pip"
 
-alias tf=terraform
 alias ofc='ofctl --names --no-stats --read-only --color=always dump-flows'
+
+function terraform.autoyes
+{
+    terraform $* -auto-approve
+}
+alias tf=terraform
+alias tfy="terraform.autoyes"

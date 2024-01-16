@@ -75,26 +75,26 @@
     ls = ls-files
     tshow = !git rev-parse --abbrev-ref --symbolic-full-name @{u}
     tset = "!f() { rb=${1:-dev/USERNAME/$(git symbolic-ref --short HEAD)}; git branch -u origin/$rb; }; f"
-    # Show the diff between the latest commit and the current state
-    d = !"git diff-index --quiet HEAD -- || clear; git --no-pager diff --patch-with-stat"
     st = status --short
     ca = commit -a --amend --reuse-message=HEAD
     co = checkout
     pushorigin = !git push --set-upstream origin $(git symbolic-ref --short HEAD)
-    pushdev = !git push --set-upstream origin $(git symbolic-ref --short HEAD):dev/USERNAME/$(git symbolic-ref --short HEAD)
+    pushdev = !git push --set-upstream origin $(git symbolic-ref --short HEAD):dev/julien.cosmao/$(git symbolic-ref --short HEAD)
     pf = pushdev --force
     pick = cherry-pick -s -x --allow-empty
     retag = "!r() { git tag -d $1 && git push origin :refs/tags/$1 && git tag $1; }; r"
-    # Remove branches that have already been merged with master
+    # Remove branches that have already been merged:with
     dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
     rst = "!f() { git clean -xfd && git reset --hard; }; f"
     rh = "!f() { git fetch && git reset --hard origin/$(git symbolic-ref --short HEAD); }; f"
+    pr = !git pull --rebase && git push
     # List contributors with number of commits
     contributors = shortlog --summary --numbered
     # https://stackoverflow.com/questions/3161204/how-to-find-the-nearest-parent-of-a-git-branch
     base = "!f() { git show-branch -a 2> /dev/null | grep '\\*' | grep -v $(git rev-parse --abbrev-ref HEAD) | head -n1 | sed -e 's/.*\\[\\(.*\\)\\].*/\\1/' -e 's/[\\^~].*//' -e 's,origin/,,'; }; f"
     root = "rev-parse --show-toplevel"
     ref = "ls-remote --ref"
+    # gerrit helper
     review = "!f() { \
         target_branch=$(grep defaultbranch= $(git rev-parse --show-toplevel)/.gitreview | cut -d= -f2); \
         test -z \"$target_branch\" && target_branch=$(git tshow | cut -d/ -f2- ); \

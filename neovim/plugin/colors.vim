@@ -10,9 +10,9 @@ let g:gruvbox_material_better_performance = 1
 
 if &background ==# "light"
     " available: material / mix / original
-    let g:gruvbox_material_palette = 'original'
+    let g:gruvbox_material_palette = 'material'
     " available: soft / medium / hard
-    let g:gruvbox_material_background = 'medium'
+    let g:gruvbox_material_background = 'hard'
     let $BAT_THEME = 'gruvbox-light'
     let g:gruvbox_material_colors_override = {
     \   'red':              ['#b20007',   '88'],

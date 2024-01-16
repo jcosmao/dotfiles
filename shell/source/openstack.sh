@@ -56,7 +56,7 @@ if [[ -d ~/.os_openrc ]]; then
     )}
 
     for openrc in $(ls ~/.os_openrc | grep -P '.openrc$'); do
-        name=$(echo $openrc | sed -e 's/.openrc$//')
+        name=$(echo $openrc | sed -e 's/.openrc$//' | tr '[:upper:]' '[:lower:]')
         region=$(echo $openrc | sed -re 's/(.*)__.*/\1/' | tr '[:lower:]' '[:upper:]')
         alias cr_${name}="openstack.unset_env; source ~/.os_openrc/$openrc; export OS_REGION_NAME=${region}"
     done
