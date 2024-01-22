@@ -208,9 +208,6 @@ function install_config {
 
     [[ $IS_SSH -eq 1 ]] && return
 
-    cp $HOME/.config/termite/config.base $HOME/.config/termite/config
-    cp $HOME/.config/alacritty/alacritty.base.yml $HOME/.config/alacritty/alacritty.yml
-
     # build i3 config
     if which i3 2>&1 > /dev/null ; then
         echo "    > build i3 conf"

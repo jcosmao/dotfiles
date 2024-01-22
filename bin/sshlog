@@ -121,7 +121,7 @@ function sshlog {
         log_files+=($(echo $LOG_MAP | jq -r .\"$group_name\".\"$found_log\"))
     done
 
-    if [[ ${log_files[1]} == "journal" ]]; then
+    if [[ ${log_files[@]} =~ journalctl ]]; then
         LOGCMD="echo '==> journalctl <==' ; timeout 86400 journalctl --output cat $TAILOPTS"
     else
         LOGCMD="timeout 86400 tail -v $TAILOPTS ${log_files[@]}"

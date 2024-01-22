@@ -32,3 +32,8 @@ function terraform.autoyes
 }
 alias tf=terraform
 alias tfy="terraform.autoyes"
+
+if [[ $(id -u) > 0 ]]; then
+    alias docker="sudo docker"
+    alias docker-compose="sudo docker-compose"
+fi
