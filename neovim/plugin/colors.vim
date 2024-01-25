@@ -6,7 +6,7 @@ let g:gruvbox_material_enable_italic = 1
 let g:gruvbox_material_visual = 'grey background'
 let g:gruvbox_material_menu_selection_background = 'orange'
 let g:gruvbox_material_statusline_style = 'mix'
-let g:gruvbox_material_better_performance = 1
+let g:gruvbox_material_better_performance = 0
 
 if &background ==# "light"
     " available: material / mix / original

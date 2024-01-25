@@ -55,7 +55,8 @@ endif
 
 Plug 'mhinz/vim-startify'
 Plug 'nvim-tree/nvim-web-devicons'
-Plug 'nvim-tree/nvim-tree.lua'
+" weird color bar appear on next commit
+Plug 'nvim-tree/nvim-tree.lua', {'commit': 'f24afa2cef551122b8bd53bb2e4a7df42343ce2e'}
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'chengzeyi/fzf-preview.vim'
