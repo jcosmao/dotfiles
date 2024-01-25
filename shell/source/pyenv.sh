@@ -51,3 +51,21 @@ function pyenv.update
 {
     pyenv.install
 }
+
+function pyenv.setup_python_version
+{
+    echo $(basename $VIRTUAL_ENV) > .python-version
+}
+
+function pyenv.setup_pyright
+{
+    VENV=$(basename $VIRTUAL_ENV)
+    VENVPATH=$(dirname $VIRTUAL_ENV)
+
+    echo '{
+        "venvPath": "VENVPATH",
+        "venv": "VENV",
+        "reportUnboundVariable": "information",
+        "reportOptionalMemberAccess": "information"
+    }' | sed "s,VENVPATH,$VENVPATH," | sed "s,VENV,$VENV," | jq > pyrightconfig.json
+}

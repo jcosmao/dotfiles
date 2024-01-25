@@ -21,6 +21,11 @@ alias vun=vim
 alias bim=vim
 alias gti=git
 
+function vim.which {
+    vim $(which $1)
+}
+alias vwhich="vim.which"
+
 alias pip="python3 -m pip"
 alias pip3="python3 -m pip"
 
