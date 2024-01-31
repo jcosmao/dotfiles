@@ -5,6 +5,9 @@ function os {
     [[ "$*" =~ (show|list|create|issue) ]] && APPEND_OPTS+=("-f" "json")
     [[ "$*" =~ (console log show|--help|-h|help) ]] && APPEND_OPTS=()
     [[ "$*" =~ (server list) ]] && APPEND_OPTS+=("-n")
+    if [[ $1 == "fip" ]]; then
+        shift; set -- "floating ip" "${@:1}"
+    fi
 
     echo "${APPEND_OPTS[@]}" | grep -qw '\-f json' && PIPE_CMD="jq" || PIPE_CMD="tee"
 
@@ -36,7 +39,6 @@ alias ossall="os server list --all --host"
 alias osl="os loadbalancer"
 alias osla="os loadbalancer amphora list --loadbalancer"
 alias ostoken="openstack.token"
-alias osfip="os floating ip"
 
 if [[ -d ~/.os_openrc ]]; then
 
@@ -65,13 +67,19 @@ fi
 function openstack.port_list
 {
     if [[ $1 =~ ^([0-9]+\.){3} ]] ; then
-        os port list --fixed-ip ip-address=$1
+        os port list --long --fixed-ip ip-address=$1
     else
-        os port list --device-id $1
+        os port list --long --device-id $1
     fi
 }
 
-alias osport="openstack.port_list"
+function openstack.port_show
+{
+    os port show $(openstack.port_list $1 | jq -r .[0].ID)
+}
+
+alias osports="openstack.port_list"
+alias osport="openstack.port_show"
 
 function openstack.get_snat
 {

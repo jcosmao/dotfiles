@@ -89,9 +89,13 @@ function custom#isSpecialFiletype() abort
     endif
 endfunction
 
+let g:custom_last_display_file_path = ""
 function! custom#displayFilePath()
     if ! custom#isSpecialFiletype()
-        echo printf("File (%s): %s", &ft, expand('%:p'))
+        if g:custom_last_display_file_path != expand('%:p')
+            echo printf("File (%s): %s", &ft, expand('%:p'))
+            let g:custom_last_display_file_path = expand('%:p')
+        endif
     endif
 endfunction
 

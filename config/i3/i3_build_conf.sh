@@ -1,12 +1,15 @@
 #!/bin/bash
 
+set -x
+exec &> /tmp/$(basename $0).log
+
 action=${1:-reload}
 
 i3_dir=$( dirname "${BASH_SOURCE[0]}" )
 i3_config_base="$i3_dir/base.config"
 hw_name=$(cat /sys/devices/virtual/dmi/id/product_name)
 i3_family_config="${i3_dir}/$hw_name.hw.config"
-layout=$(autorandr 2>&1 | grep -P "(\(current\)|\(detected\))" | awk '{print $1}' 2> /dev/null)
+layout=$(autorandr --detected 2>&1 | head -1 2> /dev/null)
 
 screen_laptop=$(xrandr | grep " connected" | awk '{print $1}' | grep -P '^eDP')
 screen_hdmi_1=$(xrandr | grep " connected" | awk '{print $1}' | grep -P '^HDMI' | head -n 1)
