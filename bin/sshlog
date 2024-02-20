@@ -85,8 +85,7 @@ function sshlog {
     found_hosts=$(cat /etc/hosts | \
         awk '{print $2}' | \
         grep -Pv '^(#|$|::1|ff|fe|127.0.0.1)' | \
-        grep -Pi ${OS_REGION_NAME:-'.*'} | \
-        grep -P "^($HOST_GROUP|$HOST_GROUP[0-9]+.*)$" | head -n 10 | xargs
+        grep -Pi "^($HOST_GROUP|$HOST_GROUP[0-9]*\.${OS_REGION_NAME}\..*)$" | head -n 10 | xargs
     )
 
     len=$(echo $found_hosts | wc -w)
@@ -164,7 +163,7 @@ function sshlog_completion
     first=${COMP_WORDS[1]}
 
     case ${COMP_CWORD} in
-        1) COMPREPLY=($(compgen -W "$(sshlog -s | jq -r 'keys[]'| xargs) $(cat /etc/hosts | awk '{print $2}' | grep -Pv '^(#|$|::1|ff|fe|127.0.0.1)' | grep -Pi ${OS_REGION_NAME:-'.*'} | xargs)" -- ${first})) ;;
+        1) COMPREPLY=($(compgen -W "$(sshlog -s | jq -r 'keys[]'| xargs) $(cat /etc/hosts | awk '{print $2}' | grep -Pv '^(#|$|::1|ff|fe|127.0.0.1)' | grep -Pi "[0-9]\.${OS_REGION_NAME}\." | xargs)" -- ${first})) ;;
         *) group=$(echo $first | cut -d. -f1 | tr -d "[0-9]");
            COMPREPLY=($(compgen -W "$(sshlog -s | jq -r .\"${group}\" | jq 'keys[]'| xargs)" -- ${cur})) ;;
     esac
