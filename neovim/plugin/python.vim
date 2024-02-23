@@ -38,6 +38,11 @@ function! AutoColorColumn()
         endif
     endif
 
+    if &filetype ==# 'gitcommit'
+        set colorcolumn=72
+        return
+    endif
+
     " reset colorcolumn
     set colorcolumn=
 endfunction
