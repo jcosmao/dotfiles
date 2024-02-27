@@ -22,13 +22,22 @@ function k {
 }
 
 function k8s.current_namespace {
-    kube_context=$(kubectl config current-context 2> /dev/null)
-    kubectl config view -o jsonpath="{.contexts[?(@.name == '$kube_context')].context.namespace}"
+    if [[ -z $KUBENS ]]; then
+        kube_context=$(kubectl config current-context 2> /dev/null)
+        kubectl config view -o jsonpath="{.contexts[?(@.name == '$kube_context')].context.namespace}"
+    else
+        echo $KUBENS
+    fi
 }
 
 function k8s.set_namespace {
     kubectl config set-context --current --namespace $1 2> /dev/null
-    k8s.current_namespace > /tmp/k8s.current_namespace
+    if [[ $? -ne 0 ]]; then
+        # if context fail to be set in config (permission issue for ex), set a global variable used by k() function
+        export KUBENS=$1
+        # same, but used by zsh theme
+        export _KUBENS=$1
+    fi
 }
 
 function _complete_kns
@@ -41,11 +50,11 @@ complete -F _complete_kns k8s.set_namespace
 complete -F _complete_kns kns
 
 function k8s.list_containers_by_pod {
-    kubectl get pods -o="custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,INIT-CONTAINERS:.spec.initContainers[*].name,CONTAINERS:.spec.containers[*].name" $*
+    k get pods -o="custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,INIT-CONTAINERS:.spec.initContainers[*].name,CONTAINERS:.spec.containers[*].name" $*
 }
 
 function k8s.list_running_containers_by_pod {
-    kubectl get pods \
+    k get pods \
         --field-selector=status.phase=Running \
         -o="custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,INIT-CONTAINERS:.spec.initContainers[*].name,CONTAINERS:.spec.containers[*].name,LABELS:.metadata.labels" \
         $*
@@ -59,38 +68,37 @@ function k8s.exec {
         k8s.list_containers_by_pod
         return
     fi
-    [[ $type == "cmd" ]] && kubectl exec -t $*
-    [[ $type == "shell" ]] && kubectl exec -it $* -- sh
+    [[ $type == "cmd" ]] && k exec -t $*
+    [[ $type == "shell" ]] && k exec -it $* -- sh
 }
 
 function k8s.get_ns_logs {
-    current_ns=$(k8s.current_namespace)
-    stern -n $current_ns --field-selector metadata.namespace=$current_ns $*
+    stern -n $current_ns --field-selector metadata.namespace=$KUBENS $*
 }
 
 function k8s.get_port_forwarding {
-    kubectl get svc -o json -A | jq '.items[] | {name:.metadata.name, p:.spec.ports[] } | select( .p.nodePort != null ) | "\(.name): localhost:\(.p.nodePort) -> \(.p.port) -> \(.p.targetPort)"'
+    k get svc -o json -A | jq '.items[] | {name:.metadata.name, p:.spec.ports[] } | select( .p.nodePort != null ) | "\(.name): localhost:\(.p.nodePort) -> \(.p.port) -> \(.p.targetPort)"'
 }
 
 function k8s.get_all_resources {
     if [[ $1 == all ]]; then
         shift
-        kubectl get deploy,replicaset,statefulset,pod,pvc,cm,secret,svc,$(kubectl api-resources --verbs=list --namespaced -o name | grep -v events | sort | paste -d, -s) $*
+        k get deploy,replicaset,statefulset,pod,pvc,cm,secret,svc,$(k api-resources --verbs=list --namespaced -o name | grep -v events | sort | paste -d, -s) $*
     else
-        kubectl get deploy,replicaset,statefulset,pod,pvc,cm,secret,svc,$(kubectl api-resources --verbs=list --namespaced -o name | grep ingress | sort | paste -d, -s) $*
+        k get deploy,replicaset,statefulset,pod,pvc,cm,secret,svc,$(k api-resources --verbs=list --namespaced -o name | grep ingress | sort | paste -d, -s) $*
     fi
 }
 
 function k8s.get_decrypted_secret {
     secret=$1
     [[ $secret =~ ^secret/ ]] && secret=$(echo $secret | cut -d'/' -f2-)
-    kubectl get secret $secret -o json | jq '.data | map_values(@base64d)'
+    k get secret $secret -o json | jq '.data | map_values(@base64d)'
 }
 
 function _complete_ksec
 {
     local word=${COMP_WORDS[1]}
-    COMPREPLY=($(compgen -W "$(kubectl get secrets -o json | jq -r .items.[].metadata.name | xargs)" -- ${word}))
+    COMPREPLY=($(compgen -W "$(k get secrets -o json | jq -r .items.[].metadata.name | xargs)" -- ${word}))
 }
 complete -F _complete_ksec ksec
 complete -F _complete_ksec k8s.get_decrypted_secret
@@ -107,7 +115,7 @@ function k8s.pod_netns_enter {
 }
 
 function k8s.get_last_traefik_config {
-    kubectl logs  -l app.kubernetes.io/name=traefik  --tail 10000 --follow=false | grep 'Configuration received:' | sed -e 's/\\//g' -re 's/.*Configuration received: (.*)\".*/\1/'
+    k logs  -l app.kubernetes.io/name=traefik  --tail 10000 --follow=false | grep 'Configuration received:' | sed -e 's/\\//g' -re 's/.*Configuration received: (.*)\".*/\1/'
 }
 
 # alias k="k8s.kubectl"
