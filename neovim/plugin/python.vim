@@ -24,7 +24,7 @@ function! AutoColorColumn()
             return
         endif
 
-        let l:maxlinelen = trim(system('grep max-line-length $(find '.l:project_root.' '.l:git_root.' -maxdepth 1 -name pyproject.toml -o -name tox.ini) | awk -F= "{print \$2}" | tail -1'))
+        let l:maxlinelen = trim(system('grep max-line-length $(find '.l:project_root.' '.l:git_root.' -maxdepth 1 -name pyproject.toml -o -name tox.ini -o -name .flake8) | awk -F= "{print \$2}" | tail -1'))
 
         if !empty(l:maxlinelen)
             exe 'set colorcolumn='.l:maxlinelen

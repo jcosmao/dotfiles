@@ -57,6 +57,16 @@ function pyenv.setup_python_version
     echo $(basename $VIRTUAL_ENV) > .python-version
 }
 
+function pyenv.setup_flake
+{
+    project_root=$(utils.find_project_root .project)
+    [[ -z $project_root ]] && project_root=$(utils.find_project_root .git)
+    [[ -z $project_root ]] && echo "Project root not found" && return
+
+    echo '[flake8]
+max-line-length = 120' >> $project_root/.flake8
+}
+
 function pyenv.setup_pyright
 {
     VENV=$(basename $VIRTUAL_ENV)
@@ -68,4 +78,11 @@ function pyenv.setup_pyright
         "reportUnboundVariable": "information",
         "reportOptionalMemberAccess": "information"
     }' | sed "s,VENVPATH,$VENVPATH," | sed "s,VENV,$VENV," | jq > pyrightconfig.json
+}
+
+function pyenv.setup
+{
+    pyenv.setup_python_version
+    pyenv.setup_pyright
+    pyenv.setup_flake
 }

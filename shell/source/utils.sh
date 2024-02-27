@@ -143,6 +143,18 @@ function utils.wireguard_toggle
     fi
 }
 
+function utils.find_project_root
+{(
+    rootdir_pattern=${1:-.project}
+
+    prev=.
+    while [[ $PWD != "$prev" ]] ; do
+        proot=$(find "$PWD" -maxdepth 1 -name $rootdir_pattern | grep .)
+        [[ $? -eq 0 ]] && dirname $proot && exit
+        prev=$PWD
+        cd ..
+    done
+)}
 
 alias dotup="utils.dotfiles_update"
 alias zup="utils.zsh_update"
