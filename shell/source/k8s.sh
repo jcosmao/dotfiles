@@ -1,5 +1,12 @@
 which kubectl &> /dev/null || return
 
+# Load default kubeconfig if found
+if [[ -f $HOME/.kube/config ]]; then
+    export KUBECONFIG=$HOME/.kube/config
+elif [[ -f /etc/rancher/k3s/k3s.yaml ]]; then
+    export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+fi
+
 which kubecolor &> /dev/null && \
     alias kubectl=kubecolor && \
     export KUBECOLOR_OBJ_FRESH="2m"
@@ -7,7 +14,9 @@ which kubecolor &> /dev/null && \
 function k {
     local OPT=()
     local PLUGIN_OPT=()
-    [[ -n $KUBENS ]] && OPT+=("-n" $KUBENS)
+
+    current_namespace=$(k8s.current_namespace)
+    [[ -n $current_namespace ]] && OPT+=("-n" $current_namespace)
 
     if [[ $1 =~ ^(d|desc)$ ]]; then
         shift; set -- "describe" "${@:1}"
@@ -22,32 +31,35 @@ function k {
 }
 
 function k8s.current_namespace {
-    if [[ -z $KUBENS ]]; then
-        kube_context=$(kubectl config current-context 2> /dev/null)
-        kubectl config view -o jsonpath="{.contexts[?(@.name == '$kube_context')].context.namespace}"
-    else
+    if [[ -n $KUBENS ]]; then
         echo $KUBENS
+    else
+        \kubectl config view --minify -o jsonpath='{..namespace}'
     fi
 }
 
-function k8s.set_namespace {
-    kubectl config set-context --current --namespace $1 2> /dev/null
-    if [[ $? -ne 0 ]]; then
-        # if context fail to be set in config (permission issue for ex), set a global variable used by k() function
-        export KUBENS=$1
-        # same, but used by zsh theme
-        export _KUBENS=$1
-    fi
+function k8s.set_context_namespace {
+    \kubectl config set-context --current --namespace $1 2> /dev/null
+}
+
+function k8s.set_shell_namespace {
+    export KUBENS=$1
+}
+
+function k8s.unset_shell_namespace {
+    unset KUBENS
 }
 
 function _complete_kns
 {
     local word=${COMP_WORDS[1]}
-    COMPREPLY=($(compgen -W "$(kubectl get namespaces -o json | jq -r .items.[].metadata.name | xargs)" -- ${word}))
+    COMPREPLY=($(compgen -W "$(\kubectl get namespaces -o json | jq -r .items.[].metadata.name | xargs)" -- ${word}))
 }
 
-complete -F _complete_kns k8s.set_namespace
+complete -F _complete_kns k8s.set_shell_namespace
 complete -F _complete_kns kns
+complete -F _complete_kns k8s.set_context_namespace
+complete -F _complete_kns knsc
 
 function k8s.list_containers_by_pod {
     k get pods -o="custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,INIT-CONTAINERS:.spec.initContainers[*].name,CONTAINERS:.spec.containers[*].name" $*
@@ -73,7 +85,7 @@ function k8s.exec {
 }
 
 function k8s.get_ns_logs {
-    stern -n $current_ns --field-selector metadata.namespace=$KUBENS $*
+    stern -n $KUBENS --field-selector metadata.namespace=$KUBENS $*
 }
 
 function k8s.get_port_forwarding {
@@ -119,7 +131,9 @@ function k8s.get_last_traefik_config {
 }
 
 # alias k="k8s.kubectl"
-alias kns="k8s.set_namespace"
+alias kns="k8s.set_shell_namespace"
+alias kunset="k8s.unset_shell_namespace"
+alias knsc="k8s.set_context_namespace"
 alias klc="k8s.list_running_containers_by_pod"
 alias ks="k8s.exec shell"
 alias kx="k8s.exec cmd"
@@ -127,6 +141,7 @@ alias klog="k8s.get_ns_logs"
 alias kg="k8s.get_all_resources"
 alias ksec="k8s.get_decrypted_secret"
 alias knet="k8s.pod_netns_enter"
+alias crictl="k3s crictl"
 
 if [[ $(basename $SHELL) == zsh ]]; then
     # get zsh complete kubectl
