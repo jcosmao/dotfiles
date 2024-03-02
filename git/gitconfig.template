@@ -6,11 +6,11 @@
     hooksPath = ~/.git/hooks
 
 [user]
-    name = USERNAME
-    email = MAIL
+    name = __USERNAME__
+    email = __MAIL__
 
 [gitreview]
-    username = USERNAME
+    username = __USERNAME__
 
 [credential]
 	helper = store
@@ -74,12 +74,12 @@
     lol = log --graph --decorate --pretty=oneline --abbrev-commit
     ls = ls-files
     tshow = !git rev-parse --abbrev-ref --symbolic-full-name @{u}
-    tset = "!f() { rb=${1:-dev/USERNAME/$(git symbolic-ref --short HEAD)}; git branch -u origin/$rb; }; f"
+    tset = "!f() { rb=${1:-dev/__USERNAME_BRANCH__/$(git symbolic-ref --short HEAD)}; git branch -u origin/$rb; }; f"
     st = status --short
     ca = commit -a --amend --reuse-message=HEAD
     co = checkout
     pushorigin = !git push --set-upstream origin $(git symbolic-ref --short HEAD)
-    pushdev = !git push --set-upstream origin $(git symbolic-ref --short HEAD):dev/julien.cosmao/$(git symbolic-ref --short HEAD)
+    pushdev = !git push --set-upstream origin $(git symbolic-ref --short HEAD):dev/__USERNAME_BRANCH__/$(git symbolic-ref --short HEAD)
     pf = pushdev --force
     pick = cherry-pick -s -x --allow-empty
     retag = "!r() { git tag -d $1 && git push origin :refs/tags/$1 && git tag $1; }; r"

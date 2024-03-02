@@ -173,8 +173,10 @@ function install_git {
     ln -sf ~/.git/gitconfig ~/.gitconfig
     [[ -z $git_username ]] && read -p 'git username : ' git_username
     [[ -z $git_mail ]] && read -p 'git mail : ' git_mail
-    [[ -n $git_username ]] && sed -i "s/USERNAME/$git_username/g" ~/.git/gitconfig
-    [[ -n $git_mail ]] && sed -i "s/MAIL/$git_mail/g" ~/.git/gitconfig
+    [[ -n $git_username ]] && git_username_branch=$(echo $git_username | tr -s ' ' '.' | tr -s [:upper:] [:lower:])
+    [[ -n $git_username ]] && sed -i "s/__USERNAME__/$git_username/g" ~/.git/gitconfig
+    [[ -n $git_username_branch ]] && sed -i "s/__USERNAME_BRANCH__/$git_username_branch/g" ~/.git/gitconfig
+    [[ -n $git_mail ]] && sed -i "s/__MAIL__/$git_mail/g" ~/.git/gitconfig
 }
 
 function install_fonts {

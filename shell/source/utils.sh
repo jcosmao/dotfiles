@@ -9,17 +9,21 @@ function utils.dotfiles_update
 function utils.zsh_update
 {
     [[ ! -d ~/.zsh ]] && return 1
+    pwd=$(pwd)
+    maxwidth=0
+    for module in $(ls ~/.zsh); do width=$(echo $module | wc -c) ; [[ $width -gt $maxwidth ]] && maxwidth=$width; done
     for module in $(ls ~/.zsh); do
         cd ~/.zsh/$module
-        echo -n "$(tput setaf 13)[$module]$(tput sgr0) "
+        printf "%s[%-${maxwidth}s]%s" $(tput setaf 13) $module $(tput sgr0)
         git fetch |& > /dev/null
         git reset --hard origin/master |& > /dev/null
         if [[ $? -eq 0 ]]; then
-            echo "updated to $(git rev-parse --short HEAD) ---> $(tput setaf 10)OK$(tput sgr0)"
+            echo " updated to $(git rev-parse --short HEAD) ---> $(tput setaf 10)OK$(tput sgr0)"
         else
-            echo "updated to $(git rev-parse --short HEAD) ---> $(tput setaf 9)ERROR$(tput sgr0)"
+            echo " updated to $(git rev-parse --short HEAD) ---> $(tput setaf 9)ERROR$(tput sgr0)"
         fi
     done
+    cd $pwd
     exec zsh
 }
 
