@@ -122,15 +122,23 @@ function sshlog {
 
     if [[ ${log_files[@]} =~ journalctl ]]; then
         LOGCMD="echo '==> journalctl <==' ; timeout 86400 journalctl --output cat $TAILOPTS"
+    elif [[ $CAT == 1 && -z $TAILLINES ]]; then
+        LOGCMD="cat ${log_files[@]}"
     else
         LOGCMD="timeout 86400 tail -v $TAILOPTS ${log_files[@]}"
     fi
 
-    echo "#########################################################################"
-    echo "# Host: $found_hosts"
-    echo "# Files: ${log_files[@]}"
-    echo "# Cmd: $LOGCMD"
-    echo "#########################################################################"
+    if [[ -n $GREP_PATTERN ]]; then
+        GREPCMD="grep -P \"$GREP_PATTERN\""
+    else
+        GREPCMD=tee
+    fi
+
+    echo "|"
+    echo "|    Host:   $found_hosts"
+    echo "|    Files:  ${log_files[@]}"
+    echo "|    Cmd:    $LOGCMD | $GREPCMD"
+    echo "|"
 
     if [[ $NOCOLOR == 1 ]]; then
         color_cmd="tee"
@@ -142,12 +150,13 @@ function sshlog {
         short=$(echo $h | sed -e 's/\.cloud.ovh.*//')
         if [[ $CAT == 1 ]]; then
             sudo ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -l admin $h \
-                $LOGCMD 2> /dev/null | \
+                "$LOGCMD | $GREPCMD" 2> /dev/null | \
                 stdbuf -o0 awk -v host=$short '/^==>/{size=split($2,splitted,"/");filename=splitted[size] ;next} !/^==>/{print host,filename,$0}'
         else
             sudo ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -l admin $h \
-                $LOGCMD 2> /dev/null | \
+                "$LOGCMD | $GREPCMD" 2> /dev/null | \
                 stdbuf -o0 awk -v host=$short '/^==>/{size=split($2,splitted,"/");filename=splitted[size] ;next} !/^==>/{print host,filename,$0}' &
+            # avoid conflicting lines
             sleep $(echo "${TAILLINES:-1} * .00001" | bc -l)
         fi
     done | $color_cmd
@@ -196,9 +205,12 @@ function main {
             -l)
                 help="no color"
                 export NOCOLOR=1 ;;
-            --cat|-c)
+            --nofollow|-c)
                 help="cat instead tail -f"
                 export CAT=1 ;;
+            --grep|-g)
+                help="grep -P pattern"
+                export GREP_PATTERN=$1 && shift;;
             --show|-s)
                 help="display log map"
                 echo $LOG_MAP ; exit ;;
@@ -214,12 +226,12 @@ function main {
         esac
     done
 
-    if [[ -n $TAILLINES ]]; then
-        export TAILOPTS="$TAILOPTS -n $TAILLINES"
-    fi
-
     if [[ $CAT != 1 ]]; then
         export TAILOPTS="$TAILOPTS -f"
+    fi
+
+    if [[ -n $TAILLINES ]]; then
+        export TAILOPTS="$TAILOPTS -n $TAILLINES"
     fi
 
     HOST_GROUP=${POSITIONNAL_ARGS[0]}

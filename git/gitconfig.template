@@ -73,8 +73,8 @@
     l = log --stat
     lol = log --graph --decorate --pretty=oneline --abbrev-commit
     ls = ls-files
-    tshow = !git rev-parse --abbrev-ref --symbolic-full-name @{u}
-    tset = "!f() { rb=${1:-dev/__USERNAME_BRANCH__/$(git symbolic-ref --short HEAD)}; git branch -u origin/$rb; }; f"
+    trackshow = !git rev-parse --abbrev-ref --symbolic-full-name @{u}
+    trackset = "!f() { rb=${1:-dev/__USERNAME_BRANCH__/$(git symbolic-ref --short HEAD)}; git branch -u origin/$rb; }; f"
     st = status --short
     ca = commit -a --amend --reuse-message=HEAD
     co = checkout
@@ -97,7 +97,7 @@
     # gerrit helper
     review = "!f() { \
         target_branch=$(grep defaultbranch= $(git rev-parse --show-toplevel)/.gitreview | cut -d= -f2); \
-        test -z \"$target_branch\" && target_branch=$(git tshow | cut -d/ -f2- ); \
+        test -z \"$target_branch\" && target_branch=$(git trackshow | cut -d/ -f2- ); \
         `# validate remote branch exist`; \
         validate=$(git branch -r --format='%(refname:strip=2)' | grep -P \"^[a-z]+/$target_branch$\" | head -1); \
         remote=$(echo $validate | cut -d/ -f1); \
