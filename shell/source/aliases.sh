@@ -31,12 +31,28 @@ alias pip3="python3 -m pip"
 
 alias ofc='ofctl --names --no-stats --read-only --color=always dump-flows'
 
-function terraform.autoyes
-{
-    terraform $* -auto-approve
-}
-alias tf=terraform
-alias tfy="terraform.autoyes"
+which terraform &> /dev/null
+if [[ $? == 0 ]]; then
+
+    function tf
+    {
+        OPTS=""
+        if [[ $1 == auto-approve ]]; then
+            shift
+            OPTS="-auto-approve"
+        fi
+
+        TFDIR="default"
+        [[ -n $OS_REGION_NAME ]] && TFDIR="$OS_REGION_NAME"
+
+        TF_WORKSPACE=$TFDIR terraform $* $OPTS
+    }
+
+    alias tfy="tf auto-approve"
+    complete -C $(which terraform) terraform
+    complete -C $(which terraform) tf
+    complete -C $(which terraform) tfy
+fi
 
 if [[ $(id -u) > 0 ]]; then
     alias docker="sudo docker"

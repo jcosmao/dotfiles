@@ -3,8 +3,10 @@ which kubectl &> /dev/null || return
 # Load default kubeconfig if found
 if [[ -f $HOME/.kube/config ]]; then
     export KUBECONFIG=$HOME/.kube/config
-elif [[ -f /etc/rancher/k3s/k3s.yaml ]]; then
+elif [[ -r /etc/rancher/k3s/k3s.yaml ]]; then
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+else
+    return
 fi
 
 which kubecolor &> /dev/null && \

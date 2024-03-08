@@ -21,3 +21,6 @@ source ~/.zsh/zsh-bash-completions-fallback/zsh-bash-completions-fallback.plugin
 
 # uncomment for profiling
 # zprof
+
+autoload -U +X bashcompinit && bashcompinit
+complete -o nospace -C /home/jcosmao/go/bin/terraform terraform

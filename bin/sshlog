@@ -121,24 +121,25 @@ function sshlog {
     done
 
     if [[ ${log_files[@]} =~ journalctl ]]; then
-        LOGCMD="echo '==> journalctl <==' ; timeout 86400 journalctl --output cat $TAILOPTS"
+        LOGCMD="echo '==> journalctl <==' ; timeout 3600 journalctl --output cat $TAILOPTS"
     elif [[ $CAT == 1 && -z $TAILLINES ]]; then
         LOGCMD="cat ${log_files[@]}"
     else
-        LOGCMD="timeout 86400 tail -v $TAILOPTS ${log_files[@]}"
+        LOGCMD="timeout 3600 tail -v $TAILOPTS ${log_files[@]}"
     fi
 
     if [[ -n $GREP_PATTERN ]]; then
-        GREPCMD="grep -P \"$GREP_PATTERN\""
+        [[ -z $GREP_OPT ]] && GREP_OPT='Pi'
+        GREPCMD="grep -${GREP_OPT} \"$GREP_PATTERN\""
     else
         GREPCMD=tee
     fi
 
-    echo "|"
-    echo "|    Host:   $found_hosts"
-    echo "|    Files:  ${log_files[@]}"
-    echo "|    Cmd:    $LOGCMD | $GREPCMD"
-    echo "|"
+    echo "│"
+    echo "│    Host:   $found_hosts"
+    echo "│    Files:  ${log_files[@]}"
+    echo "│    Cmd:    $LOGCMD | $GREPCMD"
+    echo "│"
 
     if [[ $NOCOLOR == 1 ]]; then
         color_cmd="tee"
@@ -209,8 +210,11 @@ function main {
                 help="cat instead tail -f"
                 export CAT=1 ;;
             --grep|-g)
-                help="grep -P pattern"
+                help="grep -Pi pattern"
                 export GREP_PATTERN=$1 && shift;;
+            --grepopt|-go)
+                help="grep options, default -Pi"
+                export GREP_OPT=$1 && shift;;
             --show|-s)
                 help="display log map"
                 echo $LOG_MAP ; exit ;;

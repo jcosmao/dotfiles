@@ -11,18 +11,29 @@ function utils.zsh_update
     [[ ! -d ~/.zsh ]] && return 1
     pwd=$(pwd)
     maxwidth=0
-    for module in $(ls ~/.zsh); do width=$(echo $module | wc -c) ; [[ $width -gt $maxwidth ]] && maxwidth=$width; done
     for module in $(ls ~/.zsh); do
-        cd ~/.zsh/$module
-        printf "%s[%-${maxwidth}s]%s" $(tput setaf 13) $module $(tput sgr0)
-        git fetch |& > /dev/null
-        git reset --hard origin/master |& > /dev/null
-        if [[ $? -eq 0 ]]; then
-            echo " updated to $(git rev-parse --short HEAD) ---> $(tput setaf 10)OK$(tput sgr0)"
-        else
-            echo " updated to $(git rev-parse --short HEAD) ---> $(tput setaf 9)ERROR$(tput sgr0)"
-        fi
+        width=$(echo $module | wc -c)
+        [[ $width -gt $maxwidth ]] && maxwidth=$width
     done
+    set +o monitor
+    echo "* Update zsh modules (~/.zsh):"
+    for module in $(ls ~/.zsh); do
+        (
+            cd ~/.zsh/$module
+            git fetch |& > /dev/null
+            git reset --hard origin/master |& > /dev/null
+            if [[ $? -eq 0 ]]; then
+                value=$(colors.print 10 OK)
+            else
+                value=$(colors.print 9 FAIL)
+            fi
+            commit=$(git rev-parse --short HEAD)
+            mod=$(printf "[%-${maxwidth}s]" $module)
+            printf "%s master[%s]: %s\n" "$(colors.print 13 $mod)" $(colors.print 244 $commit) $value
+        )&
+    done
+    wait
+    set -o monitor
     cd $pwd
     exec zsh
 }

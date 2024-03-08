@@ -1,7 +1,7 @@
 function prompt.display
 {
     history -a
-    PS1=$(echo -e "\n $(prompt_prefix)$(prompt) $(prompt_add)\n $(colors.print 6 ❭) ")
+    PS1=$(echo -e "\n $(prompt_prefix)$(prompt) $(prompt_add)\n $(colors.prompt_print 6 ❭) ")
 }
 
 function prompt_prefix
@@ -36,12 +36,12 @@ function prompt
     [[ "`id -u`" -eq 0 ]] && color=204 || color=36
 
     if [[ -n $SSH_TTY ]]; then
-        prompt="$(colors.print 181 '\u')$(colors.print 8 @)$(colors.print ${color} '\H')"
+        prompt="$(colors.prompt_print 181 '\u')$(colors.prompt_print 8 @)$(colors.prompt_print ${color} '\H')"
     else
-        prompt="$(colors.print ${color} '\u:')"
+        prompt="$(colors.prompt_print ${color} '\u:')"
     fi
 
-    echo "${prompt} $(colors.print 8 '\w')"
+    echo "${prompt} $(colors.prompt_print 8 '\w')"
 }
 
 function set_git
@@ -53,26 +53,26 @@ function set_git
     removed=$( git status --porcelain | grep -c '^ D')
     commit=''
     if [[ $removed -ne 0 || $modified -ne 0 ]]; then
-        commit=$(colors.print 11 )
+        commit=$(colors.prompt_print 11 )
     else
-        commit=$(colors.print 2 )
+        commit=$(colors.prompt_print 2 )
     fi
 
-    echo "$(colors.print 204 [󰊢 $repo]) $(colors.print 8 ${branch})$(colors.print 5 [${commit_id}]) ${commit}  "
+    echo "$(colors.prompt_print 204 [󰊢 $repo]) $(colors.prompt_print 8 ${branch})$(colors.prompt_print 5 [${commit_id}]) ${commit}  "
 }
 
 function set_virtualenv
 {
-    echo "$(colors.print 11 [ $(basename $VIRTUAL_ENV)])"
+    echo "$(colors.prompt_print 11 [ $(basename $VIRTUAL_ENV)])"
 }
 
 function set_netns
 {
-    echo "$(colors.print 198 [' ' $1])"
+    echo "$(colors.prompt_print 198 [' ' $1])"
 }
 
 function set_date
 {
     # strftime format
-    echo "$(colors.print 239 '[\D{%H:%M}]')"
+    echo "$(colors.prompt_print 239 '[\D{%H:%M}]')"
 }
