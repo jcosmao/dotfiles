@@ -2,16 +2,16 @@ netns.enter () {
     ip netns exec $1 $SHELL
 }
 
-alias ons=netns.enter
+alias nse=netns.enter
 
-function _complete_ons
+function _complete_nse
 {
     local word=${COMP_WORDS[1]}
     COMPREPLY=($(compgen -W "$(ip netns list | awk '{print $1}' | xargs)" -- ${word}))
 }
 
-complete -F _complete_ons netns.enter
-complete -F _complete_ons ons
+complete -F _complete_nse netns.enter
+complete -F _complete_nse nse
 
 netns.current () {
     ip netns identify $$
