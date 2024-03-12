@@ -54,6 +54,7 @@ function pyenv.update
 
 function pyenv.setup_python_version
 {
+    [[ -z $VIRTUAL_ENV ]] && echo "VIRTUAL_ENV not set" && return
     echo $(basename $VIRTUAL_ENV) > .python-version
 }
 
@@ -69,6 +70,7 @@ max-line-length = 120' >> $project_root/.flake8
 
 function pyenv.setup_pyright
 {
+    [[ -z $VIRTUAL_ENV ]] && echo "VIRTUAL_ENV not set" && return
     VENV=$(basename $VIRTUAL_ENV)
     VENVPATH=$(dirname $VIRTUAL_ENV)
 
@@ -82,6 +84,8 @@ function pyenv.setup_pyright
 
 function pyenv.setup
 {
+    [[ -z $VIRTUAL_ENV ]] && echo "VIRTUAL_ENV not set" && return
+
     pyenv.setup_python_version
     pyenv.setup_pyright
     pyenv.setup_flake
