@@ -7,71 +7,78 @@ trap "sudo pkill -9 -f sshlog -g $current_pgid" INT TERM QUIT
 
 LOG_MAP='{
     "default": {
-        "journal": "journalctl"
+        "journal": "cmd:journalctl --output cat"
     },
     "host": {
-        "journal": "journalctl",
         "vrack": "/var/log/neutron/neutron-ovh-vrack-agent.log",
         "bgp": "/var/log/neutron/neutron-ovh-bgp-agent.log",
         "l3": "/var/log/neutron/neutron-ovh-l3-agent.log",
         "metadata": "/var/log/neutron/neutron-ovh-metadata-agent.log",
-        "nova": "/var/log/nova/nova-compute.log",
+        "nova": "/var/log/nova/*.log",
         "libvirt": "/var/log/libvirt/libvirtd.log",
-        "ovs": "/var/log/openvswitch/*.log"
+        "ovs": "/var/log/openvswitch/*.log",
+        "neutron": "/var/log/neutron/*.log",
+        "default": "/var/log/nova/*.log /var/log/neutron/*.log"
     },
     "snat": {
-        "journal": "journalctl",
+        "journal": "cmd:journalctl --output cat",
         "vrack": "/var/log/neutron/neutron-ovh-vrack-agent.log",
         "bgp": "/var/log/neutron/neutron-ovh-bgp-agent.log",
         "l3": "/var/log/neutron/neutron-ovh-l3-agent.log",
         "dhcp": "/var/log/neutron/neutron-dhcp-agent.log",
         "metadata": "/var/log/neutron/neutron-ovh-metadata-agent.log",
-        "ovs": "/var/log/openvswitch/*.log"
+        "neutron": "/var/log/neutron/*.log",
+        "ovs": "/var/log/openvswitch/*.log",
+        "default": "/var/log/neutron/*.log"
     },
     "neutron": {
-        "journal": "journalctl",
+        "journal": "cmd:journalctl --output cat",
         "apache": "/var/log/apache2/neutron-api*log",
         "api": "/var/log/neutron/neutron-api.log",
-        "rpc": "/var/log/neutron/neutron-rpc.log"
+        "rpc": "/var/log/neutron/neutron-rpc.log",
+        "default": "/var/log/neutron/*.log"
     },
     "nova": {
-        "journal": "journalctl",
+        "journal": "cmd:journalctl --output cat",
         "apache": "/var/log/apache2/nova-api*log",
         "api": "/var/log/nova/nova-api.log",
         "conductor": "/var/log/nova/nova-conductor.log",
         "scheduler": "/var/log/nova/nova-scheduler.log",
-        "placement": "/var/log/placement/placement-api.log"
+        "placement": "/var/log/placement/placement-api.log",
+        "default": "/var/log/nova/*.log"
     },
     "cinder": {
-        "journal": "journalctl",
+        "journal": "cmd:journalctl --output cat",
         "apache": "/var/log/apache2/cinder-api*log",
         "api": "/var/log/cinder/cinder-api.log",
         "scheduler": "/var/log/cinder/cinder-scheduler.log",
         "volume": "/var/log/cinder/cinder-volume.log",
-        "backup": "/var/log/cinder/cinder-backup.log"
+        "backup": "/var/log/cinder/cinder-backup.log",
+        "default": "/var/log/cinder/*.log"
     },
     "glance": {
-        "journal": "journalctl",
+        "journal": "cmd:journalctl --output cat",
         "default": "/var/log/glance/*.log"
     },
     "ironic": {
-        "journal": "journalctl",
+        "journal": "cmd:journalctl --output cat",
         "api": "/var/log/ironic/ironic-api.log",
         "conductor": "/var/log/ironic/ironic-ovh-conductor.log",
         "metadata": "/var/log/ironic/ironic-ovh-metadata-server.log",
         "neutron": "/var/log/neutron/*.log",
-        "nova": "/var/log/nova/*log"
+        "nova": "/var/log/nova/*log",
+        "default": "/var/log/ironic/*.log"
     },
     "rabbit": {
-        "journal": "journalctl",
+        "journal": "cmd:journalctl --output cat",
         "default": "/var/log/rabbitmq/*.log"
     },
     "rabbit-nova": {
-        "journal": "journalctl",
+        "journal": "cmd:journalctl --output cat",
         "default": "/var/log/rabbitmq/*.log"
     },
     "rabbit-neutron": {
-        "journal": "journalctl",
+        "journal": "cmd:journalctl --output cat",
         "default": "/var/log/rabbitmq/*.log"
     }
 }'
@@ -120,8 +127,9 @@ function sshlog {
         log_files+=($(echo $LOG_MAP | jq -r .\"$group_name\".\"$found_log\"))
     done
 
-    if [[ ${log_files[@]} =~ journalctl ]]; then
-        LOGCMD="echo '==> journalctl <==' ; timeout 3600 journalctl --output cat $TAILOPTS"
+    if [[ ${log_files[@]} =~ ^cmd: ]]; then
+        CMD=$(echo ${log_files[@]} | sed -e 's/^cmd://')
+        LOGCMD="echo '==> $CMD <==' ; timeout 3600 $CMD $TAILOPTS"
     elif [[ $CAT == 1 && -z $TAILLINES ]]; then
         LOGCMD="cat ${log_files[@]}"
     else

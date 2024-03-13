@@ -90,3 +90,18 @@ function pyenv.setup
     pyenv.setup_pyright
     pyenv.setup_flake
 }
+
+function pyenv.activate {
+    pyenv activate $*
+}
+
+alias pya="pyenv.activate"
+
+function _complete_pyenv_activate
+{
+    local word=${COMP_WORDS[1]}
+    COMPREPLY=($(compgen -W "$(find $PYENV_ROOT/versions -maxdepth 1 -type l -exec basename {} \; | xargs)" -- ${word}))
+}
+
+complete -F _complete_pyenv_activate pyenv.activate
+complete -F _complete_pyenv_activate pya

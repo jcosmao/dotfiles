@@ -120,3 +120,38 @@ function openstack.log_color
 
 alias otail="openstack.log_color tail"
 alias olog="openstack.log_color less"
+
+function openstack.help_stestr
+{
+    cat<<EOF
+# init test env / launch tests
+tox -e py3
+
+# when env is already installed:
+source .tox/py3/bin/activate
+
+# Run one test
+stestr run TEST
+
+# Run one test with pdb
+stestr run --no-discover TEST -- --pdb -k exec
+
+# Run tests per unit with report
+
+mv ~/neutron.tests_report.log ~/neutron.tests_report.\$(date +%s).log
+find neutron/tests/unit/ -maxdepth 1  -exec basename {} \; | grep -v unit  | grep -v pycache | grep -v __init__ | sed -e 's/.py//' | while read u; do
+    echo -e "\n=== START \$u ===="
+    stestr run neutron.tests.unit.\$u
+done | tee -a ~/neutron.tests_report.log
+EOF
+}
+
+function openstack.devstack_logs {
+    journalctl --no-hostname -o short-iso -u 'devstack@*' $*
+}
+
+alias stacklog="openstack.devstack_logs"
+
+function openstack.devstack_activate {
+    source /opt/stack/data/venv/bin/activate
+}

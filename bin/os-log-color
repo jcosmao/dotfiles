@@ -141,6 +141,40 @@ def parse_line(line):
             '_type': 'openstack',
         }
 
+    # journalctl --no-hostname -o short-iso -f -u 'devstack@*'
+    # 2024-03-20T13:27:44+0000 devstack@keystone.service[74735]: INFO neutron.plugins.openvswitch.agent.ovs_neutron_agent [-]
+    regex = (
+        r'(.*)'
+        r'([0-9]{4}-[0-9]+-[0-9]+)T'   # date
+        r'([0-9]+:[0-9]+:[0-9]+\+[0-9]+) '  # time
+        r'([^\[]+)\[([0-9]+)\]: '  # unit   process
+        r'([A-Z]+) '   # level
+        r'([^ ]+)* '   # name
+        r"(\[(?!'Traceback)[^\]]+\])*\s*"   # context
+        r'(.+)*'  # text
+    )
+
+    result = re.match(regex, line)
+    if result is not None:
+        h = ""
+        if result.group(1):
+            h = result.group(1)
+        # it's unit name
+        elif result.group(4):
+            h = f"{result.group(4)} "
+
+        return {
+            'header': h,
+            'date': result.group(2),
+            'time': result.group(3),
+            'process': result.group(5),
+            'level': result.group(6),
+            'name': "" if not result.group(7) else result.group(7),
+            'req': "" if not result.group(8) else result.group(8),
+            'text': "" if not result.group(9) else result.group(9),
+            '_type': 'openstack',
+        }
+
     regex = (
         r'(.*)'
         r"(\['Traceback.*)"
