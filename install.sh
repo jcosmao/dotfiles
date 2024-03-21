@@ -120,7 +120,7 @@ function update_bin_from_deb {
 
     # - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
     version=$(basename $(curl -si https://github.com/BurntSushi/ripgrep/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
-    wget "https://github.com/BurntSushi/ripgrep/releases/download/$version/ripgrep_${version}_amd64.deb" -O $TMPDIR/ripgrep.deb
+    wget "https://github.com/BurntSushi/ripgrep/releases/download/$version/ripgrep_${version}-1_amd64.deb" -O $TMPDIR/ripgrep.deb
     (cd $TMPDIR; ar x $TMPDIR/ripgrep.deb && tar xf data.tar.xz)
 
     # - Install fd: https://github.com/sharkdp/fd/releases/latest
@@ -198,22 +198,23 @@ function install_icons {
 }
 
 function install_config {
-    echo '- Install .config'
-    mkdir -p ~/.config.backup
+    target=${1:-common}
+    echo "- Install .config from config.${target}"
+    mkdir -p ~/.config.${target}.backup
 
-    for cfg in $(ls config); do
+    for cfg in $(ls config.${target}); do
         if [[ ! -L $HOME/.config/$cfg ]]; then
-            mv $HOME/.config/$cfg $HOME/.config.backup/$cfg.$(date '+%s')
+            mv $HOME/.config/$cfg $HOME/.config.${target}.backup/$cfg.$(date '+%s') 2> /dev/null
         fi
-        rm -f $HOME/.config/$cfg && ln -sf $SCRIPTPATH/config/$cfg $HOME/.config/$cfg
+        rm -f $HOME/.config/$cfg 2> /dev/null && ln -sf $SCRIPTPATH/config.${target}/$cfg $HOME/.config/$cfg
     done
 
-    [[ $IS_SSH -eq 1 ]] && return
-
-    # build i3 config
-    if which i3 2>&1 > /dev/null ; then
-        echo "    > build i3 conf"
-        $HOME/.config/i3/i3_build_conf.sh > /dev/null
+    if [[ $target = i3 ]]; then
+        # build i3 config
+        if which i3 2>&1 > /dev/null ; then
+            echo "    > build i3 conf"
+            $HOME/.config/i3/i3_build_conf.sh > /dev/null
+        fi
     fi
 }
 
@@ -253,11 +254,25 @@ function main {
         arg="$1"; shift
         case "$arg" in
             --minimal|-m)
-                help="Vim 8 config without plugin, shell (bash+zsh), bin, tmux"
+                help="Vim config without plugins, shell (bash+zsh), .local/bin, tmux"
                 install_vim_light;
                 install_shell;
                 install_tmux;
                 install_local_bin ;;
+
+            --conf|-c)
+                help="shell (bash+zsh), tmux, git, .local/bin"
+                install_shell;
+                install_tmux;
+                install_git;
+                install_config common;
+                install_local_bin;;
+
+            --ui|-x)
+                help="i3 cfg, icons, fonts"
+                install_icons ;
+                install_fonts ;
+                install_config i3;;
 
             --nvim|--neovim|-v)
                 help="Neovim (optional: stable|nightly|v[0-9])"
@@ -266,16 +281,6 @@ function main {
                     install_neovim $release;
                 install_vim_requirements;
                 install_vim_config;;
-
-            --conf|-c)
-                help="shell (bash+zsh), tmux, git, i3 cfg, bin, icons, fonts"
-                install_shell;
-                install_tmux;
-                install_git;
-                install_config;
-                install_local_bin;
-                install_icons ;
-                install_fonts ;;
 
             --updatebin|-u)
                 help="update bin (pull from github)"
