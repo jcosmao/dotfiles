@@ -1,6 +1,12 @@
 # https://github.com/pyenv/pyenv-installer
 export PYENV_ROOT="$HOME/.pyenv"
 
+# force run those command using pyenv python
+alias pip="python3 -m pip"
+alias pip3="python3 -m pip"
+alias pipx="python3 -m pipx"
+alias tox="python3 -m tox"
+
 function pyenv.load
 {
     if [[ -d $PYENV_ROOT ]]; then

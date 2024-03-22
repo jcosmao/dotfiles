@@ -82,7 +82,7 @@ function utils.pretty_csv {
 
 function utils.open
 {
-    nohup xdg-open $* </dev/null >/tmp/open.log 2>&1 &
+    nohup xdg-open "$*" </dev/null >/tmp/open.log 2>&1 &
 }
 
 function utils.ssl_info
@@ -171,6 +171,51 @@ function utils.find_project_root
     done
 )}
 
+function utils.gerrit_review
+{
+    target=$1
+    topic=$2
+
+    if [[ $# -eq 0 ]]; then
+        echo "utils.gerrit_review <target: default(current tracked) OR ex: origin/master> <topic: default(current branch name) OR null>"
+        echo "No params provided. use defaults"
+    fi
+
+    if [[ -z $target ]]; then
+        target_branch=$(grep defaultbranch= $(git rev-parse --show-toplevel)/.gitreview | cut -d= -f2 2> /dev/null)
+        if [[ -z $target_branch ]]; then
+            target=$(git trackshow)
+            echo "- defaultbranch not found in .gitreview, use current tracked $target"
+        else
+            remote=$(git trackshow | cut -d'/' -f1)
+            target="${remote}/${target_branch}"
+        fi
+    fi
+
+    if [[ -z $topic ]]; then
+        topic="%topic=$(git symbolic-ref --short HEAD)"
+    elif [[ ! $topic = null ]]; then
+        topic="%topic=${topic}"
+    else
+        unset topic
+    fi
+
+    # validate remote branch exist
+    validate=$(git branch -r --format='%(refname:strip=2)' | grep -P "^${target}$")
+    remote=$(echo $validate | cut -d/ -f1)
+    branch=$(echo $validate | cut -d/ -f2-)
+
+    if [[ -n $branch && -n $remote ]]; then
+        echo "CMD: git push $remote HEAD:refs/for/${branch}${topic}"
+        [[ $SHELL =~ zsh ]] && vared -p 'Submit ? [y] ' -c response || read -r -p 'Submit ? [y] ' response
+        if [[ $response = y ]]; then
+            git push $remote HEAD:refs/for/${branch}${topic}
+        fi
+    else
+        echo "Unable to find remote (git branch -r): $target"
+    fi
+}
+
 alias dotup="utils.dotfiles_update"
 alias zup="utils.zsh_update"
 alias open="utils.open"
@@ -183,3 +228,4 @@ alias passgen="utils.randpass"
 alias passgen64="utils.randpass_b64"
 alias uuid="utils.uuid"
 alias wg-toggle="utils.wireguard_toggle"
+alias gitreview="utils.gerrit_review"

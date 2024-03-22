@@ -3,8 +3,8 @@ export CLIFF_FIT_WIDTH=1
 function os {
     APPEND_OPTS=()
     [[ "$*" =~ (show|list|create|issue) ]] && APPEND_OPTS+=("-f" "json")
-    [[ "$*" =~ (console log show|--help|-h|help) ]] && APPEND_OPTS=()
     [[ "$*" =~ (server list) ]] && APPEND_OPTS+=("-n")
+    [[ "$*" =~ (console log show|--help$| -h$| help$) ]] && APPEND_OPTS=()
     if [[ $1 == "fip" ]]; then
         shift; set -- "floating ip" "${@:1}"
     fi
@@ -39,6 +39,7 @@ alias ossall="os server list --all --host"
 alias osl="os loadbalancer"
 alias osla="os loadbalancer amphora list --loadbalancer"
 alias ostoken="openstack.token"
+alias osunset=openstack.unset_env
 
 if [[ -d ~/.os_openrc ]]; then
 
@@ -146,12 +147,12 @@ done | tee -a ~/neutron.tests_report.log
 EOF
 }
 
-function openstack.devstack_logs {
+function devstack.get_logs {
     journalctl --no-hostname -o short-iso -u 'devstack@*' $*
 }
 
-alias stacklog="openstack.devstack_logs"
+alias stacklog="devstack.get_logs"
 
-function openstack.devstack_activate {
+function devstack.venv_activate {
     source /opt/stack/data/venv/bin/activate
 }
