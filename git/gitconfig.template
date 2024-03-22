@@ -73,37 +73,27 @@
     l = log --stat
     lol = log --graph --decorate --pretty=oneline --abbrev-commit
     ls = ls-files
-    trackshow = !git rev-parse --abbrev-ref --symbolic-full-name @{u}
-    trackset = "!f() { rb=${1:-dev/__USERNAME_BRANCH__/$(git symbolic-ref --short HEAD)}; git branch -u origin/$rb; }; f"
     st = status --short
     ca = commit -a --amend --reuse-message=HEAD
-    co = checkout
-    pushorigin = !git push --set-upstream origin $(git symbolic-ref --short HEAD)
-    pushdev = !git push --set-upstream origin $(git symbolic-ref --short HEAD):dev/__USERNAME_BRANCH__/$(git symbolic-ref --short HEAD)
-    pf = pushdev --force
+    # show current tracking remote/branch
+    trackshow = !git rev-parse --abbrev-ref --symbolic-full-name @{u}
+    # set track to remote/branch
+    trackset = "!f() { rm=${1:-origin}; b=$(git symbolic-ref --short HEAD); git branch -u $rm/$b; }; f"
+    # set track to remote/dev/name/branch
+    tracksetdev = "!f() { rm=${1:-origin}; b=dev/__USERNAME_BRANCH__/$(git symbolic-ref --short HEAD); git branch -u $rm/$b; }; f"
+    # push to current branch to remote/branch
+    pushr = "!f() { rm=${1:-origin}; b=$(git symbolic-ref --short HEAD); git push --set-upstream $rm $b; }; f"
+    # push to current branch to remote/dev/name/branch
+    pushdev = "!f() { rm=${1:-origin}; b=$(git symbolic-ref --short HEAD); git push --set-upstream $rm $b:dev/__USERNAME_BRANCH__/$b ; }; f"
     pick = cherry-pick -s -x --allow-empty
-    retag = "!r() { git tag -d $1 && git push origin :refs/tags/$1 && git tag $1; }; r"
+    retag = "!r() { git tag -d $1 && git push origin :refs/tags/$0 && git tag $1; }; r"
     # Remove branches that have already been merged:with
     dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
     rst = "!f() { git clean -xfd && git reset --hard; }; f"
-    rh = "!f() { git fetch && git reset --hard origin/$(git symbolic-ref --short HEAD); }; f"
-    pr = !git pull --rebase && git push
+    pullpush = !git pull --rebase && git push
     # List contributors with number of commits
     contributors = shortlog --summary --numbered
     # https://stackoverflow.com/questions/3161204/how-to-find-the-nearest-parent-of-a-git-branch
     base = "!f() { git show-branch -a 2> /dev/null | grep '\\*' | grep -v $(git rev-parse --abbrev-ref HEAD) | head -n1 | sed -e 's/.*\\[\\(.*\\)\\].*/\\1/' -e 's/[\\^~].*//' -e 's,origin/,,'; }; f"
     root = "rev-parse --show-toplevel"
     ref = "ls-remote --ref"
-    # gerrit helper
-    review = "!f() { \
-        target_branch=$(grep defaultbranch= $(git rev-parse --show-toplevel)/.gitreview | cut -d= -f2); \
-        test -z \"$target_branch\" && target_branch=$(git trackshow | cut -d/ -f2- ); \
-        `# validate remote branch exist`; \
-        validate=$(git branch -r --format='%(refname:strip=2)' | grep -P \"^[a-z]+/$target_branch$\" | head -1); \
-        remote=$(echo $validate | cut -d/ -f1); \
-        branch=$(echo $validate | cut -d/ -f2-); \
-        test -n \"$branch\" -a -n \"$remote\" && \
-            (echo CMD: git push $remote HEAD:refs/for/${branch}%topic=$(git symbolic-ref --short HEAD) $*;\
-             git push $remote HEAD:refs/for/${branch}%topic=$(git symbolic-ref --short HEAD) $* ) || \
-            echo ERROR: missing branch=$branch or remote=$remote;\
-    }; f"

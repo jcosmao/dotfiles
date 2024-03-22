@@ -82,7 +82,7 @@ function utils.pretty_csv {
 
 function utils.open
 {
-    nohup xdg-open $* </dev/null >/tmp/open.log 2>&1 &
+    nohup xdg-open "$*" </dev/null >/tmp/open.log 2>&1 &
 }
 
 function utils.ssl_info

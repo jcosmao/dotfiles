@@ -16,7 +16,7 @@ function k {
     local PLUGIN_OPT=()
 
     current_namespace=$(k8s.current_namespace)
-    [[ -n $current_namespace ]] && OPT+=("-n" $current_namespace)
+    [[ -n $current_namespace && ! $* =~ '-n ' ]] && OPT+=("-n" $current_namespace)
 
     if [[ $1 =~ ^(d|desc)$ ]]; then
         shift; set -- "describe" "${@:1}"
@@ -27,7 +27,14 @@ function k {
         PLUGIN_OPT+=("-o" "yaml")
     fi
 
-    kubectl ${OPT[@]} $* ${PLUGIN_OPT[@]}
+    command kubectl ${OPT[@]} $* ${PLUGIN_OPT[@]}
+}
+
+function argo {
+    local OPT=()
+    current_namespace=$(k8s.current_namespace)
+    [[ -n $current_namespace && ! $* =~ '-n ' ]] && OPT+=("-n" $current_namespace)
+    command argo ${OPT[@]} $*
 }
 
 function k8s.current_namespace {

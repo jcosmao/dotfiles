@@ -5,10 +5,10 @@ local vim = vim
 -- NOTE: via `lsp_on_attach` the custom callback used by all other LSPs is called
 require("go").setup({
     go = "go", -- go command, can be go[default] or go1.18beta1
-    goimport = "gopls", -- goimport command, can be gopls[default] or goimport
     fillstruct = "gopls", -- can be nil (use fillstruct, slower) and gopls
-    gofmt = "gofumpt", -- gofmt cmd,
-    max_line_len = 120, -- max line length in goline format
+    goimports ='gopls', -- goimports command, can be gopls[default] or either goimports or golines if need to split long lines
+    gofmt = 'gopls', -- gofmt through gopls: alternative is gofumpt, goimports, golines, gofmt, etc
+    max_line_len = 0, -- max line length in golines format, Target maximum line length for golines
     tag_transform = false, -- tag_transfer  check gomodifytags for details
     test_template = "testify", -- default to testify if not set; g:go_nvim_tests_template  check gotests for details
     test_template_dir = "", -- default to nil if not set; g:go_nvim_tests_template_dir  check gotests for details
