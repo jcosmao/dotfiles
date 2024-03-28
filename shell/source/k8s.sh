@@ -27,7 +27,7 @@ function k {
         PLUGIN_OPT+=("-o" "yaml")
     fi
 
-    command kubectl ${OPT[@]} $* ${PLUGIN_OPT[@]}
+    kubectl ${OPT[@]} $* ${PLUGIN_OPT[@]}
 }
 
 function argo {
@@ -41,12 +41,12 @@ function k8s.current_namespace {
     if [[ -n $KUBENS ]]; then
         echo $KUBENS
     else
-        \kubectl config view --minify -o jsonpath='{..namespace}'
+        command kubectl config view --minify -o jsonpath='{..namespace}'
     fi
 }
 
 function k8s.set_context_namespace {
-    \kubectl config set-context --current --namespace $1 2> /dev/null
+    command kubectl config set-context --current --namespace $1 2> /dev/null
 }
 
 function k8s.set_shell_namespace {
@@ -60,7 +60,7 @@ function k8s.unset_shell_namespace {
 function _complete_kns
 {
     local word=${COMP_WORDS[1]}
-    COMPREPLY=($(compgen -W "$(\kubectl get namespaces -o json | jq -r .items.[].metadata.name | xargs)" -- ${word}))
+    COMPREPLY=($(compgen -W "$(command kubectl get namespaces -o json | jq -r .items.[].metadata.name | xargs)" -- ${word}))
 }
 
 complete -F _complete_kns k8s.set_shell_namespace
@@ -152,7 +152,7 @@ alias crictl="k3s crictl"
 
 if [[ $(basename $SHELL) == zsh ]]; then
     # get zsh complete kubectl
-    source <(kubectl completion zsh)
+    source <(command kubectl completion zsh)
     compdef k=kubectl
     compdef kubecolor=kubectl
 fi
