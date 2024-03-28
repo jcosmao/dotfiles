@@ -27,8 +27,3 @@ function vim.which {
 alias vwhich="vim.which"
 
 alias ofc='ofctl --names --no-stats --read-only --color=always dump-flows'
-
-if [[ $(id -u) > 0 ]]; then
-    alias docker="sudo docker"
-    alias docker-compose="sudo docker-compose"
-fi

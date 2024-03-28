@@ -20,6 +20,12 @@ function os {
     openstack "${EXTRA_OPTS[@]}" $* "${APPEND_OPTS[@]}" | $PIPE_CMD
 }
 
+function openstack.install_completion {
+    [[ $SHELL =~ zsh ]] && openstack complete | sed 's;local comp="${!i}";local comp="${(P)i}";' | sed -e '/.*_get_comp_words_by_ref.*/d' > ~/.bash_custom/openstack_complete.sh
+    [[ $SHELL =~ bash ]] && openstack complete  > ~/.bash_custom/openstack_complete.sh
+    echo "complete -F _openstack os" >> ~/.bash_custom/openstack_complete.sh
+}
+
 function openstack.unset_env {
     unset $(env | grep '^OS_' | cut -d= -f1) 2> /dev/null
 }
