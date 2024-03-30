@@ -203,10 +203,13 @@ function install_config {
     mkdir -p ~/.config.${target}.backup
 
     for cfg in $(ls config.${target}); do
-        if [[ ! -L $HOME/.config/$cfg ]]; then
-            mv $HOME/.config/$cfg $HOME/.config.${target}.backup/$cfg.$(date '+%s') 2> /dev/null
+        # to replace only a single file in a subdir,
+        # handle renamed file path with '\' instead of '/''
+        targetcfg=$(echo $cfg | sed -e 's/\\/\//g')
+        if [[ ! -L $HOME/.config/$targetcfg ]]; then
+            mv $HOME/.config/$targetcfg $HOME/.config.${target}.backup/$cfg.$(date '+%s') 2> /dev/null
         fi
-        rm -f $HOME/.config/$cfg 2> /dev/null && ln -sf $SCRIPTPATH/config.${target}/$cfg $HOME/.config/$cfg
+        rm -f $HOME/.config/$targetcfg 2> /dev/null && ln -sf "$SCRIPTPATH/config.${target}/$cfg" "$HOME/.config/$targetcfg"
     done
 
     if [[ $target = i3 ]]; then
@@ -214,6 +217,7 @@ function install_config {
         if which i3 2>&1 > /dev/null ; then
             echo "    > build i3 conf"
             $HOME/.config/i3/i3_build_conf.sh > /dev/null
+            ln -sf $HOME/.config/i3/scripts/i3lock_blur.sh $HOME/.local/bin/lockscreen
         fi
     fi
 }

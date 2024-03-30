@@ -238,7 +238,6 @@ endfunction
 
 function! plug#begin(...)
   if a:0 > 0
-    let s:plug_home_org = a:1
     let home = s:path(s:plug_fnamemodify(s:plug_expand(a:1), ':p'))
   elseif exists('g:plug_home')
     let home = s:path(g:plug_home)
@@ -1556,7 +1555,7 @@ endfunction
 
 function! s:merge_command(spec)
   let a:spec.branch = s:git_origin_branch(a:spec)
-  return ['git', 'merge', 'origin/'.a:spec.branch]
+  return ['git', 'merge', '--ff-only', 'origin/'.a:spec.branch]
 endfunction
 
 function! s:tick()
