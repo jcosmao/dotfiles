@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-
+#
+# forked from: https://github.com/gaelL/openstack-log-colorizer
+#
 # Author: Gaël Lambert (gaelL) <gael.lambert@netwiki.fr>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,26 +18,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+Filter and color Openstack log files from stdin
+
+--
+It support log files:
+  - openstack services with default log format (work also using journalctl, stern)
+    * journalctl: journalctl --no-hostname -o short-iso -u 'devstack@*'
+  - openvswitch
+  - rabbitmq
+  - apache
+
+
+"""
+
+
 import sys
 import re
 import argparse
 
-PARSER = argparse.ArgumentParser()
-PARSER.add_argument("-l", "--level",
-                    help="Set log level you want display",
-                    metavar='level',
-                    type=str)
-PARSER.add_argument("-e", "--exclude",
-                    help="Set log level you want exclude",
-                    metavar='level',
-                    type=str,
-                    nargs='+')
-PARSER.add_argument("-i", "--include",
-                    help="Set log level you only want display",
-                    metavar='level',
-                    type=str,
-                    nargs='+')
-ARGS = PARSER.parse_args()
 
 LOG_LEVEL = {
     'critical': 50,
@@ -51,6 +52,27 @@ LOG_LEVEL = {
     'dbg': 10,
     'notset': 100,
 }
+
+PARSER = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+PARSER.add_argument("-l", "--level",
+                    help="Set log levels you want display",
+                    metavar='level',
+                    choices=LOG_LEVEL.keys(),
+                    type=str)
+PARSER.add_argument("-e", "--exclude",
+                    help="Set log levels you want exclude",
+                    metavar='level',
+                    choices=LOG_LEVEL.keys(),
+                    type=str,
+                    nargs='+')
+PARSER.add_argument("-i", "--include",
+                    help="Set log levels you only want display",
+                    metavar='level',
+                    choices=LOG_LEVEL.keys(),
+                    type=str,
+                    nargs='+')
+ARGS = PARSER.parse_args()
 
 
 class colors:
@@ -346,9 +368,9 @@ def colorize(line):
                     val = red(v)
                 elif k == "status:" and int(v) >= 400:
                     val = yellow(v)
-                elif k == "time:" and float(v) >= 3000:
+                elif k == "time:" and float(v) >= 1000:
                     val = red(v)
-            except:
+            except Exception:
                 pass
             formatted = f"{formatted} {blue(k)} {val}"
 
@@ -400,7 +422,6 @@ def exclude_filter(line):
 
 def line_is_filtered(line):
     "Skip the line ?"
-
     if ARGS.level:
         return level_filter(line)
     elif ARGS.include:

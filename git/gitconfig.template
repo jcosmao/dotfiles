@@ -84,7 +84,7 @@
     # push to current branch to remote/branch
     pushr = "!f() { rm=${1:-origin}; b=$(git symbolic-ref --short HEAD); git push --set-upstream $rm $b; }; f"
     # push to current branch to remote/dev/name/branch
-    pushdev = "!f() { rm=${1:-origin}; b=$(git symbolic-ref --short HEAD); git push --set-upstream $rm $b:dev/__USERNAME_BRANCH__/$b ; }; f"
+    pushdev = "!f() { echo $1 | grep -Eq '^[a-z0-9]+$' && rm=$1 && shift; b=$(git symbolic-ref --short HEAD); git push --set-upstream ${rm:-origin} $b:dev/__USERNAME_BRANCH__/$b $*; }; f"
     pick = cherry-pick -s -x --allow-empty
     retag = "!r() { git tag -d $1 && git push origin :refs/tags/$0 && git tag $1; }; r"
     # Remove branches that have already been merged:with

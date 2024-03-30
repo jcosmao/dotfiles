@@ -289,7 +289,7 @@ autocmd BufNewFile,BufRead *.pp set filetype=puppet
 autocmd BufNewFile,BufRead *.inc set filetype=perl
 autocmd BufNewFile,BufRead *.tf set filetype=terraform
 
-autocmd WinEnter,BufWinEnter,FileWritePost,BufWritePost * call custom#displayFilePath()
+autocmd WinEnter,BufWinEnter,FileWritePost,BufWritePost,BufRead * call custom#displayFilePath()
 
 " remove auto<fucking>indent on colon :
 autocmd FileType python,yaml setlocal indentkeys-=<:>
