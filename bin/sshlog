@@ -237,8 +237,10 @@ function main {
                 help="grep -Pi pattern"
                 export GREP_PATTERN=$1 && shift;;
             --grepopt|-G)
-                help="grep options, default 'Pi'"
-                export GREP_OPT=$1 && shift;;
+                help="grep options, default -Pi"
+                export GREP_OPT=$1
+                [[ ! $GREP_OPT =~ ^\- ]] && echo "grep opt should begin with ^-.." && exit 1
+                shift;;
             --show|-s)
                 help="display log map"
                 echo $LOG_MAP ; exit ;;
