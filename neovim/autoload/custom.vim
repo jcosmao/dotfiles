@@ -110,11 +110,13 @@ function! custom#lineInfosToggle()
         execute ':SignifyEnable'
         set signcolumn=auto
         let g:custom_line_infos_status = 1
+        set conceallevel=2
     else
         set nonumber
         execute ':IndentLinesDisable'
         execute ':SignifyDisable'
         set signcolumn=no
         let g:custom_line_infos_status = 0
+        set conceallevel=0
     endif
 endfunction
