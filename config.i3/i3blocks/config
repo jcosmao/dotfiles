@@ -37,6 +37,7 @@ interval=10
 
 # Monitoring
 
+# require sysstat
 [cpu_usage]
 label=
 command=~/.config/i3blocks/blocks/$BLOCK_NAME -d 0
@@ -45,7 +46,7 @@ separator=false
 separator_block_width=10
 
 [memory]
-label=
+label=
 interval=30
 
 [disk]
@@ -56,7 +57,7 @@ interval=30
 # Common
 
 [volume]
-label=
+label=󰋋
 interval=10
 signal=10
 
@@ -66,11 +67,6 @@ interval=10
 [utc_hour]
 label=
 command=echo " $(date -u '+%0H:%0M')"
-interval=5
-
-[canada_hour]
-label=
-command=echo " $(TZ=America/Montreal date '+%0H:%0M')"
 interval=5
 
 [calendar]

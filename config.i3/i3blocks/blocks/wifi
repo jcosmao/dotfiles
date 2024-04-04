@@ -5,7 +5,7 @@ import json
 import subprocess
 import sys
 
-label = ''
+label = ' '
 color_good = '#c0ff80'
 color_medium = '#fffc80'
 color_low = '#ffdf80'

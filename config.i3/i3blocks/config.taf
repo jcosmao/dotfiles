@@ -1,0 +1,79 @@
+# vim: ft=cfg
+
+command=~/.config/i3blocks/blocks/$BLOCK_NAME
+separator_block_width=30
+markup=none
+
+[spotify]
+interval=15
+signal=11
+
+# Network
+
+# [bandwidth]
+# command=~/.config/i3blocks/blocks/$BLOCK_NAME -o ' ' -i ' '
+# interval=5
+
+[vpn]
+interval=5
+
+[ethernet]
+interval=10
+separator=false
+separator_block_width=10
+
+[ip]
+instance=ethernet
+interval=10
+
+[wifi]
+interval=10
+separator=false
+separator_block_width=10
+
+[ip]
+instance=wireless
+interval=10
+
+# Monitoring
+
+# require sysstat
+[cpu_usage]
+label=  
+command=~/.config/i3blocks/blocks/$BLOCK_NAME -d 0
+interval=10
+separator=false
+separator_block_width=10
+
+[memory]
+label=  
+interval=30
+
+[disk]
+label=  
+command=echo " /: $(df -h -l --output='avail' / | grep -E -o '[0-9]+(G|M)')  /home: $(df -h -l --output='avail' /home | grep -E -o '[0-9]+(G|M)')"
+interval=30
+
+# Common
+
+[volume]
+label=󰋋  
+interval=10
+signal=10
+
+[battery]
+interval=10
+
+[utc_hour]
+label=  
+command=echo " $(date -u '+%0H:%0M')"
+interval=5
+
+[canada_hour]
+label=  
+command=echo " $(TZ=America/Montreal date '+%0H:%0M')"
+interval=5 
+
+[calendar]
+label=  
+interval=5

@@ -8,7 +8,7 @@ action=${1:-reload}
 i3_dir=$( dirname "${BASH_SOURCE[0]}" )
 i3_config_base="$i3_dir/base.config"
 hw_name=$(cat /sys/devices/virtual/dmi/id/product_name)
-i3_family_config="${i3_dir}/$hw_name.hw.config"
+i3_family_config="${i3_dir}/hw_model/$hw_name.hw.config"
 layout=$(autorandr --detected 2>&1 | head -1 2> /dev/null)
 
 screen_laptop=$(xrandr | grep " connected" | awk '{print $1}' | grep -P '^eDP')
@@ -18,7 +18,7 @@ screen_display_port_1=$(xrandr | grep " connected" | awk '{print $1}' | grep -P 
 screen_display_port_2=$(xrandr | grep " connected" | awk '{print $1}' | grep -P '^DP' | head -n 2 | tail -1)
 
 if [[ -f "${i3_dir}/${layout}.layout.config" ]]; then
-    i3_layout_config="${i3_dir}/${layout}.layout.config"
+    i3_layout_config="${i3_dir}/i3_layout/${layout}.layout.config"
 fi
 
 # build final i3 config
