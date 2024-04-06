@@ -212,7 +212,7 @@ function install_config {
         rm -f $HOME/.config/$targetcfg 2> /dev/null && ln -sf "$SCRIPTPATH/config.${target}/$cfg" "$HOME/.config/$targetcfg"
     done
 
-    if [[ $target = i3 ]]; then
+    if [[ $target = X11 ]]; then
         # build i3 config
         if which i3 2>&1 > /dev/null ; then
             echo "    > build i3 conf"
@@ -276,7 +276,7 @@ function main {
                 help="i3 cfg, icons, fonts"
                 install_icons ;
                 install_fonts ;
-                install_config i3;;
+                install_config X11;;
 
             --nvim|--neovim|-v)
                 help="Neovim (optional: stable|nightly|v[0-9])"

@@ -2,18 +2,19 @@
 
 # Need brightness-udev for non root users to access file
 
+file=$(find -L /sys/class/backlight/ -maxdepth 2 -name brightness 2> /dev/null)
 
 function inc_brightness() {
     inc=$1
-    current=$(cat /sys/class/backlight/amdgpu_bl1/brightness)
-    echo $((current + inc)) > /sys/class/backlight/amdgpu_bl1/brightness
+    current=$(cat $file)
+    echo $((current + inc)) > $file
     exit
 }
 
 function dec_brightness() {
     dec=$1
-    current=$(cat /sys/class/backlight/amdgpu_bl1/brightness)
-    echo $((current - dec)) > /sys/class/backlight/amdgpu_bl1/brightness
+    current=$(cat $file)
+    echo $((current - dec)) > $file
     exit
 }
 

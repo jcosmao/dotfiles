@@ -42,8 +42,6 @@ interval=10
 label=
 command=~/.config/i3blocks/blocks/$BLOCK_NAME -d 0
 interval=10
-separator=false
-separator_block_width=10
 
 [memory]
 label=

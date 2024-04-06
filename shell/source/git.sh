@@ -1,6 +1,7 @@
 function git
 {
-    if [[ $1 == "review" ]]; then
+    if [[ $1 = "review" ]]; then
+        shift
         git.review $*
         return $?
     fi
@@ -29,18 +30,19 @@ function git.review
         fi
     fi
 
-    if [[ -z $topic ]]; then
-        topic="%topic=$(git symbolic-ref --short HEAD)"
-    elif [[ ! $topic = null ]]; then
-        topic="%topic=${topic}"
-    else
-        unset topic
-    fi
-
     # validate remote branch exist
     validate=$(git branch -r --format='%(refname:strip=2)' | grep -P "^${target}$")
     remote=$(echo $validate | cut -d/ -f1)
     branch=$(echo $validate | cut -d/ -f2-)
+    current_branch=$(git symbolic-ref --short HEAD)
+
+    if [[ -z $topic && ! $current_branch = $branch ]]; then
+        topic="%topic=$(git symbolic-ref --short HEAD)"
+    elif [[ -n $topic && ! $topic = null ]]; then
+        topic="%topic=${topic}"
+    else
+        unset topic
+    fi
 
     if [[ -n $branch && -n $remote ]]; then
         echo "CMD: git push $remote HEAD:refs/for/${branch}${topic}"
@@ -49,6 +51,6 @@ function git.review
             git push $remote HEAD:refs/for/${branch}${topic}
         fi
     else
-        echo "Unable to find remote (git branch -r): $target"
+        echo "Unable to find remote branch (git branch -r): $target"
     fi
 }

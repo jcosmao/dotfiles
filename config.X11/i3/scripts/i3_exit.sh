@@ -15,10 +15,7 @@ case "$select" in
         lock
         ;;
     logout)
-        # Kill user processes
-        ps -U $USER | grep -Ev "(ps|grep|ssh|tmux|screen|gvfsd|gvfsd-fuse|systemd|\(sd-pam\)|dbus-daemon|i3.*)$" | \
-        awk '{print $1}' | tail -n +2 | xargs -t kill
-        i3-msg exit
+        loginctl list-sessions -o json | jq -r .[].session | xargs loginctl terminate-session
         ;;
     suspend)
         # nmcli radio wifi off && \

@@ -80,11 +80,6 @@ function utils.pretty_csv {
     column -t -s, -n "$@" | less -F -S -X -K
 }
 
-function utils.open
-{
-    nohup xdg-open "$*" </dev/null >/tmp/open.log 2>&1 &
-}
-
 function utils.ssl_info
 {
     [[ -z $1 ]] && echo "need domain" && return
@@ -173,7 +168,6 @@ function utils.find_project_root
 
 alias dotup="utils.dotfiles_update"
 alias zup="utils.zsh_update"
-alias open="utils.open"
 alias json="utils.json"
 alias ssl_info="utils.ssl_info"
 alias ssl_get="utils.ssl_get"

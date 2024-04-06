@@ -56,7 +56,8 @@ endif
 Plug 'mhinz/vim-startify'
 Plug 'nvim-tree/nvim-web-devicons'
 " weird color bar appear on next commit
-Plug 'nvim-tree/nvim-tree.lua', {'commit': 'f24afa2cef551122b8bd53bb2e4a7df42343ce2e'}
+" Plug 'nvim-tree/nvim-tree.lua', {'commit': 'f24afa2cef551122b8bd53bb2e4a7df42343ce2e'}
+Plug 'nvim-tree/nvim-tree.lua'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'chengzeyi/fzf-preview.vim'
@@ -287,12 +288,14 @@ autocmd BufNewFile,BufRead *.source set filetype=sh
 autocmd BufNewFile,BufRead *.pp set filetype=puppet
 autocmd BufNewFile,BufRead *.inc set filetype=perl
 autocmd BufNewFile,BufRead *.tf set filetype=terraform
+autocmd BufNewFile,BufRead *.conf set filetype=ini
 
 autocmd WinEnter,BufWinEnter,FileWritePost,BufWritePost,BufRead * call custom#displayFilePath()
 
 " remove auto<fucking>indent on colon :
 autocmd FileType python,yaml setlocal indentkeys-=<:>
 autocmd FileType python,yaml setlocal indentkeys-=:
+autocmd FileType html,javascript set shiftwidth=2
 
 augroup gomapping
     autocmd!

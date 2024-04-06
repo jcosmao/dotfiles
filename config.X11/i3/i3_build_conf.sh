@@ -17,7 +17,7 @@ screen_hdmi_2=$(xrandr | grep " connected" | awk '{print $1}' | grep -P '^HDMI' 
 screen_display_port_1=$(xrandr | grep " connected" | awk '{print $1}' | grep -P '^DP' | head -n 1)
 screen_display_port_2=$(xrandr | grep " connected" | awk '{print $1}' | grep -P '^DP' | head -n 2 | tail -1)
 
-if [[ -f "${i3_dir}/${layout}.layout.config" ]]; then
+if [[ -f "${i3_dir}/i3_layout/${layout}.layout.config" ]]; then
     i3_layout_config="${i3_dir}/i3_layout/${layout}.layout.config"
 fi
 
