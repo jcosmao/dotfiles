@@ -3,6 +3,13 @@ if not has then
     return nil
 end
 
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.opt.foldcolumn = "0"
+vim.opt.foldtext = ""
+vim.opt.foldlevel = 20
+vim.opt.foldnestmax = 10
+
 require("nvim-treesitter.install").prefer_git = false
 require'nvim-treesitter.configs'.setup {
   ensure_installed = {"dockerfile", "c", "python", "rust", "latex", "yaml", "perl", "markdown", "go", "make", "http", "comment", "css", "javascript", "vim", "cmake", "ruby", "json", "regex", "lua", "cpp", "html", "rst", "hcl", "gomod", "bash", "toml", "diff", "terraform", "ini"},

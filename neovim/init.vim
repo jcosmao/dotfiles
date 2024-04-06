@@ -156,7 +156,6 @@ set clipboard^=unnamedplus          " send yank to system clipboard
 set updatetime=100
 set hidden                          " Allow modified hidden buffers
 set autowriteall
-set nofoldenable                    " Folding makes things unreadable.
 set noautochdir
 set keymodel=startsel               " shift+arrow selection
 set diffopt+=vertical               " start :diffsplit in vertical mode

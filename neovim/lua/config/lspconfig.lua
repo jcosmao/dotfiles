@@ -201,3 +201,8 @@ mason_lspconfig.setup_handlers {
         }
     end,
 }
+
+-- volar for vuejs stuff
+require 'lspconfig'.volar.setup {
+  filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue', 'html' }
+}
