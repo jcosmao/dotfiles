@@ -97,3 +97,4 @@
     base = "!f() { git show-branch -a 2> /dev/null | grep '\\*' | grep -v $(git rev-parse --abbrev-ref HEAD) | head -n1 | sed -e 's/.*\\[\\(.*\\)\\].*/\\1/' -e 's/[\\^~].*//' -e 's,origin/,,'; }; f"
     root = "rev-parse --show-toplevel"
     ref = "ls-remote --ref"
+    log-merge = "!f() { git log --stat $1^..$1; }; f"
