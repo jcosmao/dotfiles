@@ -1,35 +1,59 @@
 # vim surround
 
 ## change surround
-    cs'"
+```shell
+cs'"
+```
 
 ## delete surround
-    ds"
+```shell
+ds"
+```
 
 ## change tags (balise)
-    cst'
+```shell
+cst'
+```
 
 ## add surround on word
-    ysiw]  => no space
-    ysiw[  => space
+```shell
+ysiw]  => no space
+ysiw[  => space
+```
 
 ## add surround on line
-    yss]
+```shell
+yss]
+```
 
 ## visual block surround
-    select and S]
+
+```shell
+select and S]
 
 
 :help text-objects
 
-    da” – D elete A round double quotes
-    di] – D elete I nside square brackets
-    ci{ – C hange I nside curly braces
-    dap – D elete A round P aragraph
-    vaw – V isually select A round W ord
+da” – D elete A round double quotes
+di] – D elete I nside square brackets
+ci{ – C hange I nside curly braces
+dap – D elete A round P aragraph
+vaw – V isually select A round W ord
+```
 
 # Fold
 
-    zR open all folds
-    zM close all open folds
-    za toggles the fold at the cursor
+```shell
+zf close fold under cursor
+zo open fold
+zR open all folds
+zM close all open folds
+za toggles the fold at the cursor
+```
+
+# Vim diff mode
+
+```shell
+:windo diffthis
+:windo diffoff
+```

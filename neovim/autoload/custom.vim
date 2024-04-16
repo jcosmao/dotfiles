@@ -133,3 +133,20 @@ function! custom#foldText()
   let l:ft = substitute(foldtext(), ': \zs.\+', l:label, '')
   return l:ft
 endfunction
+
+function! custom#diffToggle()
+    if ! exists("g:custom_diff_toggle")
+        let g:custom_diff_toggle = 0
+    endif
+
+    if g:custom_diff_toggle == 0
+        execute ':NvimTreeClose'
+        windo diffthis
+        let g:custom_diff_toggle = 1
+    else
+        windo diffoff
+        let g:custom_diff_toggle = 0
+    endif
+endfunction
+
+autocmd FileType * command! -nargs=0 DiffToggle :call custom#diffToggle()
