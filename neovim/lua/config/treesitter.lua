@@ -9,6 +9,8 @@ vim.opt.foldcolumn = "0"
 vim.opt.foldtext = ""
 vim.opt.foldlevel = 25
 vim.opt.foldnestmax = 25
+vim.opt.foldtext = "custom#foldText()"
+vim.opt.foldcolumn = "1"
 
 require("nvim-treesitter.install").prefer_git = false
 require'nvim-treesitter.configs'.setup {

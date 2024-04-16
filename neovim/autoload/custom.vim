@@ -109,6 +109,7 @@ function! custom#lineInfosToggle()
         execute ':IndentLinesEnable'
         execute ':SignifyEnable'
         set signcolumn=auto
+        set foldcolumn=1
         let g:custom_line_infos_status = 1
         set conceallevel=2
     else
@@ -116,7 +117,19 @@ function! custom#lineInfosToggle()
         execute ':IndentLinesDisable'
         execute ':SignifyDisable'
         set signcolumn=no
+        set foldcolumn=0
         let g:custom_line_infos_status = 0
         set conceallevel=0
     endif
+endfunction
+
+function! custom#foldText()
+  let l:fs = match(getline(v:foldstart, v:foldend), '"label":')
+  if l:fs < 0
+    return foldtext()
+  endif
+  let l:label = matchstr(getline(v:foldstart + l:fs),
+        \ '"label":\s\+"\zs[^"]\+\ze"')
+  let l:ft = substitute(foldtext(), ': \zs.\+', l:label, '')
+  return l:ft
 endfunction
