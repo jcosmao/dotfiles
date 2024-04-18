@@ -81,15 +81,14 @@
     trackset = "!f() { rm=${1:-origin}; b=$(git symbolic-ref --short HEAD); git branch -u $rm/$b; }; f"
     # set track to remote/dev/name/branch
     tracksetdev = "!f() { rm=${1:-origin}; b=dev/__USERNAME_BRANCH__/$(git symbolic-ref --short HEAD); git branch -u $rm/$b; }; f"
-    # push to current branch to remote/branch
-    pushr = "!f() { rm=${1:-origin}; b=$(git symbolic-ref --short HEAD); git push --set-upstream $rm $b; }; f"
+    # push current branch to remote/target_branch
+    pushr = "!f() { target=${1:-$(git trackshow)}; r=${target%/*}; rb=${target##*/}; b=$(git symbolic-ref --short HEAD); git push --set-upstream $r $b:$rb; }; f"
     # push to current branch to remote/dev/name/branch
     pushdev = "!f() { echo $1 | grep -Eq '^[a-z0-9]+$' && rm=$1 && shift; b=$(git symbolic-ref --short HEAD); git push --set-upstream ${rm:-origin} $b:dev/__USERNAME_BRANCH__/$b $*; }; f"
     pick = cherry-pick -s -x --allow-empty
     retag = "!r() { git tag -d $1 && git push origin :refs/tags/$0 && git tag $1; }; r"
     # Remove branches that have already been merged:with
     dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
-    rst = "!f() { git clean -xfd && git reset --hard; }; f"
     pullpush = !git pull --rebase && git push
     # List contributors with number of commits
     contributors = shortlog --summary --numbered

@@ -22,6 +22,7 @@ if &background ==# "light"
     \   'aqua':             ['#51986d',   '165'],
     \   'blue':             ['#09859c',   '24'],
     \   'purple':           ['#af528c',   '96'],
+    \   'bg5':              ['#c3b685',   '229'],
     \ }
     let s:match_paren = ['#dacc94', '229']
 else

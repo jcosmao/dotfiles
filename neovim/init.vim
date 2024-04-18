@@ -295,7 +295,7 @@ autocmd WinEnter,BufWinEnter,FileWritePost,BufWritePost,BufRead * call custom#di
 " remove auto<fucking>indent on colon :
 autocmd FileType python,yaml setlocal indentkeys-=<:>
 autocmd FileType python,yaml setlocal indentkeys-=:
-autocmd FileType html,javascript set shiftwidth=2
+autocmd FileType html,javascript,terraform set shiftwidth=2
 
 augroup gomapping
     autocmd!
