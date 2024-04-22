@@ -51,8 +51,10 @@ set pumheight=20
 
 " colorscheme
 set notermguicolors                  " this fix mosh/tmux color
-set background=dark
-colorscheme gruvbox8
+set background=light
+set term=screen-256color
+let g:gruvbox_contrast_light = "hard"
+colorscheme gruvbox
 
 " Remap some common typos
 command! -bang E e<bang>
@@ -129,4 +131,3 @@ set completeopt=longest,menuone,noinsert,noselect
 let g:apc_enable_ft = {'text':1, 'markdown':1, 'sh':1, 'python':1, 'perl':1, 'puppet':1, 'ansible':1}    " enable filetypes
 let g:apc_min_length = 2   " minimal length to open popup
 let g:apc_key_ignore =  []  " ignore keywords
-
