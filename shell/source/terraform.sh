@@ -24,11 +24,6 @@ function tf
 function terraform.set_workspace
 {
     tf_workspace=$1
-    if [[ -n $OS_REGION_NAME ]]; then
-        [[ -n $tf_workspace ]] && tf_suffix="_"
-        tf_suffix+=$OS_REGION_NAME
-    fi
-    tf_workspace="${tf_workspace}${tf_suffix}"
     [[ -n $tf_workspace ]] && export TF_WORKSPACE=$tf_workspace
 }
 
@@ -58,5 +53,3 @@ complete -C $(which terraform) tf
 complete -C $(which terraform) tfy
 complete -F _complete_tf_workspace terraform.set_workspace
 complete -F _complete_tf_workspace tfset
-
-

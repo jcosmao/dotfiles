@@ -139,6 +139,7 @@ history = 5000
 [window]
 dynamic_padding = false
 title = "Alacritty"
+dynamic_title = true
 
 [window.class]
 general = "Alacritty"

@@ -78,7 +78,7 @@ Plug 'akinsho/toggleterm.nvim'
 " Language Specific
 
 " python syntax hilight
-Plug 'wookayin/semshi', {'do': ':UpdateRemotePlugins'}
+" Plug 'wookayin/semshi', {'do': ':UpdateRemotePlugins'}
 " nvim-go + deps
 Plug 'ray-x/go.nvim', {'for': 'go'}
 Plug 'ray-x/guihua.lua', {'for': 'go'}
