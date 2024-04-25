@@ -115,6 +115,17 @@ function utils.randpass_b64
     echo "base64: $(echo -n $password | base64 -w0)"
 }
 
+function utils.basic_auth_hashed
+{
+    passize=${1:-64}
+
+    read -r "user?user: "
+    password=$(utils.randpass $passize)
+    hash=$(openssl passwd -apr1 $password)
+    echo "password: $password"
+    echo "base64: $(echo -n $user:$hash | base64 -w0)"
+}
+
 function ssh-rdp.help
 {
     echo "https://github.com/kokoko3k/ssh-rdp"

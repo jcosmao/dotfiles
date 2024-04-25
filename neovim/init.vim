@@ -161,6 +161,7 @@ set noautochdir
 set keymodel=startsel               " shift+arrow selection
 set diffopt+=vertical               " start :diffsplit in vertical mode
 set conceallevel=0                  " Do not interpret markdown for ex
+set numberwidth=6
 
 " Autocompletion
 set shortmess+=c

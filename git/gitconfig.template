@@ -58,8 +58,7 @@
     showPatch = true
 
 [help]
-	# Automatically correct and execute mistyped commands
-    autocorrect = 1
+    autocorrect = 0
 
 [trailer "sign"]
     key = "Signed-off-by: "
@@ -82,7 +81,7 @@
     # set track to remote/dev/name/branch
     tracksetdev = "!f() { rm=${1:-origin}; b=dev/__USERNAME_BRANCH__/$(git symbolic-ref --short HEAD); git branch -u $rm/$b; }; f"
     # push current branch to remote/target_branch
-    pushr = "!f() { target=${1:-$(git trackshow)}; r=${target%/*}; rb=${target##*/}; b=$(git symbolic-ref --short HEAD); git push --set-upstream $r $b:$rb; }; f"
+    pushr = "!f() { target=${1:-$(git trackshow)}; shift; r=${target%/*}; rb=${target##*/}; b=$(git symbolic-ref --short HEAD); git push --set-upstream $r $b:$rb $*; }; f"
     # push to current branch to remote/dev/name/branch
     pushdev = "!f() { echo $1 | grep -Eq '^[a-z0-9]+$' && rm=$1 && shift; b=$(git symbolic-ref --short HEAD); git push --set-upstream ${rm:-origin} $b:dev/__USERNAME_BRANCH__/$b $*; }; f"
     pick = cherry-pick -s -x --allow-empty
