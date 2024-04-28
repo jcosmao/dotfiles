@@ -1,0 +1,6 @@
+git/gitconfig
+neovim/.plug/
+vim/autoload/plug.vim.old
+*.zwc
+.uuid
+.netrwhist

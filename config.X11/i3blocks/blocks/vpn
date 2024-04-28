@@ -1,0 +1,18 @@
+#!/bin/bash
+
+label=''
+color_up='#9ec600'
+color_down='#676767'
+
+echo $label
+echo $label
+
+function wireguard_count {
+    ip --json link show | jq -r '.[] | select(.ifname | test("^wg")).ifname' | wc -l
+}
+
+if [[ -f /var/run/vpnc.pid || -n $(pidof nm-vpnc-service) || $(wireguard_count) > 0 ]]; then
+    echo $color_up
+else
+    echo $color_down
+fi

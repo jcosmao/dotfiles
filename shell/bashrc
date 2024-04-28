@@ -1,0 +1,24 @@
+source ~/.shell/source/path.sh
+
+# If not running interactively, don't do anything
+[ -z "$PS1" ] && return
+
+# Autolaunch zsh
+#if [ -f ~/.zshrc -a -f "$(which zsh)" ]; then
+#    export SHELL="$(which zsh)"
+#    exec $(which zsh) -l
+#fi
+export SHELL=/bin/bash
+
+# source bashrc extend
+[ -f ~/.bash_aliases ] && source ~/.bash_aliases
+[ -d ~/.bash_custom ] && for source in $(find ~/.bash_custom -type f); do source $source; done
+[ -e ~/.shell ] && for source in $(find ~/.shell/ -type f -name '*.sh' -or -name '*.bash'); do source $source; done
+[ -d ~/.shell/completions ] && source ~/.shell/completions/*
+
+# Set prompt
+if [[ $(basename ${BASH_SOURCE[0]}) == ".bashrc" ]]; then
+    source ~/.shell/bash/prompt.sh
+    PS1='# '
+    PROMPT_COMMAND=prompt.display
+fi

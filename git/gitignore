@@ -1,0 +1,7 @@
+*.gutentags
+*.gutentags.*
+.project/
+.python-version
+pyrightconfig.json
+pyproject.toml
+.git-hooks/*

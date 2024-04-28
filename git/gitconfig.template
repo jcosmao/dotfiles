@@ -1,0 +1,95 @@
+# vim: set ft=gitconfig:
+
+[core]
+	excludesfile = ~/.gitignore
+    attributesfile = ~/.gitattributes
+    hooksPath = ~/.git/hooks
+
+[user]
+    name = __USERNAME__
+    email = __MAIL__
+
+[credential]
+	helper = store
+
+[branch]
+    autosetupmerge = true
+    autosetuprebase = always
+
+[diff]
+    ignoreSubmodules = dirty
+
+[color]
+    ui = auto
+
+[color "branch"]
+    current = yellow reverse
+    local = yellow
+    remote = green
+
+[color "diff"]
+    meta = yellow bold
+    frag = magenta bold
+    old = red bold
+    new = green bold
+    whitespace = red reverse
+
+[color "status"]
+    added = yellow
+    changed = green
+    untracked = cyan
+
+[push]
+    default = current
+    followTags = false
+
+[merge]
+	# Include summaries of merged commits in newly created merge commit messages
+    log = true
+
+[apply]
+	# Detect whitespace errors when applying a patch
+    whitespace = fix
+
+[stash]
+    showPatch = true
+
+[help]
+    autocorrect = 0
+
+[trailer "sign"]
+    key = "Signed-off-by: "
+    command = 'echo "$(git config user.name) <$(git config user.email)>"'
+    ifexists = doNothing
+    ifmissing = doNothing
+
+[alias]
+    aliases = config --get-regexp alias
+    br = branch -vv
+    l = log --stat
+    ls = log --stat --show-signature
+    lol = log --graph --decorate --pretty=oneline --abbrev-commit
+    st = status --short
+    ca = commit -a --amend --reuse-message=HEAD
+    # show current tracking remote/branch
+    trackshow = !git rev-parse --abbrev-ref --symbolic-full-name @{u}
+    # set track to remote/branch
+    trackset = "!f() { rm=${1:-origin}; b=$(git symbolic-ref --short HEAD); git branch -u $rm/$b; }; f"
+    # set track to remote/dev/name/branch
+    tracksetdev = "!f() { rm=${1:-origin}; b=dev/__USERNAME_BRANCH__/$(git symbolic-ref --short HEAD); git branch -u $rm/$b; }; f"
+    # push current branch to remote/target_branch
+    pushr = "!f() { target=${1:-$(git trackshow)}; shift; r=${target%/*}; rb=${target##*/}; b=$(git symbolic-ref --short HEAD); git push --set-upstream $r $b:$rb $*; }; f"
+    # push to current branch to remote/dev/name/branch
+    pushdev = "!f() { echo $1 | grep -Eq '^[a-z0-9]+$' && rm=$1 && shift; b=$(git symbolic-ref --short HEAD); git push --set-upstream ${rm:-origin} $b:dev/__USERNAME_BRANCH__/$b $*; }; f"
+    pick = cherry-pick -s -x --allow-empty
+    retag = "!r() { git tag -d $1 && git push origin :refs/tags/$0 && git tag $1; }; r"
+    # Remove branches that have already been merged:with
+    dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
+    pullpush = !git pull --rebase && git push
+    # List contributors with number of commits
+    contributors = shortlog --summary --numbered
+    # https://stackoverflow.com/questions/3161204/how-to-find-the-nearest-parent-of-a-git-branch
+    base = "!f() { git show-branch -a 2> /dev/null | grep '\\*' | grep -v $(git rev-parse --abbrev-ref HEAD) | head -n1 | sed -e 's/.*\\[\\(.*\\)\\].*/\\1/' -e 's/[\\^~].*//' -e 's,origin/,,'; }; f"
+    root = "rev-parse --show-toplevel"
+    ref = "ls-remote --ref"
+    log-merge = "!f() { git log --stat $1^..$1; }; f"
