@@ -283,6 +283,12 @@ nmap <leader>< <plug>(signify-prev-hunk)
 
 map <silent> <C-g> :ToggleTerm dir=%:p:h <cr>
 
+" started in diff mode ?
+if &diff
+    call custom#setupDiffMapping()
+endif
+au OptionSet diff call custom#setupDiffMapping()
+
 " Specific filetype
 autocmd BufNewFile,BufRead *.lib set filetype=sh
 autocmd BufNewFile,BufRead *.source set filetype=sh

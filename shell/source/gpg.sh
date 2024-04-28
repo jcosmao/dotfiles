@@ -11,3 +11,13 @@ function gpg.import_and_trust
     # trust key
     (echo trust &echo 5 &echo y &echo quit) | gpg --command-fd 0 --edit-key $kid
 }
+
+gpg.trust () {
+	kid=$1
+	(
+		echo trust &
+		echo 5 &
+		echo y &
+		echo quit
+	) | gpg --command-fd 0 --edit-key $kid
+}

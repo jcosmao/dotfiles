@@ -82,7 +82,7 @@ function install_vim_config {
     echo "- Install neovim"
 
     rm -rf ~/.config/nvim && ln -sf $SCRIPTPATH/neovim ~/.config/nvim
-    $HOME/.local/bin/.nvim/usr/bin/nvim --headless +PlugUpgrade +PlugClean! +PlugInstall +PlugUpdate! +qall 2> /dev/null
+    $HOME/.local/bin/.nvim/usr/bin/nvim --headless +PlugClean! +PlugInstall +PlugUpdate! +qall 2> /dev/null
 }
 
 function install_vim_light {
@@ -114,8 +114,6 @@ function install_shell {
 function update_bin_from_deb {
     echo "- Update bin from deb pkg"
 
-    # fzf: deb from debian 11
-    # rofi: ubuntu 22.04
     # ctags: compiled from https://github.com/universal-ctags/ctags.git
 
     # - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
@@ -139,7 +137,7 @@ function install_local_bin {
     # install local bin
     for bin in $(ls bin | grep -v README.md); do
         # check ldd
-        echo "    > $bin"
+        echo "  ❭ $bin"
         if [[ $(ldd bin/$bin 2>&1 |grep -c 'not found') -eq 0 ]]; then
             bin_name=$(echo $bin | cut -d. -f1)
             ln -sf $SCRIPTPATH/bin/$bin ~/.local/bin/$bin_name
@@ -171,12 +169,34 @@ function install_git {
     cp ~/.git/gitconfig.template ~/.git/gitconfig
     ln -sf ~/.git/gitignore ~/.gitignore
     ln -sf ~/.git/gitconfig ~/.gitconfig
-    [[ -z $git_username ]] && read -p 'git username : ' git_username
-    [[ -z $git_mail ]] && read -p 'git mail : ' git_mail
-    [[ -n $git_username ]] && git_username_branch=$(echo $git_username | tr -s ' ' '.' | tr -s [:upper:] [:lower:])
-    [[ -n $git_username ]] && sed -i "s/__USERNAME__/$git_username/g" ~/.git/gitconfig
-    [[ -n $git_username_branch ]] && sed -i "s/__USERNAME_BRANCH__/$git_username_branch/g" ~/.git/gitconfig
-    [[ -n $git_mail ]] && sed -i "s/__MAIL__/$git_mail/g" ~/.git/gitconfig
+
+    if [[ -z $git_username || -z $git_mail ]]; then
+        gpg=()
+        IFS=$'\n'; for line in $(gpg -K --with-colons 2> /dev/null | grep ^uid: | cut -d: -f10); do
+            gpg+=("$line")
+        done
+
+        echo
+        PS3="Select user/mail from gpg ❭ "
+        select opt in ${gpg[*]}; do
+            git_username=$(echo $opt | sed -re 's/(.*) <.*>/\1/')
+            git_mail=$(echo $opt | sed -re 's/.*<(.*)>/\1/')
+            break
+        done
+        echo
+    fi
+
+    [[ -z $git_username ]] && read -p 'enter username ❭ ' git_username
+    [[ -z $git_mail ]] && read -p 'enter mail ❭ ' git_mail
+    [[ -z $git_username || -z $git_mail ]] && echo "Need to provide user/mail" && return
+
+    git_username_branch=$(echo $git_username | tr -s ' ' '.' | tr -s [:upper:] [:lower:])
+    sed -i "s/__USERNAME__/$git_username/g" ~/.git/gitconfig
+    sed -i "s/__USERNAME_BRANCH__/$git_username_branch/g" ~/.git/gitconfig
+    sed -i "s/__MAIL__/$git_mail/g" ~/.git/gitconfig
+
+    gpg_found=$(gpg -K "$git_username <$git_mail>" 2>&1 > /dev/null)
+    [[ $? -eq 0 ]] && git config --global commit.gpgsign true && echo "  ❭ gpg signing enabled"
 }
 
 function install_fonts {
@@ -185,7 +205,7 @@ function install_fonts {
     font_dir="$HOME/.fonts"
     rm -rf $font_dir && ln -sf $SCRIPTPATH/fonts $font_dir
     if [[ -f $(which fc-cache 2>/dev/null) ]]; then
-        echo "    > Resetting font cache..."
+        echo "  ❭ Resetting font cache..."
         fc-cache -f $font_dir
     fi
 }
@@ -215,7 +235,7 @@ function install_config {
     if [[ $target = X11 ]]; then
         # build i3 config
         if which i3 2>&1 > /dev/null ; then
-            echo "    > build i3 conf"
+            echo "  ❭ build i3 conf"
             $HOME/.config/i3/i3_build_conf.sh > /dev/null
             ln -sf $HOME/.config/i3/scripts/i3lock_blur.sh $HOME/.local/bin/lockscreen
         fi

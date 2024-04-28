@@ -149,4 +149,18 @@ function! custom#diffToggle()
     endif
 endfunction
 
+function! custom#setupDiffMapping()
+    " current focused window has a window on the left,
+    " assume we are on the right diff
+    if winnr() !=# winnr('h')
+        nmap <leader>< :diffput<cr>
+        nmap <leader>> :diffget<cr>
+    else
+        nmap <leader>> :diffput<cr>
+        nmap <leader>< :diffget<cr>
+    endif
+endfunction
+
+
+
 autocmd FileType * command! -nargs=0 DiffToggle :call custom#diffToggle()

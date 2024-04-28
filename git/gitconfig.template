@@ -9,9 +9,6 @@
     name = __USERNAME__
     email = __MAIL__
 
-[gitreview]
-    username = __USERNAME__
-
 [credential]
 	helper = store
 
@@ -70,8 +67,8 @@
     aliases = config --get-regexp alias
     br = branch -vv
     l = log --stat
+    ls = log --stat --show-signature
     lol = log --graph --decorate --pretty=oneline --abbrev-commit
-    ls = ls-files
     st = status --short
     ca = commit -a --amend --reuse-message=HEAD
     # show current tracking remote/branch
