@@ -179,7 +179,7 @@ function install_git {
         echo
         PS3="Select user/mail from gpg ❭ "
         select opt in ${gpg[*]}; do
-            git_username=$(echo $opt | sed -re 's/(.*) <.*>/\1/')
+            git_username=$(echo $opt | sed -re 's/(.*) <.*>/\1/' -re 's/ \(.*\)//')
             git_mail=$(echo $opt | sed -re 's/.*<(.*)>/\1/')
             break
         done
@@ -196,7 +196,17 @@ function install_git {
     sed -i "s/__MAIL__/$git_mail/g" ~/.git/gitconfig
 
     gpg_found=$(gpg -K "$git_username <$git_mail>" 2>&1 > /dev/null)
-    [[ $? -eq 0 ]] && git config --global commit.gpgsign true && echo "  ❭ gpg signing enabled"
+    if [[ $? -eq 0 ]]; then
+        git config --global commit.gpgsign true
+        echo
+        echo "  * gpg signing enabled."
+        echo
+        echo "    Default sign key will be used, to select a subkey: "
+        echo "      ❭ git config --global user.signingkey SUBKEYID!"
+        echo "      ❭ gpg --keyid-format long -K | grep '\[.*S.*\]'"
+        echo
+    fi
+
 }
 
 function install_fonts {
