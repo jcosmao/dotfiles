@@ -25,6 +25,9 @@ function k {
     elif [[ $1 == g ]]; then
         shift; set -- "get" "${@:1}"
         PLUGIN_OPT+=("-o" "yaml")
+    elif [[ $1 == delete && ! $* =~ \-\-dry-run ]]; then
+        # append dry-run. need to pass --dry-run=none to force
+        PLUGIN_OPT+=("--dry-run=client")
     fi
 
     kubectl ${OPT[@]} $* ${PLUGIN_OPT[@]}
@@ -92,7 +95,7 @@ function k8s.exec {
 }
 
 function k8s.get_ns_logs {
-    stern -n $KUBENS --field-selector metadata.namespace=$KUBENS $*
+    command stern -n $KUBENS --field-selector metadata.namespace=$KUBENS $*
 }
 
 function k8s.get_port_forwarding {
@@ -105,6 +108,14 @@ function k8s.get_all_resources {
         k get deploy,replicaset,statefulset,pod,pvc,cm,secret,svc,$(k api-resources --verbs=list --namespaced -o name | grep -v events | sort | paste -d, -s) $*
     else
         k get deploy,replicaset,statefulset,pod,pvc,cm,secret,svc,$(k api-resources --verbs=list --namespaced -o name | grep ingress | sort | paste -d, -s) $*
+    fi
+}
+
+function k8s.delete_all_resources {
+    k delete $(k api-resources --verbs=list --namespaced -o name | grep -v events | sort | paste -d, -s) --dry-run=client --all
+    [[ $SHELL =~ zsh ]] && vared -p 'Delete all ? [yes] ' -c response || read -r -p 'Delete all ? [yes] ' response
+    if [[ $response = "yes" ]]; then
+        k delete $(k api-resources --verbs=list --namespaced -o name | grep -v events | sort | paste -d, -s) --all --dry-run=none
     fi
 }
 
