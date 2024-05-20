@@ -246,6 +246,10 @@ map <silent> <leader>k :TroubleToggle document_diagnostics<cr>
 map <silent> <leader>l :TroubleToggle workspace_diagnostics <cr>
 " paste last yank (not from dd)
 map <silent> <leader>p "0p
+
+" Insert mode, paste yank using Ctrl-p
+imap <silent> <C-p> <C-r>"
+
 " vim surround
 map <silent> <leader>" ysiW"
 map <silent> <leader>: ysiw"
