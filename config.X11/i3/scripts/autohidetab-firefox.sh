@@ -2,9 +2,9 @@
 
 pkill firefox
 
-find ~/.mozilla -name prefs.js | while read pref; do
-    profile=$(dirname $pref)
-    cat $pref | grep -q '^user_pref("toolkit.legacyUserProfileCustomizations.stylesheets'
+find ~/.mozilla -name prefs.js | while read -r pref; do
+    profile=$(dirname "$pref")
+    cat "$pref" | grep -q '^user_pref("toolkit.legacyUserProfileCustomizations.stylesheets'
 
     if [[ $? -eq 0 ]]; then
         sed 's/user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", false);/user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);/' -i $pref
@@ -13,8 +13,7 @@ find ~/.mozilla -name prefs.js | while read pref; do
     fi
 
     mkdir -p $profile/chrome
-    cat <<EOF > $profile/chrome/userChrome.css
+    cat <<EOF > "$profile/chrome/userChrome.css"
 #main-window[titlepreface*="[Sidebery]"] #titlebar {visibility: collapse !important;}
 EOF
-
 done
