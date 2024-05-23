@@ -251,10 +251,10 @@ map <silent> <leader>p "0p
 imap <silent> <C-p> <C-r>"
 
 " vim surround
-map <silent> <leader>" ysiW"
-map <silent> <leader>: ysiw"
-map <silent> <leader>' ysiW'
-map <silent> <leader>; ysiw'
+map <silent> <leader>" ysiw"
+map <silent> <leader>: ysiW"
+map <silent> <leader>' ysiw'
+map <silent> <leader>; ysiW'
 
 nnoremap <silent> <M-Up> <cmd>call smoothie#do("\<C-U>") <CR>
 vnoremap <silent> <M-Up> <cmd>call smoothie#do("\<C-U>") <CR>
@@ -307,6 +307,7 @@ autocmd WinEnter,BufWinEnter,FileWritePost,BufWritePost,BufRead * call custom#di
 autocmd FileType python,yaml setlocal indentkeys-=<:>
 autocmd FileType python,yaml setlocal indentkeys-=:
 autocmd FileType html,javascript,terraform set shiftwidth=2
+autocmd Filetype sh setlocal iskeyword+=$
 
 augroup gomapping
     autocmd!
