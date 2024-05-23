@@ -30,7 +30,7 @@ function launch_ssh_agent
         fi
     fi
 
-    ssh-add -l 2> /dev/null; rc=$?
+    ssh-add -l &> /dev/null; rc=$?
     # no ssh-agent running
     if [[ $rc == 2 ]]; then
         # Try to export ssh-agent env
