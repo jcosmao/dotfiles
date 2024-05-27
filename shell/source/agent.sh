@@ -45,4 +45,4 @@ function launch_ssh_agent
     fi
 }
 
-launch_ssh_agent
+[[ -z $SSH_TTY ]] && launch_ssh_agent
