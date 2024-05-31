@@ -66,12 +66,14 @@ function pyenv.setup_python_version
 
 function pyenv.setup_flake
 {
+    line_len=${1:120}
+
     project_root=$(utils.find_project_root .project)
     [[ -z $project_root ]] && project_root=$(utils.find_project_root .git)
     [[ -z $project_root ]] && echo "Project root not found" && return
 
-    echo '[flake8]
-max-line-length = 120' >> $project_root/.flake8
+    echo "[flake8]"                    > "$project_root/.flake8"
+    echo "max-line-length = $line_len" >> "$project_root/.flake8"
 }
 
 function pyenv.setup_pyright
@@ -94,11 +96,11 @@ function pyenv.setup
 
     pyenv.setup_python_version
     pyenv.setup_pyright
-    pyenv.setup_flake
+    pyenv.setup_flake 120
 }
 
 function pyenv.activate {
-    pyenv activate $*
+    pyenv activate "$*"
 }
 
 alias pya="pyenv.activate"
