@@ -47,6 +47,12 @@ function gpg.help
     '
 }
 
+function gpg.reload_agent
+{
+    echo RELOADAGENT | gpg-connect-agent
+    echo test_sign | gpg --clearsign
+}
+
 function gpg.offline_master_edit
 {
     priv_key_asc=$1; shift

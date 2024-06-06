@@ -202,7 +202,7 @@ map <silent> <leader>V :tabedit $MYVIMRC <cr>
 map <silent> <leader>VV :source $MYVIMRC \| :echo $MYVIMRC 'reloaded' <cr>
 map <silent> <leader><ESC> :call custom#lineInfosToggle() <cr>
 map <silent> <F1> :NvimTreeFindFileToggle! <cr>
-map <silent> <F2> :AerialToggle <cr>
+map <silent> <F2> :Trouble symbols toggle win.size=50 focus=false <cr>
 map <silent> <F3> :IndentLinesToggle <cr>
 map <silent> <F4> :set number! <cr>
 map <silent> <F5> :SignifyToggle <cr>
@@ -242,8 +242,9 @@ map <silent> <leader><Right> :wincmd l<cr>
 map <silent> <leader><Left> :wincmd h<cr>
 map <silent> <leader><leader> :noh <cr>
 map <silent> <leader><ENTER> <C-w>o
-map <silent> <leader>k :TroubleToggle document_diagnostics<cr>
-map <silent> <leader>l :TroubleToggle workspace_diagnostics <cr>
+" buffer diag
+map <silent> <leader>k :Trouble diagnostics toggle filter.buf=0 focus=false <cr>
+map <silent> <leader>l :Trouble diagnostics toggle focus=false <cr>
 " paste last yank (not from dd)
 map <silent> <leader>p "0p
 

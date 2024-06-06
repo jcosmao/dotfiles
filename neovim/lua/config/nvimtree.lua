@@ -10,7 +10,7 @@ require("nvim-tree").setup({
     reload_on_bufenter = true,
     view = {
         cursorline = true,
-        width = 42,
+        width = 50,
         side = "left",
     },
     renderer = {
