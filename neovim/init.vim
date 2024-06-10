@@ -327,3 +327,7 @@ autocmd BufWritePre * :%s/\s\+$//e
 " save without trim
 imap <silent> <C-s> <Esc>:noautocmd w <cr>
 map <silent> <C-s> :noautocmd w <cr>
+
+" sudo save
+command! -nargs=0 W :w !sudo tee %
+command! -nargs=0 WQ :wq !sudo tee %

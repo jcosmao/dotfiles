@@ -44,10 +44,14 @@ set autowriteall
 set nofoldenable                    " Folding makes things unreadable.
 set noautochdir
 set keymodel=startsel               " shift+arrow selection
+set nuw=6
 
 " Autocompletion
 set shortmess+=c
 set pumheight=20
+
+set timeoutlen=1000
+set ttimeoutlen=100
 
 " colorscheme
 set notermguicolors                  " this fix mosh/tmux color
@@ -98,10 +102,30 @@ map <silent> <leader><ENTER> <C-w>o
 " paste last yank (not from dd)
 map <silent> <leader>p "0p
 
-nnoremap <silent> <M-Up> :-10 <CR>
-vnoremap <silent> <M-Up> :-10 <CR>
-nnoremap <silent> <M-Down> :+10 <CR>
-vnoremap <silent> <M-Down> :+10 <CR>
+" > cat
+" ^[[1;3A     => M-Up
+" ^[[1;3B     => M-Down
+" ^[[1;5C     => C-Right
+" ^[[1;5D     => C-Left
+"
+" ^[ == <Esc> or \e
+
+noremap <silent> <Esc>[1;3A :-15 <CR>
+noremap <silent> <Esc>[1;3B :+15 <CR>
+inoremap <silent> <Esc>[1;3A <C-o>:-15 <CR>
+inoremap <silent> <Esc>[1;3B <C-o>:+15 <CR>
+noremap <silent> <Esc>[1;5C W
+noremap <silent> <Esc>[1;5D B
+inoremap <silent> <Esc>[1;5C <C-o>W
+inoremap <silent> <Esc>[1;5D <C-o>B
+noremap <silent> <Esc>[H ^
+noremap <silent> <Esc>[F $
+inoremap <silent> <Esc>[H <C-o>^
+inoremap <silent> <Esc>[F <C-o>$
+noremap <silent> <Esc>OH ^
+noremap <silent> <Esc>OF $
+inoremap <silent> <Esc>OH <C-o>^
+inoremap <silent> <Esc>OF <C-o>$
 
 " Always forward with n / backward with N
 noremap <expr> n (v:searchforward ? 'n' : 'N')
@@ -131,3 +155,10 @@ set completeopt=longest,menuone,noinsert,noselect
 let g:apc_enable_ft = {'text':1, 'markdown':1, 'sh':1, 'python':1, 'perl':1, 'puppet':1, 'ansible':1}    " enable filetypes
 let g:apc_min_length = 2   " minimal length to open popup
 let g:apc_key_ignore =  []  " ignore keywords
+
+" sudo save
+" https://stackoverflow.com/a/48237738
+cnoremap W w !sudo tee % > /dev/null
+cnoremap WQ wq !sudo tee % > /dev/null
+
+hi LineNr  term=underline ctermfg=181 guifg=#a89984
