@@ -1,5 +1,3 @@
-source ~/.shell/source/path.sh
-
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
@@ -10,10 +8,19 @@ source ~/.shell/source/path.sh
 #fi
 export SHELL=/bin/bash
 
-# source bashrc extend
+function _get_sourceable_bash_files_ordered
+{
+    find /etc/profile.d/ ~/.bash_custom/ ~/.shell/ -type f -follow -name '*.sh'  2> /dev/null | while read file;do
+        [[ $file = '/etc/profile.d/ovh_bashrc.sh' ]] && continue
+        echo $(basename $file) $file
+    done | sort -n | awk '{print $2}'
+}
+
+for src in $(_get_sourceable_bash_files_ordered); do
+    source "$src"
+done
+
 [ -f ~/.bash_aliases ] && source ~/.bash_aliases
-[ -d ~/.bash_custom ] && for source in $(find ~/.bash_custom -type f); do source $source; done
-[ -e ~/.shell ] && for source in $(find ~/.shell/ -type f -name '*.sh' -or -name '*.bash'); do source $source; done
 [ -d ~/.shell/completions ] && source ~/.shell/completions/*
 
 # Set prompt

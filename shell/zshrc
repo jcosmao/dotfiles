@@ -2,7 +2,6 @@
 
 # uncomment for profiling
 # zmodload zsh/zprof
-source ~/.shell/source/path.sh
 
 [[ ! -d ~/.zsh ]] && mkdir ~/.zsh
 [[ ! -d ~/.zsh/myzsh ]] && git clone https://github.com/jcosmao/myzsh.git ~/.zsh/myzsh
@@ -23,4 +22,3 @@ source ~/.zsh/zsh-bash-completions-fallback/zsh-bash-completions-fallback.plugin
 # zprof
 
 autoload -U +X bashcompinit && bashcompinit
-complete -o nospace -C /home/jcosmao/go/bin/terraform terraform
