@@ -156,9 +156,4 @@ let g:apc_enable_ft = {'text':1, 'markdown':1, 'sh':1, 'python':1, 'perl':1, 'pu
 let g:apc_min_length = 2   " minimal length to open popup
 let g:apc_key_ignore =  []  " ignore keywords
 
-" sudo save
-" https://stackoverflow.com/a/48237738
-cnoremap W w !sudo tee % > /dev/null
-cnoremap WQ wq !sudo tee % > /dev/null
-
 hi LineNr  term=underline ctermfg=181 guifg=#a89984
