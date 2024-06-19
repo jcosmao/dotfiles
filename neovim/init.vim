@@ -55,22 +55,19 @@ endif
 
 Plug 'mhinz/vim-startify'
 Plug 'nvim-tree/nvim-web-devicons'
-" weird color bar appear on next commit
-" Plug 'nvim-tree/nvim-tree.lua', {'commit': 'f24afa2cef551122b8bd53bb2e4a7df42343ce2e'}
 Plug 'nvim-tree/nvim-tree.lua'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'chengzeyi/fzf-preview.vim'
 Plug 'itchyny/lightline.vim'
 Plug 'josa42/nvim-lightline-lsp'
-Plug 'Yggdroot/indentLine'
+Plug 'lukas-reineke/indent-blankline.nvim'
 Plug 'Raimondi/delimitMate'
 Plug 'tpope/vim-sensible'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
-Plug 'tpope/vim-eunuch'
+Plug 'lambdalisue/vim-suda'
 Plug 'psliwka/vim-smoothie'
-Plug 'troydm/zoomwintab.vim'
 " breaking change - does not detect root pattern with priority
 Plug 'airblade/vim-rooter', {'commit': 'd64f3e04df9914e784508019a1a1f291cbb40bd4'}
 Plug 'akinsho/toggleterm.nvim'
@@ -105,6 +102,7 @@ Plug 'sindrets/diffview.nvim'
 
 " Colorscheme
 Plug 'sainnhe/gruvbox-material'
+Plug 'catppuccin/nvim'
 Plug 'norcalli/nvim-colorizer.lua'
 
 call plug#end()
@@ -117,7 +115,7 @@ set nocompatible
 filetype off
 filetype plugin indent on
 syntax off
-set mouse=
+set mouse=a                         " Enable mouse by default
 set ttyfast                         " Indicate fast terminal conn for faster redraw
 set lazyredraw                      " Wait to redraw
 set magic
@@ -203,7 +201,7 @@ map <silent> <leader>VV :source $MYVIMRC \| :echo $MYVIMRC 'reloaded' <cr>
 map <silent> <leader><ESC> :call custom#lineInfosToggle() <cr>
 map <silent> <F1> :NvimTreeFindFileToggle! <cr>
 map <silent> <F2> :Trouble symbols toggle win.size=50 focus=false <cr>
-map <silent> <F3> :IndentLinesToggle <cr>
+map <silent> <F3> :IBLToggle <cr>
 map <silent> <F4> :set number! <cr>
 map <silent> <F5> :SignifyToggle <cr>
 map <silent> <F6> :set paste! <cr>
@@ -304,7 +302,7 @@ autocmd BufNewFile,BufRead *.conf set filetype=ini
 
 autocmd WinEnter,BufWinEnter,FileWritePost,BufWritePost,BufRead * call custom#displayFilePath()
 
-" remove auto<fucking>indent on colon :
+" remove auto<fucking>indent on semicolon :
 autocmd FileType python,yaml setlocal indentkeys-=<:>
 autocmd FileType python,yaml setlocal indentkeys-=:
 autocmd FileType html,javascript,terraform set shiftwidth=2
@@ -318,8 +316,8 @@ augroup end
 
 augroup indentlinesdisable
     autocmd!
-    autocmd TermOpen * execute 'IndentLinesDisable'
-    autocmd FileType markdown,json,yaml,join(g:custom_special_filtetypes, ",") execute 'IndentLinesDisable'
+    autocmd TermOpen * execute 'IBLDisable'
+    autocmd FileType markdown,json,yaml,join(g:custom_special_filtetypes, ",") execute 'IBLDisable'
 augroup end
 
 " trim whitespace
@@ -328,6 +326,6 @@ autocmd BufWritePre * :%s/\s\+$//e
 imap <silent> <C-s> <Esc>:noautocmd w <cr>
 map <silent> <C-s> :noautocmd w <cr>
 
-" sudo save
-command! -nargs=0 W :w !sudo tee %
-command! -nargs=0 WQ :wq !sudo tee %
+set conceallevel=2
+autocmd InsertEnter * setlocal conceallevel=0
+autocmd InsertLeave * setlocal conceallevel=2

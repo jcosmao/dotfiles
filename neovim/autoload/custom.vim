@@ -106,7 +106,7 @@ function! custom#lineInfosToggle()
 
     if g:custom_line_infos_status == 0
         set number
-        execute ':IndentLinesEnable'
+        execute ':IBLEnable'
         execute ':SignifyEnable'
         set signcolumn=auto
         set foldcolumn=1
@@ -114,7 +114,7 @@ function! custom#lineInfosToggle()
         set conceallevel=2
     else
         set nonumber
-        execute ':IndentLinesDisable'
+        execute ':IBLDisable'
         execute ':SignifyDisable'
         set signcolumn=no
         set foldcolumn=0

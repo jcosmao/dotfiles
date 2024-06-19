@@ -16,25 +16,25 @@ require("luasnip.loaders.from_lua").load()
 require("luasnip.loaders.from_lua").lazy_load { paths = vim.g.lua_snippets_path or "" }
 
 vim.api.nvim_create_autocmd("InsertLeave", {
-callback = function()
-  if
-    require("luasnip").session.current_nodes[vim.api.nvim_get_current_buf()]
-    and not require("luasnip").session.jump_active
-  then
-    require("luasnip").unlink_current()
-  end
-end,
+    callback = function()
+        if
+            require("luasnip").session.current_nodes[vim.api.nvim_get_current_buf()]
+            and not require("luasnip").session.jump_active
+        then
+            require("luasnip").unlink_current()
+        end
+    end,
 })
 
 luasnip_list_available_snips = function()
-	local ft_list = require("luasnip").available()
-	local ft_snips = {}
-	for _, item in pairs(ft_list[vim.o.filetype]) do
-		table.insert(ft_snips, string.format("%-50s\t[%s]\t\t%s", item.trigger, vim.o.filetype, item.name))
-	end
-	for _, item in pairs(ft_list["all"]) do
-		table.insert(ft_snips, string.format("%-50s\t[default]\t\t%s", item.trigger, item.name))
-	end
+    local ft_list = require("luasnip").available()
+    local ft_snips = {}
+    for _, item in pairs(ft_list[vim.o.filetype]) do
+        table.insert(ft_snips, string.format("%-50s\t[%s]\t\t%s", item.trigger, vim.o.filetype, item.name))
+    end
+    for _, item in pairs(ft_list["all"]) do
+        table.insert(ft_snips, string.format("%-50s\t[default]\t\t%s", item.trigger, item.name))
+    end
     return ft_snips
 end
 

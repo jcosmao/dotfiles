@@ -1,3 +1,14 @@
+#!/bin/bash
+
+function append_path () {
+    case ":$PATH:" in
+        *:"$1":*)
+            ;;
+        *)
+            PATH="${PATH:+$PATH:}$1"
+    esac
+}
+
 function common.get_sourceable_bash_files_ordered
 {
     find /etc/profile.d/ ~/.bash_custom/ ~/.shell/ -type f -follow -name '*.sh'  2> /dev/null | while read file;do

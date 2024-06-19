@@ -32,6 +32,8 @@ call lightline#lsp#register()
 " Autoset lightline colorsheme (except gruvbox-material which does not match)
 if colors_name == 'gruvbox-material'
     let g:lightline.colorscheme = 'gruvbox_material'
+elseif colors_name =~# '^catppuccin'
+    let g:lightline.colorscheme = 'catppuccin'
 else
     let g:lightline.colorscheme = colors_name
 endif

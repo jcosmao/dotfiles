@@ -107,25 +107,35 @@ map <silent> <leader>p "0p
 " ^[[1;3B     => M-Down
 " ^[[1;5C     => C-Right
 " ^[[1;5D     => C-Left
+" ^[[1;5A     => C-Up
+" ^[[1;5B     => C-Down
 "
 " ^[ == <Esc> or \e
 
 noremap <silent> <Esc>[1;3A :-15 <CR>
-noremap <silent> <Esc>[1;3B :+15 <CR>
 inoremap <silent> <Esc>[1;3A <C-o>:-15 <CR>
+noremap <silent> <Esc>[1;3B :+15 <CR>
 inoremap <silent> <Esc>[1;3B <C-o>:+15 <CR>
 noremap <silent> <Esc>[1;5C W
-noremap <silent> <Esc>[1;5D B
 inoremap <silent> <Esc>[1;5C <C-o>W
+noremap <silent> <Esc>[1;5D B
 inoremap <silent> <Esc>[1;5D <C-o>B
+noremap <silent> <Esc>[1;5A :-5 <cr>
+inoremap <silent> <Esc>[1;5A <C-o>:-5 <cr>
+noremap <silent> <Esc>[1;5B :+2 <cr>
+inoremap <silent> <Esc>[1;5B <C-o>:+2 <cr>
+" Home / Fin
 noremap <silent> <Esc>[H ^
-noremap <silent> <Esc>[F $
 inoremap <silent> <Esc>[H <C-o>^
+noremap <silent> <Esc>[F $
 inoremap <silent> <Esc>[F <C-o>$
+" Home / Fin - tmux
 noremap <silent> <Esc>OH ^
-noremap <silent> <Esc>OF $
 inoremap <silent> <Esc>OH <C-o>^
+noremap <silent> <Esc>OF $
 inoremap <silent> <Esc>OF <C-o>$
+
+
 
 " Always forward with n / backward with N
 noremap <expr> n (v:searchforward ? 'n' : 'N')
@@ -156,4 +166,4 @@ let g:apc_enable_ft = {'text':1, 'markdown':1, 'sh':1, 'python':1, 'perl':1, 'pu
 let g:apc_min_length = 2   " minimal length to open popup
 let g:apc_key_ignore =  []  " ignore keywords
 
-hi LineNr  term=underline ctermfg=181 guifg=#a89984
+hi LineNr  term=underline ctermfg=250 guifg=#a89984

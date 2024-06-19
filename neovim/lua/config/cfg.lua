@@ -19,8 +19,8 @@ vim.api.nvim_create_autocmd('FileType',     {
     group    = 'bufcheck',
     pattern  = 'man',
     callback = function()
-      vim.keymap.set('n', '<enter>'    , 'K'    , {buffer=true})
-      vim.keymap.set('n', '<backspace>', '<c-o>', {buffer=true})
+        vim.keymap.set('n', '<enter>'    , 'K'    , {buffer=true})
+        vim.keymap.set('n', '<backspace>', '<c-o>', {buffer=true})
     end
 })
 
@@ -39,10 +39,19 @@ vim.api.nvim_create_autocmd('BufReadPost',  {
 
 -- Close nvimtree and aerial when diffview mode is opened
 vim.api.nvim_create_autocmd("BufEnter", {
-  group = vim.api.nvim_create_augroup("DiffviewOpen", {clear = true}),
-  pattern = "Diffview*",
-  callback = function()
-    vim.cmd(":NvimTreeClose")
-    vim.cmd(":AerialClose")
-  end
+    group = vim.api.nvim_create_augroup("DiffviewOpen", {clear = true}),
+    pattern = "Diffview*",
+    callback = function()
+        vim.cmd(":NvimTreeClose")
+        vim.cmd(":AerialClose")
+    end
 })
+
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.opt.foldcolumn = "0"
+vim.opt.foldtext = ""
+vim.opt.foldlevel = 25
+vim.opt.foldnestmax = 25
+vim.opt.foldtext = "custom#foldText()"
+vim.opt.foldcolumn = "1"

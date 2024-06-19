@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
@@ -5,12 +7,11 @@ export SHELL=/bin/bash
 
 source $HOME/.shell/common.sh
 
+[ -f ~/.bash_aliases ] && common.source ~/.bash_aliases
+
 for src in $(common.get_sourceable_bash_files_ordered); do
     common.source "$src"
 done
-
-[ -f ~/.bash_aliases ] && common.source ~/.bash_aliases
-# [ -d ~/.shell/completions ] && comon.source ~/.shell/completions/*
 
 # Set prompt
 if [[ $(basename ${BASH_SOURCE[0]}) == ".bashrc" ]]; then
