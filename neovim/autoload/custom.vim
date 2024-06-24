@@ -78,7 +78,7 @@ autocmd FileType * command! -nargs=0 BackgroundToggle :call custom#backgroundTog
 
 
 let g:custom_special_filtetypes = ['NvimTree', 'NvimTree_*', 'aerial', 'startify', 'fzf', 'Trouble',
-    \                              'Mason', 'DiffviewFiles', 'toggleterm', 'toggleterm*']
+    \                              'trouble', 'Mason', 'DiffviewFiles', 'toggleterm', 'toggleterm*']
 
 function custom#isSpecialFiletype() abort
     let l:regexp = join(g:custom_special_filtetypes, '\|')
@@ -152,6 +152,7 @@ endfunction
 function! custom#setupDiffMapping()
     " current focused window has a window on the left,
     " assume we are on the right diff
+    execute ':IBLDisable'
     if winnr() !=# winnr('h')
         nmap <leader>< :diffput<cr>
         nmap <leader>> :diffget<cr>

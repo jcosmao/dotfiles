@@ -1,9 +1,5 @@
 local vim = vim
 
--- setup with all defaults
--- each of these are documented in `:help nvim-tree.OPTION_NAME`
--- nested options are documented by accessing them with `.` (eg: `:help nvim-tree.view.mappings.list`).
-
 require("nvim-tree").setup({
     sort_by = "case_sensitive",
     sync_root_with_cwd = true,

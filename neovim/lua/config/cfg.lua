@@ -43,7 +43,8 @@ vim.api.nvim_create_autocmd("BufEnter", {
     pattern = "Diffview*",
     callback = function()
         vim.cmd(":NvimTreeClose")
-        vim.cmd(":AerialClose")
+        vim.cmd(":Trouble close")
+        vim.keymap.set({'n', 'i'}, '<F1>', ':DiffviewToggleFiles <cr>', {buffer=true})
     end
 })
 

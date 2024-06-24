@@ -2,7 +2,7 @@
 require'colorizer'.setup({'css'; 'javascript'; 'vim';})
 
 require("catppuccin").setup({
-    flavour = "auto", -- latte, frappe, macchiato, mocha
+    flavour = "macchiato", -- latte, frappe, macchiato, mocha
     background = { -- :h background
         light = "latte",
         dark = "macchiato",

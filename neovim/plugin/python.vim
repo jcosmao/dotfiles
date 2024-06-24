@@ -45,10 +45,3 @@ endfunction
 
 autocmd FileType python command! -nargs=0 Black :call PythonBlack()
 autocmd BufReadPost * call AutoColorColumn()
-" Fix semshi color
-if custom#PlugLoaded("semshi")
-    let g:semshi#always_update_all_highlights = 1
-    let g:semshi#tolerate_syntax_errors = 1
-
-    autocmd BufWritePost,BufRead python execute 'Semshi enable'
-endif

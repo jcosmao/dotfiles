@@ -62,7 +62,7 @@ Plug 'chengzeyi/fzf-preview.vim'
 Plug 'itchyny/lightline.vim'
 Plug 'josa42/nvim-lightline-lsp'
 Plug 'lukas-reineke/indent-blankline.nvim'
-Plug 'Raimondi/delimitMate'
+Plug 'windwp/nvim-autopairs'
 Plug 'tpope/vim-sensible'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
@@ -74,8 +74,6 @@ Plug 'akinsho/toggleterm.nvim'
 
 " Language Specific
 
-" python syntax hilight
-" Plug 'wookayin/semshi', {'do': ':UpdateRemotePlugins'}
 " nvim-go + deps
 Plug 'ray-x/go.nvim', {'for': 'go'}
 Plug 'ray-x/guihua.lua', {'for': 'go'}
@@ -91,8 +89,6 @@ if executable('ctags')
     \    'do': 'cd ' . g:plug_root . '/vim-gutentags; patch -p1 -stNr /dev/null < ~/.config/nvim/plugin_patch/vim-gutentags.patch; git commit -am local; true'
     \}
 endif
-
-Plug 'stevearc/aerial.nvim'
 
 " git
 Plug 'mhinz/vim-signify'
@@ -241,8 +237,8 @@ map <silent> <leader><Left> :wincmd h<cr>
 map <silent> <leader><leader> :noh <cr>
 map <silent> <leader><ENTER> <C-w>o
 " buffer diag
-map <silent> <leader>k :Trouble diagnostics toggle filter.buf=0 focus=false <cr>
-map <silent> <leader>l :Trouble diagnostics toggle focus=false <cr>
+map <silent> <leader>k :Trouble diagnostics toggle filter.buf=0 focus=false win.size=35 <cr>
+map <silent> <leader>l :Trouble diagnostics toggle focus=false win.size=35 <cr>
 " paste last yank (not from dd)
 map <silent> <leader>p "0p
 
