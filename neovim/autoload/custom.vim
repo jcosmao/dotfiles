@@ -162,6 +162,16 @@ function! custom#setupDiffMapping()
     endif
 endfunction
 
-
-
 autocmd FileType * command! -nargs=0 DiffToggle :call custom#diffToggle()
+
+function! custom#debugToggle()
+    if !&verbose
+        set verbosefile=/tmp/nvim_debug.log
+        set verbose=10
+    else
+        set verbose=0
+        set verbosefile=
+    endif
+endfunction
+
+autocmd FileType * command! -nargs=0 DebugToggle :call custom#debugToggle()

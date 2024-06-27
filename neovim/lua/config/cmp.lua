@@ -35,10 +35,10 @@ cmp.setup {
         end
     },
     mapping = {
-        ['<C-n>'] = cmp.mapping(cmp.mapping.select_next_item(), {'i','c'}),
         ['<C-p>'] = cmp.mapping(cmp.mapping.select_prev_item(), {'i','c'}),
-        ['<Up>'] = cmp.mapping.select_prev_item(),
-        ['<Down>'] = cmp.mapping.select_next_item(),
+        ['<C-n>'] = cmp.mapping(cmp.mapping.select_next_item(), {'i','c'}),
+        ['<Up>'] = cmp.mapping(cmp.mapping.select_prev_item(), {'i','c'}),
+        ['<Down>'] = cmp.mapping(cmp.mapping.select_next_item(), {'i','c'}),
         ['<C-Up>'] = cmp.mapping.scroll_docs(-4),
         ['<C-Down>'] = cmp.mapping.scroll_docs(4),
         ['<C-Space>'] = cmp.mapping.complete(),
@@ -74,13 +74,26 @@ cmp.setup {
         -- { name = 'treesitter' },
         { name = 'buffer' },
     },
-    cmp.setup.cmdline('/', {
-        mapping = cmp.mapping.preset.cmdline(),
-        sources = {
-            { name = 'buffer' }
-        }
-    }),
 }
+
+
+-- Enable completion for command-line
+cmp.setup.cmdline({ '/', '?' }, {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = {
+    { name = 'buffer' }
+  }
+})
+
+-- Enable completion for command-line (:)
+cmp.setup.cmdline(':', {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = cmp.config.sources({
+    { name = 'path' }
+  }, {
+    { name = 'cmdline' }
+  })
+})
 
 -- -- Setup lspconfig.
 local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
