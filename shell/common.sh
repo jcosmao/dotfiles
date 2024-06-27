@@ -11,8 +11,8 @@ function append_path () {
 
 function common.get_sourceable_bash_files_ordered
 {
-    find /etc/profile.d/ ~/.bash_custom/ ~/.shell/ -type f -follow -name '*.sh'  2> /dev/null | while read file;do
-        echo $(basename $file) $file
+    find /etc/profile ~/.bash_custom/ ~/.shell/source ~/.shell/completions -type f -follow  2> /dev/null | while read file;do
+        echo "$(basename "$file") $file"
     done | sort -n | awk '{print $2}'
 }
 
