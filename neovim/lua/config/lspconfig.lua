@@ -36,9 +36,15 @@ require("lsp_signature").setup(signature_config)
 
 
 local virtual_text_default = {
-        prefix = "■",
-        spacing = 10
-    }
+    format = function(diagnostic)
+      local lines = vim.split(diagnostic.message, '\n')
+      return lines[1]
+    end,
+    virt_text_pos = 'right_align',
+    suffix = ' ',
+    prefix = "■",
+    spacing = 10,
+}
 
 vim.diagnostic.config({
     update_in_insert = true,

@@ -297,7 +297,7 @@ autocmd BufNewFile,BufRead *.inc set filetype=perl
 autocmd BufNewFile,BufRead *.tf set filetype=terraform
 autocmd BufNewFile,BufRead *.conf set filetype=ini
 
-autocmd WinEnter,BufWinEnter,FileWritePost,BufWritePost,BufRead * call custom#displayFilePath()
+autocmd BufEnter,WinEnter,TabEnter,BufWritePost * call custom#displayFilePath()
 
 " remove auto<fucking>indent on semicolon :
 autocmd FileType python,yaml setlocal indentkeys-=<:>
