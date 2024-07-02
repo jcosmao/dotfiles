@@ -44,6 +44,7 @@ vim.api.nvim_create_autocmd("BufEnter", {
     callback = function()
         vim.cmd(":NvimTreeClose")
         vim.cmd(":Trouble close")
+        vim.diagnostic.disable()
         vim.keymap.set({'n', 'i'}, '<F1>', ':DiffviewToggleFiles <cr>', {buffer=true})
     end
 })

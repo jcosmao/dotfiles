@@ -13,12 +13,14 @@ function cleanup {
 
 trap cleanup SIGINT INT TERM QUIT ERR
 
+SSH_USER=admin
 TAILOPTS=''
 TAILLINES=''
 CAT=0
 GREP_PATTERN=''
 GREP_OPT=''
 NOCOLOR=0
+HEADER=1
 LOG_MAP='{
     "default": {
         "default": "cmd:journalctl --output cat"
@@ -175,9 +177,9 @@ function sshlog {
         # stdbuf -o0 : do not buffer stdout
         # awk: prefix each line whith  "host filename ..."  #  filename is retrieved using tail -v
         # grep -F '' --line-buffered: try to not mix output
-        sudo ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -l admin $h \
+        sudo ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -l $SSH_USER $h \
             "$LOGCMD | $GREPCMD" 2> /dev/null | \
-            stdbuf -o0 awk -v host=$short '/^==>/{size=split($2,splitted,"/");filename=splitted[size] ;next} !/^==>/{print host,filename,$0}' | \
+            stdbuf -o0 awk -v host=$short -v header=$HEADER '/^==>/{size=split($2,splitted,"/");filename=splitted[size] ;next} !/^==>/{ if(header == 0) {print $0} else {print host,filename,$0} }' | \
             grep -F '' --line-buffered  &
     done | $color_cmd
 
@@ -224,6 +226,12 @@ function main {
     while [[ $# -ne 0 ]]; do
         arg="$1"; shift
         case "$arg" in
+            -u)
+                help="ssh user. default=admin"
+                export SSH_USER=$1 && shift;;
+            -H)
+                help="strip headers"
+                export HEADER=0 ;;
             -n)
                 help="NB: nb lines. tail option"
                 export TAILLINES=$1 && shift;;

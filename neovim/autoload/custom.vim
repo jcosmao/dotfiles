@@ -93,7 +93,7 @@ let g:custom_last_display_file_path = ""
 function! custom#displayFilePath()
     if ! custom#isSpecialFiletype()
         if g:custom_last_display_file_path != expand('%:p')
-            echo printf("File (%s): %s", &ft, expand('%:p'))
+            echo printf("File: %s", expand('%:p'))
             let g:custom_last_display_file_path = expand('%:p')
         endif
     endif
