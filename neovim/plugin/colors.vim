@@ -99,12 +99,6 @@ unlet s:palette
 
 " override colorscheme config
 
-" vimdiff
-hi DiffAdd          guibg=#262626   guifg=#a9d1a9   gui=reverse
-hi DiffDelete       guibg=#262626   guifg=#e09b9b   gui=reverse
-hi DiffChange       guibg=#262626   guifg=#b6b6d9   gui=reverse
-hi DiffText         guibg=#262626   guifg=#dec5d5   gui=reverse
-
 " Signify gutter
 hi SignifyLineAdd guifg=#a9d1a9
 hi SignifyLineDelete guifg=#e09b9b
@@ -121,7 +115,8 @@ hi NormalFloat  guibg=None
 hi FloatBorder  guifg=None guibg=None
 
 if &background ==# "light"
-    hi Search       guifg=#FF8700    guibg=             gui=bold
+    hi DiffText     guibg=#f0e5ec    guifg=none
+    hi Search       guifg=#FF8700    guibg=none         gui=bold
     hi CurSearch    guibg=#FF8700    guifg=#f5edca      gui=bold
     hi IncSearch    guibg=#FF8700    guifg=#f5edca      gui=bold
     hi Substitute   guibg=#FF8700    gui=reverse,bold

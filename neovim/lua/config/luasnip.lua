@@ -1,4 +1,7 @@
-require("luasnip").config.set_config({
+local ls = require("luasnip")
+local fmt = require("luasnip.extras.fmt").fmt
+
+ls.config.set_config({
     history = true,
     updateevents = "TextChanged,TextChangedI",
 })
@@ -14,6 +17,24 @@ require("luasnip.loaders.from_snipmate").lazy_load { paths = vim.g.snipmate_snip
 -- lua format
 require("luasnip.loaders.from_lua").load()
 require("luasnip.loaders.from_lua").lazy_load { paths = vim.g.lua_snippets_path or "" }
+
+ls.add_snippets('python', {
+    ls.snippet(
+		"osdebug",
+		fmt(
+			[[
+        import logging
+        for app in ["neutron", "neutron_lib", "networking_ovh",
+                    "nova", "nova_ovh", "glance", "cinder",
+                    "stevedore", "alembic", "oslo_db",
+                    "oslo_policy", "oslo_messaging", "oslo_concurrency",
+                    "ovsdbapp"]:
+            logging.getLogger(app).setLevel(logging.DEBUG)
+		]],
+			{}
+		)
+	),
+})
 
 vim.api.nvim_create_autocmd("InsertLeave", {
     callback = function()
