@@ -37,18 +37,6 @@ vim.api.nvim_create_autocmd('BufReadPost',  {
     end
 })
 
--- Close nvimtree and aerial when diffview mode is opened
-vim.api.nvim_create_autocmd("BufEnter", {
-    group = vim.api.nvim_create_augroup("DiffviewOpen", {clear = true}),
-    pattern = "Diffview*",
-    callback = function()
-        vim.cmd(":NvimTreeClose")
-        vim.cmd(":Trouble close")
-        vim.diagnostic.disable()
-        vim.keymap.set({'n', 'i'}, '<F1>', ':DiffviewToggleFiles <cr>', {buffer=true})
-    end
-})
-
 vim.opt.foldmethod = "expr"
 vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 vim.opt.foldcolumn = "0"

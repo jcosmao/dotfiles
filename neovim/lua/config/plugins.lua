@@ -8,6 +8,7 @@ require('blame').setup({
 
 require("cscope_maps").setup()
 
+
 -- NeoGen
 
 require("neogen").setup({
@@ -20,6 +21,7 @@ require("neogen").setup({
     -- Enables placeholders when inserting annotation
     enable_placeholders = false,
 })
+
 
 
 -- Indent BlankLine
@@ -48,9 +50,13 @@ require("ibl").setup({
      },
 })
 
+
+
 -- AutoPairs
 
 require("nvim-autopairs").setup {}
+
+
 
 -- DiffView
 
@@ -66,3 +72,17 @@ require("diffview").setup({
     },
   },
 })
+
+-- Close nvimtree and Trouble when diffview mode is opened
+vim.api.nvim_create_autocmd("BufEnter", {
+    group = vim.api.nvim_create_augroup("DiffviewOpen", {clear = true}),
+    pattern = "Diffview*",
+    callback = function()
+        vim.cmd(":NvimTreeClose")
+        vim.cmd(":Trouble close")
+        vim.diagnostic.disable()
+        vim.keymap.set({'n', 'i'}, '<F1>', ':DiffviewToggleFiles <cr>', {buffer=true})
+    end
+})
+
+vim.api.nvim_create_user_command('Opendev20231', 'DiffviewOpen opendev/stable/2023.1', {})
