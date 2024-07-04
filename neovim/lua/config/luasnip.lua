@@ -34,7 +34,25 @@ ls.add_snippets('python', {
 			{}
 		)
 	),
+    ls.snippet(
+		"logtrace",
+		fmt(
+		[[
+        __import__('logging').getLogger().error(
+            '\n'.join(__import__('traceback').format_stack())
+        )
+		]],
+			{}
+		)
+	),
+    ls.snippet(
+		"logerr",
+		fmt(
+		[[__import__('logging').getLogger().error(f"{}")]], {ls.insert_node(1)}
+		)
+	),
 })
+
 
 vim.api.nvim_create_autocmd("InsertLeave", {
     callback = function()
