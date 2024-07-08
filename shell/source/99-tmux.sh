@@ -2,7 +2,7 @@
 
 function tmux.list_cr
 {
-    alias | grep ^cr_ | cut -d= -f1
+    alias | grep ^cr_ | cut -d= -f1 | sed -re 's/cr_//'
 }
 
 function tmux.set_cr_env
@@ -10,8 +10,8 @@ function tmux.set_cr_env
     crenv="$1"
 
     if tmux.list_cr | grep -q "^${crenv}$" ; then
-        tmux set-environment CR_COMMAND "$crenv"
-        eval "$crenv"
+        tmux set-environment CR_COMMAND "cr_${crenv}"
+        eval "cr_${crenv}"
     fi
 }
 
