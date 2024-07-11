@@ -86,3 +86,18 @@ vim.api.nvim_create_autocmd("BufEnter", {
 })
 
 vim.api.nvim_create_user_command('Opendev20231', 'DiffviewOpen opendev/stable/2023.1', {})
+
+
+
+-- Git Messenger
+
+vim.g.git_messenger_floating_win_opts = {
+    border = "rounded"
+}
+
+
+-- Vim rooter
+
+vim.g.rooter_patterns = { '.project/', '.project', '.git' }
+vim.g.rooter_resolve_links = 1
+vim.g.rooter_silent_chdir = 1

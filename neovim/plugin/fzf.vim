@@ -26,21 +26,5 @@ command! -bang -nargs=* RgWithFilePath
     \ <bang>0)
 
 
-autocmd! FileType fzf
-autocmd  FileType fzf set laststatus=0 noshowmode noruler
+autocmd! FileType fzf set laststatus=0 noshowmode noruler
   \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
-
-let g:fzf_colors =
-\ { 'fg':      ['fg', 'Normal'],
-  \ 'bg':      ['bg', 'Normal'],
-  \ 'hl':      ['fg', 'Comment'],
-  \ 'fg+':     ['fg', 'Macro'],
-  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-  \ 'hl+':     ['fg', 'Orange'],
-  \ 'info':    ['fg', 'Aqua'],
-  \ 'border':  ['fg', 'CursorLine'],
-  \ 'prompt':  ['fg', 'Orange'],
-  \ 'pointer': ['fg', 'Exception'],
-  \ 'marker':  ['fg', 'Orange'],
-  \ 'spinner': ['fg', 'Aqua'],
-  \ 'header':  ['fg', 'Aqua'] }
