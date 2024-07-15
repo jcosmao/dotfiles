@@ -92,9 +92,8 @@ if executable('ctags')
 endif
 
 " git
-Plug 'mhinz/vim-signify'
-Plug 'rhysd/git-messenger.vim'
-Plug 'jcosmao/blame.nvim'
+Plug 'lewis6991/gitsigns.nvim'
+Plug 'FabijanZulj/blame.nvim'
 Plug 'sindrets/diffview.nvim'
 
 " Colorscheme
@@ -216,8 +215,8 @@ map <silent> <leader>b :Buffers <cr>
 map <silent> <leader>t :FZFCtags <cr>
 map <silent> <leader>c :BCommits <cr>
 map <silent> <leader>h :History <cr>
-map <silent> <leader>g :execute 'ToggleBlame virtual' <cr>
-map <silent> <leader>G :GitMessenger <cr>
+map <silent> <leader>g :execute 'BlameToggle virtual' <cr>
+" map <silent> <leader>G  => gitsigns blame_line
 map <silent> <leader>m :Snippets <cr>
 map <silent> <C-a> ^
 imap <silent> <C-a> <C-o>^
@@ -277,9 +276,6 @@ for i in range(1, 9)
     execute "map <leader>" . i . " " . i . "gt"
 endfor
 map <leader>0 :tablast <cr>
-
-nmap <leader>> <plug>(signify-next-hunk)
-nmap <leader>< <plug>(signify-prev-hunk)
 
 map <silent> <C-g> :ToggleTerm dir=%:p:h <cr>
 
