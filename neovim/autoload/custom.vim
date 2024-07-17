@@ -104,6 +104,7 @@ function! custom#lineInfosToggle()
         set number
         silent! execute ':IBLEnable'
         silent! execute ':SignifyEnable'
+        silent! execute ':Gitsigns attach'
         set signcolumn=auto
         set foldcolumn=1
         let g:custom_line_infos_status = 1
@@ -112,6 +113,7 @@ function! custom#lineInfosToggle()
         set nonumber
         silent! execute ':IBLDisable'
         silent! execute ':SignifyDisable'
+        silent! execute ':Gitsigns detach'
         set signcolumn=no
         set foldcolumn=0
         let g:custom_line_infos_status = 0

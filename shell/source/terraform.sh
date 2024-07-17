@@ -14,7 +14,7 @@ function tf
     if [[ -z $TF_WORKSPACE && -n $OS_REGION_NAME ]]; then
         TF_DIR=$OS_REGION_NAME
     elif [[ -n $TF_WORKSPACE ]]; then
-        TFDIR=$TF_WORKSPACE
+        TF_DIR=$TF_WORKSPACE
     fi
 
     [[ -z $TF_DIR ]] && unset TF_DIR || export TF_WORKSPACE=$TF_DIR
@@ -42,7 +42,6 @@ function _complete_tf_workspace
     local word=${COMP_WORDS[1]}
     COMPREPLY=($(compgen -W "$(terraform.list_workspace | xargs)" -- ${word}))
 }
-
 
 alias tfy="tf auto-approve"
 alias tfset=terraform.set_workspace

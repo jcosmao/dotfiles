@@ -3,6 +3,7 @@ local cmp = require('cmp')
 local lspconfig = require('lspconfig')
 
 cmp.setup {
+    preselect = 'none',
     completion = {
         completeopt = 'menu,menuone,noinsert,noselect'
     },
@@ -45,7 +46,7 @@ cmp.setup {
         ['<C-e>'] = cmp.mapping.close(),
         ['<CR>'] = cmp.mapping.confirm({
             behavior = cmp.ConfirmBehavior.Insert,
-            select = true
+            select = false
         }),
         ['<Tab>'] = function(fallback)
             if cmp.visible() then
