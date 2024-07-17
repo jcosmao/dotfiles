@@ -48,7 +48,6 @@ require("catppuccin").setup({
         },
     },
 })
-
 EOF
 
 let g:gruvbox_material_disable_italic_comment = 0
@@ -92,20 +91,9 @@ let g:terminal_color_15 = g:color_palette.fg0[0]
 
 exec 'colorscheme ' . g:colorscheme
 
-call gruvbox_material#highlight('MatchParen', g:color_palette.none, s:match_paren)
-let s:palette = g:lightline#colorscheme#gruvbox_material#palette
-let s:palette.tabline.tabsel = [ [ g:color_palette.bg0[0], g:color_palette.green[0] , 238, 10, 'bold' ] ]
-unlet s:palette
-
 " override colorscheme config
 
-" Signify gutter
-hi SignifyLineAdd guifg=#a9d1a9
-hi SignifyLineDelete guifg=#e09b9b
-hi SignifyLineChange guifg=#b6b6d9
-hi SignifySignAdd guifg=#a9d1a9
-hi SignifySignDelete guifg=#e09b9b
-hi SignifySignChange guifg=#b6b6d9
+call gruvbox_material#highlight('MatchParen', g:color_palette.none, s:match_paren)
 
 " Remove floating background color
 hi ErrorFloat   guibg=None

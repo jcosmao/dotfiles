@@ -4,16 +4,12 @@ function! custom#PlugLoaded(name)
         \ isdirectory(g:plugs[a:name].dir))
 endfunction
 
-function! custom#GitInfo()
+function! custom#GitRepo()
     let current_file_path = resolve(expand('%:p:h'))
     let git_repo = system("cd " . current_file_path . "; basename -s .git $(git remote get-url origin 2> /dev/null) 2> /dev/null")
-    let git_branch = system("cd " . current_file_path . "; git rev-parse --abbrev-ref HEAD 2> /dev/null")
     let repo = substitute(git_repo, '\n\+$', '', '')
-    let branch = substitute(git_branch, '\n\+$', '', '')
     if (repo != '')
-        let g:lightline_git_info = " " . repo ." [" . branch . "]"
-    else
-        let g:lightline_git_info = ''
+        return repo
     endif
 endfunction
 
@@ -65,13 +61,13 @@ function! custom#backgroundToggle()
 
     let l:config_dir = $HOME."/.config/nvim/"
     let l:theme_dir = g:plugs['gruvbox-material']['dir']
-    exec 'source '. l:config_dir .'/plugin/colors.vim'
-    exec 'source '. l:config_dir .'/lua/config/toggleterm.lua'
-    exec 'source '. l:theme_dir .'/autoload/lightline/colorscheme/gruvbox_material.vim'
-    exec 'source '. l:config_dir .'/plugin/lightline.vim'
-    exec 'NvimTreeToggle'
-    exec 'NvimTreeToggle'
-    exec 'call lightline#colorscheme() | call lightline#update()'
+    silent! exec 'source '. l:config_dir .'/plugin/colors.vim'
+    silent! exec 'source '. l:config_dir .'/lua/config/toggleterm.lua'
+    silent! exec 'source '. l:theme_dir .'/autoload/lightline/colorscheme/gruvbox_material.vim'
+    silent! exec 'source '. l:config_dir .'/plugin/lightline.vim'
+    silent! exec 'NvimTreeToggle'
+    silent! exec 'NvimTreeToggle'
+    silent! exec 'call lightline#colorscheme() | call lightline#update()'
 endfunction
 
 autocmd FileType * command! -nargs=0 BackgroundToggle :call custom#backgroundToggle()
@@ -106,16 +102,16 @@ function! custom#lineInfosToggle()
 
     if g:custom_line_infos_status == 0
         set number
-        execute ':IBLEnable'
-        execute ':SignifyEnable'
+        silent! execute ':IBLEnable'
+        silent! execute ':SignifyEnable'
         set signcolumn=auto
         set foldcolumn=1
         let g:custom_line_infos_status = 1
         set conceallevel=2
     else
         set nonumber
-        execute ':IBLDisable'
-        execute ':SignifyDisable'
+        silent! execute ':IBLDisable'
+        silent! execute ':SignifyDisable'
         set signcolumn=no
         set foldcolumn=0
         let g:custom_line_infos_status = 0

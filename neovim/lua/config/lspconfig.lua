@@ -47,6 +47,7 @@ local virtual_text_default = {
 }
 
 vim.diagnostic.config({
+    underline = false,
     update_in_insert = true,
     float = {
         focusable = true,
@@ -56,7 +57,9 @@ vim.diagnostic.config({
         header = "",
         prefix = "",
     },
-    virtual_text = virtual_text_default,
+    -- virtual_text = virtual_text_default,
+    -- disable by default
+    virtual_text = false,
 })
 
 -- display config
