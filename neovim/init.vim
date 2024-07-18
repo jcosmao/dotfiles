@@ -72,6 +72,7 @@ Plug 'psliwka/vim-smoothie'
 " breaking change - does not detect root pattern with priority
 Plug 'airblade/vim-rooter', {'commit': 'd64f3e04df9914e784508019a1a1f291cbb40bd4'}
 Plug 'akinsho/toggleterm.nvim'
+Plug 'troydm/zoomwintab.vim'
 
 " Language Specific
 
