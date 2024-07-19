@@ -19,6 +19,10 @@ function tf
 
     [[ -z $TF_DIR ]] && unset TF_DIR || export TF_WORKSPACE=$TF_DIR
     terraform $* $OPTS
+
+    [[ $? = 0 && $1 = "destroy" ]] && \
+        rm -rf terraform.tfstate.d/$TF_WORKSPACE && \
+        unset TF_WORKSPACE
 }
 
 function terraform.set_workspace

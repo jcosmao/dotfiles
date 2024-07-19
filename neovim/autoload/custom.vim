@@ -4,13 +4,18 @@ function! custom#PlugLoaded(name)
         \ isdirectory(g:plugs[a:name].dir))
 endfunction
 
-function! custom#GitRepo()
+let g:custom_current_git_repo = ''
+function! custom#setGitRepo()
     let current_file_path = resolve(expand('%:p:h'))
     let git_repo = system("cd " . current_file_path . "; basename -s .git $(git remote get-url origin 2> /dev/null) 2> /dev/null")
     let repo = substitute(git_repo, '\n\+$', '', '')
     if (repo != '')
-        return repo
+        let g:custom_current_git_repo = repo
     endif
+endfunction
+
+function! custom#getGitRepo()
+    return g:custom_current_git_repo
 endfunction
 
 function! custom#LightlineToggleBuffer()

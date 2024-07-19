@@ -295,6 +295,7 @@ autocmd BufNewFile,BufRead *.tf set filetype=terraform
 autocmd BufNewFile,BufRead *.conf set filetype=ini
 
 autocmd BufEnter,WinEnter,TabEnter,BufWritePost * call custom#displayFilePath()
+autocmd BufEnter,WinEnter,TabEnter,BufWritePost * call custom#setGitRepo()
 
 " remove auto<fucking>indent on semicolon :
 autocmd FileType python,yaml setlocal indentkeys-=<:>
