@@ -1,10 +1,12 @@
+local vim = vim
+
 local has, _ = pcall(require, 'nvim-treesitter')
 if not has then
     return nil
 end
 
 require("nvim-treesitter.install").prefer_git = false
-require'nvim-treesitter.configs'.setup {
+require 'nvim-treesitter.configs'.setup {
     ensure_installed = {
         "bash",
         "go",
@@ -40,7 +42,7 @@ require'nvim-treesitter.configs'.setup {
     -- one of "all", "maintained" (parsers with maintainers), or a list of languages
     ignore_install = {},
     highlight = {
-        enable = true,              -- false will disable the whole extension
+        enable = true, -- false will disable the whole extension
         disable = {},  -- list of language that will be disabled
         -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
         -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).

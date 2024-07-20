@@ -1,3 +1,4 @@
+local vim = vim
 local gitsigns = require("gitsigns")
 
 gitsigns.setup({
@@ -35,7 +36,7 @@ gitsigns.setup({
         -- Navigation
         map('n', '<leader>>', function()
             if vim.wo.diff then
-                vim.cmd.normal({']c', bang = true})
+                vim.cmd.normal({ ']c', bang = true })
             else
                 gitsigns.nav_hunk('next')
             end
@@ -43,13 +44,12 @@ gitsigns.setup({
 
         map('n', '<leader><', function()
             if vim.wo.diff then
-                vim.cmd.normal({'[c', bang = true})
+                vim.cmd.normal({ '[c', bang = true })
             else
                 gitsigns.nav_hunk('prev')
             end
         end)
 
-    map('n', '<leader>G', function() gitsigns.blame_line{full=true} end)
-
+        map('n', '<leader>G', function() gitsigns.blame_line { full = true } end)
     end
 })

@@ -1,3 +1,5 @@
+local vim = vim
+
 -- Blame
 
 require('blame').setup({
@@ -64,9 +66,8 @@ require("ibl").setup({
         show_start = false,
         show_end = false,
         highlight = scope,
-     },
+    },
 })
-
 
 
 -- AutoPairs
@@ -80,25 +81,25 @@ require("nvim-autopairs").setup {}
 local actions = require("diffview.actions")
 
 require("diffview").setup({
-  keymaps = {
-    disable_defaults = false, -- Disable the default keymaps
-    view = {
-      -- The `view` bindings are active in the diff buffers, only when the current
-      -- tabpage is a Diffview.
-      { {"n", "i"}, "<F1>", actions.toggle_files,                   { desc = "Toggle the file panel." } },
+    keymaps = {
+        disable_defaults = false, -- Disable the default keymaps
+        view = {
+            -- The `view` bindings are active in the diff buffers, only when the current
+            -- tabpage is a Diffview.
+            { { "n", "i" }, "<F1>", actions.toggle_files, { desc = "Toggle the file panel." } },
+        },
     },
-  },
 })
 
 -- Close nvimtree and Trouble when diffview mode is opened
 vim.api.nvim_create_autocmd("BufEnter", {
-    group = vim.api.nvim_create_augroup("DiffviewOpen", {clear = true}),
+    group = vim.api.nvim_create_augroup("DiffviewOpen", { clear = true }),
     pattern = "Diffview*",
     callback = function()
         vim.cmd(":NvimTreeClose")
         vim.cmd(":Trouble close")
         vim.diagnostic.disable()
-        vim.keymap.set({'n', 'i'}, '<F1>', ':DiffviewToggleFiles <cr>', {buffer=true})
+        vim.keymap.set({ 'n', 'i' }, '<F1>', ':DiffviewToggleFiles <cr>', { buffer = true })
     end
 })
 

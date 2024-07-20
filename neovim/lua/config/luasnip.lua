@@ -1,3 +1,5 @@
+local vim = vim
+
 local ls = require("luasnip")
 local fmt = require("luasnip.extras.fmt").fmt
 
@@ -20,9 +22,9 @@ require("luasnip.loaders.from_lua").lazy_load { paths = vim.g.lua_snippets_path 
 
 ls.add_snippets('python', {
     ls.snippet(
-		"osdebug",
-		fmt(
-			[[
+        "osdebug",
+        fmt(
+            [[
         import logging
         for app in ["neutron", "neutron_lib", "networking_ovh",
                     "nova", "nova_ovh", "glance", "cinder",
@@ -31,26 +33,26 @@ ls.add_snippets('python', {
                     "ovsdbapp"]:
             logging.getLogger(app).setLevel(logging.DEBUG)
 		]],
-			{}
-		)
-	),
+            {}
+        )
+    ),
     ls.snippet(
-		"logtrace",
-		fmt(
-		[[
+        "logtrace",
+        fmt(
+            [[
         __import__('logging').getLogger().error(
             '\n'.join(__import__('traceback').format_stack())
         )
 		]],
-			{}
-		)
-	),
+            {}
+        )
+    ),
     ls.snippet(
-		"logerr",
-		fmt(
-		[[__import__('logging').getLogger().error(f"{}")]], {ls.insert_node(1)}
-		)
-	),
+        "logerr",
+        fmt(
+            [[__import__('logging').getLogger().error(f"{}")]], { ls.insert_node(1) }
+        )
+    ),
 })
 
 

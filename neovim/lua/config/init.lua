@@ -4,6 +4,9 @@
 -- Get the base directory
 local base_dir = vim.fn.stdpath("config") .. "/lua/config/"
 
+-- first require utils, as it has common variables and functions
+require("config.utils")
+
 -- Iterate through all files in the base directory
 for _, file in ipairs(vim.fn.readdir(base_dir)) do
     -- Check if the file is a Lua file (ends with .lua) and is not init.lua

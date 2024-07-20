@@ -6,7 +6,7 @@ if vim.o.background == "light" then
     shading_factor = "-3"
 end
 
-toggleterm.setup{
+toggleterm.setup {
     size = 20,
     open_mapping = [[<c-g>]],
     insert_mappings = true, -- whether or not the open mapping applies in insert mode
@@ -16,7 +16,7 @@ toggleterm.setup{
     winbar = {
         enabled = false,
         name_formatter = function(term) --  term: Terminal
-            return  string.format("  Term %s  ", term.id)
+            return string.format("  Term %s  ", term.id)
         end,
     },
     shade_terminals = true,
@@ -28,7 +28,8 @@ local toggletermGrp = vim.api.nvim_create_augroup("ToggleTermGrp", { clear = tru
 -- timeoutlen is timeout used for leader send key, reduce it in term mode and restore it outside
 vim.api.nvim_create_autocmd("FileType", {
     pattern = 'toggleterm',
-    command = "set laststatus=0 noshowmode noruler timeoutlen=150 | autocmd BufLeave <buffer> set laststatus=2 showmode ruler timeoutlen=1000",
+    command =
+    "set laststatus=0 noshowmode noruler timeoutlen=150 | autocmd BufLeave <buffer> set laststatus=2 showmode ruler timeoutlen=1000",
     group = toggletermGrp,
 })
 
@@ -37,7 +38,7 @@ vim.api.nvim_create_autocmd("TermOpen", {
     pattern = "term://*",
     group = toggletermGrp,
     callback = function()
-        local opts = {buffer = 0}
+        local opts = { buffer = 0 }
         vim.keymap.set('t', '<leader><ENTER>', [[<Cmd>ZoomWinTabToggle <cr>]], opts)
         vim.keymap.set('t', '<leader><Up>', [[<Cmd>wincmd k <cr>]], opts)
         vim.keymap.set('t', '<leader><Left>', [[<Cmd>wincmd h <cr>]], opts)

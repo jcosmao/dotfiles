@@ -195,16 +195,13 @@ command! -bang WQ wq<bang>
 map <silent> <leader>? :exec printf('view %s/help.md', fnamemodify(expand($MYVIMRC), ':p:h'))<cr>
 map <silent> <leader>V :tabedit $MYVIMRC <cr>
 map <silent> <leader>VV :source $MYVIMRC \| :echo $MYVIMRC 'reloaded' <cr>
-map <silent> <leader><ESC> :call custom#lineInfosToggle() <cr>
+map <silent> <leader><ESC> :LineInfosToggle <cr>
 map <silent> <F1> :NvimTreeFindFileToggle! <cr>
 map <silent> <F2> :Trouble symbols toggle win.size=50 focus=false <cr>
-map <silent> <F3> :IBLToggle <cr>
-map <silent> <F4> :set number! <cr>
-map <silent> <F5> :SignifyToggle <cr>
-map <silent> <F6> :set paste! <cr>
+map <silent> <F3> :set paste! <cr>
 map <silent> <F9> :BackgroundToggle <cr>
 map <silent> <F10> :Startify <cr>
-map <silent> <F12> :call custom#ToggleMouse() <cr>
+map <silent> <F12> :MouseToggle <cr>
 map <silent><expr> <leader>q empty(filter(getwininfo(), 'v:val.quickfix')) ? ":copen<cr>" : ":cclose<cr>"
 map <silent> <leader>a :execute 'RgWithFilePath' expand('<cword>') <cr>
 map <silent> <leader>A :execute 'Rg' expand('<cword>') <cr>
@@ -280,12 +277,6 @@ map <leader>0 :tablast <cr>
 
 map <silent> <C-g> :ToggleTerm dir=%:p:h <cr>
 
-" started in diff mode ?
-if &diff
-    call custom#setupDiffMapping()
-endif
-au OptionSet diff call custom#setupDiffMapping()
-
 " Specific filetype
 autocmd BufNewFile,BufRead *.lib set filetype=sh
 autocmd BufNewFile,BufRead *.source set filetype=sh
@@ -293,9 +284,6 @@ autocmd BufNewFile,BufRead *.pp set filetype=puppet
 autocmd BufNewFile,BufRead *.inc set filetype=perl
 autocmd BufNewFile,BufRead *.tf set filetype=terraform
 autocmd BufNewFile,BufRead *.conf set filetype=ini
-
-autocmd BufEnter,WinEnter,TabEnter,BufWritePost * call custom#displayFilePath()
-autocmd BufEnter,WinEnter,TabEnter,BufWritePost * call custom#setGitRepo()
 
 " remove auto<fucking>indent on semicolon :
 autocmd FileType python,yaml setlocal indentkeys-=<:>

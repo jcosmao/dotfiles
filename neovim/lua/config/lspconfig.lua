@@ -37,8 +37,8 @@ require("lsp_signature").setup(signature_config)
 
 local virtual_text_default = {
     format = function(diagnostic)
-      local lines = vim.split(diagnostic.message, '\n')
-      return lines[1]
+        local lines = vim.split(diagnostic.message, '\n')
+        return lines[1]
     end,
     virt_text_pos = 'right_align',
     suffix = ' ',
@@ -66,10 +66,10 @@ vim.diagnostic.config({
 -- :lua = vim.diagnostic.config()
 function lspconfig_diagnostic_virtual_text_toggle()
     if not vim.diagnostic.config().virtual_text then
-        vim.diagnostic.config({virtual_text = virtual_text_default})
+        vim.diagnostic.config({ virtual_text = virtual_text_default })
         vim.notify("diagnostic.virtual_text enabled")
     else
-        vim.diagnostic.config({virtual_text = false})
+        vim.diagnostic.config({ virtual_text = false })
         vim.notify("diagnostic.virtual_text disabled")
     end
 end
@@ -116,7 +116,7 @@ local on_attach = function(_, bufnr)
     vim.keymap.set('n', '<C-\\>', vim.lsp.buf.references, opts)
     vim.keymap.set('n', '?', vim.lsp.buf.hover, opts)
     vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, opts)
-    vim.keymap.set({'n', 'i'}, '<C-k>', vim.lsp.buf.signature_help, opts)
+    vim.keymap.set({ 'n', 'i' }, '<C-k>', vim.lsp.buf.signature_help, opts)
     vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, opts)
     vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
     vim.keymap.set('n', '<leader>F', function() vim.lsp.buf.format { async = true } end, opts)
@@ -162,11 +162,11 @@ local servers = {
             -- configure plugins in pylsp
             pylsp = {
                 plugins = {
-                    flake8 = {enabled = true},
-                    mccabe = {enabled = false},
-                    pycodestyle = {enabled= false},
-                    pyflakes = {enabled = true},
-                    pylint = {enabled = false},
+                    flake8 = { enabled = true },
+                    mccabe = { enabled = false },
+                    pycodestyle = { enabled = false },
+                    pyflakes = { enabled = true },
+                    pylint = { enabled = false },
                 },
             },
         },
@@ -179,7 +179,7 @@ local servers = {
             },
             diagnostics = {
                 -- Get the language server to recognize the `vim` global
-                globals = {'vim'},
+                globals = { 'vim' },
             },
             workspace = {
                 -- Make the server aware of Neovim runtime files
@@ -202,7 +202,7 @@ local lspconfig = require("lspconfig")
 
 mason_lspconfig.setup_handlers {
     -- This is a default handler that will be called for each installed server (also for new servers that are installed during a session)
-    function (server_name)
+    function(server_name)
         lspconfig[server_name].setup {
             on_attach = on_attach,
             capabilities = capabilities,
@@ -213,5 +213,5 @@ mason_lspconfig.setup_handlers {
 
 -- volar for vuejs stuff
 require 'lspconfig'.volar.setup {
-  filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue', 'html' }
+    filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue', 'html' }
 }
