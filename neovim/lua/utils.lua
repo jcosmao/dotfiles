@@ -1,96 +1,5 @@
 local vim = vim
 
-vim.api.nvim_create_augroup('bufcheck', { clear = true })
-
--- Always quit nvimtree window when leaving tab by switching to previous file.
-vim.api.nvim_create_autocmd('TabLeave', {
-    group   = 'bufcheck',
-    pattern = 'NvimTree*',
-    command = 'wincmd p'
-})
-
--- start git messages in insert mode
-vim.api.nvim_create_autocmd('FileType', {
-    group   = 'bufcheck',
-    pattern = { 'gitcommit', 'gitrebase', },
-    command = 'startinsert | 1'
-})
-
--- pager mappings for Manual
-vim.api.nvim_create_autocmd('FileType', {
-    group    = 'bufcheck',
-    pattern  = 'man',
-    callback = function()
-        vim.keymap.set('n', '<enter>', 'K', { buffer = true })
-        vim.keymap.set('n', '<backspace>', '<c-o>', { buffer = true })
-    end
-})
-
--- Return to last edit position when opening files
-vim.api.nvim_create_autocmd('BufReadPost', {
-    group    = 'bufcheck',
-    pattern  = '*',
-    callback = function()
-        if vim.fn.line("'\"") > 0 and vim.fn.line("'\"") <= vim.fn.line("$") then
-            vim.fn.setpos('.', vim.fn.getpos("'\""))
-            vim.cmd('silent! foldopen')
-        end
-    end
-})
-
--- startup in diff mode ?
-if vim.o.diff then
-    setup_diff_mapping()
-end
-
-vim.api.nvim_create_user_command("DiffToggle", function()
-    diff_toggle()
-end, { nargs = 0 })
-
-vim.api.nvim_create_autocmd({ "OptionSet" }, {
-    pattern = "diff",
-    callback = function()
-        setup_diff_mapping()
-    end
-})
-
-vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter", "TabEnter", "BufWritePost" }, {
-    pattern = "*",
-    callback = function()
-        display_file_path()
-        set_git_repo()
-    end
-})
-
-vim.g.special_filtetypes = {
-    'NvimTree', 'NvimTree_*',
-    'aerial',
-    'startify',
-    'fzf',
-    'Trouble', 'trouble',
-    'Mason',
-    'DiffviewFiles',
-    'toggleterm', 'toggleterm*'
-}
-
-vim.api.nvim_create_user_command("HieraEncrypt", function()
-    hiera_encrypt()
-end, { nargs = 0 })
-
-vim.api.nvim_create_user_command("MouseToggle", function()
-    mouse_toggle()
-end, { nargs = 0 })
-
-vim.api.nvim_create_user_command("DebugToggle", function()
-    debug_toggle()
-end, { nargs = 0 })
-
-vim.api.nvim_create_user_command("LineInfosToggle", function()
-    line_infos_toggle()
-end, { nargs = 0 })
-
-
-
 function plug_loaded(name)
     return vim.g.plugs[name] and vim.fn.isdirectory(vim.g.plugs[name].dir)
 end
@@ -128,13 +37,15 @@ function set_git_repo()
 end
 
 function is_special_filetype()
-    local regexp = table.concat(vim.g.special_filtetypes, '|')
-    if vim.fn.match(vim.bo.filetype, '^(' .. regexp .. ')$') == 0 or vim.bo.filetype == '' then
-        return true
-    else
-        return false
+    local current_filetype = vim.bo.filetype
+    for _, pattern in ipairs(special_filtetypes) do
+        if vim.fn.match(current_filetype, pattern) ~= -1 then
+            return true
+        end
     end
+    return false
 end
+
 
 vim.g.last_display_file_path = ""
 
@@ -207,5 +118,15 @@ function debug_toggle()
     else
         vim.o.verbose = 0
         vim.o.verbosefile = ''
+    end
+end
+
+function load_vimscript_files(directory)
+    local neovim_root = vim.fn.stdpath("config")
+    local files = vim.fn.readdir(neovim_root .. "/" .. directory)
+    for _, file in ipairs(files) do
+        if file:match("%.vim$") then
+            vim.cmd("source " .. neovim_root .. "/" .. directory .. "/" .. file)
+        end
     end
 end

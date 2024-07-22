@@ -10,7 +10,7 @@ require('lualine').setup {
             statusline = {},
             winbar = {},
         },
-        ignore_focus = vim.g.special_filtetypes,
+        ignore_focus = special_filtetypes,
         always_divide_middle = true,
         globalstatus = false,
         refresh = {

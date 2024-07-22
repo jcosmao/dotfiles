@@ -1,0 +1,8 @@
+require("globals")
+require("settings")
+require("keybindings")
+require("utils")
+require("plugins")
+require("plugins_config")
+load_vimscript_files("vim")
+require('autocommand')
