@@ -10,7 +10,7 @@ function tf
 
     # Set terraform state dir
     # - default is local dir
-    # - TF_WORKSPACE -> ./terraform.d/$TF_WORKSPACE
+    # - TF_WORKSPACE -> ./terraform.tfstate.d/$TF_WORKSPACE
     if [[ -z $TF_WORKSPACE && -n $OS_REGION_NAME ]]; then
         TF_DIR=$OS_REGION_NAME
     elif [[ -n $TF_WORKSPACE ]]; then
@@ -18,10 +18,29 @@ function tf
     fi
 
     [[ -z $TF_DIR ]] && unset TF_DIR || export TF_WORKSPACE=$TF_DIR
+
+    state_dir="terraform.tfstate.d/${TF_WORKSPACE}"
+    mkdir -p $state_dir
+
+    if [[ $1 = "apply" && ! -f $state_dir/args ]]; then
+        echo $* | sed -e 's/apply//' > ${state_dir}/args
+    fi
+
+    if [[ $1 =~ (apply|destroy) ]]; then
+        if [[ "$*" != "$(cat ${state_dir}/args)" ]]; then
+            echo "WORKSPACE=$TF_WORKSPACE  previously used with args: '$(cat ${state_dir}/args)'"
+            [[ $SHELL =~ zsh ]] && vared -p 'continue ? [y] ' -c response || read -r -p 'continue ? [y] ' response
+            if [[ $response != y ]]; then
+                return
+            fi
+
+        fi
+    fi
+
     terraform $* $OPTS
 
     [[ $? = 0 && $1 = "destroy" ]] && \
-        rm -rf terraform.tfstate.d/$TF_WORKSPACE && \
+        rm -rf $state_dir && \
         unset TF_WORKSPACE
 }
 
