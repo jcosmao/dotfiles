@@ -78,9 +78,33 @@ function k8s.list_containers_by_pod {
 function k8s.list_running_containers_by_pod {
     k get pods \
         --field-selector=status.phase=Running \
+        -o="custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,CONTAINERS:.spec.containers[*].name,INIT-CONTAINERS:.spec.initContainers[*].name,NODE:spec.nodeName" \
+        $*
+}
+
+function k8s.list_running_containers_by_pod_with_labels {
+    k get pods \
+        --field-selector=status.phase=Running \
         -o="custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,INIT-CONTAINERS:.spec.initContainers[*].name,CONTAINERS:.spec.containers[*].name,LABELS:.metadata.labels" \
         $*
 }
+
+function k8s.get_requests_limits {
+    k get pods \
+        -o custom-columns="Name:metadata.name,CPU-request:spec.containers[*].resources.requests.cpu,CPU-limit:spec.containers[*].resources.limits.cpu,MEM-request:spec.containers[*].resources.requests.memory,MEM-limit:spec.containers[*].resources.limit.memory" \
+        $*
+}
+
+function k8s.top_node {
+    if [[ $# == 0 ]]; then
+        echo "missing param: <node>"
+        return
+    fi
+    node=$1
+    k top pods -A --sort-by cpu --containers=true | \
+        grep --color=never -E $(k get pods -A -o="custom-columns=NAME:.metadata.name" --field-selector=spec.nodeName=${node} --no-headers | paste -d'|' -s)
+}
+
 
 function k8s.exec {
     type=$1; shift
