@@ -15,12 +15,13 @@ let g:gutentags_exclude_filetypes = [
 let g:gutentags_add_default_project_roots = 0
 let g:gutentags_generate_on_empty_buffer = 0
 let g:gutentags_resolve_symlinks = 1
-let g:gutentags_modules = ['ctags', 'cscope']
+let g:gutentags_modules = ['ctags', 'cscope_maps']
 let g:gutentags_ctags_executable = '~/.local/bin/ctags'
 let g:gutentags_ctags_extra_args = ['--fields=+niaSszt --python-kinds=-vi --tag-relative=yes']
 " rg --type-list
 let g:gutentags_file_list_command = '/bin/true ; .project/file_list || rg --files -tsh -tperl -tpy -tgo -tcpp -tpuppet -tjson -tyaml'
 let g:gutentags_scopefile = '.cscope.gutentags'
+let g:gutentags_scopefile_maps = '.cscope.gutentags'
 let g:gutentags_ctags_tagfile = '.ctags.gutentags'
 let g:gutentags_ctags_exclude = [
 \  '*.git', '*.svn', '*.hg',

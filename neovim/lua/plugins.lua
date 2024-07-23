@@ -44,13 +44,28 @@ require("lazy").setup({
     { 'windwp/nvim-autopairs' },
     { 'tpope/vim-sensible' },
     { 'tpope/vim-commentary' },
-    { 'tpope/vim-surround' },
     { 'lambdalisue/vim-suda' },
     { 'psliwka/vim-smoothie' },
     {
-        'airblade/vim-rooter',
-        commit = 'd64f3e04df9914e784508019a1a1f291cbb40bd4'
+        "kylechui/nvim-surround",
+        version = "*", -- Use for stability; omit to use `main` branch for the latest features
+        event = "VeryLazy",
+        config = function()
+            require("nvim-surround").setup({})
+        end
     },
+    {
+        "ahmedkhalf/project.nvim",
+        config = function()
+            require("project_nvim").setup {
+                detection_methods = { "pattern" },
+                patterns = { ".project" },
+                silent_chdir = false,
+                scope_chdir = 'global',
+            }
+        end
+    },
+
     { 'akinsho/toggleterm.nvim' },
     { 'troydm/zoomwintab.vim' },
 
@@ -77,10 +92,6 @@ require("lazy").setup({
     {
         'ludovicchabant/vim-gutentags',
         cond = vim.fn.executable('ctags') == 1,
-        build = function()
-            local script = vim.fn.stdpath("config") .. "/plugin_patch/patch.sh"
-            vim.fn.system(script)
-        end,
     },
 
     -- git

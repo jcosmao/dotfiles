@@ -4,6 +4,11 @@ function plug_loaded(name)
     return vim.g.plugs[name] and vim.fn.isdirectory(vim.g.plugs[name].dir)
 end
 
+function plugins_patch()
+    local script = vim.fn.stdpath("config") .. "/plugin_patch/patch.sh"
+    vim.fn.system(script)
+end
+
 function hiera_encrypt()
     local git_root = vim.fn.system('git -C ' ..
         vim.fn.shellescape(vim.fn.expand("%:p:h")) .. ' rev-parse --show-toplevel'):match('(.*)\n')
