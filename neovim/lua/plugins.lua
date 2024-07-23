@@ -54,17 +54,6 @@ require("lazy").setup({
             require("nvim-surround").setup({})
         end
     },
-    {
-        "ahmedkhalf/project.nvim",
-        config = function()
-            require("project_nvim").setup {
-                detection_methods = { "pattern" },
-                patterns = { ".project" },
-                silent_chdir = false,
-                scope_chdir = 'global',
-            }
-        end
-    },
 
     { 'akinsho/toggleterm.nvim' },
     { 'troydm/zoomwintab.vim' },

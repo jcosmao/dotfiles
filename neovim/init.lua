@@ -1,5 +1,6 @@
 require("globals")
 require("utils")
+require("project_root")
 
 -- nvim options
 require("settings")
