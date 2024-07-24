@@ -72,13 +72,7 @@ complete -F _complete_kns k8s.set_context_namespace
 complete -F _complete_kns knsc
 
 function k8s.list_containers_by_pod {
-    k get pods -o="custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,INIT-CONTAINERS:.spec.initContainers[*].name,CONTAINERS:.spec.containers[*].name" $*
-}
-
-function k8s.list_running_containers_by_pod {
-    k get pods \
-        --field-selector=status.phase=Running \
-        -o="custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,CONTAINERS:.spec.containers[*].name,INIT-CONTAINERS:.spec.initContainers[*].name,NODE:spec.nodeName" \
+        k get pods -o="custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,CONTAINERS:.spec.containers[*].name,INIT-CONTAINERS:.spec.initContainers[*].name,STATUS:.status.phase,NODE:spec.nodeName,HostIP:.status.hostIP,PodIP:status.podIP" \
         $*
 }
 
@@ -176,7 +170,7 @@ function k8s.get_last_traefik_config {
 alias kns="k8s.set_shell_namespace"
 alias kunset="k8s.unset_shell_namespace"
 alias knsc="k8s.set_context_namespace"
-alias klc="k8s.list_running_containers_by_pod"
+alias klc="k8s.list_containers_by_pod"
 alias ks="k8s.exec shell"
 alias kx="k8s.exec cmd"
 alias klog="k8s.get_ns_logs"
