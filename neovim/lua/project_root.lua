@@ -27,5 +27,19 @@ local set_root = function()
     vim.fn.chdir(root)
 end
 
+function FindRootDirectory()
+    local path = vim.api.nvim_buf_get_name(0)
+    if path == '' then return end
+    path = vim.fs.dirname(path)
+
+    set_root()
+
+    if root_cache[path] then
+        return root_cache[path]
+    else
+        return path
+    end
+end
+
 local root_augroup = vim.api.nvim_create_augroup('ProjectRoot', {})
 vim.api.nvim_create_autocmd('BufEnter', { group = root_augroup, callback = set_root })

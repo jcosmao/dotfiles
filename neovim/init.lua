@@ -4,8 +4,6 @@ require("project_root")
 
 -- nvim options
 require("settings")
--- nvim mapping
-require("keybindings")
 
 -- load vimscripts from vim dir
 load_vimscript_files("vim")
@@ -16,5 +14,7 @@ require("plugins_config")
 -- apply custom patches on modules
 plugins_patch()
 
+-- nvim mapping
+require("keybindings")
 -- load autocommand
 require('autocommand')

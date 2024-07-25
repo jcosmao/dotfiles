@@ -28,21 +28,3 @@ vim.api.nvim_create_user_command(
         )
     end, { nargs = '*', bang = true }
 )
-
-vim.api.nvim_create_autocmd({ "FileType" }, {
-    pattern = "fzf",
-    callback = function()
-        vim.o.laststatus = 0
-        vim.o.showmode = false
-        vim.o.ruler = false
-    end
-})
-
-vim.api.nvim_create_autocmd({ "BufLeave" }, {
-    buffer = 0,
-    callback = function()
-        vim.o.laststatus = 2
-        vim.o.showmode = true
-        vim.o.ruler = true
-    end
-})

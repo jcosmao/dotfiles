@@ -14,7 +14,7 @@ end
 
 function AutoColorColumn()
     if vim.bo.filetype == "python" then
-        local project_root = vim.fn.FindRootDirectory()
+        local project_root = FindRootDirectory()
         local git_root = vim.fn.trim(vim.fn.system('git -C ' ..
             vim.fn.expand('%:h') .. ' rev-parse --show-toplevel 2> /dev/null'))
 

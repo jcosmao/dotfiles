@@ -100,7 +100,6 @@ function! GotoCtags(tag, ctx_line)
 
     " set csto=1
     execute 'FZFCtags' '^'.l:tag.'$'
-    echo "[GotoCtags] FZFCtags"
 endfunction
 
 command! -bang -nargs=* FZFCtags
@@ -132,12 +131,11 @@ function! GotoCscope(tag, ctx_line)
     endif
 
     execute 'FZFCscope' '^'.l:tag.'$'
-    echo "[GotoCscope] FZFCscope"
 endfunction
 
 command! -bang -nargs=* FZFCscope
   \ call fzf#run(fzf#wrap({
-  \     'source': 'cscope -d -L -f '.b:gutentags_files['cscope'].' -0 '. shellescape(<q-args>).' | sed -e "s,^'.getcwd().'/,," | grep -Pv "\d+\s\s*(\#|:|\")" | grep -Pv "(class|def|func|function|sub) '.<q-args>.'"',
+  \     'source': 'cscope -d -L -f '.b:gutentags_files['cscope_maps'].' -0 '. shellescape(<q-args>).' | sed -e "s,^'.getcwd().'/,," | grep -Pv "\d+\s\s*(\#|:|\")" | grep -Pv "(class|def|func|function|sub) '.<q-args>.'"',
   \     'sink*': function('s:sink_cscope'),
   \     'options': '
   \         --query '.s:filter.'
@@ -152,18 +150,11 @@ command! -bang -nargs=* FZFCscope
   \ }))
 
 
-
 " Tag mapping ctags/cscope
 
 " Append : to <cword> vim allowed char. This allow expand(<cword>) detect
 " puppet class like xxx::yyy
 autocmd FileType puppet set iskeyword+=:
-" map <silent> <leader>\ :execute 'tselect' expand('<cword>')<cr>
-
-" map <silent> <leader>] :execute 'tag' expand('<cword>')<CR>
-" map <silent> <leader>] :execute 'FZFCtags' '^'.expand('<cword>').'$'<cr>
-" autocmd FileType puppet nnoremap <C-]> call GoToDef(trim(expand('<cword>'), '^::'))
-" autocmd FileType puppet nnoremap <leader>] :execute 'tag' trim(expand('<cword>'), '^::')<CR>
 
 map <silent> <leader>] :call GotoCtags(expand('<cword>'), getline('.')) <cr>
 map <silent> <leader>\ :call GotoCscope(expand('<cword>'), getline('.')) <cr>
