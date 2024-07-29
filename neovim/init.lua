@@ -5,8 +5,6 @@ require("project_root")
 -- nvim options
 require("settings")
 
--- load vimscripts from vim dir
-load_vimscript_files("vim")
 -- lazy install
 require("plugins")
 -- setup plugins

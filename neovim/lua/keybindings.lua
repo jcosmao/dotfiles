@@ -59,15 +59,20 @@ vim.keymap.set("n", "<leader>k", ":Trouble diagnostics toggle filter.buf=0 focus
 vim.keymap.set("n", "<leader>l", ":Trouble diagnostics toggle focus=false win.size=35<cr>", opts)
 vim.keymap.set("n", "<leader>p", "\"0p", opts)
 vim.keymap.set("i", "<C-p>", "<C-r>\"", opts)
-vim.keymap.set("n", "<leader>\"", "ysiw\"", opts)
-vim.keymap.set("n", "<leader>:", "ysiW\"", opts)
-vim.keymap.set("n", "<leader>'", "ysiw'", opts)
-vim.keymap.set("n", "<leader>;", "ysiW'", opts)
 vim.keymap.set("n", "<M-Up>", "<cmd>call smoothie#do(\"<C-U>\")<cr>", opts)
 vim.keymap.set("v", "<M-Up>", "<cmd>call smoothie#do(\"<C-U>\")<cr>", opts)
 vim.keymap.set("n", "<M-Down>", "<cmd>call smoothie#do(\"<C-D>\")<cr>", opts)
 vim.keymap.set("v", "<M-Down>", "<cmd>call smoothie#do(\"<C-D>\")<cr>", opts)
 vim.keymap.set("n", "<C-G>", ":ToggleTerm dir=%:p:h <cr>", opts)
+
+-- Set key mappings using Vimscript commands within Lua
+-- not working with pure lua...
+vim.cmd([[
+  map <silent> <leader>" ysiw"
+  map <silent> <leader>: ysiW"
+  map <silent> <leader>' ysiw'
+  map <silent> <leader>; ysiW'
+]])
 
 -- save without trim
 vim.keymap.set("i", "<C-s>", "<Esc>:noautocmd w<CR>")

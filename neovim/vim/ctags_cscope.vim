@@ -15,7 +15,7 @@ let g:gutentags_exclude_filetypes = [
 let g:gutentags_add_default_project_roots = 0
 let g:gutentags_generate_on_empty_buffer = 0
 let g:gutentags_resolve_symlinks = 1
-let g:gutentags_modules = ['ctags', 'cscope_maps']
+let g:gutentags_modules = ['ctags', 'cscope']
 let g:gutentags_ctags_executable = '~/.local/bin/ctags'
 let g:gutentags_ctags_extra_args = ['--fields=+niaSszt --python-kinds=-vi --tag-relative=yes']
 " rg --type-list
@@ -135,7 +135,7 @@ endfunction
 
 command! -bang -nargs=* FZFCscope
   \ call fzf#run(fzf#wrap({
-  \     'source': 'cscope -d -L -f '.b:gutentags_files['cscope_maps'].' -0 '. shellescape(<q-args>).' | sed -e "s,^'.getcwd().'/,," | grep -Pv "\d+\s\s*(\#|:|\")" | grep -Pv "(class|def|func|function|sub) '.<q-args>.'"',
+  \     'source': 'cscope -d -L -f '.b:gutentags_files['cscope'].' -0 '. shellescape(<q-args>).' | sed -e "s,^'.getcwd().'/,," | grep -Pv "\d+\s\s*(\#|:|\")" | grep -Pv "(class|def|func|function|sub) '.<q-args>.'"',
   \     'sink*': function('s:sink_cscope'),
   \     'options': '
   \         --query '.s:filter.'

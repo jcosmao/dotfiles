@@ -126,12 +126,61 @@ function debug_toggle()
     end
 end
 
-function load_vimscript_files(directory)
+function load_vimscript(file)
     local neovim_root = vim.fn.stdpath("config")
-    local files = vim.fn.readdir(neovim_root .. "/" .. directory)
-    for _, file in ipairs(files) do
-        if file:match("%.vim$") then
-            vim.cmd("source " .. neovim_root .. "/" .. directory .. "/" .. file)
+    local file_path = neovim_root .. "/vim/" .. file
+
+    if vim.fn.filereadable(file_path)  then
+        vim.cmd("source " .. file_path)
+    end
+end
+
+
+function PythonBlack()
+    local opts = ""
+
+    local is_openstack = tonumber(vim.fn.system("find . -maxdepth 2 -name .gitreview | wc -l"))
+    if is_openstack > 0 then
+        opts = "-l 79"
+    end
+
+    vim.fn.system("black " .. opts .. " " .. vim.fn.expand("%:p"))
+    print("[Black] done")
+end
+
+function AutoColorColumn()
+    if vim.bo.filetype == "python" then
+        local project_root = FindRootDirectory()
+        local git_root = vim.fn.trim(vim.fn.system('git -C ' ..
+            vim.fn.expand('%:h') .. ' rev-parse --show-toplevel 2> /dev/null'))
+
+        if project_root == "" and git_root == "" then
+            return
+        end
+
+        local maxlinelen = vim.fn.trim(vim.fn.system('grep max-line-length $(find ' ..
+            project_root ..
+            ' ' ..
+            git_root ..
+            ' -maxdepth 1 -name pyproject.toml -o -name tox.ini -o -name .flake8) | awk -F= "{print $2}" | tail -1'))
+
+        if maxlinelen ~= "" then
+            vim.cmd('set colorcolumn=' .. maxlinelen)
+            return
+        end
+
+        -- Force 79 char max for openstack projects
+        if vim.loop.fs_stat(git_root .. '/.gitreview') then
+            vim.cmd('set colorcolumn=79')
+            return
         end
     end
+
+    if vim.bo.filetype == "gitcommit" then
+        vim.cmd('set colorcolumn=72')
+        return
+    end
+
+    -- reset colorcolumn
+    vim.cmd('set colorcolumn=')
 end

@@ -163,3 +163,31 @@ vim.api.nvim_create_autocmd("InsertLeave", {
         vim.opt_local.conceallevel = 2
     end,
 })
+
+vim.api.nvim_create_autocmd({ "FileType" }, {
+    pattern = "python",
+    callback = function()
+        vim.cmd("command! -nargs=0 Black lua PythonBlack()")
+    end
+})
+
+vim.api.nvim_create_autocmd({ "BufEnter" }, {
+    pattern = "*",
+    callback = function()
+        AutoColorColumn()
+    end
+})
+
+-- Close nvimtree and Trouble when diffview mode is opened
+vim.api.nvim_create_autocmd("BufEnter", {
+    group = vim.api.nvim_create_augroup("DiffviewOpen", { clear = true }),
+    pattern = "Diffview*",
+    callback = function()
+        vim.cmd(":NvimTreeClose")
+        vim.cmd(":Trouble close")
+        vim.diagnostic.disable()
+        vim.keymap.set({ 'n', 'i' }, '<F1>', ':DiffviewToggleFiles <cr>', { buffer = true })
+    end
+})
+
+vim.api.nvim_create_user_command('Opendev20231', 'DiffviewOpen opendev/stable/2023.1', {})
