@@ -1,3 +1,4 @@
+local vim = vim
 -- First get priority, other are fallback if first not found
 local root_names = { '.project', '.git' }
 

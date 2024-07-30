@@ -1,15 +1,6 @@
 local vim = vim
 
-function plug_loaded(name)
-    return vim.g.plugs[name] and vim.fn.isdirectory(vim.g.plugs[name].dir)
-end
-
-function plugins_patch()
-    local script = vim.fn.stdpath("config") .. "/plugin_patch/patch.sh"
-    vim.fn.system(script)
-end
-
-function hiera_encrypt()
+function HieraEncrypt()
     local git_root = vim.fn.system('git -C ' ..
         vim.fn.shellescape(vim.fn.expand("%:p:h")) .. ' rev-parse --show-toplevel'):match('(.*)\n')
     if vim.loop.fs_stat(git_root .. '/ovh-hiera-encrypt') then
@@ -17,12 +8,12 @@ function hiera_encrypt()
             git_root .. '/ovh-hiera-encrypt -f ' .. vim.fn.shellescape(vim.fn.expand("%:p")))
         vim.cmd(':silent edit!')
         vim.cmd('echohl WarningMsg')
-        vim.cmd('echo "hiera_encrypt: ' .. message .. '"')
+        vim.cmd('echo "HieraEncrypt: ' .. message .. '"')
         vim.cmd('echohl None')
     end
 end
 
-function mouse_toggle()
+function MouseToggle()
     if vim.o.mouse == 'a' then
         vim.o.mouse = ''
     else
@@ -31,7 +22,7 @@ function mouse_toggle()
 end
 
 vim.g.current_git_repo = ''
-function set_git_repo()
+function SetGitRepo()
     local current_file_path = vim.fn.resolve(vim.fn.expand('%:p:h'))
     local git_repo = vim.fn.system("cd " ..
         current_file_path .. "; basename -s .git $(git remote get-url origin 2> /dev/null) 2> /dev/null")
@@ -41,7 +32,7 @@ function set_git_repo()
     end
 end
 
-function is_special_filetype()
+function IsSpecialFiletype()
     local current_filetype = vim.bo.filetype
     for _, pattern in ipairs(special_filtetypes) do
         if vim.fn.match(current_filetype, pattern) ~= -1 then
@@ -54,8 +45,8 @@ end
 
 vim.g.last_display_file_path = ""
 
-function display_file_path()
-    if not is_special_filetype() then
+function DisplayFilePath()
+    if not IsSpecialFiletype() then
         if vim.g.last_display_file_path ~= vim.fn.expand('%:p') then
             print(string.format("File: %s", vim.fn.expand('%:p')))
             vim.g.last_display_file_path = vim.fn.expand('%:p')
@@ -63,7 +54,7 @@ function display_file_path()
     end
 end
 
-function line_infos_toggle()
+function LineInfosToggle()
     if vim.g.line_infos_status == nil then
         vim.g.line_infos_status = 1
     end
@@ -90,7 +81,7 @@ function line_infos_toggle()
     end
 end
 
-function diff_toggle()
+function DiffToggle()
     if vim.g.custom_diff_toggle == nil then
         vim.g.custom_diff_toggle = 0
     end
@@ -105,7 +96,7 @@ function diff_toggle()
     end
 end
 
-function setup_diff_mapping()
+function SetupDiffMapping()
     vim.cmd(':IBLDisable')
     if vim.fn.winnr() ~= vim.fn.winnr('h') then
         vim.api.nvim_set_keymap('n', '<leader><', ':diffput<cr>', { noremap = true, silent = true })
@@ -116,7 +107,7 @@ function setup_diff_mapping()
     end
 end
 
-function debug_toggle()
+function DebugToggle()
     if not vim.o.verbose then
         vim.o.verbosefile = '/tmp/nvim_debug.log'
         vim.o.verbose = 10
@@ -126,7 +117,7 @@ function debug_toggle()
     end
 end
 
-function load_vimscript(file)
+function LoadVimscript(file)
     local neovim_root = vim.fn.stdpath("config")
     local file_path = neovim_root .. "/vim/" .. file
 
@@ -135,6 +126,10 @@ function load_vimscript(file)
     end
 end
 
+function PatchPlugin(patch)
+    local script = vim.fn.stdpath("config") .. "/plugin_patch/patch.sh"
+    vim.fn.system({script, patch})
+end
 
 function PythonBlack()
     local opts = ""

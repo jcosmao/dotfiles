@@ -1,3 +1,4 @@
+local vim = vim
 -- Plugin management
 require("lazy-bootstrap")
 
@@ -94,8 +95,11 @@ require("lazy").setup({
     {
         'ludovicchabant/vim-gutentags',
         cond = vim.fn.executable('ctags') == 1,
+        build = function()
+            PatchPlugin("vim-gutentags.patch")
+        end,
         config = function()
-            load_vimscript("ctags_cscope.vim")
+            LoadVimscript("ctags_cscope.vim")
         end
     },
 

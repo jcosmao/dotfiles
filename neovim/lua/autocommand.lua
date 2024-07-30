@@ -41,42 +41,42 @@ vim.api.nvim_create_autocmd('BufReadPost', {
 
 -- startup in diff mode ?
 if vim.o.diff then
-    setup_diff_mapping()
+    SetupDiffMapping()
 end
 
 vim.api.nvim_create_user_command("DiffToggle", function()
-    diff_toggle()
+    DiffToggle()
 end, { nargs = 0 })
 
 vim.api.nvim_create_autocmd({ "OptionSet" }, {
     pattern = "diff",
     callback = function()
-        setup_diff_mapping()
+        SetupDiffMapping()
     end
 })
 
 vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter", "TabEnter", "BufWritePost" }, {
     pattern = "*",
     callback = function()
-        display_file_path()
-        set_git_repo()
+        DisplayFilePath()
+        SetGitRepo()
     end
 })
 
 vim.api.nvim_create_user_command("HieraEncrypt", function()
-    hiera_encrypt()
+    HieraEncrypt()
 end, { nargs = 0 })
 
 vim.api.nvim_create_user_command("MouseToggle", function()
-    mouse_toggle()
+    MouseToggle()
 end, { nargs = 0 })
 
 vim.api.nvim_create_user_command("DebugToggle", function()
-    debug_toggle()
+    DebugToggle()
 end, { nargs = 0 })
 
 vim.api.nvim_create_user_command("LineInfosToggle", function()
-    line_infos_toggle()
+    LineInfosToggle()
 end, { nargs = 0 })
 
 vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {

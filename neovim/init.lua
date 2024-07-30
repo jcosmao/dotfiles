@@ -9,8 +9,6 @@ require("settings")
 require("plugins")
 -- setup plugins
 require("plugins_config")
--- apply custom patches on modules
-plugins_patch()
 
 -- nvim mapping
 require("keybindings")

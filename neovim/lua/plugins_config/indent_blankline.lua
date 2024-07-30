@@ -21,4 +21,3 @@ require("ibl").setup({
         highlight = scope,
     },
 })
-
