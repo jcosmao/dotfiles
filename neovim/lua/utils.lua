@@ -143,21 +143,19 @@ function PythonBlack()
     print("[Black] done")
 end
 
+require("project_root")
+
 function AutoColorColumn()
     if vim.bo.filetype == "python" then
         local project_root = FindRootDirectory()
-        local git_root = vim.fn.trim(vim.fn.system('git -C ' ..
-            vim.fn.expand('%:h') .. ' rev-parse --show-toplevel 2> /dev/null'))
+        local git_root = vim.fn.trim(vim.fn.system('git -C ' .. vim.fn.expand('%:h') .. ' rev-parse --show-toplevel 2> /dev/null'))
 
         if project_root == "" and git_root == "" then
             return
         end
 
-        local maxlinelen = vim.fn.trim(vim.fn.system('grep max-line-length $(find ' ..
-            project_root ..
-            ' ' ..
-            git_root ..
-            ' -maxdepth 1 -name pyproject.toml -o -name tox.ini -o -name .flake8) | awk -F= "{print $2}" | tail -1'))
+        local cmd = "grep max-line-length $(find " .. project_root .. " " .. git_root .. " -maxdepth 1 -name pyproject.toml -o -name tox.ini -o -name .flake8) | awk -F= '{print $2}' | tail -1"
+        local maxlinelen = vim.fn.trim(vim.fn.system(cmd))
 
         if maxlinelen ~= "" then
             vim.cmd('set colorcolumn=' .. maxlinelen)

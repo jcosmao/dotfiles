@@ -46,6 +46,12 @@ bash $SCRIPTPATH/scripts/term_font_size.sh
 setxkbmap -layout us -variant altgr-intl
 [[ -d ~/.wallpapers ]] && /usr/bin/feh --bg-fill --no-fehbg --randomize ~/.wallpapers/*
 
+if [[ -e "$HOME/.config/i3blocks/${hw_name}.config" ]]; then
+    ln -sf "$HOME/.config/i3blocks/${hw_name}.config" $HOME/.config/i3blocks/config
+else
+    ln -sf $HOME/.config/i3blocks/common.config $HOME/.config/i3blocks/config
+fi
+
 # Then reload/restart i3
 i3-msg $action
 
