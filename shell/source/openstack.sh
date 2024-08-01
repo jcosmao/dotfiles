@@ -166,3 +166,22 @@ alias stacklog="devstack.get_logs"
 function devstack.venv_activate {
     source /opt/stack/data/venv/bin/activate
 }
+
+function openstack.router_delete {
+    router=$1
+    echo "Detach fip/port if any"
+    os fip list --router $router | jq '.[] | .ID .Port'
+    os fip list --router $router | jq -r '.[] | .ID + " " + .Port' | while read fip port; do
+        if [[ -n $port ]]; then
+            echo "- fip: $fip  port: $port"
+            os fip unset $fip --port $port
+        fi
+    done
+    echo "Detach subnets"
+    for subnet in $(os router show $router 2> /dev/null | jq '.interfaces_info | .[] | .subnet_id' -r | sort -u); do
+        echo "- subnet: $subnet"
+        os router remove subnet $router $subnet
+    done
+    echo "Delete router"
+    os router delete $router
+}
