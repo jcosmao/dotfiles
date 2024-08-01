@@ -89,6 +89,13 @@ vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
     command = "setfiletype puppet",
 })
 
+vim.api.nvim_create_autocmd({ "FileType" }, {
+    pattern = { "puppet" },
+    callback = function()
+        vim.opt_local.iskeyword = vim.opt_local.iskeyword + ":"
+    end
+})
+
 vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
     pattern = "*.inc",
     command = "setfiletype perl",

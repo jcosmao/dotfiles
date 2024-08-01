@@ -89,3 +89,6 @@ vim.keymap.set({ "n", "i" }, "<C-t>", "<C-o>:tabnew<CR>", opts)
 --     vim.keymap.set("n", "<leader>" .. i, i .. "gt", opts)
 -- end
 -- vim.keymap.set("n", "<leader>0", ":tablast<cr>", opt)
+--
+vim.keymap.set('n', '<leader>]', ':lua GotoCtags(vim.fn.expand("<cword>"), vim.fn.getline("."))<cr>', opts)
+vim.keymap.set('n', '<leader>\\', ':lua GotoCscope(vim.fn.expand("<cword>"), vim.fn.getline("."))<cr>', opts)

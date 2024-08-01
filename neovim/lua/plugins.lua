@@ -95,12 +95,12 @@ require("lazy").setup({
     {
         'ludovicchabant/vim-gutentags',
         cond = vim.fn.executable('ctags') == 1,
+        config = function()
+            require("plugins_config.gutentags").setup()
+        end,
         build = function()
             PatchPlugin("vim-gutentags.patch")
         end,
-        config = function()
-            LoadVimscript("ctags_cscope.vim")
-        end
     },
 
     -- git

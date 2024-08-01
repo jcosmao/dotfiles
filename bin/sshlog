@@ -166,17 +166,6 @@ function sshlog {
     >&2 echo "│    Cmd:    $LOGCMD | $GREPCMD"
     >&2 echo "│"
 
-    if [[ $NOCOLOR -eq 1 ]]; then
-        color_cmd="tee"
-    else
-        color_cmd="os-log-color"
-    fi
-
-    sort_cmd=cat
-    if [[ -n $SORT_OPT ]]; then
-        sort_cmd="sort $SORT_OPT"
-    fi
-
     for h in $(echo $found_hosts); do
         short=$(echo $h | sed -e 's/\.cloud.ovh.*//')
         # Execute tail cmd through ssh
@@ -187,10 +176,26 @@ function sshlog {
             "$LOGCMD | $GREPCMD" 2> /dev/null | \
             stdbuf -o0 awk -v host=$short -v header=$HEADER '/^==>/{size=split($2,splitted,"/");filename=splitted[size] ;next} !/^==>/{ if(header == 0) {print $0} else {print host,filename,$0} }' | \
             grep -F '' --line-buffered  &
-    done | $color_cmd | $sort_cmd
+    done | process_output
 
     wait
     cleanup
+}
+
+function process_output
+{
+    if [[ $NOCOLOR -eq 0 ]]; then
+        if [[ -n $SORT_OPT ]]; then
+            os-log-color | sort $SORT_OPT
+        else
+            os-log-color
+        fi
+    else
+        # trick to avoid buffering output instead of using 'cat'
+        while IFS= read -r line; do
+            echo "$line"
+        done
+    fi
 }
 
 function sshlog_completion
