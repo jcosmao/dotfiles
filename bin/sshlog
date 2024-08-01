@@ -6,7 +6,7 @@ current_pgid=$(ps -o pgid= $$ | tr -d ' ')
 current_sid=$(ps -o sid= $$ | tr -d ' ')
 
 function cleanup {
-    echo "│ Cleanup function"
+    >&2 echo "│ Cleanup function"
     # ps xao user,pid,pgid,sid,user,cmd | grep -P '(sshlog|tail)'
     sudo pkill -9 -g $current_pgid -s $current_sid
 }
@@ -21,6 +21,7 @@ GREP_PATTERN=''
 GREP_OPT=''
 NOCOLOR=0
 HEADER=1
+SORT_OPT=''
 LOG_MAP='{
     "default": {
         "default": "cmd:journalctl --output cat"
@@ -147,9 +148,9 @@ function sshlog {
            exit 1
         fi
         CMD=$(echo ${log_files[@]} | sed -e 's/^cmd://')
-        LOGCMD="echo '==> $CMD <==' ; timeout 3600 $CMD $TAILOPTS"
+        LOGCMD="echo '==> $CMD <==' ; timeout 600 $CMD $TAILOPTS"
     else
-        LOGCMD="timeout 3600 tail -v $TAILOPTS ${log_files[@]}"
+        LOGCMD="timeout 600 tail -v $TAILOPTS ${log_files[@]}"
     fi
 
     if [[ -n $GREP_PATTERN ]]; then
@@ -159,16 +160,21 @@ function sshlog {
         GREPCMD=tee
     fi
 
-    echo "│"
-    echo "│    Host:   $found_hosts"
-    echo "│    Files:  ${log_files[@]}"
-    echo "│    Cmd:    $LOGCMD | $GREPCMD"
-    echo "│"
+    >&2 echo "│"
+    >&2 echo "│    Host:   $found_hosts"
+    >&2 echo "│    Files:  ${log_files[@]}"
+    >&2 echo "│    Cmd:    $LOGCMD | $GREPCMD"
+    >&2 echo "│"
 
     if [[ $NOCOLOR -eq 1 ]]; then
         color_cmd="tee"
     else
         color_cmd="os-log-color"
+    fi
+
+    sort_cmd=cat
+    if [[ -n $SORT_OPT ]]; then
+        sort_cmd="sort $SORT_OPT"
     fi
 
     for h in $(echo $found_hosts); do
@@ -181,7 +187,7 @@ function sshlog {
             "$LOGCMD | $GREPCMD" 2> /dev/null | \
             stdbuf -o0 awk -v host=$short -v header=$HEADER '/^==>/{size=split($2,splitted,"/");filename=splitted[size] ;next} !/^==>/{ if(header == 0) {print $0} else {print host,filename,$0} }' | \
             grep -F '' --line-buffered  &
-    done | $color_cmd
+    done | $color_cmd | $sort_cmd
 
     wait
     cleanup
@@ -235,6 +241,9 @@ function main {
             -n)
                 help="NB: nb lines. tail option"
                 export TAILLINES=$1 && shift;;
+            -s)
+                help="Sort opts (cat only)"
+                export SORT_OPT=$1 && shift;;
             --nocolor|-N)
                 help="no color"
                 export NOCOLOR=1 ;;
@@ -267,15 +276,17 @@ function main {
         esac
     done
 
-    if [[ $CAT -eq 1 ]]; then
+    if [[ $CAT -eq 1 && -z $TAILLINES ]]; then
         export TAILLINES="+1"
-    else
+    elif [[ $CAT -eq 0 ]]; then
         export TAILOPTS="$TAILOPTS -f"
     fi
 
     if [[ -n $TAILLINES ]]; then
         export TAILOPTS="$TAILOPTS -n $TAILLINES"
     fi
+
+    [[ $CAT -eq 0 ]] && SORT_OPT=
 
     HOST_GROUP=${POSITIONNAL_ARGS[0]}
     LOG_KEYS=${POSITIONNAL_ARGS[@]:1}
