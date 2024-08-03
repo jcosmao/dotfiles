@@ -68,10 +68,10 @@ vim.keymap.set("n", "<C-G>", ":ToggleTerm dir=%:p:h <cr>", opts)
 -- Set key mappings using Vimscript commands within Lua
 -- not working with pure lua...
 vim.cmd([[
-  map <silent> <leader>" ysiw"
-  map <silent> <leader>: ysiW"
-  map <silent> <leader>' ysiw'
-  map <silent> <leader>; ysiW'
+    map <silent> <leader>" ysiw"
+    map <silent> <leader>: ysiW"
+    map <silent> <leader>' ysiw'
+    map <silent> <leader>; ysiW'
 ]])
 
 -- save without trim
@@ -85,10 +85,5 @@ vim.keymap.set({ "n", "i" }, "<C-PageUp>", "<C-o>:tabnext<CR>", opts)
 vim.keymap.set({ "n", "i" }, "<S-PageUp>", "<C-o>:tabnext<CR>", opts)
 vim.keymap.set({ "n", "i" }, "<C-t>", "<C-o>:tabnew<CR>", opts)
 
--- for i = 1, 9 do
---     vim.keymap.set("n", "<leader>" .. i, i .. "gt", opts)
--- end
--- vim.keymap.set("n", "<leader>0", ":tablast<cr>", opt)
---
-vim.keymap.set('n', '<leader>]', ':lua GotoCtags(vim.fn.expand("<cword>"), vim.fn.getline("."))<cr>', opts)
-vim.keymap.set('n', '<leader>\\', ':lua GotoCscope(vim.fn.expand("<cword>"), vim.fn.getline("."))<cr>', opts)
+vim.keymap.set('n', '<leader>]', ':lua GotoCtags(vim.fn.expand("<cword>"))<cr>', opts)
+vim.keymap.set('n', '<leader>\\', ':lua GotoCscope(vim.fn.expand("<cword>"))<cr>', opts)

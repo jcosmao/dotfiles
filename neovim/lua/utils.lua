@@ -1,5 +1,11 @@
 local vim = vim
 
+function PrintTable(t)
+    for k, v in pairs(t) do
+        print("[" .. k .. "]", v)
+    end
+end
+
 function HieraEncrypt()
     local git_root = vim.fn.system('git -C ' ..
         vim.fn.shellescape(vim.fn.expand("%:p:h")) .. ' rev-parse --show-toplevel'):match('(.*)\n')

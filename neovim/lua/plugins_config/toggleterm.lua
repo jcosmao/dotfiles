@@ -28,8 +28,11 @@ local toggletermGrp = vim.api.nvim_create_augroup("ToggleTermGrp", { clear = tru
 -- timeoutlen is timeout used for leader send key, reduce it in term mode and restore it outside
 vim.api.nvim_create_autocmd("FileType", {
     pattern = 'toggleterm',
-    command =
-    "set laststatus=0 noshowmode noruler timeoutlen=150 | autocmd BufLeave <buffer> set laststatus=2 showmode ruler timeoutlen=1000",
+    command = [[
+        set laststatus=0 noshowmode noruler timeoutlen=150 |
+        startinsert |
+        autocmd BufLeave <buffer> set laststatus=2 showmode ruler timeoutlen=1000
+    ]],
     group = toggletermGrp,
 })
 

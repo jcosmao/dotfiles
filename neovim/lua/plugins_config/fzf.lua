@@ -1,10 +1,84 @@
 local vim = vim
-local fzf_run = vim.fn["fzf#run"]
-local fzf_wrap = vim.fn["fzf#wrap"]
 
 vim.g.fzf_layout = { down = '60%' }
 vim.g.fzf_preview_window = { 'right:hidden', '?' }
+vim.g.fzf_action = {
+    ['ctrl-t'] = 'tab split',
+    ['ctrl-s'] = 'split',
+    ['ctrl-v'] = 'vsplit',
+}
 
+vim.env.FZF_DEFAULT_OPTS = [[
+    --ansi
+    --layout reverse
+    --preview-window right:60%
+    --preview 'bat --color=always --style=header,grid --line-range :300 {}'
+    --bind ?:toggle-preview,page-up:preview-up,page-down:preview-down,alt-up:page-up,alt-down:page-down,home:preview-top,end:preview-bottom
+    --height=60%
+    --margin 1,1
+]]
+
+local function fzf(search_str, source, options, callback)
+    local fzf_run = vim.fn["fzf#run"]
+    local fzf_wrap = vim.fn["fzf#wrap"]
+    local default_opts = {
+        '-1', '-0', '+i',
+        '--exact',
+        '--with-nth', '1',
+        '--nth', '1',
+        '--delimiter', '\t',
+        '--ansi',
+        '--preview-window', '+{3}-10',
+        '--preview', 'bat  --color always --italic-text always --style header,grid,numbers --highlight-line {3} {2}'
+    }
+
+    local opts = options or default_opts
+
+    local action_keys = {}
+    for k in pairs(vim.g.fzf_action) do action_keys[#action_keys + 1] = k end
+    table.insert(opts, "--expect=" .. table.concat(action_keys, ","))
+
+    local function default_callback(lines, search_str)
+        -- action key
+        local key = lines[1]
+        -- first selected line
+        local line = lines[2]
+
+        if line == nil or line == "" then
+            return
+        end
+
+        -- default parsing expect format:
+        -- {tag to search}\t{file path}\t{file line}
+        local split = vim.split(line, "\t")
+        local match = split[1]
+        local file = split[2]
+        local line_nb = split[3]
+
+        -- action if any (e.g. split)
+        local action = vim.g.fzf_action[key]
+        if action then vim.cmd(action) end
+
+        vim.cmd('e +' .. line_nb .. ' ' .. file)
+        vim.cmd('call search("' .. search_str .. '", "", line("."))')
+        vim.cmd('normal zz')
+    end
+
+    fzf_run(fzf_wrap({
+        source = source,
+        options = opts,
+        sinklist = function(lines)
+            if not callback then
+                default_callback(lines, search_str)
+            else
+                callback(lines, search_str)
+            end
+        end,
+    }))
+end
+
+
+-- '--query', get_openstack_query_filter(),
 local function get_openstack_query_filter()
     local current_file = vim.fn.expand('%:p')
     if current_file:match('/tests/') then
@@ -14,142 +88,112 @@ local function get_openstack_query_filter()
     end
 end
 
-vim.env.FZF_DEFAULT_OPTS =
-"--ansi --layout reverse --preview-window right:60% --bind ?:toggle-preview,page-up:preview-up,page-down:preview-down --height=60% --margin 1,1"
 
-vim.api.nvim_create_user_command(
-    "Rg",
+vim.api.nvim_create_user_command("Rg",
     function(opts)
         local args = opts.args
         local bang = opts.bang
         vim.fn['fzf#vim#grep'](
             'rg --no-ignore --column --no-heading --line-number --color=always ' .. vim.fn.shellescape(args), 1,
-            vim.fn['fzf#vim#with_preview']({ options = '--delimiter ":" --exact --nth 4..' }), bang
+            vim.fn['fzf#vim#with_preview']({
+                options = '--delimiter ":" --exact --nth 4..'
+            }), bang
         )
     end,
     { nargs = '*', bang = true }
 )
 
-vim.api.nvim_create_user_command(
-    "RgWithFilePath",
+vim.api.nvim_create_user_command("RgWithFilePath",
     function(opts)
         local args = opts.args
         local bang = opts.bang
         vim.fn['fzf#vim#grep'](
             'rg --no-ignore --column --no-heading --line-number --color=always ' .. vim.fn.shellescape(args), 1,
-            vim.fn['fzf#vim#with_preview']({ options = '--exact' }), bang
+            vim.fn['fzf#vim#with_preview']({
+                options = '--exact'
+            }), bang
         )
     end,
     { nargs = '*', bang = true }
 )
-
-
--- Get ctags
 
 local function ctags_cmd(search_str, tag_file)
-    -- [1] ref
-    -- [2] file
-    -- [3]
-    -- [4] kind
-    -- [5] line
-    local grep_pattern = 'grep -v "^!_TAG"'
-    if search_str then
-        grep_pattern = string.format('grep -P "^%s\\t"', search_str)
-    end
-    return string.format(
-        'cat %s | %s | sed -e "s,\tline:,\t,g"', tag_file, grep_pattern
+    -- return ctags list in format:
+    -- {tag}\t{filepath}\t{line}\t{function}\t{kind}
+    local cmd = string.format(
+        [[
+            cat %s | grep -v '^!_TAG' | grep -P '^%s\t' | sed -e 's,\tline:,\t,g' |
+            awk -F"\t" -vRED=$(tput setaf 1) -vRES=$(tput sgr0) '{print RED $1 RES "\t" $2 "\t" $5 "\t" $6 "\t" $4}'
+        ]],
+        tag_file, search_str
     )
+    -- print(cmd)
+    return cmd
 end
 
-local function ctags_fzf_opts(search_str)
-    search_str = search_str or '.*'
-    local fzf_opts = {
-        '--prompt', 'Ctags [' .. search_str .. '] > ',
-        '-1', '-0', '+i',
-        '--exact',
-        '--with-nth', '1,4,2',
-        '--nth', '1',
-        '--delimiter', '\t',
-        '--preview-window', '+{5}-15',
-        '--preview', 'bat --color always --highlight-line {5} {2}'
-    }
-    return fzf_opts
-end
-
-local function ctags_callback(line)
-    if line == nil or line == "" then
-        return
-    end
-    local split = vim.split(line, "\t")
-    local ref = split[1]
-    local file = split[2]
-    local line_num = split[5]
-    vim.cmd('e +' .. line_num .. ' ' .. file)
-    vim.cmd('call search("' .. ref .. '", "", line("."))')
-    vim.cmd('normal zz')
+local function cscope_cmd(search_str, mode, tag_file)
+    -- {tag}\t{filepath}\t{line}\t{function}
+    local cmd = string.format(
+        [[
+            cscope -d -f %s -L -%d '%s' | sed -e 's,^%s/,,' | grep -Pv '\d+\s\s*(#|:|")' |
+            awk -vSEARCH=%s -vRED=$(tput setaf 1) -vRES=$(tput sgr0) '$2 != SEARCH {print substr($0,index($0,$4)) "\t" RED $1 RES "\t" $3 "\t" $2}'
+        ]],
+        -- grep -Pv '(class|def|func|function|sub) %s' |
+        tag_file, mode, search_str, vim.fn.getcwd(), search_str
+    )
+    -- print(cmd)
+    return cmd
 end
 
 function FZFLuaCtags(search_str, tag_file)
-    fzf_run(fzf_wrap("ctags", {
-        source = ctags_cmd(search_str, tag_file),
-        options = ctags_fzf_opts(search_str),
-        sinklist = function(lines)
-            ctags_callback(lines[1])
-        end
-    }))
-end
-
--- Cscope
-
-local function cscope_cmd(search_str, tag_file)
-    -- [1] file
-    -- [2] function
-    -- [3] line
-    -- [5]+ target
-    return string.format(
-        'cscope -d -L -f %s -0 %s | sed -e "s,^%s/,," | grep -Pv "\\d+\\s\\s*(\\#|:|\\")" | grep -Pv "(class|def|func|function|sub) %s"',
-        tag_file,
-        search_str,
-        vim.fn.getcwd(),
-        search_str
-    )
-end
-
-local function cscope_fzf_opts(search_str)
+    search_str = search_str or ".*"
     local fzf_opts = {
-        '--query', get_openstack_query_filter(),
-        '--prompt', 'Cscope [' .. search_str .. '] > ',
+        '--prompt', string.format("Ctags [%s] ❭ ", search_str),
         '-1', '-0', '+i',
         '--exact',
-        '--with-nth', '1',
+        -- display kind and function
+        '--with-nth', '1,4,5',
+        -- filter only on first element
         '--nth', '1',
-        '--delimiter', ' ',
-        '--preview-window', '+{3}-15',
-        '--preview', 'bat --color always --highlight-line {3} {1}'
+        '--delimiter', '\t',
+        '--ansi',
+        '--preview-window', '+{3}-10',
+        '--preview', 'bat  --color always --italic-text always --style header,grid,numbers --highlight-line {3} {2}'
     }
-    return fzf_opts
+    fzf(search_str, ctags_cmd(search_str, tag_file), fzf_opts)
 end
 
-local function cscope_callback(line)
-    if line == nil or line == "" then
-        return
+function FZFLuaCscope(search_str, mode, tag_file)
+    -- 0 Find this symbol:
+    -- 1 Find this function definition:
+    -- 2 Find functions called by this function:
+    -- 3 Find functions calling this function:
+    -- 4 Find this text string:
+    -- 5 Change this text string:
+    -- 6 Find this egrep pattern:
+    -- 7 Find this file:
+    -- 8 Find files #including this file:
+    if not mode then mode = 0 end
+    if not search_str then
+        search_str = ".*"
+        mode = 6
     end
-    local split = vim.split(line, " ")
-    local file = split[1]
-    local line_num = split[3]
-    vim.cmd('e +' .. line_num .. ' ' .. file)
-    vim.cmd('call search("' .. vim.fn.expand('<cword>') .. '", "", line("."))')
-    vim.cmd('normal zz')
-end
+    search_str = search_str or ".*"
+    local fzf_opts = {
+        '--prompt', string.format("Cscope [%s] ❭ ", search_str),
+        '--query', get_openstack_query_filter(),
+        '-1', '-0', '+i',
+        '--exact',
+        '--with-nth', '2,4',
+        -- filter only on first element of nth
+        '--nth', '1',
+        '--delimiter', '\t',
+        '--ansi',
+        '--preview-window', '+{3}-10',
+        '--preview', 'bat  --color always --italic-text always --style header,grid,numbers --highlight-line {3} {2}'
+    }
 
-function FZFLuaCscope(search_str, tag_file)
-    fzf_run(fzf_wrap("cscope", {
-        source = cscope_cmd(search_str, tag_file),
-        options = cscope_fzf_opts(search_str),
-        sinklist = function(lines)
-            cscope_callback(lines[1])
-        end
-    }))
+    fzf(search_str, cscope_cmd(search_str, mode, tag_file), fzf_opts)
 end
 
 function GotoCtags(tag, ctx_line)
@@ -170,15 +214,26 @@ end
 
 function GotoCscope(tag, ctx_line)
     if GutentagsEnabled() then
-        FZFLuaCscope(tag, vim.b.gutentags_files['cscope'])
+        FZFLuaCscope(tag, 0, vim.b.gutentags_files['cscope'])
     end
 end
 
-vim.api.nvim_create_user_command(
-    "FZFCtags",
-    function()
+vim.api.nvim_create_user_command("FZFCtags",
+    function(opts)
         if GutentagsEnabled() then
             FZFLuaCtags(nil, vim.b.gutentags_files['ctags'])
+        end
+    end,
+    { nargs = '*', bang = true }
+)
+
+vim.api.nvim_create_user_command("FZFCscope",
+    function(opts)
+        local args = vim.split(opts.args, " ")
+        local search_str = args[1]
+        local mode = args[2]
+        if GutentagsEnabled() then
+            FZFLuaCscope(search_str, mode, vim.b.gutentags_files['cscope'])
         end
     end,
     { nargs = '*', bang = true }
