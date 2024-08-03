@@ -58,7 +58,7 @@ set notermguicolors                  " this fix mosh/tmux color
 set background=light
 set term=screen-256color
 let g:gruvbox_contrast_light = "hard"
-colorscheme gruvbox
+colorscheme Tomorrow-Night
 
 " Remap some common typos
 command! -bang E e<bang>

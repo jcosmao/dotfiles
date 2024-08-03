@@ -1,5 +1,11 @@
 #!/bin/bash
 
+[[ -z $SOURCE ]] && export SOURCE=()
+
+function export_shell () {
+    export SHELL=$(readlink /proc/$$/exe)
+}
+
 function append_path () {
     case ":$PATH:" in
         *:"$1":*)
@@ -17,14 +23,13 @@ function common.get_sourceable_bash_files_ordered
     done | sort -n | awk '{print $2}'
 }
 
-[[ -z $SOURCE ]] && export SOURCED=()
-
 function is_already_sourced
 {
     for f in "${SOURCE[@]}"; do
-        [[ $f = "$1" ]] && return 0
+        [[ "$f" == "$1" ]] && return 0
     done
     return 1
+
 }
 
 function common.source

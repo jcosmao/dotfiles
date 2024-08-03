@@ -1,13 +1,17 @@
 #!/bin/bash
 
 # If not running interactively, don't do anything
-[ -z "$PS1" ] && return
-
-export SHELL=/bin/bash
+[[ -z "$PS1" ]] && return
 
 source $HOME/.shell/common.sh
+is_already_sourced bashrc && return || SOURCE+=("bashrc")
 
-[ -f ~/.bash_aliases ] && common.source ~/.bash_aliases
+export_shell
+
+[[ ! "$SHELL" =~ bash ]] && return
+
+[[ -f ~/.bash_aliases ]] && common.source ~/.bash_aliases
+
 
 for src in $(common.get_sourceable_bash_files_ordered); do
     common.source "$src"

@@ -7,7 +7,7 @@ function launch_ssh_agent
 {
     # cache key for 10h
     ssh_agent_cmd="ssh-agent -s -t 36000"
-    agent_pid=$(pidof ssh-agent | awk '{print $1}')
+    agent_pid=$(pgrep ssh-agent -u $USER -n)
 
     if [[ -z $agent_pid && -n $SSH_AUTH_SOCK && -S $SSH_AUTH_SOCK  ]]; then
         # SSH agent forwarded, nothing to spawn
@@ -45,10 +45,11 @@ function launch_ssh_agent
     fi
 }
 
-if [[ $SHELL =~ zsh ]]; then
-    export PERIOD=120
-    autoload -U add-zsh-hook
-    add-zsh-hook periodic "launch_ssh_agent"
+if [[ -z $SSH_TTY ]]; then
+    launch_ssh_agent
+    if [[ $SHELL =~ zsh ]]; then
+        export PERIOD=120
+        autoload -U add-zsh-hook
+        add-zsh-hook periodic "launch_ssh_agent"
+    fi
 fi
-
-[[ -z $SSH_TTY ]] && launch_ssh_agent

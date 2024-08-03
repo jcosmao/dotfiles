@@ -44,7 +44,7 @@ configuration {
 /*	threads: 0;*/
 /*	scroll-method: 0;*/
 /*	window-format: "{w}    {c}   {t}";*/
-click-to-exit: false;
+/* click-to-exit: false; */
 /*	theme: ;*/
 /*	max-history-size: 25;*/
 /*	combi-hide-mode-prefix: false;*/

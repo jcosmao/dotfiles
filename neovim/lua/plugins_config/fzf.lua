@@ -1,7 +1,7 @@
 local vim = vim
 
 vim.g.fzf_layout = { down = '60%' }
-vim.g.fzf_preview_window = { 'right:hidden', '?' }
+vim.g.fzf_preview_window = { 'right:+{2}-/2', '?' }
 vim.g.fzf_action = {
     ['ctrl-t'] = 'tab split',
     ['ctrl-s'] = 'split',
@@ -118,14 +118,18 @@ vim.api.nvim_create_user_command("RgWithFilePath",
 )
 
 local function ctags_cmd(search_str, tag_file)
+    local line_number = vim.fn.line('.')
+    local filename = vim.fn.expand('%:.')
     -- return ctags list in format:
     -- {tag}\t{filepath}\t{line}\t{function}\t{kind}
     local cmd = string.format(
         [[
             cat %s | grep -v '^!_TAG' | grep -P '^%s\t' | sed -e 's,\tline:,\t,g' |
-            awk -F"\t" -vRED=$(tput setaf 1) -vRES=$(tput sgr0) '{print RED $1 RES "\t" $2 "\t" $5 "\t" $6 "\t" $4}'
+            awk -vF=%s -vL=%s -F"\t" -vRED=$(tput setaf 1) -vRES=$(tput sgr0) '$1 != F && $3 != L {
+                print RED $1 RES "\t" $2 "\t" $5 "\t" $6 "\t" $4
+            }'
         ]],
-        tag_file, search_str
+        tag_file, search_str, filename, line_number
     )
     -- print(cmd)
     return cmd
@@ -133,13 +137,17 @@ end
 
 local function cscope_cmd(search_str, mode, tag_file)
     -- {tag}\t{filepath}\t{line}\t{function}
+    local line_number = vim.fn.line('.')
+    local filename = vim.fn.expand('%:.')
     local cmd = string.format(
         [[
             cscope -d -f %s -L -%d '%s' | sed -e 's,^%s/,,' | grep -Pv '\d+\s\s*(#|:|")' |
-            awk -vSEARCH=%s -vRED=$(tput setaf 1) -vRES=$(tput sgr0) '$2 != SEARCH {print substr($0,index($0,$4)) "\t" RED $1 RES "\t" $3 "\t" $2}'
+            awk -vF=%s -vL=%s -vRED=$(tput setaf 1) -vRES=$(tput sgr0) '$1 != F && $3 != L {
+                print substr($0,index($0,$4)) "\t" RED $1 RES "\t" $3 "\t" $2
+            }'
         ]],
         -- grep -Pv '(class|def|func|function|sub) %s' |
-        tag_file, mode, search_str, vim.fn.getcwd(), search_str
+        tag_file, mode, search_str, vim.fn.getcwd(), filename, line_number
     )
     -- print(cmd)
     return cmd

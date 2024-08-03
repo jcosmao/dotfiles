@@ -3,6 +3,13 @@
 # uncomment for profiling
 # zmodload zsh/zprof
 
+source $HOME/.shell/common.sh
+is_already_sourced zshrc && return || SOURCE+=("zshrc")
+
+export_shell
+
+[[ ! "$SHELL" =~ zsh ]] && return
+
 [[ ! -d ~/.zsh ]] && mkdir ~/.zsh
 [[ ! -d ~/.zsh/myzsh ]] && git clone https://github.com/jcosmao/myzsh.git ~/.zsh/myzsh
 [[ ! -d ~/.zsh/blox-zsh-theme ]] && git clone https://github.com/jcosmao/blox-zsh-theme.git ~/.zsh/blox-zsh-theme
