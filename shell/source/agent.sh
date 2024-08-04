@@ -45,4 +45,10 @@ function launch_ssh_agent
     fi
 }
 
+if [[ $SHELL =~ zsh ]]; then
+    export PERIOD=120
+    autoload -U add-zsh-hook
+    add-zsh-hook periodic "launch_ssh_agent"
+fi
+
 [[ -z $SSH_TTY ]] && launch_ssh_agent
