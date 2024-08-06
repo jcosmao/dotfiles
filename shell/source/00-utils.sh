@@ -1,3 +1,5 @@
+export JQ_COLORS="2;33:2;33:0;33:0;36:1;32:0;35:1;35:2;34"
+
 function utils.dotfiles_update
 {
     [[ ! -e ~/.dotfiles ]] && return 1
