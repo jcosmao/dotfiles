@@ -12,7 +12,7 @@ local set_root = function()
     path = vim.fs.dirname(path)
 
     -- Try cache and resort to searching upward for root directory
-    PrintTable(root_cache)
+    -- PrintTable(root_cache)
 
     local root = root_cache[path]
     if root == nil then
