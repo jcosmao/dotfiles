@@ -190,16 +190,16 @@ function openstack.lb_show {
     lb=$1
 
     echo === LB $1 ===
-    os loadbalancer show  $lb | grep --color=always -Pe '(ERROR|[^ ]+ING[^ ]+|^)'
+    op loadbalancer show  $lb | grep --color=always -Pe '(ERROR|[^ ]+ING[^ ]+|^)'
     echo === AMPHORA ===
-    os loadbalancer amphora list --loadbalancer  $lb --long | grep --color=always -Pe '(ERROR|[^ ]+ING[^ ]+|^)'
+    op loadbalancer amphora list --loadbalancer  $lb --long | grep --color=always -Pe '(ERROR|[^ ]+ING[^ ]+|^)'
     echo === LISTENER ===
-    os loadbalancer listener list --loadbalancer  $lb | grep --color=always -Pe '(ERROR|[^ ]+ING[^ ]+|^)'
+    op loadbalancer listener list --loadbalancer  $lb | grep --color=always -Pe '(ERROR|[^ ]+ING[^ ]+|^)'
     echo === POOL ===
-    os loadbalancer pool list --loadbalancer  $lb | grep --color -Pe '(ERROR|[^ ]+ING[^ ]+|^)'
+    op loadbalancer pool list --loadbalancer  $lb | grep --color -Pe '(ERROR|[^ ]+ING[^ ]+|^)'
 
     for pool in $(os loadbalancer pool list --loadbalancer  $lb | jq -r .[].id); do
         echo === MEMBERS of pool $pool ===
-        os loadbalancer member list $pool | grep --color -Pe '(ERROR|[^ ]+ING[^ ]+|^)'
+        op loadbalancer member list $pool | grep --color -Pe '(ERROR|[^ ]+ING[^ ]+|^)'
     done
 }
