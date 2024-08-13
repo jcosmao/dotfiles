@@ -79,36 +79,11 @@ vim.api.nvim_create_user_command("LineInfosToggle", function()
     LineInfosToggle()
 end, { nargs = 0 })
 
-vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
-    pattern = { "*.lib", "*.source" },
-    command = "setfiletype sh",
-})
-
-vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
-    pattern = "*.pp",
-    command = "setfiletype puppet",
-})
-
 vim.api.nvim_create_autocmd({ "FileType" }, {
     pattern = { "puppet" },
     callback = function()
         vim.opt_local.iskeyword = vim.opt_local.iskeyword + ":"
     end
-})
-
-vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
-    pattern = "*.inc",
-    command = "setfiletype perl",
-})
-
-vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
-    pattern = "*.tf",
-    command = "setfiletype terraform",
-})
-
-vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
-    pattern = "*.conf",
-    command = "setfiletype ini",
 })
 
 vim.api.nvim_create_autocmd("FileType", {

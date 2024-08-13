@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=GPG reload agent
+Comment=Reload gpg agent
+Exec=alacritty -T gpg_reload -e bash -c "echo RELOADAGENT | gpg-connect-agent && echo gpg_passphrase | gpg --clearsign --pinentry-mode loopback"
+Type=Application
+Terminal=false

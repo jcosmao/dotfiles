@@ -210,11 +210,12 @@ function GotoCtags(tag, ctx_line)
     end
 
     if vim.bo.filetype == 'puppet' then
-        tag = tag:gsub('^::', '')
+        tag = string.gsub(tag, '^::', '')
     end
 
     if vim.bo.filetype == 'perl' then
-        tag = tag:match('.*::(.*)$')
+        ftag = string.match(tag, '.*::(.*)$')
+        if ftag then tag = ftag end
     end
 
     FZFLuaCtags(tag, vim.b.gutentags_files['ctags'])

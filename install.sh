@@ -252,6 +252,10 @@ function install_config {
             "$HOME/.config/i3/i3_build_conf.sh" > /dev/null
             ln -sf "$HOME/.config/i3/scripts/i3lock_blur.sh" "$HOME/.local/bin/lockscreen"
         fi
+
+        for app in $(ls $SCRIPTPATH/config.${target}/applications/*.desktop); do
+            ln -sf $app "$HOME/.local/share/applications/$(basename $app)"
+        done
     fi
 }
 

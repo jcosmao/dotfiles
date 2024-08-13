@@ -76,3 +76,15 @@ if vim.fn.has('python3') == 0 then
     print('Missing python3 support - need to pip install pynvim')
     vim.cmd('echohl None')
 end
+
+vim.filetype.add({
+  -- Detect and assign filetype based on the extension of the filename
+  extension = {
+    lib = "sh",
+    source = "sh",
+    pp = "puppet",
+    inc = "perl",
+    conf = "ini",
+    tf = "terraform",
+  },
+})
