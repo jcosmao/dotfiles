@@ -125,8 +125,8 @@ local function ctags_cmd(search_str, tag_file)
     local cmd = string.format(
         [[
             cat %s | grep -v '^!_TAG' | grep -P '^%s\t' | sed -e 's,\tline:,\t,g' |
-            awk -vF=%s -vL=%s -F"\t" -vRED=$(tput setaf 1) -vRES=$(tput sgr0) '$1 != F && $3 != L {
-                print RED $1 RES "\t" $2 "\t" $5 "\t" $6 "\t" $4
+            awk -vF=%s -vL=%s -F"\t" -vRED=$(tput setaf 1) -vRES=$(tput sgr0) '{
+                if ($1 != F || $3 != L) print RED $1 RES "\t" $2 "\t" $5 "\t" $6 "\t" $4
             }'
         ]],
         tag_file, search_str, filename, line_number
@@ -142,8 +142,8 @@ local function cscope_cmd(search_str, mode, tag_file)
     local cmd = string.format(
         [[
             cscope -d -f %s -L -%d '%s' | sed -e 's,^%s/,,' | grep -Pv '\d+\s\s*(#|:|")' |
-            awk -vF=%s -vL=%s -vRED=$(tput setaf 1) -vRES=$(tput sgr0) '$1 != F && $3 != L {
-                print substr($0,index($0,$4)) "\t" RED $1 RES "\t" $3 "\t" $2
+            awk -vF=%s -vL=%s -vRED=$(tput setaf 1) -vRES=$(tput sgr0) '{
+                if ($1 != F || $3 != L) print substr($0,index($0,$4)) "\t" RED $1 RES "\t" $3 "\t" $2
             }'
         ]],
         -- grep -Pv '(class|def|func|function|sub) %s' |

@@ -3,7 +3,7 @@
 # prompt for GPG passphrase when needed
 export GPG_TTY=$(tty)
 
-function launch_ssh_agent
+function agent.launch_ssh_agent
 {
     # cache key for 10h
     ssh_agent_cmd="ssh-agent -s -t 36000"
@@ -30,14 +30,17 @@ function launch_ssh_agent
         fi
     fi
 
-    ssh-add -l &> /dev/null; rc=$?
+    sshadd_out=$(ssh-add -l); rc=$?
+    sshadd_len=$(echo $sshadd_out | wc -l)
+    lspub_len=$(ls ~/.ssh/*.pub | wc -l)
+
     # no ssh-agent running
     if [[ $rc == 2 ]]; then
         # Try to export ssh-agent env
         (umask 066; eval "$ssh_agent_cmd" >| ~/.ssh-agent)
         eval "$(<~/.ssh-agent)" >/dev/null
         ssh-add $(ls ~/.ssh/*.pub | sed -re 's/\.pub$//') 2> /dev/null
-    elif [[ $rc == 1 ]]; then
+    elif [[ $rc == 1 || ($rc == 0 && $sshadd_len < $lspub_len) ]]; then
         # Add default ssh-key to agent cache
         ssh-add $(ls ~/.ssh/*.pub | sed -re 's/\.pub$//') 2> /dev/null
     else
@@ -46,10 +49,10 @@ function launch_ssh_agent
 }
 
 if [[ -z $SSH_TTY ]]; then
-    launch_ssh_agent
+    agent.launch_ssh_agent
     if [[ $SHELL =~ zsh ]]; then
         export PERIOD=120
         autoload -U add-zsh-hook
-        add-zsh-hook periodic "launch_ssh_agent"
+        add-zsh-hook periodic "agent.launch_ssh_agent"
     fi
 fi
