@@ -17,10 +17,11 @@ mkdir -p ~/.local/bin
 
 ln -sf "$SCRIPT" ~/.local/bin/dotfiles
 
-function install_neovim {
+function install_neovim
+{
     release=$1
     echo "- Update neovim from $release"
-    wget "https://github.com/neovim/neovim/releases/download/$release/nvim.appimage" -O "$TMPDIR/nvim.appimage" 2>/dev/null || \
+    wget "https://github.com/neovim/neovim/releases/download/$release/nvim.appimage" -O "$TMPDIR/nvim.appimage" 2> /dev/null ||
         cp nvim/nvim.appimage "$TMPDIR"
     chmod +x "$TMPDIR/nvim.appimage"
     echo "  - install neovim under ~/.local/bin/nvim"
@@ -36,7 +37,8 @@ function install_neovim {
     ) &> /dev/null
 }
 
-function install_vim_requirements {
+function install_vim_requirements
+{
     echo "- Install vim requirements"
 
     if [[ ! -e ~/.local/bin/nvim ]]; then
@@ -80,19 +82,22 @@ function install_vim_requirements {
     ln -sf "$(which node)" "$HOME/.local/bin/node"
 }
 
-function install_vim_config {
+function install_vim_config
+{
     echo "- Install neovim"
 
     rm -rf ~/.config/nvim && ln -sf "$SCRIPTPATH/neovim" ~/.config/nvim
     "$HOME/.local/bin/.nvim/usr/bin/nvim" --headless +PlugClean! +PlugInstall +PlugUpdate! +qall 2> /dev/null
 }
 
-function install_vim_light {
+function install_vim_light
+{
     rm -rf ~/.vim && ln -sf "$SCRIPTPATH/vim" ~/.vim
     ln -sf ~/.vim/vimrc_lite.vim ~/.vimrc
 }
 
-function install_shell {
+function install_shell
+{
     echo "- Install bash/zsh"
 
     rm -f ~/.shell
@@ -113,27 +118,35 @@ function install_shell {
     ln -sf ~/.shell/fzf/fzf.bash.password-store ~/.password-store/.extensions/fzf.bash
 }
 
-function update_bin_from_deb {
+function update_bin_from_deb
+{
     echo "- Update bin from deb pkg"
 
     # ctags: compiled from https://github.com/universal-ctags/ctags.git
 
     # - Install ripgrep: https://github.com/BurntSushi/ripgrep/releases/latest
-    version=$(basename $(curl -si https://github.com/BurntSushi/ripgrep/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
+    version=$(basename $(curl -si https://github.com/BurntSushi/ripgrep/releases/latest | grep ^location | awk '{print $2}') | sed 's/[^a-zA-Z0-9\.]//g')
     wget "https://github.com/BurntSushi/ripgrep/releases/download/$version/ripgrep_${version}-1_amd64.deb" -O "$TMPDIR/ripgrep.deb"
-    (cd "$TMPDIR"; ar x "$TMPDIR/ripgrep.deb" && tar xf data.tar.xz)
+    (
+        cd "$TMPDIR"
+        ar x "$TMPDIR/ripgrep.deb" && tar xf data.tar.xz
+    )
 
     # - Install fd: https://github.com/sharkdp/fd/releases/latest
-    version=$(basename $(curl -si https://github.com/sharkdp/fd/releases/latest | grep ^location | awk '{print $2}' ) | sed 's/[^a-zA-Z0-9\.]//g')
+    version=$(basename $(curl -si https://github.com/sharkdp/fd/releases/latest | grep ^location | awk '{print $2}') | sed 's/[^a-zA-Z0-9\.]//g')
     wget "https://github.com/sharkdp/fd/releases/download/${version}/fd_${version:1}_amd64.deb" -O $TMPDIR/fd.deb
-    (cd "$TMPDIR"; ar x "$TMPDIR/fd.deb" && tar xf data.tar.xz)
+    (
+        cd "$TMPDIR"
+        ar x "$TMPDIR/fd.deb" && tar xf data.tar.xz
+    )
 
     # save binary
     cp "$TMPDIR/usr/bin/*" "$SCRIPTPATH/bin" && rm -rf "$TMPDIR/deb"
     chmod +x "$SCRIPTPATH/bin/*"
 }
 
-function install_local_bin {
+function install_local_bin
+{
     echo "- Install ~/.local/bin"
 
     # install local bin
@@ -142,14 +155,15 @@ function install_local_bin {
         [[ $bin = "README.md" ]] && continue
         # check ldd
         echo "  ❭ $bin"
-        if [[ $(ldd "bin/$bin" 2>&1 |grep -c 'not found') -eq 0 ]]; then
+        if [[ $(ldd "bin/$bin" 2>&1 | grep -c 'not found') -eq 0 ]]; then
             bin_name=$(echo "$bin" | cut -d. -f1)
             ln -sf "$SCRIPTPATH/bin/$bin" "$HOME/.local/bin/$bin_name"
         fi
     done
 }
 
-function install_tmux {
+function install_tmux
+{
     echo "- Install tmux"
     [[ ! -L ~/.tmux ]] && rm -rf ~/.tmux
     ln -sf "$SCRIPTPATH/tmux/tm" ~/.local/bin/tm
@@ -164,7 +178,8 @@ function install_tmux {
     fi
 }
 
-function install_git {
+function install_git
+{
     echo "- Install git"
     git_username=$(git config --get user.name 2> /dev/null || echo "$GIT_USER")
     git_mail=$(git config --get user.email 2> /dev/null || echo "$GIT_MAIL")
@@ -176,7 +191,8 @@ function install_git {
 
     if [[ -z $git_username || -z $git_mail ]]; then
         gpg=()
-        IFS=$'\n'; for line in $(gpg -K --with-colons 2> /dev/null | grep ^uid: | cut -d: -f10); do
+        IFS=$'\n'
+        for line in $(gpg -K --with-colons 2> /dev/null | grep ^uid: | cut -d: -f10); do
             gpg+=("$line")
         done
 
@@ -212,30 +228,33 @@ function install_git {
 
 }
 
-function install_fonts {
+function install_fonts
+{
     [[ $IS_SSH -eq 1 ]] && return
     echo "- Install fonts"
     font_dir="$HOME/.fonts"
     rm -rf "$font_dir" && ln -sf "$SCRIPTPATH/fonts" "$font_dir"
-    if [[ -f $(which fc-cache 2>/dev/null) ]]; then
+    if [[ -f $(which fc-cache 2> /dev/null) ]]; then
         echo "  ❭ Resetting font cache..."
         fc-cache -f "$font_dir"
     fi
 }
 
-function install_icons {
+function install_icons
+{
     [[ $IS_SSH -eq 1 ]] && return
     echo "- Install icons"
     icons_dir="$HOME/.icons"
     rm -rf "$icons_dir" && ln -sf "$SCRIPTPATH/icons" "$icons_dir"
 }
 
-function install_config {
+function install_config
+{
     target=${1:-common}
     echo "- Install .config from config.${target}"
     mkdir -p "$HOME/.config.${target}.backup"
 
-    for cfg in $(ls "config.${target}") ; do
+    for cfg in $(ls "config.${target}"); do
         # to replace only a single file in a subdir,
         # handle renamed file path with '\' instead of '/''
         targetcfg=$(echo "$cfg" | sed -e 's/\\/\//g')
@@ -247,7 +266,7 @@ function install_config {
 
     if [[ $target = X11 ]]; then
         # build i3 config
-        if which i3 &> /dev/null ; then
+        if which i3 &> /dev/null; then
             echo "  ❭ build i3 conf"
             "$HOME/.config/i3/i3_build_conf.sh" > /dev/null
             ln -sf "$HOME/.config/i3/scripts/i3lock_blur.sh" "$HOME/.local/bin/lockscreen"
@@ -259,84 +278,97 @@ function install_config {
     fi
 }
 
-function uninstall {
-    echo "- Uninstall"; set -x
+function uninstall
+{
+    echo "- Uninstall"
+    set -x
     rm -rf "$HOME/.local/bin/.nvim"
     rm -rf "$HOME/.zsh"
-    for dir in "$HOME" "$HOME/.config" "$HOME/.local/bin" ; do
+    for dir in "$HOME" "$HOME/.config" "$HOME/.local/bin"; do
         find "$dir" -maxdepth 1 -lname '*dotfiles*' -delete
         find "$dir" -maxdepth 1 -xtype l -delete
     done
     set +x
 }
 
-function print_help {
+function print_help
+{
 
     [[ $# -ne 0 ]] && echo "$(tput setaf 1)[ERROR] $*"
 
     echo "
     Options:
 
-$(declare -f main | \
-    grep -P '(help=|--|-[a-z]\))' | \
-    xargs | \
-    sed -e 's/; /\n/g' -e 's/help=/#/g' | \
-    column -t -s '#')"
+$(declare -f main |
+        grep -P '(help=|--|-[a-z]\))' |
+        xargs |
+        sed -e 's/; /\n/g' -e 's/help=/#/g' |
+        column -t -s '#')"
 
     exit
 }
 
-function main {
+function main
+{
     [[ $# -eq 0 ]] && print_help
 
     echo "Install dotfiles for user $USER"
 
     while [[ $# -ne 0 ]]; do
-        arg="$1"; shift
+        arg="$1"
+        shift
         case "$arg" in
-            --minimal|-m)
+            --minimal | -m)
                 help="Vim config without plugins, shell (bash+zsh), .local/bin, tmux"
-                install_vim_light;
-                install_shell;
-                install_tmux;
-                install_local_bin ;;
+                install_vim_light
+                install_shell
+                install_tmux
+                install_local_bin
+                ;;
 
-            --conf|-c)
+            --conf | -c)
                 help="shell (bash+zsh), tmux, git, .local/bin"
-                install_shell;
-                install_tmux;
-                install_git;
-                install_config common;
-                install_local_bin;;
+                install_shell
+                install_tmux
+                install_git
+                install_config common
+                install_local_bin
+                ;;
 
-            --ui|-x)
+            --ui | -x)
                 help="i3 cfg, icons, fonts"
-                install_icons ;
-                install_fonts ;
-                install_config X11;;
+                install_icons
+                install_fonts
+                install_config X11
+                ;;
 
-            --nvim|--neovim|-v)
+            --nvim | --neovim | -v)
                 help="Neovim (optional: stable|nightly|v[0-9])"
-                [[ $1 =~ ^(stable|nightly|v[0-9]) ]] && \
-                    release=$1 && shift && \
-                    install_neovim "$release";
-                install_vim_requirements;
-                install_vim_config;;
+                [[ $1 =~ ^(stable|nightly|v[0-9]) ]] &&
+                    release=$1 && shift &&
+                    install_neovim "$release"
+                install_vim_requirements
+                install_vim_config
+                ;;
 
-            --updatebin|-u)
+            --updatebin | -u)
                 help="update bin (pull from github)"
-                update_bin_from_deb;;
+                update_bin_from_deb
+                ;;
 
-            --uninstall|-d)
+            --uninstall | -d)
                 help="uninstall dotfiles"
-                uninstall;;
+                uninstall
+                ;;
 
-            --help|-h)
+            --help | -h)
                 help="this"
-                print_help ;;
+                print_help
+                ;;
 
             *)
                 [[ $arg =~ \-+.* ]] && print_help "$arg unknown"
+                ;;
         esac
     done
 

@@ -18,12 +18,12 @@ vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
 
 -- display result in FZF
 require('lspfuzzy').setup {
-    methods = 'all',              -- either 'all' or a list of LSP methods (see below)
-    jump_one = true,              -- jump immediately if there is only one location
-    save_last = false,            -- save last location results for the :LspFuzzyLast command
-    callback = nil,               -- callback called after jumping to a location
-    fzf_modifier = ':~:.',        -- format FZF entries, see |filename-modifiers|
-    fzf_trim = true,              -- trim FZF entries
+    methods = 'all',       -- either 'all' or a list of LSP methods (see below)
+    jump_one = true,       -- jump immediately if there is only one location
+    save_last = false,     -- save last location results for the :LspFuzzyLast command
+    callback = nil,        -- callback called after jumping to a location
+    fzf_modifier = ':~:.', -- format FZF entries, see |filename-modifiers|
+    fzf_trim = true,       -- trim FZF entries
 }
 
 local signature_config = {
@@ -40,7 +40,6 @@ local signature_config = {
 }
 
 require("lsp_signature").setup(signature_config)
-
 
 local virtual_text_default = {
     format = function(diagnostic)
@@ -140,85 +139,57 @@ capabilities.textDocument.foldingRange = {
     lineFoldingOnly = true
 }
 
-local mason_lspconfig = require("mason-lspconfig")
 
-local servers = {
+local efm_cfg = require("plugins_config.efm")
+
+local lsp = {
     bashls = {},
-    dockerls = {},
-    eslint = {},
-    efm = {},
-    jsonls = {
-        on_new_config = function(new_config)
-            new_config.settings.json.schemas = new_config.settings.json.schemas or {}
-            vim.list_extend(new_config.settings.json.schemas, require("schemastore").json.schemas())
-        end,
-        settings = {
-            json = {
-                format = {
-                    enable = true,
-                },
-                validate = { enable = true },
-            },
-        },
-    },
-    yamlls = {},
-    -- python
     pyright = {},
-    pylsp = {
-        settings = {
-            -- configure plugins in pylsp
-            pylsp = {
-                plugins = {
-                    flake8 = { enabled = true },
-                    mccabe = { enabled = false },
-                    pycodestyle = { enabled = false },
-                    pyflakes = { enabled = true },
-                    pylint = { enabled = false },
-                },
-            },
-        },
+    jsonls = {},
+    yamlls = {},
+    lua_ls = {},
+    efm = {
+        settings = efm_cfg.settings,
+        filetypes = vim.tbl_keys(efm_cfg.settings.languages),
+        init_options = { documentFormatting = true },
     },
-    sumneko_lua = {
-        Lua = {
-            runtime = {
-                -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
-                version = 'LuaJIT',
-            },
-            diagnostics = {
-                -- Get the language server to recognize the `vim` global
-                globals = { 'vim' },
-            },
-            workspace = {
-                -- Make the server aware of Neovim runtime files
-                library = vim.api.nvim_get_runtime_file("", true),
-            },
-            -- Do not send telemetry data containing a randomized but unique identifier
-            telemetry = {
-                enable = false,
-            },
-        },
+    terraformls = {},
+    ansiblels = {},
+    eslint = {},
+    gopls = {},
+    puppet = {},
+    volar = {
+        filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue', 'html' }
     },
+    -- shfmt = {},
+    -- mypy = {},
+    -- isort = {},
+    -- prettierd = {},
+    -- ["pyproject-flake8"] = {},
 }
 
+local mason_lspconfig = require("mason-lspconfig")
 mason_lspconfig.setup {
-    -- ensure_installed = vim.tbl_keys(servers),
-    -- automatic_installation = true,
+    ensure_installed = vim.tbl_keys(lsp),
+    automatic_installation = true,
 }
-
-local lspconfig = require("lspconfig")
 
 mason_lspconfig.setup_handlers {
     -- This is a default handler that will be called for each installed server (also for new servers that are installed during a session)
     function(server_name)
+
+        local srv = lsp[server_name] or {}
+        local settings = srv.settings or nil
+        local filetypes = srv.filetypes or nil
+        local init_options = srv.init_options or nil
+
+        local lspconfig = require("lspconfig")
         lspconfig[server_name].setup {
             on_attach = on_attach,
             capabilities = capabilities,
-            settings = servers[server_name],
+            settings = settings,
+            filetypes = filetypes,
+            init_options = init_options,
         }
     end,
-}
-
--- volar for vuejs stuff
-require 'lspconfig'.volar.setup {
-    filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue', 'html' }
 }
