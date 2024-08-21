@@ -22,17 +22,14 @@ local terraform_fmt = {
     formatStdin = true
 }
 
-local openstack_isort = {
-    formatCommand = 'isort --quiet --profile open_stack -',
+local python_isort = {
+    formatCommand = [[
+        test -f $(git -C $(dirname ${INPUT}) rev-parse --show-toplevel 2> /dev/null)/.gitreview &&
+        isort --quiet --lines-after-imports 2 -l 79 --profile open_stack - ||
+        isort --quiet -
+    ]],
     formatStdin = true,
-    rootMarkers = { '.gitreview' },
 }
-
--- local python_isort = {
---     formatCommand = 'isort --quiet -',
---     formatStdin = true,
---     rootMarkers = { 'pyproject.toml' },
--- }
 
 local markdown_lint = {
     lintCommand = 'mdl ${INPUT}',
@@ -43,7 +40,7 @@ local markdown_lint = {
 }
 
 local efm_languages = {
-    python = { openstack_isort },
+    python = { python_isort },
     hcl = { terraform_fmt },
     terraform = { terraform_fmt },
     sh = { sh_fmt, sh_lint },
@@ -53,7 +50,8 @@ local efm_languages = {
 }
 
 M.settings = {
-    languages = efm_languages
+    languages = efm_languages,
+    rootMarkers = { '.git/' },
 }
 
 return M

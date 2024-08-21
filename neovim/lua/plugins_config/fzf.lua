@@ -126,7 +126,7 @@ local function ctags_cmd(search_str, tag_file)
         [[
             cat %s | grep -v '^!_TAG' | grep -P '^%s\t' | sed -e 's,\tline:,\t,g' |
             awk -vF=%s -vL=%s -F"\t" -vRED=$(tput setaf 1) -vRES=$(tput sgr0) '{
-                if ($1 != F || $3 != L) print RED $1 RES "\t" $2 "\t" $5 "\t" $6 "\t" $4
+                if ($1 != F || $3 != L) print RED $1 RES "\t" $2 "\t" $5 "\t" $6 "\t" $4 "\t"
             }'
         ]],
         tag_file, search_str, filename, line_number
@@ -143,7 +143,7 @@ local function cscope_cmd(search_str, mode, tag_file)
         [[
             cscope -d -f %s -L -%d '%s' | sed -e 's,^%s/,,' | grep -Pv '\d+\s\s*(#|:|")' |
             awk -vF=%s -vL=%s -vRED=$(tput setaf 1) -vRES=$(tput sgr0) '{
-                if ($1 != F || $3 != L) print substr($0,index($0,$4)) "\t" RED $1 RES "\t" $3 "\t" $2
+                if ($1 != F || $3 != L) print substr($0,index($0,$4)) "\t" RED $1 RES "\t" $3 "\t" $2 "\t"
             }'
         ]],
         -- grep -Pv '(class|def|func|function|sub) %s' |
@@ -159,10 +159,10 @@ function FZFLuaCtags(search_str, tag_file)
         '--prompt', string.format("Ctags [%s] ❭ ", search_str),
         '-1', '-0', '+i',
         '--exact',
-        -- display kind and function
-        '--with-nth', '1,4,5',
-        -- filter only on first element
-        '--nth', '1',
+        -- display kind tag and filepath
+        '--with-nth', '5,1,2',
+        -- filter only on second element
+        '--nth', '2',
         '--delimiter', '\t',
         '--ansi',
         '--preview-window', '+{3}-10',

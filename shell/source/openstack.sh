@@ -1,8 +1,11 @@
 export CLIFF_FIT_WIDTH=1
 
 function os {
+    JSON=1
+    [[ $1 == "--nojson" ]] && JSON=0 && shift
+
     APPEND_OPTS=()
-    [[ "$*" =~ (show|list|create|issue) ]] && APPEND_OPTS+=("-f" "json")
+    [[ "$*" =~ (show|list|create|issue) && $JSON == 1 ]] && APPEND_OPTS+=("-f" "json")
     [[ "$*" =~ (server list) ]] && APPEND_OPTS+=("-n")
     [[ "$*" =~ (console log show|--help$| -h$| help$) ]] && APPEND_OPTS=()
     if [[ $1 == "fip" ]]; then
@@ -34,15 +37,15 @@ function openstack.token {
     export OSTOKEN=$(os token issue | jq -r .id)
 }
 
+alias o="os --nojson"
 alias oss="os server"
 alias osc="os compute"
 alias osn="os network"
 alias osb="os baremetal"
 alias osv="os volume"
 alias osi="os image"
-alias op="openstack"
 # nova
-alias ossall="os server list --all --host"
+alias osshost="os server list --all --host"
 # octavia
 alias osl="os loadbalancer"
 alias osla="os loadbalancer amphora list --loadbalancer"
