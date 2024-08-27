@@ -30,7 +30,7 @@ vim.api.nvim_create_autocmd("FileType", {
     pattern = 'toggleterm',
     command = [[
         set laststatus=0 noshowmode noruler timeoutlen=150 |
-        startinsert |
+        autocmd BufEnter <buffer> startinsert |
         autocmd BufLeave <buffer> set laststatus=2 showmode ruler timeoutlen=1000
     ]],
     group = toggletermGrp,

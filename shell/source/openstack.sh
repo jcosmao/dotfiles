@@ -12,6 +12,12 @@ function os {
         shift; set -- "floating ip" "${@:1}"
     elif [[ $1 == "lb" ]]; then
         shift; set -- "loadbalancer" "${@:1}"
+    elif [[ $1 == "net" ]]; then
+        shift; set -- "network" "${@:1}"
+    elif [[ $1 == "bm" ]]; then
+        shift; set -- "baremetal" "${@:1}"
+    elif [[ $1 == "sg" ]]; then
+        shift; set -- "security group" "${@:1}"
     fi
 
     echo "${APPEND_OPTS[@]}" | grep -qw '\-f json' && PIPE_CMD="jq" || PIPE_CMD="tee"

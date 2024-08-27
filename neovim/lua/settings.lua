@@ -42,7 +42,6 @@ vim.opt.undoreload = 100000
 vim.opt.history = 1000
 vim.opt.backup = false
 vim.opt.swapfile = false
-vim.opt.clipboard = "unnamedplus"
 vim.opt.updatetime = 100
 vim.opt.hidden = true
 vim.opt.autowriteall = true
@@ -55,6 +54,8 @@ vim.opt.shortmess = vim.opt.shortmess + "c"
 vim.opt.pumheight = 20
 vim.opt.termguicolors = true
 vim.opt.conceallevel = 2
+
+vim.api.nvim_set_option("clipboard", "unnamedplus")
 
 if vim.fn.empty(vim.env.THEME) == 0 then
     vim.opt.background = vim.env.THEME

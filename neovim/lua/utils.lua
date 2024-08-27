@@ -7,14 +7,18 @@ function PrintTable(t)
 end
 
 function HieraEncrypt()
-    local git_root = vim.fn.system('git -C ' ..
-        vim.fn.shellescape(vim.fn.expand("%:p:h")) .. ' rev-parse --show-toplevel'):match('(.*)\n')
+    local git_root = vim.fn.trim(vim.fn.system(
+        'git -C ' .. vim.fn.expand('%:h') .. ' rev-parse --show-toplevel 2> /dev/null'
+    ))
+
     if vim.loop.fs_stat(git_root .. '/ovh-hiera-encrypt') then
-        local message = vim.fn.system(':silent !' ..
-            git_root .. '/ovh-hiera-encrypt -f ' .. vim.fn.shellescape(vim.fn.expand("%:p")))
+        local encrypt_cmd = string.format("%s/ovh-hiera-encrypt -f %s", git_root, vim.fn.shellescape(vim.fn.expand("%:p")))
+        local message = vim.fn.system(encrypt_cmd)
+
         vim.cmd(':silent edit!')
         vim.cmd('echohl WarningMsg')
-        vim.cmd('echo "HieraEncrypt: ' .. message .. '"')
+        print(encrypt_cmd)
+        print(message)
         vim.cmd('echohl None')
     end
 end
