@@ -22,22 +22,38 @@ function tf
     state_dir="terraform.tfstate.d/${TF_WORKSPACE}"
     mkdir -p $state_dir
 
-    if [[ $1 = "apply" && ! -f $state_dir/args ]]; then
-        echo $* | sed -e 's/apply//' > ${state_dir}/args
+    if [[ -f $state_dir/args ]]; then
+         eval $(cat $state_dir/args)
     fi
 
-    if [[ $1 =~ (apply|destroy) ]]; then
-        if [[ "$*" != "$(cat ${state_dir}/args)" ]]; then
-            echo "WORKSPACE=$TF_WORKSPACE  previously used with args: '$(cat ${state_dir}/args)'"
+    if [[ $1 =~ (apply) ]]; then
+        if [[ "$*" != "${TF_COMMAND}" ]]; then
+            echo "WORKSPACE=$TF_WORKSPACE  previously used with args: '$TF_COMMAND'"
+            unset response
             [[ $SHELL =~ zsh ]] && vared -p 'continue ? [y] ' -c response || read -r -p 'continue ? [y] ' response
             if [[ $response != y ]]; then
                 return
             fi
 
         fi
+
+        if [[ $OS_REGION_NAME != $TF_OS_REGION_NAME ]]; then
+            echo "OS_REGION_NAME is not set to = $TF_OS_REGION_NAME "
+            unset response
+            [[ $SHELL =~ zsh ]] && vared -p 'continue ? [y] ' -c response || read -r -p 'continue ? [y] ' response
+            if [[ $response != y ]]; then
+                return
+            fi
+        fi
     fi
 
+    >&2 echo "[DEBUG] terraform $* $OPTS"
     terraform $* $OPTS
+
+    if [[ $1 = "apply" ]]; then
+        echo "TF_COMMAND=\"$*\"" > ${state_dir}/args
+        echo "TF_OS_REGION_NAME=${OS_REGION_NAME}" >> ${state_dir}/args
+    fi
 
     [[ $? = 0 && $1 = "destroy" ]] && \
         rm -rf $state_dir && \

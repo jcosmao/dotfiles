@@ -112,3 +112,8 @@ shopt -s cdable_vars
 # export projects="$HOME/projects"
 # export documents="$HOME/Documents"
 # export dropbox="$HOME/Dropbox"
+
+
+# Color stderr
+exec 3>&2
+exec 2> >(sed -u 's/^\(.*\)$/'$'\e''[31m\1'$'\e''[m/' >&3)
