@@ -212,3 +212,9 @@ function openstack.lb_show {
         os loadbalancer member list $pool
     done
 }
+
+function openstack.json_to_openrc
+{
+    prefix=$1
+    jq -r --arg prefix "$prefix" 'to_entries | map("export \($prefix + .key | ascii_upcase)=\(.value)")|.[]'
+}
