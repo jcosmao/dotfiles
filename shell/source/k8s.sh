@@ -72,8 +72,20 @@ complete -F _complete_kns k8s.set_context_namespace
 complete -F _complete_kns knsc
 
 function k8s.list_containers_by_pod {
-        k get pods -o="custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,CONTAINERS:.spec.containers[*].name,INIT-CONTAINERS:.spec.initContainers[*].name,STATUS:.status.phase,NODE:spec.nodeName,HostIP:.status.hostIP,PodIP:status.podIP" \
-        $*
+    {
+        echo -n "POD\tCONTAINER\tSTATE\tSTARTED\tRESTARTS\tPOD_IP\tNODE\tNODE_IP\n";  k get pods -o json | jq -r '.items[] | .metadata.name as $pod_name |  .spec.nodeName as $node | .status.hostIP as $nodeip | .status.podIP as $podip | .status.containerStatuses[] | [
+           "\u001b[32m" + $pod_name + "\u001b[0m",
+           "\u001b[34m" + .name + "\u001b[0m",
+           (
+             if .state.waiting then "\u001b[31m" + (.state.waiting.reason // "Waiting") + "\u001b[0m"
+             elif .state.terminated then "\u001b[31m" + (.state.terminated.reason // "Terminated") + "\u001b[0m"
+             elif .state.running then "\u001b[32mRunning\u001b[0m"
+             else "\u001b[35mUnknown\u001b[0m"
+             end
+           ),  (.lastState.terminated.finishedAt // .state.running.startedAt // "Unknown" ),
+           .restartCount, $podip, $node, $nodeip
+        ] | @tsv'
+    } | column -ts $'\t'
 }
 
 function k8s.list_running_containers_by_pod_with_labels {
@@ -170,7 +182,8 @@ function k8s.get_last_traefik_config {
 alias kns="k8s.set_shell_namespace"
 alias kunset="k8s.unset_shell_namespace"
 alias knsc="k8s.set_context_namespace"
-alias klc="k8s.list_containers_by_pod"
+alias kgp="k get pods -o wide"
+alias kgc="k8s.list_containers_by_pod"
 alias ks="k8s.exec shell"
 alias kx="k8s.exec cmd"
 alias klog="k8s.get_ns_logs"
