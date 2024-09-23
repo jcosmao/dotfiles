@@ -73,19 +73,27 @@ complete -F _complete_kns knsc
 
 function k8s.list_containers_by_pod {
     {
-        echo -n "POD\tCONTAINER\tSTATE\tSTARTED\tRESTARTS\tPOD_IP\tNODE\tNODE_IP\n";  k get pods -o json | jq -r '.items[] | .metadata.name as $pod_name |  .spec.nodeName as $node | .status.hostIP as $nodeip | .status.podIP as $podip | .status.containerStatuses[] | [
-           "\u001b[32m" + $pod_name + "\u001b[0m",
-           "\u001b[34m" + .name + "\u001b[0m",
-           (
-             if .state.waiting then "\u001b[31m" + (.state.waiting.reason // "Waiting") + "\u001b[0m"
-             elif .state.terminated then "\u001b[31m" + (.state.terminated.reason // "Terminated") + "\u001b[0m"
-             elif .state.running then "\u001b[32mRunning\u001b[0m"
-             else "\u001b[35mUnknown\u001b[0m"
-             end
-           ),  (.lastState.terminated.finishedAt // .state.running.startedAt // "Unknown" ),
-           .restartCount, $podip, $node, $nodeip
-        ] | @tsv'
-    } | column -ts $'\t'
+        >&2 echo -n "POD\tCONTAINER\tSTATE\tSTARTED\tRESTARTS\tPOD_IP\tNODE\tNODE_IP\n";
+        k get pods -o json | \
+            jq -r --arg RED "$(tput setaf 1)" --arg RES "$(tput sgr0)" --arg GREEN "$(tput setaf 2)" --arg BLUE "$(tput setaf 4)" --arg MAGENTA "$(tput setaf 5)" \
+            '.items[] | .metadata.name as $pod_name |  .spec.nodeName as $node | .status.hostIP as $nodeip | .status.podIP as $podip | .status.containerStatuses[] | [
+                $GREEN + $pod_name + $RES,
+                $BLUE + .name + $RES,
+                (
+                  if .state.waiting then $RED + (.state.waiting.reason // "Waiting") + $RES
+                  elif (.state.terminated and .state.terminated.reason == "Completed") then $MAGENTA + .state.terminated.reason + $RES
+                  elif .state.terminated then $RED + (.state.terminated.reason // "Terminated") + $RES
+                  elif .state.running then $GREEN + "Running" + $RES
+                  else $MAGENTA + "Unknown" + $RES
+                  end
+                ),
+                (.state.terminated.startedAt // .state.running.startedAt | fromdateiso8601 | strftime("%Y-%m-%d %H:%M:%S %Z")),
+                if (.restartCount > 0) then $RED + (.restartCount | tostring) + $RES else $GREEN + (.restartCount | tostring)  + $RES end,
+                $podip,
+                $node,
+                $nodeip
+            ] | @tsv'
+    } | sort -k4 -k5 | column -ts $'\t'
 }
 
 function k8s.list_running_containers_by_pod_with_labels {
@@ -191,6 +199,19 @@ alias kg="k8s.get_all_resources"
 alias ksec="k8s.get_decrypted_secret"
 alias knet="k8s.pod_netns_enter"
 alias crictl="k3s crictl"
+
+function _complete_pod
+{
+    local word=${COMP_WORDS[1]}
+    COMPREPLY=($(compgen -W "$(k get pods -o name | awk -F'/' '{print $2}' | xargs)" -- ${word}))
+}
+
+complete -F _complete_pod ks
+complete -F _complete_pod kx
+complete -F _complete_pod k8s.exec
+complete -F _complete_pod knet
+complete -F _complete_pod k8s.pod_netns_enter
+
 
 if [[ $(basename $SHELL) == zsh ]]; then
     # get zsh complete kubectl

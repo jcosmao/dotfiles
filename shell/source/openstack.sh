@@ -5,9 +5,9 @@ function os {
     [[ $1 == "--nojson" ]] && JSON=0 && shift
 
     APPEND_OPTS=()
-    [[ "$*" =~ (show|list|create|issue) && $JSON == 1 ]] && APPEND_OPTS+=("-f" "json")
+    [[ "$*" =~ ( show| list| create| issue)( |$) && $JSON == 1 ]] && APPEND_OPTS+=("-f" "json")
     [[ "$*" =~ (server list) ]] && APPEND_OPTS+=("-n")
-    [[ "$*" =~ (console log show|--help$| -h$| help$) ]] && APPEND_OPTS=()
+    [[ "$*" =~ (console log show|--help$| -h$| help$|lb status show|loadbalancer status show) ]] && APPEND_OPTS=()
     if [[ $1 == "fip" ]]; then
         shift; set -- "floating ip" "${@:1}"
     elif [[ $1 == "lb" ]]; then
@@ -21,6 +21,7 @@ function os {
     fi
 
     echo "${APPEND_OPTS[@]}" | grep -qw '\-f json' && PIPE_CMD="jq" || PIPE_CMD="tee"
+    echo "$*" | grep -qw "loadbalancer status show" && PIPE_CMD="jq"
 
     EXTRA_OPTS=()
     # Require at least 2.24 to get migration id + abort
@@ -54,7 +55,7 @@ alias osi="os image"
 alias osshost="os server list --all --host"
 # octavia
 alias osl="os loadbalancer"
-alias osla="os loadbalancer amphora list --loadbalancer"
+alias osla="os loadbalancer amphora list --long --loadbalancer"
 alias ostoken="openstack.token"
 alias osunset=openstack.unset_env
 
@@ -178,6 +179,8 @@ function devstack.venv_activate {
 
 function openstack.router_delete {
     router=$1
+    echo "Remove routes"
+    os router set --no-route $router
     echo "Detach fip/port if any"
     os fip list --router $router | jq '.[] | .ID .Port'
     os fip list --router $router | jq -r '.[] | .ID + " " + .Port' | while read fip port; do
@@ -194,6 +197,7 @@ function openstack.router_delete {
     echo "Delete router"
     os router delete $router
 }
+
 
 function openstack.lb_show {
     lb=$1

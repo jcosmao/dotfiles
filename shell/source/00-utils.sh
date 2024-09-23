@@ -1,4 +1,4 @@
-export JQ_COLORS="2;33:2;33:0;33:0;36:1;32:0;35:1;35:2;34"
+export JQ_COLORS="0;90:1;31:1;36:1;33:1;32:1;35:1;35:2;34"
 
 function utils.dotfiles_update
 {
