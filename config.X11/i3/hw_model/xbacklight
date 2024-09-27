@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Need brightness-udev for non root users to access file
+
+brightness_file=$(find -L /sys/class/backlight/ -maxdepth 2 -name brightness 2> /dev/null)
+
+function set_brightness() {
+    current=$(cat $brightness_file)
+    echo $((current + $1)) > $brightness_file
+}
+
+function main ()
+{
+    while [[ $# -ne 0 ]]; do
+        arg="$1"; shift
+        case "$arg" in
+            --inc) set_brightness "+ $1" ;;
+            --dec) set_brightness "- $1" ;;
+            * ) [[ $arg =~ \-+.* ]] && echo "$arg unknown"
+        esac
+    done
+}
+
+main "$@"
