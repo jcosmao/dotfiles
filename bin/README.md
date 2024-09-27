@@ -7,3 +7,4 @@ fzf         debian 11
 rofi        ubuntu 22.04
 stern       https://github.com/stern/stern/releases/tag/v1.25.0
 jq          https://github.com/jqlang/jq/releases/tag/jq-1.7
+kubectl     "https://dl.k8s.io/release/"
