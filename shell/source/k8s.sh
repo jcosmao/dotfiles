@@ -75,7 +75,7 @@ function k8s.list_containers_by_pod {
     {
         >&2 echo -n "POD\tCONTAINER\tSTATE\tSTARTED\tRESTARTS\tPOD_IP\tNODE\tNODE_IP\n";
         k get pods -o json | \
-            jq -r --arg RED "$(tput setaf 1)" --arg RES "$(tput sgr0)" --arg GREEN "$(tput setaf 2)" --arg BLUE "$(tput setaf 4)" --arg MAGENTA "$(tput setaf 5)" \
+            jq -r --arg RED "$(tput setaf 1)" --arg RES "$(tput sgr0)" --arg GREEN "$(tput setaf 2)" --arg BLUE "$(tput setaf 4)" --arg MAGENTA "$(tput setaf 5)" --arg GREY "$(tput setaf 8)" \
             '.items[] | .metadata.name as $pod_name |  .spec.nodeName as $node | .status.hostIP as $nodeip | .status.podIP as $podip | .status.containerStatuses[] | [
                 $GREEN + $pod_name + $RES,
                 $BLUE + .name + $RES,
@@ -90,8 +90,8 @@ function k8s.list_containers_by_pod {
                 (.state.terminated.startedAt // .state.running.startedAt | fromdateiso8601 | strftime("%Y-%m-%d %H:%M:%S %Z")),
                 if (.restartCount > 0) then $RED + (.restartCount | tostring) + $RES else $GREEN + (.restartCount | tostring)  + $RES end,
                 $podip,
-                $node,
-                $nodeip
+                $GREY + $node + $RES,
+                $GREY + $nodeip  + $RES
             ] | @tsv'
     } | sort -k4 -k5 | column -ts $'\t'
 }
