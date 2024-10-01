@@ -184,11 +184,14 @@ function sshlog {
 
 function process_output
 {
+    # stdout piped, do not color
+    [[ -p /dev/stdout ]] && NOCOLOR=1
+
     if [[ $NOCOLOR -eq 0 ]]; then
         if [[ -n $SORT_OPT ]]; then
-            os-log-color | sort $SORT_OPT
+            oslog | sort $SORT_OPT
         else
-            os-log-color
+            oslog
         fi
     else
         # trick to avoid buffering output instead of using 'cat'
@@ -267,7 +270,7 @@ function main {
                 help="display log map"
                 echo $LOG_MAP ; exit ;;
             --max|-m)
-                help="maximum nb hosts o get log from"
+                help="maximum nb hosts to get log from"
                 export MAX_HOSTS=$1 && shift ;;
             --completion)
                 help='completion function (eval "$(sshlog --completion)")'

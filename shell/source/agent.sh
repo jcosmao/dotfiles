@@ -30,7 +30,7 @@ function agent.launch_ssh_agent
         fi
     fi
 
-    sshadd_out=$(ssh-add -l); rc=$?
+    sshadd_out=$(ssh-add -l 2> /dev/null); rc=$?
     sshadd_len=$(echo $sshadd_out | wc -l)
     lspub_len=$(ls ~/.ssh/*.pub | wc -l)
 
