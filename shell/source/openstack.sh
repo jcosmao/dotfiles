@@ -135,8 +135,8 @@ function openstack.log_color
 
     os_opts=$*
 
-    [[ $cmd == "less" ]] && cat ${os_files[@]} | ~/.local/bin/os-log-color $os_opts | less -R
-    [[ $cmd == "tail" ]] && tail ${tail_opts[@]} -F ${os_files[@]} | ~/.local/bin/os-log-color $os_opts
+    [[ $cmd == "less" ]] && cat ${os_files[@]} | ~/.local/bin/oslog $os_opts | less -R
+    [[ $cmd == "tail" ]] && tail ${tail_opts[@]} -F ${os_files[@]} | ~/.local/bin/oslog $os_opts
 )}
 
 alias otail="openstack.log_color tail"

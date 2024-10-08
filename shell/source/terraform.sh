@@ -95,9 +95,12 @@ function _complete_tf_workspace
 alias tfy="tf auto-approve"
 alias tfset=terraform.set_workspace
 alias tfunset=terraform.unset_workspace
+alias tg=terragrunt
 
 complete -C $(which terraform) terraform
 complete -C $(which terraform) tf
 complete -C $(which terraform) tfy
+complete -C $(which terraform) terragrunt
+complete -C $(which terraform) tg
 complete -F _complete_tf_workspace terraform.set_workspace
 complete -F _complete_tf_workspace tfset
