@@ -1,4 +1,4 @@
-which terraform &> /dev/null || return
+which tofu &> /dev/null || return
 
 function tf
 {
@@ -54,7 +54,7 @@ function tf
     fi
 
     >&2 echo "│ [DEBUG] terraform $* $OPTS"
-    terraform $* $OPTS
+    tofu $* $OPTS
 
     wait
 
