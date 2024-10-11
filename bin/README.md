@@ -3,7 +3,7 @@ kubecolor   (debian 12) http://ftp.debian.org/debian/pool/main/k/kubecolor/kubec
 ripgrep     https://github.com/BurntSushi/ripgrep/releases/latest
 fd          https://github.com/sharkdp/fd/releases/latest
 ctgags      compiled from https://github.com/universal-ctags/ctags.git
-fzf         debian 11
+fzf         https://github.com/junegunn/fzf/releases/download/v0.55.0/fzf-0.55.0-linux_amd64.tar.gz
 rofi        ubuntu 22.04
 stern       https://github.com/stern/stern/releases/tag/v1.25.0
 jq          https://github.com/jqlang/jq/releases/tag/jq-1.7
