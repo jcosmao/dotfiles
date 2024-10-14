@@ -63,7 +63,7 @@ function k8s.unset_shell_namespace {
 function _complete_kns
 {
     local word=${COMP_WORDS[1]}
-    COMPREPLY=($(compgen -W "$(command kubectl get namespaces -o json | jq -r .items.[].metadata.name | xargs)" -- ${word}))
+    COMPREPLY=($(compgen -W "$(command kubectl get namespaces -o json 2> /dev/null | jq -r .items.[].metadata.name | xargs)" -- ${word}))
 }
 
 complete -F _complete_kns k8s.set_shell_namespace
