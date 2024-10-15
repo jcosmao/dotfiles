@@ -198,25 +198,6 @@ function openstack.router_delete {
     os router delete $router
 }
 
-
-function openstack.lb_show {
-    lb=$1
-
-    echo === LB $1 ===
-    os loadbalancer show  $lb
-    echo === AMPHORA ===
-    os loadbalancer amphora list --loadbalancer  $lb --long
-    echo === LISTENER ===
-    os loadbalancer listener list --loadbalancer  $lb
-    echo === POOL ===
-    os loadbalancer pool list --loadbalancer  $lb
-
-    for pool in $(os loadbalancer pool list --loadbalancer  $lb | jq -r .[].id); do
-        echo === MEMBERS of pool $pool ===
-        os loadbalancer member list $pool
-    done
-}
-
 function openstack.json_to_openrc
 {
     prefix=$1
