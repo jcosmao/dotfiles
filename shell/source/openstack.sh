@@ -186,7 +186,7 @@ function openstack.router_delete {
     os fip list --router $router | jq -r '.[] | .ID + " " + .Port' | while read fip port; do
         if [[ -n $port ]]; then
             echo "- fip: $fip  port: $port"
-            os fip unset $fip --port $port
+            os fip unset $fip --port
         fi
     done
     echo "Detach subnets"
