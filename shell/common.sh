@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mkdir -p $HOME/{.history,.bash_custom}
+
 [[ -z $SOURCE ]] && export SOURCE=()
 
 function export_shell () {

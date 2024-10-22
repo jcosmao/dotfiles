@@ -1,4 +1,5 @@
 # history
+export HISTFILE="$HOME/.history/zsh_history"
 export HISTORY_IGNORE="(ls|cd|pwd|cd ..)"
 export HISTSIZE=500000
 export SAVEHIST=500000

@@ -19,6 +19,7 @@ done
 
 # Set prompt
 if [[ $(basename ${BASH_SOURCE[0]}) == ".bashrc" ]]; then
+    source ~/.shell/bash/default.sh
     source ~/.shell/bash/prompt.sh
     PS1='# '
     PROMPT_COMMAND=prompt.display

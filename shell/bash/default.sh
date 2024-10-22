@@ -68,6 +68,7 @@ shopt -s cmdhist
 PROMPT_COMMAND='history -a'
 
 # Huge history. Doesn't appear to slow things down, so why not?
+HISTFILE="$HOME/.history/bash_history"
 HISTSIZE=500000
 HISTFILESIZE=100000
 
