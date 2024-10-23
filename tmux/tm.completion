@@ -1,5 +1,7 @@
 # vim: ft=sh
 
+unalias tm 2> /dev/null
+
 # tmux functions
 function _complete_tm_session
 {
