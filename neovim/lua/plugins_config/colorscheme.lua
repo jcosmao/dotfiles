@@ -91,7 +91,7 @@ function setColorscheme(mode)
         vim.api.nvim_set_hl(0, 'MatchParen', { bg = '#dacc94' })
     else
         vim.cmd('colorscheme catppuccin')
-        vim.fn.setenv('BAT_THEME', 'TwoDark')
+        vim.fn.setenv('BAT_THEME', 'Catppuccin Macchiato')
 
         vim.api.nvim_set_hl(0, 'Search', { fg = '#d8ff00', bg = 'NONE', bold = true })
         vim.api.nvim_set_hl(0, 'CurSearch', { fg = '#202e52', bg = '#d8ff00', bold = true })
@@ -105,6 +105,22 @@ function setColorscheme(mode)
     vim.api.nvim_set_hl(0, 'InfoFloat', { bg = 'NONE' })
     vim.api.nvim_set_hl(0, 'NormalFloat', { bg = 'NONE' })
     vim.api.nvim_set_hl(0, 'FloatBorder', { fg = 'NONE', bg = 'NONE' })
+
+    vim.g.fzf_colors = {
+        ['bg+'] = { 'bg', 'CursorLine', 'CursorColumn' },
+        bg      = { 'bg', 'Normal' },
+        border  = { 'fg', 'NonText' },
+        spinner = { 'fg', 'Yellow' },
+        fg      = { 'fg', 'Normal' },
+        pointer = { 'fg', 'Blue' },
+        info    = { 'fg', 'Aqua' },
+        ['fg+'] = { 'fg', 'CursorLine', 'CursorColumn', 'Normal' },
+        marker  = { 'fg', 'Yellow' },
+        header  = { 'fg', '' },
+        prompt  = { 'fg', 'Orange' },
+        hl      = { 'fg', 'Search' },
+        ['hl+'] = { 'fg', 'Search' }
+    }
 end
 
 setColorscheme(vim.o.background)

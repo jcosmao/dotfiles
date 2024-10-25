@@ -20,7 +20,7 @@ vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
 require('lspfuzzy').setup {
     methods = 'all',       -- either 'all' or a list of LSP methods (see below)
     jump_one = true,       -- jump immediately if there is only one location
-    save_last = false,     -- save last location results for the :LspFuzzyLast command
+    save_last = true,     -- save last location results for the :LspFuzzyLast command
     callback = nil,        -- callback called after jumping to a location
     fzf_modifier = ':~:.', -- format FZF entries, see |filename-modifiers|
     fzf_trim = true,       -- trim FZF entries
@@ -144,7 +144,15 @@ local efm_cfg = require("plugins_config.efm")
 
 local lsp = {
     bashls = {},
-    pyright = {},
+    basedpyright = {
+        settings = {
+            basedpyright = {
+                analysis = {
+                    typeCheckingMode = "off",
+                },
+            },
+        }
+    },
     jsonls = {},
     yamlls = {},
     lua_ls = {},
@@ -153,7 +161,12 @@ local lsp = {
         filetypes = vim.tbl_keys(efm_cfg.settings.languages),
         init_options = { documentFormatting = true },
     },
-    terraformls = {},
+    terraformls = {
+        filetypes = { 'terraform' },
+    },
+    tflint = {
+        filetypes = { 'terraform' },
+    },
     ansiblels = {},
     eslint = {},
     gopls = {},
@@ -177,7 +190,6 @@ mason_lspconfig.setup {
 mason_lspconfig.setup_handlers {
     -- This is a default handler that will be called for each installed server (also for new servers that are installed during a session)
     function(server_name)
-
         local srv = lsp[server_name] or {}
         local settings = srv.settings or nil
         local filetypes = srv.filetypes or nil

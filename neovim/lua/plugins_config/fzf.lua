@@ -7,15 +7,14 @@ vim.g.fzf_action = {
     ['ctrl-s'] = 'split',
     ['ctrl-v'] = 'vsplit',
 }
-
 vim.env.FZF_DEFAULT_OPTS = [[
     --ansi
     --layout reverse
-    --preview-window right:60%
+    --preview-window right:60%,border-left
     --preview 'bat --color=always --style=header,grid --line-range :300 {}'
     --bind ?:toggle-preview,page-up:preview-up,page-down:preview-down,alt-up:page-up,alt-down:page-down,home:preview-top,end:preview-bottom
-    --height=60%
-    --margin 1,1
+    --height=70%
+    --margin 1,0
 ]]
 
 local function fzf(search_str, source, options, callback)
@@ -28,8 +27,7 @@ local function fzf(search_str, source, options, callback)
         '--nth', '1',
         '--delimiter', '\t',
         '--ansi',
-        '--preview-window', '+{3}-10',
-        '--preview', 'bat  --color always --italic-text always --style header,grid,numbers --highlight-line {3} {2}'
+        '--preview-window', '+{3}-10'
     }
 
     local opts = options or default_opts
@@ -125,8 +123,8 @@ local function ctags_cmd(search_str, tag_file)
     local cmd = string.format(
         [[
             cat %s | grep -v '^!_TAG' | grep -P '^%s\t' | sed -e 's,\tline:,\t,g' |
-            awk -vF=%s -vL=%s -F"\t" -vRED=$(tput setaf 1) -vRES=$(tput sgr0) '{
-                if ($1 != F || $3 != L) print RED $1 RES "\t" $2 "\t" $5 "\t" $6 "\t" $4 "\t"
+            awk -vF=%s -vL=%s -F"\t" -vBLUE=$(tput setaf 4) -vRES=$(tput sgr0) '{
+                if ($1 != F || $3 != L) print BLUE $1 RES "\t" $2 "\t" $5 "\t" $6 "\t" $4 "\t"
             }'
         ]],
         tag_file, search_str, filename, line_number
@@ -142,8 +140,8 @@ local function cscope_cmd(search_str, mode, tag_file)
     local cmd = string.format(
         [[
             cscope -d -f %s -L -%d '%s' | sed -e 's,^%s/,,' | grep -Pv '\d+\s\s*(#|:|")' |
-            awk -vF=%s -vL=%s -vRED=$(tput setaf 1) -vRES=$(tput sgr0) '{
-                if ($1 != F || $3 != L) print substr($0,index($0,$4)) "\t" RED $1 RES "\t" $3 "\t" $2 "\t"
+            awk -vF=%s -vL=%s -vBLUE=$(tput setaf 4) -vRES=$(tput sgr0) '{
+                if ($1 != F || $3 != L) print substr($0,index($0,$4)) "\t" BLUE $1 RES "\t" $3 "\t" $2 "\t"
             }'
         ]],
         -- grep -Pv '(class|def|func|function|sub) %s' |

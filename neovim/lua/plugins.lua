@@ -10,7 +10,6 @@ require("lazy").setup({
     { 'williamboman/mason-lspconfig.nvim' },
     { 'neovim/nvim-lspconfig' },
     { 'onsails/lspkind-nvim' },
-    { 'ojroques/nvim-lspfuzzy' },
     { 'ray-x/lsp_signature.nvim' },
     { 'hrsh7th/nvim-cmp' },
     { 'hrsh7th/cmp-buffer' },
@@ -38,7 +37,7 @@ require("lazy").setup({
     { 'nvim-tree/nvim-tree.lua' },
     { 'junegunn/fzf' },
     { 'junegunn/fzf.vim' },
-    { 'chengzeyi/fzf-preview.vim' },
+    { 'ojroques/nvim-lspfuzzy' },
     { 'nvim-lualine/lualine.nvim' },
     { 'akinsho/bufferline.nvim' },
     { 'lukas-reineke/indent-blankline.nvim' },
@@ -59,6 +58,21 @@ require("lazy").setup({
         config = function()
             require("nvim-surround").setup({})
         end
+    },
+    {
+        'MeanderingProgrammer/render-markdown.nvim',
+        opts = {
+            code = {
+                sign = false,
+                width = "block",
+                right_pad = 1,
+            },
+            heading = {
+                sign = false,
+                icons = {},
+            },
+        },
+        ft = { "markdown", "norg", "rmd", "org" },
     },
 
     { 'akinsho/toggleterm.nvim' },

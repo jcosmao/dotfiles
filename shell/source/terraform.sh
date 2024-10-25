@@ -31,7 +31,6 @@ function tf
             eval $(cat $state_dir/args) 2> /dev/null
         fi
 
-
         if [[ -n $TF_COMMAND && "$*" != "${TF_COMMAND}" ]]; then
             echo "│ WORKSPACE=$TF_WORKSPACE  previously used with args: '$TF_COMMAND'"
             unset response
@@ -59,8 +58,8 @@ function tf
     wait
 
     if [[ $1 = "apply" ]]; then
-        echo "│ TF_COMMAND=\"$*\"" > ${state_dir}/args
-        echo "│ TF_OS_REGION_NAME=${OS_REGION_NAME}" >> ${state_dir}/args
+        echo "TF_COMMAND=\"$*\"" > ${state_dir}/args
+        echo "TF_OS_REGION_NAME=${OS_REGION_NAME}" >> ${state_dir}/args
     fi
 
     if [[ $1 = "destroy" ]]; then

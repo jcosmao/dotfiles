@@ -158,6 +158,8 @@ function install_local_bin
         if [[ $(ldd "bin/$bin" 2>&1 | grep -c 'not found') -eq 0 ]]; then
             bin_name=$(echo "$bin" | cut -d. -f1)
             ln -sf "$SCRIPTPATH/bin/$bin" "$HOME/.local/bin/$bin_name"
+
+            [[ $bin == "bat" ]] && bat cache --build 2>&1 > /dev/null
         fi
     done
 }
