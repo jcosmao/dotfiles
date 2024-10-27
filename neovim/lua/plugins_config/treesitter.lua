@@ -1,12 +1,4 @@
-local vim = vim
-
-local has, _ = pcall(require, 'nvim-treesitter')
-if not has then
-    return nil
-end
-
-require("nvim-treesitter.install").prefer_git = false
-require 'nvim-treesitter.configs'.setup {
+return {
     ensure_installed = {
         "bash",
         "go",

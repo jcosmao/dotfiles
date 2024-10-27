@@ -70,7 +70,7 @@ vim.diagnostic.config({
 
 -- display config
 -- :lua = vim.diagnostic.config()
-function lspconfig_diagnostic_virtual_text_toggle()
+local function lspconfig_diagnostic_virtual_text_toggle()
     if not vim.diagnostic.config().virtual_text then
         vim.diagnostic.config({ virtual_text = virtual_text_default })
         vim.notify("diagnostic.virtual_text enabled")
@@ -80,7 +80,7 @@ function lspconfig_diagnostic_virtual_text_toggle()
     end
 end
 
-function lspconfig_diagnostic_toggle()
+local function lspconfig_diagnostic_toggle()
     if vim.diagnostic.is_disabled() then
         vim.diagnostic.enable()
         vim.notify("diagnostic enabled")
@@ -174,6 +174,10 @@ local lsp = {
     volar = {
         filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue', 'html' }
     },
+    markdown_oxide = {
+        filetypes = { 'markdown' },
+    },
+
     -- shfmt = {},
     -- mypy = {},
     -- isort = {},

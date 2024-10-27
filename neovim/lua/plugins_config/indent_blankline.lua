@@ -1,13 +1,9 @@
-local scope = "focus"
 local hooks = require("ibl.hooks")
+local hilight = { "focus" }
 
 hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
-    local bg = vim.o.background
-    if bg == "dark" then
-        vim.api.nvim_set_hl(0, "focus", { fg = "#7486bd" })
-    else
-        vim.api.nvim_set_hl(0, "focus", { fg = "#c8a66d" })
-    end
+    -- color defined in colorscheme.lua
+    vim.api.nvim_set_hl(0, "focus", {})
 end)
 
 require("ibl").setup({
@@ -18,6 +14,6 @@ require("ibl").setup({
     scope = {
         show_start = false,
         show_end = false,
-        highlight = scope,
+        highlight = highlight,
     },
 })

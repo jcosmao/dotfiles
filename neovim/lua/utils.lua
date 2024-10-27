@@ -73,7 +73,8 @@ function LineInfosToggle()
         vim.o.number = true
         vim.cmd('silent! execute :IBLEnable')
         vim.cmd('silent! execute :SignifyEnable')
-        vim.cmd('silent! execute :Gitsigns attach')
+        vim.cmd('silent! execute ":Gitsigns attach"')
+        vim.cmd('silent! execute ":RenderMarkdown enable"')
         vim.o.signcolumn = 'auto'
         vim.o.foldcolumn = '1'
         vim.g.line_infos_status = 1
@@ -82,8 +83,9 @@ function LineInfosToggle()
         vim.o.number = false
         vim.cmd('silent! execute :IBLDisable')
         vim.cmd('silent! execute :SignifyDisable')
-        vim.cmd('silent! execute :Gitsigns detach')
         vim.cmd('silent! execute :NvimTreeClose')
+        vim.cmd('silent! execute ":Gitsigns detach"')
+        vim.cmd('silent! execute ":RenderMarkdown disable"')
         vim.o.signcolumn = 'no'
         vim.o.foldcolumn = '0'
         vim.g.line_infos_status = 0

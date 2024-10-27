@@ -1,6 +1,4 @@
-local vim = vim
-
-require("trouble").setup {
+return {
     -- your configuration comes here
     -- or leave it empty to use the default settings
     -- refer to the configuration section below
@@ -39,11 +37,3 @@ require("trouble").setup {
     auto_fold = false,                -- automatically fold a file trouble list at creation
     use_diagnostic_signs = true       -- enabling this will use the signs defined in your lsp client
 }
-
-vim.api.nvim_create_augroup('trouble', { clear = true })
-
-vim.api.nvim_create_autocmd('BufEnter', {
-    group   = 'trouble',
-    pattern = 'python',
-    command = 'TroubleRefresh'
-})

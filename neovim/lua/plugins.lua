@@ -17,15 +17,27 @@ require("lazy").setup({
     { 'hrsh7th/cmp-path' },
     { 'hrsh7th/cmp-cmdline' },
     { 'hrsh7th/cmp-nvim-lua' },
-    { 'ray-x/cmp-treesitter' },
+    {
+        'ray-x/cmp-treesitter',
+        config = function()
+            require("nvim-treesitter.install").prefer_git = true
+            opts = require('plugins_config.treesitter')
+            require('nvim-treesitter.configs').setup(opts)
+        end,
+    },
     { 'saadparwaiz1/cmp_luasnip' },
     {
         'L3MON4D3/LuaSnip',
         build = 'make install_jsregexp'
     },
     { 'rafamadriz/friendly-snippets' },
-    { 'folke/trouble.nvim' },
-
+    {
+        'folke/trouble.nvim',
+        opt = require("plugins_config.trouble"),
+        config = function()
+            require("trouble").setup()
+        end
+    },
     -- Utils
     {
         'nvim-treesitter/nvim-treesitter',
@@ -44,7 +56,7 @@ require("lazy").setup({
     {
         'windwp/nvim-autopairs',
         config = function()
-            require("nvim-autopairs").setup {}
+            require("nvim-autopairs").setup({})
         end
     },
     { 'tpope/vim-sensible' },
@@ -61,17 +73,7 @@ require("lazy").setup({
     },
     {
         'MeanderingProgrammer/render-markdown.nvim',
-        opts = {
-            code = {
-                sign = false,
-                width = "block",
-                right_pad = 1,
-            },
-            heading = {
-                sign = false,
-                icons = {},
-            },
-        },
+        opts = require("plugins_config.render_markdown"),
         ft = { "markdown", "norg", "rmd", "org" },
     },
 
@@ -93,18 +95,7 @@ require("lazy").setup({
     },
     {
         'danymat/neogen',
-        config = function()
-            require("neogen").setup({
-                -- Enables Neogen capabilities
-                enabled = true,
-                -- Configuration for default languages
-                languages = {},
-                -- Use a snippet engine to generate annotations.
-                snippet_engine = "luasnip",
-                -- Enables placeholders when inserting annotation
-                enable_placeholders = false,
-            })
-        end
+        opts = require('plugins_config.neogen')
     },
     {
         'ludovicchabant/vim-gutentags',
@@ -121,44 +112,13 @@ require("lazy").setup({
     { 'lewis6991/gitsigns.nvim' },
     {
         'FabijanZulj/blame.nvim',
-        config = function()
-            require('blame').setup({
-                date_format = "%d.%m.%Y",
-                virtual_style = "right",
-                views = {
-                    window = window_view,
-                    virtual = virtual_view,
-                    default = window_view,
-                },
-                merge_consecutive = false,
-                max_summary_width = 30,
-                colors = nil,
-                commit_detail_view = "vsplit",
-                mappings = {
-                    commit_info = "i",
-                    stack_push = "<TAB>",
-                    stack_pop = "<BS>",
-                    show_commit = "<CR>",
-                    close = { "<esc>", "q" },
-                }
-            })
-        end
+        opts = require('plugins_config.blame')
     },
     {
         'sindrets/diffview.nvim',
         config = function()
-            local actions = require("diffview.actions")
-            require("diffview").setup({
-                keymaps = {
-                    disable_defaults = false, -- Disable the default keymaps
-                    view = {
-                        -- The `view` bindings are active in the diff buffers, only when the current
-                        -- tabpage is a Diffview.
-                        { { "n", "i" }, "<F1>", actions.toggle_files, { desc = "Toggle the file panel." } },
-                    },
-                },
-            })
-        end
+            require('plugins_config.diffview').setup()
+        end,
     },
 
     -- Colorscheme

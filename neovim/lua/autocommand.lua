@@ -63,6 +63,10 @@ vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter", "TabEnter", "BufWritePost"
     end
 })
 
+vim.api.nvim_create_user_command("Memo", function()
+    vim.api.nvim_command('tabnew ' .. vim.fn.stdpath("config") .. '/help.md')
+end, { nargs = 0 })
+
 vim.api.nvim_create_user_command("HieraEncrypt", function()
     HieraEncrypt()
 end, { nargs = 0 })
@@ -78,6 +82,10 @@ end, { nargs = 0 })
 vim.api.nvim_create_user_command("LineInfosToggle", function()
     LineInfosToggle()
 end, { nargs = 0 })
+
+vim.api.nvim_create_user_command('Git', function(opts)
+  vim.cmd('Gitsigns ' .. opts.args)
+end, { nargs = '*' })
 
 vim.api.nvim_create_autocmd({ "FileType" }, {
     pattern = { "puppet" },
@@ -173,3 +181,11 @@ vim.api.nvim_create_autocmd("BufEnter", {
 })
 
 vim.api.nvim_create_user_command('Opendev20231', 'DiffviewOpen opendev/stable/2023.1', {})
+
+vim.api.nvim_create_augroup('trouble', { clear = true })
+
+vim.api.nvim_create_autocmd('BufEnter', {
+    group   = 'trouble',
+    pattern = 'python',
+    command = 'TroubleRefresh'
+})

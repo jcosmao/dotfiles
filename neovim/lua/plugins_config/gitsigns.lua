@@ -50,6 +50,14 @@ gitsigns.setup({
             end
         end)
 
+        -- Actions
         map('n', '<leader>G', function() gitsigns.blame_line { full = true } end)
+        map('n', 'gv', gitsigns.preview_hunk)
+        map('n', 'gs', gitsigns.stage_hunk)
+        map('n', 'gr', gitsigns.reset_hunk)
+        map('n', 'gu', gitsigns.undo_stage_hunk)
+        map('n', 'gS', gitsigns.stage_buffer)
+        map('n', 'gR', gitsigns.reset_buffer)
+        map('n', 'gd', gitsigns.diffthis)
     end
 })

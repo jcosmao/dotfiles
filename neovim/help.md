@@ -1,28 +1,33 @@
 # vim surround
 
 ## change surround
+
 ```shell
 cs'"
 ```
 
 ## delete surround
+
 ```shell
 ds"
 ```
 
 ## change tags (balise)
+
 ```shell
 cst'
 ```
 
 ## add surround on word
+
 ```shell
 ysiw]  => no space
 ysiw[  => space
 ```
 
 ## add surround on line
-```shell
+
+```python
 yss]
 ```
 
@@ -44,11 +49,13 @@ vaw – V isually select A round W ord
 # Fold
 
 ```shell
-zf close fold under cursor
-zo open fold
+zo open current fold
+zO open all fold under cursor
+za toggle current fold
+zA toggle all fold under cursor
+
 zR open all folds
-zM close all open folds
-za toggles the fold at the cursor
+zM close all folds
 ```
 
 # Vim diff mode
