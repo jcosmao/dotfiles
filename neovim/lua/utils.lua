@@ -12,7 +12,8 @@ function HieraEncrypt()
     ))
 
     if vim.loop.fs_stat(git_root .. '/ovh-hiera-encrypt') then
-        local encrypt_cmd = string.format("%s/ovh-hiera-encrypt -f %s", git_root, vim.fn.shellescape(vim.fn.expand("%:p")))
+        local encrypt_cmd = string.format("%s/ovh-hiera-encrypt -f %s", git_root,
+            vim.fn.shellescape(vim.fn.expand("%:p")))
         local message = vim.fn.system(encrypt_cmd)
 
         vim.cmd(':silent edit!')
@@ -52,7 +53,6 @@ function IsSpecialFiletype()
     return false
 end
 
-
 vim.g.last_display_file_path = ""
 
 function DisplayFilePath()
@@ -71,8 +71,8 @@ function LineInfosToggle()
 
     if vim.g.line_infos_status == 0 then
         vim.o.number = true
-        vim.cmd('silent! execute :IBLEnable')
-        vim.cmd('silent! execute :SignifyEnable')
+        vim.cmd('silent! execute ":IBLEnable"')
+        vim.cmd('silent! execute ":SignifyEnable"')
         vim.cmd('silent! execute ":Gitsigns attach"')
         vim.cmd('silent! execute ":RenderMarkdown enable"')
         vim.o.signcolumn = 'auto'
@@ -81,9 +81,9 @@ function LineInfosToggle()
         vim.o.conceallevel = 2
     else
         vim.o.number = false
-        vim.cmd('silent! execute :IBLDisable')
-        vim.cmd('silent! execute :SignifyDisable')
-        vim.cmd('silent! execute :NvimTreeClose')
+        vim.cmd('silent! execute ":IBLDisable"')
+        vim.cmd('silent! execute ":SignifyDisable"')
+        vim.cmd('silent! execute ":NvimTreeClose"')
         vim.cmd('silent! execute ":Gitsigns detach"')
         vim.cmd('silent! execute ":RenderMarkdown disable"')
         vim.o.signcolumn = 'no'
@@ -133,14 +133,14 @@ function LoadVimscript(file)
     local neovim_root = vim.fn.stdpath("config")
     local file_path = neovim_root .. "/vim/" .. file
 
-    if vim.fn.filereadable(file_path)  then
+    if vim.fn.filereadable(file_path) then
         vim.cmd("source " .. file_path)
     end
 end
 
 function PatchPlugin(patch)
     local script = vim.fn.stdpath("config") .. "/plugin_patch/patch.sh"
-    vim.fn.system({script, patch})
+    vim.fn.system({ script, patch })
 end
 
 function PythonBlack()
@@ -152,6 +152,8 @@ function PythonBlack()
     end
 
     vim.fn.system("black " .. opts .. " " .. vim.fn.expand("%:p"))
+    -- reload current file
+    vim.cmd('edit!')
     print("[Black] done")
 end
 
@@ -160,13 +162,18 @@ require("project_root")
 function AutoColorColumn()
     if vim.bo.filetype == "python" then
         local project_root = FindRootDirectory()
-        local git_root = vim.fn.trim(vim.fn.system('git -C ' .. vim.fn.expand('%:h') .. ' rev-parse --show-toplevel 2> /dev/null'))
+        local git_root = vim.fn.trim(vim.fn.system('git -C ' ..
+        vim.fn.expand('%:h') .. ' rev-parse --show-toplevel 2> /dev/null'))
 
         if project_root == "" and git_root == "" then
             return
         end
 
-        local cmd = "grep max-line-length $(find " .. project_root .. " " .. git_root .. " -maxdepth 1 -name pyproject.toml -o -name tox.ini -o -name .flake8) | awk -F= '{print $2}' | tail -1"
+        local cmd = "grep max-line-length $(find " ..
+        project_root ..
+        " " ..
+        git_root ..
+        " -maxdepth 1 -name pyproject.toml -o -name tox.ini -o -name .flake8) | awk -F= '{print $2}' | tail -1"
         local maxlinelen = vim.fn.trim(vim.fn.system(cmd))
 
         if maxlinelen ~= "" then

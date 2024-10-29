@@ -89,8 +89,7 @@ function setColorscheme(mode)
         vim.api.nvim_set_hl(0, 'Substitute', { bg = '#FF8700', reverse = true, bold = true })
         vim.api.nvim_set_hl(0, 'FoldColumn', { fg = '#c8ad81' })
         vim.api.nvim_set_hl(0, 'MatchParen', { bg = '#dacc94' })
-        -- IBL config
-        vim.api.nvim_set_hl(0, "focus", { fg = "#c8a66d" })
+        vim.api.nvim_set_hl(0, "IblScope", { fg = "#c8a66d" })
     else
         vim.cmd('colorscheme catppuccin')
         vim.fn.setenv('BAT_THEME', 'Catppuccin Macchiato')
@@ -100,8 +99,7 @@ function setColorscheme(mode)
         vim.api.nvim_set_hl(0, 'IncSearch', { fg = '#202e52', bg = '#d8ff00', bold = true })
         vim.api.nvim_set_hl(0, 'Substitute', { bg = '#d8ff00', reverse = true, bold = true })
         vim.api.nvim_set_hl(0, 'FoldColumn', { fg = '#897e6c' })
-        -- IBL config
-        vim.api.nvim_set_hl(0, "focus", { fg = "#7486bd" })
+        vim.api.nvim_set_hl(0, "IblScope", { fg = "#7486bd" })
     end
 
     vim.api.nvim_set_hl(0, 'ErrorFloat', { bg = 'NONE' })

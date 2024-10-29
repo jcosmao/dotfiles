@@ -24,3 +24,4 @@ if [[ $(basename ${BASH_SOURCE[0]}) == ".bashrc" ]]; then
     PS1='# '
     PROMPT_COMMAND=prompt.display
 fi
+HISTFILESIZE=200

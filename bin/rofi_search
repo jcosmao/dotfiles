@@ -1,0 +1,176 @@
+#!/usr/bin/env python
+
+import argparse
+import logging
+import os
+import re
+import subprocess
+import sys
+import time
+
+import pyperclip
+import yaml
+
+LOG = logging.getLogger()
+
+
+class Rofi:
+    def __init__(self):
+        prompt = ""
+        self.rofi_command = f"rofi -dmenu -markup -p {prompt}"
+
+    def select(self, prompt, options, search):
+        command = f"{self.rofi_command} -l {str(len(options))}"
+        rofi_process = subprocess.Popen(
+            command.split(" ")
+            + [
+                "-mesg",
+                f"<small><b>string:</b> {search}</small>",
+                "-theme-str",
+                f'entry {{placeholder: "{prompt}";}}',
+            ],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            text=True,
+        )
+        rofi_process.stdin.write("\n".join(options) + "\n")
+        rofi_process.stdin.close()
+        selected_option = rofi_process.stdout.read().strip()
+        return selected_option
+
+    def text_entry(self, prompt="", default_text=""):
+        command = f"{self.rofi_command} -l 0"
+        rofi_process = subprocess.Popen(
+            command.split(" ") + ["-theme-str", f'entry {{placeholder: "{prompt}";}}'],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            text=True,
+        )
+        rofi_process.stdin.write(f"{default_text}\n")
+        rofi_process.stdin.close()
+        user_input = rofi_process.stdout.read().strip()
+        return user_input
+
+    def error(self, msg):
+        command = f"rofi -e {msg}"
+        rofi_process = subprocess.Popen(
+            command.split(" "), stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True
+        )
+
+
+def load_config(file_path):
+    """
+    Parse yaml config
+    Args:
+        file_path (string):
+
+    ```yaml
+    - match: '(regex capture group)'
+      items:
+        - title: "title: $1"
+          url: 'https://search.com/?q=$1'
+    ```
+
+    Returns: []
+    """
+    try:
+        with open(file_path, "r") as file:
+            return yaml.safe_load(file)
+    except Exception:
+        LOG.exception("Fail to read file")
+        return []
+
+
+def get_matches(user_input, config):
+    matched_items = []
+    for entry in config:
+        try:
+            match = re.match(entry["match"], user_input)
+        except Exception:
+            LOG.error(f"error match - {entry['match']}")
+            continue
+
+        if match:
+            for item in entry["items"]:
+                title = item["title"]
+                url = item["url"]
+                title = re.sub(
+                    r"\$(\d+)", lambda m: match.group(int(m.group(1))), title
+                )
+                url = re.sub(r"\$(\d+)", lambda m: match.group(int(m.group(1))), url)
+                matched_items.append((title, url))
+
+    return matched_items
+
+
+def search(rofi, user_input, config):
+    matched_items = get_matches(user_input, config)
+    if not matched_items:
+        user_input = rofi.text_entry("anything you want")
+        if not user_input:
+            sys.exit(0)
+
+        matched_items = get_matches(user_input, config)
+        if not matched_items:
+            # Fallback on google search
+            subprocess.run(
+                ["xdg-open", f"https://www.google.com/search?q={user_input}"]
+            )
+            time.sleep(0.3)
+            subprocess.run(["i3-msg", "[urgent=latest] focus"])
+            sys.exit(0)
+
+    options = [item[0] for item in matched_items]
+    options.append("search other")
+    selected_option = rofi.select("Select an option ", options, search=user_input)
+
+    if selected_option:
+        if selected_option == "search other":
+            search(rofi, "", config)
+
+        for title, url in matched_items:
+            if title == selected_option:
+                subprocess.run(["xdg-open", url])
+                time.sleep(0.3)
+                subprocess.run(["i3-msg", "[urgent=latest] focus"])
+                break
+
+
+def main(args):
+    rofi = Rofi()
+    config = load_config(args.config)
+
+    user_input = (
+        subprocess.check_output("xclip -out -selection".split(" "))
+        .decode("utf-8")
+        .strip()
+    )
+
+    search(rofi, user_input, config)
+
+
+def parse_args():
+    """
+    Parse command line args
+    """
+    default_conf = f"{os.getenv('HOME')}/.config/rofi-search.yaml"
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument(
+        "--config", help="yaml config file", metavar=default_conf, default=default_conf
+    )
+    parser.add_argument("--debug", help="trigger debug mode", action="store_true")
+
+    args = parser.parse_args()
+    return args
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    logging.basicConfig(level=logging.INFO, format="[%(levelname)8s]  %(message)s")
+
+    if args.debug:
+        logging.getLogger().setLevel(logging.DEBUG)
+
+    main(args)

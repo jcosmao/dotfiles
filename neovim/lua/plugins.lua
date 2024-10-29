@@ -35,7 +35,7 @@ require("lazy").setup({
         'folke/trouble.nvim',
         opt = require("plugins_config.trouble"),
         config = function()
-            require("trouble").setup()
+            require("trouble").setup(opts)
         end
     },
     -- Utils
@@ -52,7 +52,11 @@ require("lazy").setup({
     { 'ojroques/nvim-lspfuzzy' },
     { 'nvim-lualine/lualine.nvim' },
     { 'akinsho/bufferline.nvim' },
-    { 'lukas-reineke/indent-blankline.nvim' },
+    {
+        'lukas-reineke/indent-blankline.nvim',
+        main = "ibl",
+        opts = require("plugins_config.indent_blankline"),
+    },
     {
         'windwp/nvim-autopairs',
         config = function()
@@ -109,7 +113,10 @@ require("lazy").setup({
     },
 
     -- git
-    { 'lewis6991/gitsigns.nvim' },
+    {
+        'lewis6991/gitsigns.nvim',
+        opts = require('plugins_config.gitsigns')
+    },
     {
         'FabijanZulj/blame.nvim',
         opts = require('plugins_config.blame')

@@ -1,7 +1,6 @@
 local vim = vim
-local gitsigns = require("gitsigns")
 
-gitsigns.setup({
+return {
     signs = {
         add          = { text = '▐' },
         change       = { text = '▐' },
@@ -60,4 +59,4 @@ gitsigns.setup({
         map('n', 'gR', gitsigns.reset_buffer)
         map('n', 'gd', gitsigns.diffthis)
     end
-})
+}

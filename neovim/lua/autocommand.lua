@@ -83,6 +83,10 @@ vim.api.nvim_create_user_command("LineInfosToggle", function()
     LineInfosToggle()
 end, { nargs = 0 })
 
+vim.api.nvim_create_user_command("Black", function()
+    PythonBlack()
+end, { nargs = 0 })
+
 vim.api.nvim_create_user_command('Git', function(opts)
   vim.cmd('Gitsigns ' .. opts.args)
 end, { nargs = '*' })
@@ -152,13 +156,6 @@ vim.api.nvim_create_autocmd("InsertLeave", {
     callback = function()
         vim.opt_local.conceallevel = 2
     end,
-})
-
-vim.api.nvim_create_autocmd({ "FileType" }, {
-    pattern = "python",
-    callback = function()
-        vim.cmd("command! -nargs=0 Black lua PythonBlack()")
-    end
 })
 
 vim.api.nvim_create_autocmd({ "InsertEnter" }, {

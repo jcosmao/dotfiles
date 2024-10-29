@@ -2,24 +2,6 @@
 # which can be switched at runtime with shift+left/right
 # root=/path/to/root
 
-# rofi command. Make sure to have "$@" as last argument
-_rofi () {
-    rofi -i -no-auto-select -no-click-to-exit "$@"
-}
-
-# default command to generate passwords
-_pwgen () {
-	pwgen -y "$@"
-}
-
-# image viewer to display qrcode of selected entry
-# qrencode is needed to generate the image and a viewer
-# that can read from pipes. Known viewers to work are feh and display
-_image_viewer () {
-    feh -
-#    display
-}
-
 # xdotool needs the keyboard layout to be set using setxkbmap
 # You can do this in your autostart scripts (e.g. xinitrc)
 
@@ -56,7 +38,7 @@ BROWSER='xdg-open'
 
 default_do='autotype' # menu, autotype, copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
 auto_enter='false'
-notify='false'
+notify='true'
 default_autotype='user :tab pass'
 
 # color of the help messages

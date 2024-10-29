@@ -1,0 +1,4 @@
+#!/bin/bash -e
+
+. ${PYENV_ROOT:-"$HOME/.pyenv"}/versions/rofi-search/bin/activate
+rofi_search $*

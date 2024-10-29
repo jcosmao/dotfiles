@@ -6,7 +6,24 @@ basecommand="$0"
 
 # set default settings
 _rofi () {
-	rofi -no-click-to-exit -no-auto-select -i "$@"
+
+    local -a output=()
+    while [[ $# -gt 0 ]]
+    do
+        case $1 in
+            -p)
+                string="${2:-password-store}"
+                output+=("-theme-str" "entry {placeholder: \"$string\";}")
+                shift 2
+                ;;
+            *)
+                output+=("$1")
+                shift
+                ;;
+        esac
+    done
+
+    rofi -i -no-auto-select -no-click-to-exit -p "" "${output[@]}"
 }
 
 _pwgen () {
@@ -364,7 +381,7 @@ generatePass () {
 		"No"
 	)
 
-	askGenMenu=$(printf '%s\n' "${askmenu_content[@]}" | _rofi -dmenu -p "Generate new Password for ${selected_password}? > ")
+	askGenMenu=$(printf '%s\n' "${askmenu_content[@]}" | _rofi -dmenu -p "Generate new Password for ${selected_password}?")
 	askgen_exit=$?
 
 	if [[ $askgen_exit -eq 1 ]]; then
@@ -384,7 +401,7 @@ generatePass () {
 		"2  No"
 	)
 
-	symbols=$(printf '%s\n' "${symbols_content[@]}" | _rofi -dmenu -p "Use Symbols? > ")
+	symbols=$(printf '%s\n' "${symbols_content[@]}" | _rofi -dmenu -p "Use Symbols ?")
 	symbols_val=$?
 
 	if [[ $symbols_val -eq 1 ]]; then
@@ -399,7 +416,7 @@ generatePass () {
 	fi
 
 	HELP="Enter Number or hit Enter to use default length"
-	length=$(printf '%s' "" | _rofi -dmenu -mesg "${HELP}" -p "Password length? (Default: ${password_length}) > ")
+	length=$(printf '%s' "" | _rofi -dmenu -mesg "${HELP}" -p "Password length? (Default: ${password_length})")
 	length_exit=$?
 
 	if [[ $length_exit -eq 1 ]]; then
@@ -420,7 +437,7 @@ mainMenu () {
 			-dmenu \
 			-kb-custom-10 "${switch}" \
 			-select "$entry" \
-			-p "rofi-pass > ")"
+			-p "rofi-pass")"
 
 		rofi_exit=$?
 
@@ -433,6 +450,9 @@ mainMenu () {
 		fi
 	else
 		unset selected_password
+
+        helper="<small><b>copy user:</b> ${copy_name}   <b>|  type user:</b> ${type_user}  <b>|  copy pass:</b> ${copy_pass}   <b>|  type pass:</b> ${type_pass}
+<b>show:</b>      ${show}        <b>|  menu:</b>      ${action_menu}     <b>|  insert:</b>  ${insert_pass} </small>"
 
 		args=( -dmenu
 			-kb-custom-1 "${autotype}"
@@ -457,7 +477,8 @@ mainMenu () {
 		args+=( -kb-mode-previous ""    # These keyboard shortcut options are needed, because
 		-kb-mode-next ""            # Shift+<Left|Right> are otherwise taken by rofi.
 		-select "$entry"
-		-p "> "	)
+		-p ""
+        -markup -mesg "$helper")
 
 		if [[ ${#roots[@]} -gt "1" || $custom_root == "true" ]]; then
 			args+=(-mesg "PW Store: ${root}")
@@ -569,7 +590,7 @@ clearUp () {
 }
 
 helpMenu () {
-	_rofi -dmenu -mesg "Hint: All hotkeys are configurable in config file" -p "Help > " <<- EOM
+	_rofi -dmenu -mesg "Hint: All hotkeys are configurable in config file" -p "Help" <<- EOM
 	${autotype}: Autotype
 	${type_user}: Type Username
 	${type_pass}: Type Password
@@ -606,7 +627,7 @@ typeMenu () {
 			checkIfPass
 			local -a keys=("${!stuff[@]}")
 			keys=("${keys[@]/$AUTOTYPE_field}")
-			typefield=$({ printf '%s' "${AUTOTYPE_field}" ; printf '%s\n' "${keys[@]}" | sort; } | _rofi -dmenu  -p "Choose Field to type > ")
+			typefield=$({ printf '%s' "${AUTOTYPE_field}" ; printf '%s\n' "${keys[@]}" | sort; } | _rofi -dmenu  -p "Choose Field to type")
 			typefield_exit=$?
 			if [[ $typefield_exit -eq 1 ]]; then
 				exit
@@ -628,7 +649,7 @@ typeMenu () {
 
 copyMenu () {
 	checkIfPass
-	copyfield=$(printf '%s\n' "${!stuff[@]}" | sort | _rofi -dmenu  -p "Choose Field to copy > ")
+	copyfield=$(printf '%s\n' "${!stuff[@]}" | sort | _rofi -dmenu  -p "Choose Field to copy")
 	val=$?
 	if [[ $val -eq 1 ]]; then
 		exit;
@@ -644,24 +665,23 @@ copyMenu () {
 actionMenu () {
 	checkIfPass
 	action_content=("< Return"
-		"---"
-		"1 Move Password File"
-		"2 Copy Password File"
-		"3 Delete Password File"
-		"4 Edit Password File"
-		"5 Generate New Password"
+		"Move Password File"
+		"Copy Password File"
+		"Delete Password File"
+		"Edit Password File"
+		"Generate New Password"
 	)
 
-	action=$(printf '%s\n' "${action_content[@]}" | _rofi -dmenu -p "Choose Action > ")
-	if [[ ${action} == "1 Move Password File" ]]; then
+	action=$(printf '%s\n' "${action_content[@]}" | _rofi -dmenu -p "Choose Action")
+	if [[ ${action} == "Move Password File" ]]; then
 		manageEntry move;
-	elif [[ ${action} == "3 Delete Password File" ]]; then
+	elif [[ ${action} == "Delete Password File" ]]; then
 		manageEntry delete;
-	elif [[ ${action} == "2 Copy Password File" ]]; then
+	elif [[ ${action} == "Copy Password File" ]]; then
 		manageEntry copy;
-	elif [[ ${action} == "4 Edit Password File" ]]; then
+	elif [[ ${action} == "Edit Password File" ]]; then
 		manageEntry edit;
-	elif [[ ${action} == "5 Generate New Password" ]]; then
+	elif [[ ${action} == "Generate New Password" ]]; then
 		generatePass;
 	elif [[ ${action} == "< Return" ]]; then
 		mainMenu;
@@ -698,7 +718,7 @@ showEntry () {
 		"${pass_content}"
 	)
 
-	bla=$(printf '%s\n' "${bla_content[@]}" | _rofi -dmenu -mesg "Enter: Copy entry to clipboard" -p "> ")
+	bla=$(printf '%s\n' "${bla_content[@]}" | _rofi -dmenu -p "Enter: Copy entry to clipboard")
 	rofi_exit=$?
 
 	word=$(printf '%s' "$bla" | gawk -F': ' '{print $1}')
@@ -741,7 +761,7 @@ manageEntry () {
 	elif [[ $1 == "move" ]]; then
 		cd "${root}" || exit
 		group_array=(*/)
-		group=$(printf '%s\n' "${group_array[@]%/}" | _rofi -dmenu -p "Choose Group > ")
+		group=$(printf '%s\n' "${group_array[@]%/}" | _rofi -dmenu -p "Choose Group")
 		if [[ $group == "" ]]; then
 			exit
 		fi
@@ -750,11 +770,11 @@ manageEntry () {
 	elif [[ $1 == "copy" ]]; then
 		cd "${root}" || exit
 		group_array=(*/)
-		group=$(printf '%s\n' "${group_array[@]%/}" | _rofi -dmenu -p "Choose Group > ")
+		group=$(printf '%s\n' "${group_array[@]%/}" | _rofi -dmenu -p "Choose Group")
 		if [[ $group == "" ]]; then
 			exit
 		else
-			new_name="$(listgpg | _rofi -dmenu -format 'f' -mesg "Copying to same Group. Please enter a name for the new entry" -p "> ")"
+			new_name="$(listgpg | _rofi -dmenu -format 'f' -mesg "Copying to same Group. Please enter a name for the new entry" -p "")"
 		fi
 		PASSWORD_STORE_DIR="${root}" pass cp "$selected_password" "${group}/${new_name}"
 		mainMenu
@@ -763,7 +783,7 @@ manageEntry () {
 		ask_content=("Yes"
 			"No"
 		)
-		ask=$(printf '%s\n' "${ask_content[@]}" | _rofi -mesg "${HELP}" -dmenu -p "Are You Sure? > ")
+		ask=$(printf '%s\n' "${ask_content[@]}" | _rofi -mesg "${HELP}" -dmenu -p "Are You Sure ?")
 		if [[ "$ask" == "Yes" ]]; then
 			PASSWORD_STORE_DIR="${root}" pass rm --force "${selected_password}"
 		elif [[ "$ask" == "No" ]]; then
@@ -797,7 +817,7 @@ insertPass () {
 	cd "${root}" || exit
 	group_array=(*/)
 	grouplist=$(printf '%s\n' "${group_array[@]%/}")
-	name="$(listgpg | _rofi -dmenu -format 'f' -filter "${domain_name}" -mesg "${help_content}" -p "> ")"
+	name="$(listgpg | _rofi -dmenu -format 'f' -filter "${domain_name}" -mesg "${help_content}" -p "")"
 	val=$?
 
 	if [[ $val -eq 1 ]]; then
@@ -809,7 +829,7 @@ insertPass () {
 		"${default_user}"
 	)
 
-	user=$(printf '%s\n' "${user_content[@]}" | _rofi -dmenu -mesg "Chose Username or type" -p "> ")
+	user=$(printf '%s\n' "${user_content[@]}" | _rofi -dmenu -mesg "Chose Username or type" -p "")
 	val=$?
 
 	if [[ $val -eq 1 ]]; then
@@ -821,14 +841,14 @@ insertPass () {
 		"${grouplist}"
 	)
 
-	group=$(printf '%s\n' "${group_content[@]}" | _rofi -dmenu -p "Choose Group > ")
+	group=$(printf '%s\n' "${group_content[@]}" | _rofi -dmenu -p "Choose Group")
 	val=$?
 
 	if [[ $val -eq 1 ]]; then
 		exit
 	fi
 
-	pw=$(printf '%s' "Generate" | _rofi -dmenu -password -p "Password > " -mesg "Type Password or hit Enter to generate one")
+	pw=$(printf '%s' "Generate" | _rofi -dmenu -password -p "Password" -mesg "Type Password or hit Enter to generate one")
 
 	if [[ $pw == "Generate" ]]; then
 		pw=$(_pwgen "${password_length}")
