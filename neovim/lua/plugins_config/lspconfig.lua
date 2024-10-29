@@ -20,7 +20,7 @@ vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
 require('lspfuzzy').setup {
     methods = 'all',       -- either 'all' or a list of LSP methods (see below)
     jump_one = true,       -- jump immediately if there is only one location
-    save_last = true,     -- save last location results for the :LspFuzzyLast command
+    save_last = true,      -- save last location results for the :LspFuzzyLast command
     callback = nil,        -- callback called after jumping to a location
     fzf_modifier = ':~:.', -- format FZF entries, see |filename-modifiers|
     fzf_trim = true,       -- trim FZF entries
@@ -162,7 +162,12 @@ local lsp = {
         init_options = { documentFormatting = true },
     },
     terraformls = {
-        filetypes = { 'terraform' },
+        filetypes = { 'terraform', 'hcl' },
+        init_options = {
+            experimentalFeatures = {
+                prefillRequiredFields = true,
+            },
+        },
     },
     tflint = {
         filetypes = { 'terraform' },

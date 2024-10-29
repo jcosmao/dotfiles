@@ -26,6 +26,11 @@ function _complete_tmcr
 complete -F _complete_tmcr tmux.set_cr_env
 complete -F _complete_tmcr tmcr
 
+if [[ -n $TMUX ]]; then
+    session_name=$(tmux display-message -p '#S')
+    [[ -z $CR_COMMAND ]] && tmux.set_cr_env $session_name
+fi
+
 if [[ -n $CR_COMMAND ]]; then
     eval $CR_COMMAND
 fi
