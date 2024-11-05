@@ -86,7 +86,8 @@ function pyenv.setup_pyright
         "venvPath": "VENVPATH",
         "venv": "VENV",
         "reportUnboundVariable": "information",
-        "reportOptionalMemberAccess": "information"
+        "reportOptionalMemberAccess": "information",
+        "typeCheckingMode": "standard"
     }' | sed "s,VENVPATH,$VENVPATH," | sed "s,VENV,$VENV," | jq > pyrightconfig.json
 }
 
@@ -100,7 +101,7 @@ function pyenv.setup
 }
 
 function pyenv.activate {
-    pyenv activate "$*"
+    pyenv activate "$*" 2> /dev/null
 }
 
 alias pya="pyenv.activate"

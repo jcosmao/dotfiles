@@ -46,4 +46,17 @@ function FindRootDirectory()
 end
 
 local root_augroup = vim.api.nvim_create_augroup('ProjectRoot', {})
-vim.api.nvim_create_autocmd('BufEnter', { group = root_augroup, callback = set_root })
+
+vim.api.nvim_create_autocmd(
+    'BufEnter', {
+        group = root_augroup,
+        callback = set_root
+    }
+)
+
+vim.api.nvim_create_autocmd(
+    'VimEnter', {
+        group = root_augroup,
+        callback = set_root
+    }
+)

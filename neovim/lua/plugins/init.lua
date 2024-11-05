@@ -28,13 +28,7 @@ require("lazy").setup({
     require("plugins.statuscol"),
     { 'nvim-tree/nvim-web-devicons' },
     { 'troydm/zoomwintab.vim' },
-    {
-        "karb94/neoscroll.nvim",
-        config = function()
-            require('neoscroll').setup({})
-            SetupScrollKeybinding()
-        end
-    },
+    require('plugins.scrolling'),
 
     -- Utils
     { 'junegunn/fzf' },
@@ -49,7 +43,9 @@ require("lazy").setup({
     { 'lambdalisue/vim-suda' },
     {
         "kylechui/nvim-surround",
-        version = "*"
+        version = "*",
+        event = "VeryLazy",
+        config = true
     },
 
     -- Terminal

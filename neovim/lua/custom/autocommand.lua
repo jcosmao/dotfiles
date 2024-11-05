@@ -49,10 +49,22 @@ vim.api.nvim_create_autocmd('BufReadPost', {
     end
 })
 
+vim.api.nvim_create_autocmd('BufEnter', {
+    group    = 'bufcheck',
+    pattern  = '*',
+    callback = function()
+        vim.cmd('silent! execute ":NvimTreeRefresh"')
+    end
+})
+
 -- startup in diff mode ?
-if vim.o.diff then
-    SetupDiffMapping()
-end
+vim.api.nvim_create_autocmd('VimEnter', {
+    callback = function()
+        if vim.o.diff then
+            SetupDiffMapping()
+        end
+    end,
+})
 
 vim.api.nvim_create_user_command("DiffToggle", function()
     DiffToggle()
@@ -68,12 +80,15 @@ vim.api.nvim_create_autocmd({ "OptionSet" }, {
 vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter", "TabEnter", "BufWritePost" }, {
     pattern = "*",
     callback = function()
-        DisplayFilePath()
         SetGitRepo()
     end
 })
 
-vim.api.nvim_create_user_command("Memo", function()
+vim.api.nvim_create_user_command("F", function()
+    DisplayFilePath()
+end, { nargs = 0 })
+
+vim.api.nvim_create_user_command("M", function()
     vim.api.nvim_command('tabnew ' .. vim.fn.stdpath("config") .. '/help.md')
 end, { nargs = 0 })
 
@@ -96,10 +111,6 @@ end, { nargs = 0 })
 vim.api.nvim_create_user_command("Black", function()
     PythonBlack()
 end, { nargs = 0 })
-
-vim.api.nvim_create_user_command('Git', function(opts)
-  vim.cmd('Gitsigns ' .. opts.args)
-end, { nargs = '*' })
 
 vim.api.nvim_create_autocmd({ "FileType" }, {
     pattern = { "puppet" },
@@ -161,7 +172,7 @@ vim.api.nvim_create_autocmd("InsertLeave", {
 
 -- python max line len
 vim.api.nvim_create_autocmd({ "InsertEnter" }, {
-    pattern = "python",
+    pattern = "*",
     callback = function()
         AutoColorColumn()
     end
@@ -203,6 +214,16 @@ vim.api.nvim_create_autocmd("FileType", {
         autocmd BufEnter,CursorMoved <buffer> startinsert |
         autocmd BufLeave <buffer> set laststatus=2 showmode ruler timeoutlen=1000
     ]],
+})
+
+vim.api.nvim_create_autocmd("BufEnter", {
+    group = TermGrp,
+    pattern = '*',
+    callback = function()
+        if vim.bo.filetype ~= 'toggleterm' then
+            vim.opt.timeoutlen = 1000
+        end
+    end
 })
 
 -- Run gofmt + goimport on save

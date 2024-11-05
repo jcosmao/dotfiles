@@ -55,6 +55,8 @@ vim.opt.pumheight = 20
 vim.opt.termguicolors = true
 vim.opt.conceallevel = 2
 vim.api.nvim_set_option("clipboard", "unnamedplus")
+vim.opt.timeoutlen = 1000
+vim.opt.ttimeoutlen = 100
 
 if vim.fn.empty(vim.env.THEME) == 0 then
     vim.opt.background = vim.env.THEME

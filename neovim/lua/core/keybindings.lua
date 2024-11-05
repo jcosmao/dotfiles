@@ -73,12 +73,6 @@ vim.cmd([[
     map <silent> <leader>; ysiW'
 ]])
 
--- Fold toggle
-vim.cmd([[
-    map <silent> <M-/> za
-    map <silent> <C-/> zA
-]])
-
 -- save without trim
 vim.keymap.set("i", "<C-s>", "<Esc>:noautocmd w<CR>")
 vim.keymap.set("n", "<C-s>", ":noautocmd w<CR>")
@@ -121,7 +115,7 @@ function LspKeymap()
     vim.keymap.set('n', '<C-\\>', vim.lsp.buf.references, opts)
     vim.keymap.set('n', '?', vim.lsp.buf.hover, opts)
     vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, opts)
-    vim.keymap.set({ 'n', 'i' }, '<C-k>', vim.lsp.buf.signature_help, opts)
+    vim.keymap.set({ 'n', 'i' }, '<C-k>', function() require('lsp_signature').toggle_float_win() end, opts)
     vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, opts)
     vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
     vim.keymap.set('n', '<leader>F', function() vim.lsp.buf.format { async = true } end, opts)
@@ -130,10 +124,10 @@ function LspKeymap()
 end
 
 function SetupScrollKeybinding()
-    local neoscroll = require('neoscroll')
+    local cinnamon = require('cinnamon')
     local keymap = {
-        ["<M-Up>"]   = function() neoscroll.ctrl_u({ duration = 250 }) end,
-        ["<M-Down>"] = function() neoscroll.ctrl_d({ duration = 250 }) end,
+        ["<M-Up>"]   = function() cinnamon.scroll("<C-U>zz") end,
+        ["<M-Down>"] = function() cinnamon.scroll("<C-D>zz") end,
     }
     local modes = { 'n', 'v', 'x' }
     for key, func in pairs(keymap) do
@@ -147,3 +141,21 @@ vim.cmd([[
     map <silent> <M-x> zz
     map <silent> <M-c> zb
 ]])
+
+-- Fold toggle
+vim.cmd([[
+    map <silent> <M-/> za
+    map <silent> <M-.> zA
+]])
+
+-- Diff mode
+function SetupDiffMapping()
+    vim.cmd(':IBLDisable')
+    if vim.fn.winnr() ~= vim.fn.winnr('h') then
+        vim.api.nvim_set_keymap('n', '<<', ':diffput<cr>', opts)
+        vim.api.nvim_set_keymap('n', '>>', ':diffget<cr>', opts)
+    else
+        vim.api.nvim_set_keymap('n', '<<', ':diffput<cr>', opts)
+        vim.api.nvim_set_keymap('n', '>>', ':diffget<cr>', opts)
+    end
+end

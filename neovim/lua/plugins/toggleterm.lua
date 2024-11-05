@@ -3,9 +3,9 @@ local vim = V
 return {
     'akinsho/toggleterm.nvim',
     opts = function()
-        local shading_factor = "-40"
+        local shading_factor = "-30"
         if vim.o.background == "light" then
-            shading_factor = "-3"
+            shading_factor = "-2"
         end
 
         return {

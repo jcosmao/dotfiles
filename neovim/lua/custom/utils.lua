@@ -37,14 +37,9 @@ function SetGitRepo()
     end
 end
 
-vim.g.last_display_file_path = ""
-
 function DisplayFilePath()
     if not IsSpecialFiletype() then
-        if vim.g.last_display_file_path ~= vim.fn.expand('%:p') then
-            print(string.format("File: %s", vim.fn.expand('%:p')))
-            vim.g.last_display_file_path = vim.fn.expand('%:p')
-        end
+        print(string.format("File: %s", vim.fn.expand('%:p')))
     end
 end
 
@@ -91,17 +86,6 @@ function DiffToggle()
     else
         vim.cmd('windo diffoff')
         vim.g.custom_diff_toggle = 0
-    end
-end
-
-function SetupDiffMapping()
-    vim.cmd(':IBLDisable')
-    if vim.fn.winnr() ~= vim.fn.winnr('h') then
-        vim.api.nvim_set_keymap('n', '<leader><', ':diffput<cr>', { noremap = true, silent = true })
-        vim.api.nvim_set_keymap('n', '<leader>>', ':diffget<cr>', { noremap = true, silent = true })
-    else
-        vim.api.nvim_set_keymap('n', '<leader>>', ':diffput<cr>', { noremap = true, silent = true })
-        vim.api.nvim_set_keymap('n', '<leader><', ':diffget<cr>', { noremap = true, silent = true })
     end
 end
 
@@ -164,7 +148,9 @@ function BackgroundToggle()
         vim.o.background = "light"
     end
     local mod = require("plugins.colorscheme")
-    mod.setColorscheme(vim.o.background)
+    mod.setColorscheme()
+
+    vim.cmd('silent! execute "Lazy reload toggleterm.nvim"')
 end
 
 function GutentagsEnabled()

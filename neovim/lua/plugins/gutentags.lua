@@ -18,7 +18,7 @@ return {
         --     'text', 'markdown'
         -- }
         vim.g.gutentags_add_default_project_roots = 0
-        vim.g.gutentags_generate_on_empty_buffer = 0
+        vim.g.gutentags_generate_on_empty_buffer = 1
         vim.g.gutentags_resolve_symlinks = 1
         vim.g.gutentags_modules = { 'ctags', 'cscope' }
         vim.g.gutentags_ctags_executable = '~/.local/bin/ctags'

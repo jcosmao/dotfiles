@@ -1,9 +1,9 @@
 V = vim
 C = V.cmd
 A = V.api
-F = V.fn    -- Vim function
-G = V.g     -- Vim globals
-O = V.opt   -- Vim optionals
+F = V.fn  -- Vim function
+G = V.g   -- Vim globals
+O = V.opt -- Vim optionals
 
 Border = "rounded"
 
@@ -20,9 +20,16 @@ SpecialFiltetypes = {
 
 TermGrp = V.api.nvim_create_augroup("TermGrp", { clear = true })
 
-function PrintTable(t)
-    for k, v in pairs(t) do
-        print("[" .. k .. "]", v)
+function PrintTable(tbl, indent)
+    if not indent then indent = 0 end
+    for k, v in pairs(tbl) do
+        local formatting = string.rep("  ", indent) .. k .. ": "
+        if type(v) == "table" then
+            print(formatting)
+            PrintTable(v, indent + 1)
+        else
+            print(formatting .. v)
+        end
     end
 end
 
@@ -36,13 +43,24 @@ function IsSpecialFiletype()
     return false
 end
 
+function Contains(tab, val)
+    for index, value in ipairs(tab) do
+        if value == val then
+            return true
+        end
+    end
+
+    return false
+end
+
 function FoldedTextInfo()
     local fs = string.find(A.nvim_buf_get_lines(0, V.v.foldstart - 1, V.v.foldend, false)[1], '"label":')
     if fs == nil then
         return V.fn.foldtext()
     end
-    local label = string.match(A.nvim_buf_get_lines(0, V.v.foldstart, V.v.foldstart + 1, false)[1],
-        '"label":\\s+"([^"]+)"')
+    local label = string.match(
+        A.nvim_buf_get_lines(0, V.v.foldstart, V.v.foldstart + 1, false)[1], '"label":\\s+"([^"]+)"'
+    )
     local ft = string.gsub(V.fn.foldtext(), ': .+', label)
     return ft
 end

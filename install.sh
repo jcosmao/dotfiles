@@ -200,9 +200,9 @@ function install_git
 
         echo
         PS3="Select user/mail from gpg ❭ "
-        select opt in "${gpg[*]}"; do
-            git_username=$(echo "$opt" | sed -re 's/(.*) <.*>/\1/' -re 's/ \(.*\)//')
-            git_mail=$(echo "$opt" | sed -re 's/.*<(.*)>/\1/')
+        select opt in ${gpg[*]}; do
+            git_username=$(echo "$opt" | sed -re 's,\s*([^<]+).*,\1,g' )
+            git_mail=$(echo "$opt" | sed -re 's,\s*[^<]+<([^>]+)>.*,\1,g' )
             break
         done
         echo

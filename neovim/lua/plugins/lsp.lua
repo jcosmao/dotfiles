@@ -4,15 +4,7 @@ local efm_cfg = require("plugins.efm")
 
 local lsp = {
     bashls = {},
-    basedpyright = {
-        settings = {
-            basedpyright = {
-                analysis = {
-                    typeCheckingMode = "off",
-                },
-            },
-        }
-    },
+    basedpyright = {},
     jsonls = {},
     yamlls = {},
     lua_ls = {},
@@ -84,11 +76,15 @@ return {
             }
             require('lspconfig.ui.windows').default_options.border = Border
 
-            vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
-                vim.lsp.handlers.hover, {
-                    border = Border
-                }
-            )
+            local float = {
+                focusable = false,
+                style = "minimal",
+                max_width = 100,
+                border = Border,
+                noautocmd = true,
+            }
+            vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, float)
+            -- vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, float)
         end,
         dependencies = {
             {
@@ -106,19 +102,28 @@ return {
         'onsails/lspkind-nvim',
     },
     {
-        'ray-x/lsp_signature.nvim',
+        "ray-x/lsp_signature.nvim",
+        event = "VeryLazy",
         opts = {
             log_path = vim.fn.expand("$HOME") .. "/.cache/vim_lsp_signature.log",
             debug = false,
             hint_enable = false,
-            max_width = 80,
+            max_width = 100,
             doc_lines = 0,
+            wrap = true,
             bind = true, -- This is mandatory, otherwise border config won't get registered.
             handler_opts = {
                 border = Border
             },
             padding = ' ',
-        }
+            transparency = 0,
+            noautocmd = true,
+            -- toggle_key = '<M-k>',
+            auto_close_after = 3000,
+        },
+        config = function(_, opts)
+            require('lsp_signature').setup(opts)
+        end
     },
     {
         'ojroques/nvim-lspfuzzy',
