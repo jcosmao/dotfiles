@@ -49,14 +49,6 @@ vim.api.nvim_create_autocmd('BufReadPost', {
     end
 })
 
-vim.api.nvim_create_autocmd('BufEnter', {
-    group    = 'bufcheck',
-    pattern  = '*',
-    callback = function()
-        vim.cmd('silent! execute ":NvimTreeRefresh"')
-    end
-})
-
 -- startup in diff mode ?
 vim.api.nvim_create_autocmd('VimEnter', {
     callback = function()
