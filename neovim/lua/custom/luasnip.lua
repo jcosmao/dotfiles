@@ -27,12 +27,15 @@ vim.api.nvim_create_user_command("Snippets",
         local function expand_callback(lines)
             local line = lines[2]
             local split = vim.split(line, "\t")
-            local snip = split[0]
-            -- TODO - expand snip...
---         execute 'normal! a'.trim(snip)."\<plug>luasnip-expand-or-jump"
+            local snip = vim.trim(split[1])
+            local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+            vim.api.nvim_buf_set_text(0, row - 1, col, row - 1, col, { snip })
+            require("luasnip").expand()
         end
 
         Fzf(".*", luasnip_list(), fzf_opts, expand_callback)
     end,
     { nargs = '*', bang = true }
 )
+
+
