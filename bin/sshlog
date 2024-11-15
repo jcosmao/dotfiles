@@ -1,131 +1,84 @@
 #!/bin/bash
 
 set -Eu
+set -o noglob
 
-current_pgid=$(ps -o pgid= $$ | tr -d ' ')
-current_sid=$(ps -o sid= $$ | tr -d ' ')
-
-function cleanup {
-    >&2 echo "│ Cleanup function"
-    # ps xao user,pid,pgid,sid,user,cmd | grep -P '(sshlog|tail)'
-    sudo pkill -9 -g $current_pgid -s $current_sid
-}
-
-trap cleanup SIGINT INT TERM QUIT ERR
+current_pid=$$
+current_pgid=$(ps -o pgid= $current_pid | tr -d ' ')
+current_sid=$(ps -o sid= $current_pid | tr -d ' ')
 
 SSH_USER=admin
 TAILOPTS=''
 TAILLINES=''
 CAT=0
-GREP_PATTERN=''
-GREP_OPT=''
-NOCOLOR=0
+SSH_PIPE_COMMAND=()
 HEADER=1
-SORT_OPT=''
-LOG_MAP='{
-    "default": {
-        "default": "cmd:journalctl --output cat"
-    },
-    "host": {
-        "journal": "cmd:journalctl --output cat",
-        "vrack": "/var/log/neutron/neutron-ovh-vrack-agent.log",
-        "bgp": "/var/log/neutron/neutron-ovh-bgp-agent.log",
-        "l3": "/var/log/neutron/neutron-ovh-l3-agent.log",
-        "metadata": "/var/log/neutron/neutron-ovh-metadata-agent.log",
-        "nova": "/var/log/nova/*.log",
-        "libvirt": "/var/log/libvirt/libvirtd.log",
-        "ovs": "/var/log/openvswitch/*.log",
-        "neutron": "/var/log/neutron/*.log",
-        "default": "/var/log/nova/*.log /var/log/neutron/*.log"
-    },
-    "snat": {
-        "journal": "cmd:journalctl --output cat",
-        "vrack": "/var/log/neutron/neutron-ovh-vrack-agent.log",
-        "bgp": "/var/log/neutron/neutron-ovh-bgp-agent.log",
-        "l3": "/var/log/neutron/neutron-ovh-l3-agent.log",
-        "dhcp": "/var/log/neutron/neutron-dhcp-agent.log",
-        "metadata": "/var/log/neutron/neutron-ovh-metadata-agent.log",
-        "neutron": "/var/log/neutron/*.log",
-        "ovs": "/var/log/openvswitch/*.log",
-        "default": "/var/log/neutron/*.log"
-    },
-    "neutron": {
-        "journal": "cmd:journalctl --output cat",
-        "apache": "/var/log/apache2/neutron-api*log",
-        "api": "/var/log/neutron/neutron-api.log",
-        "rpc": "/var/log/neutron/neutron-rpc.log",
-        "default": "/var/log/neutron/*.log"
-    },
-    "nova": {
-        "journal": "cmd:journalctl --output cat",
-        "apache": "/var/log/apache2/nova-api*log",
-        "api": "/var/log/nova/nova-api.log",
-        "conductor": "/var/log/nova/nova-conductor.log",
-        "scheduler": "/var/log/nova/nova-scheduler.log",
-        "placement": "/var/log/placement/placement-api.log",
-        "default": "/var/log/nova/*.log"
-    },
-    "cinder": {
-        "journal": "cmd:journalctl --output cat",
-        "apache": "/var/log/apache2/cinder-api*log",
-        "api": "/var/log/cinder/cinder-api.log",
-        "scheduler": "/var/log/cinder/cinder-scheduler.log",
-        "volume": "/var/log/cinder/cinder-volume.log",
-        "backup": "/var/log/cinder/cinder-backup.log",
-        "default": "/var/log/cinder/*.log"
-    },
-    "glance": {
-        "journal": "cmd:journalctl --output cat",
-        "default": "/var/log/glance/*.log"
-    },
-    "ironic": {
-        "journal": "cmd:journalctl --output cat",
-        "api": "/var/log/ironic/ironic-api.log",
-        "conductor": "/var/log/ironic/ironic-ovh-conductor.log",
-        "metadata": "/var/log/ironic/ironic-ovh-metadata-server.log",
-        "neutron": "/var/log/neutron/*.log",
-        "nova": "/var/log/nova/*log",
-        "default": "/var/log/ironic/*.log"
-    },
-    "rabbit": {
-        "journal": "cmd:journalctl --output cat",
-        "default": "/var/log/rabbitmq/*.log"
-    },
-    "rabbit-nova": {
-        "journal": "cmd:journalctl --output cat",
-        "default": "/var/log/rabbitmq/*.log"
-    },
-    "rabbit-neutron": {
-        "journal": "cmd:journalctl --output cat",
-        "default": "/var/log/rabbitmq/*.log"
-    }
-}'
+
+CONFIG_JSON=$(cat ~/.config/sshlog/config.json 2>/dev/null || true)
+if [[ -z $CONFIG_JSON ]]; then
+    CONFIG_JSON='{
+        "sudo": false,
+        "logmap": {
+            "default": {
+                "default": "cmd:journalctl --output cat",
+                "log": "/var/log/*.log"
+            }
+        }
+    }'
+fi
+
+USE_SUDO=$(echo $CONFIG_JSON | jq -r '.sudo // false')
+[[ $USE_SUDO == true ]] && SUDO=sudo || SUDO=
+DOMAIN=$(echo $CONFIG_JSON | jq -r '.domain // ".*"')
+LOGMAP=$(echo $CONFIG_JSON | jq -r .logmap)
+
+
+function cleanup {
+    # >&2 echo "│ Cleanup function: ${1:-end}"
+    # ps xao user,pid,pgid,sid,user,cmd | grep -P '(sshlog|tail)'
+    # Clean ssh subprocess if still there
+    tokill=($($SUDO pgrep --list-full -g $current_pgid -s $current_sid | grep -E "ssh -o" | awk '{print $1}' | xargs))
+    if [[ ${#tokill[*]} > 0 ]]; then
+        # >&2 echo "│ kill -9 ${tokill[*]}"
+        $SUDO kill -9 ${tokill[*]} 2> /dev/null || true
+    fi
+}
+
+function trap_with_arg {
+    func="$1" ; shift
+    for sig ; do
+        trap "$func $sig" "$sig"
+    done
+}
+
+trap_with_arg cleanup ERR INT TERM EXIT
+
 
 function sshlog {
-    HOST_GROUP="$1"
+    HOST_PATTERN="$1"
     LOG_KEYS=(${2:-default})
 
     # Get matching host from /etc/hosts - retrieve maximum MAX_HOSTS
-    found_hosts=$(cat /etc/hosts | \
-        grep -Pv '(^#|^$)' | \
-        awk '{print $2}' | \
-        grep -Pi "^($HOST_GROUP|$HOST_GROUP[0-9]*\.${OS_REGION_NAME:-.*}\..*)$" | head -n ${MAX_HOSTS:-10} | xargs
+    search_hosts=$(
+        cat /etc/hosts | grep -Pv '(^#|^$)' | awk '{print $2}' | \
+            grep -Pi "^($HOST_PATTERN|$HOST_PATTERN[0-9]*\.${OS_REGION_NAME:-.*}\..*)$" | \
+            head -n ${MAX_HOSTS:-10} | xargs
     )
 
     # Get group from host arg
-    len=$(echo $found_hosts | wc -w)
+    len=$(echo $search_hosts | wc -w)
     if [[ $len -eq 0 ]]; then
-        echo no host found
-        exit 1
+        search_hosts=$HOST_PATTERN
+        group_name=default
     elif [[ $len -eq 1 ]]; then
-        group_name=$(echo $found_hosts | cut -d. -f1 | tr -d '[0-9]')
+        group_name=$(echo $search_hosts | cut -d. -f1 | tr -d '[0-9]')
     else
-        group_name=$HOST_GROUP
+        group_name=$HOST_PATTERN
     fi
 
-    # Find matching group from LOG_MAP
-    found_group=$(echo $LOG_MAP | jq -r 'keys[]' | grep -P "^$group_name$" || true)
-    if [[ -z $found_group ]]; then
+    # Find matching group from LOGMAP
+    search_group=$(echo $LOGMAP | jq -r 'keys[]' | grep -P "^$group_name$" || true)
+    if [[ -z $search_group ]]; then
         # fallback on default group
         group_name="default"
     fi
@@ -133,12 +86,12 @@ function sshlog {
     # get log files from map[group][key]
     log_files=()
     for key in ${LOG_KEYS[@]}; do
-        found_log=$(echo $LOG_MAP | jq .\"$group_name\" | jq -r 'keys[]' | grep -P "^$key$" || true)
+        found_log=$(echo $LOGMAP | jq --arg group_name "$group_name" ."$group_name" | jq -r 'keys[]' | grep -P "^$key$" || true)
         if  [[ -z $found_log ]]; then
-            echo "[$key] does not match any of $(echo $LOG_MAP | jq .\"$group_name\" | jq 'keys[]')"
+            echo "[$key] does not match any of $(echo $LOGMAP | jq ."$group_name" | jq 'keys[]')"
             exit 1
         fi
-        log_files+=($(echo $LOG_MAP | jq -r .\"$group_name\".\"$found_log\"))
+        log_files+=($(echo $LOGMAP | jq -r ."${group_name}"."${found_log}" ))
     done
 
     # build logging command
@@ -153,56 +106,49 @@ function sshlog {
         LOGCMD="timeout 600 tail -v $TAILOPTS ${log_files[@]}"
     fi
 
-    if [[ -n $GREP_PATTERN ]]; then
-        [[ -z $GREP_OPT ]] && GREP_OPT='-Pi'
-        GREPCMD="grep --line-buffered ${GREP_OPT} '$GREP_PATTERN'"
-    else
-        GREPCMD=tee
+    if [[ ${#SSH_PIPE_COMMAND[*]} > 0 ]]; then
+        [[ ${SSH_PIPE_COMMAND[0]} == "grep" ]] && SSH_PIPE_COMMAND[0]="grep --line-buffered"
+        LOGCMD="$LOGCMD | ${SSH_PIPE_COMMAND[*]}"
     fi
 
     >&2 echo "│"
-    >&2 echo "│    Host:   $found_hosts"
+    >&2 echo "│    Host:   $search_hosts"
     >&2 echo "│    Files:  ${log_files[@]}"
-    >&2 echo "│    Cmd:    $LOGCMD | $GREPCMD"
+    >&2 echo "│    Cmd:    $LOGCMD"
     >&2 echo "│"
 
-    for h in $(echo $found_hosts); do
-        short=$(echo $h | sed -e 's/\.cloud.ovh.*//')
+    for h in $(echo $search_hosts); do
+        short=$(echo $h | sed -e "s/\.$DOMAIN//")
         # Execute tail cmd through ssh
         # stdbuf -o0 : do not buffer stdout
         # awk: prefix each line whith  "host filename ..."  #  filename is retrieved using tail -v
         # grep -F '' --line-buffered: try to not mix output
-        sudo ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -l $SSH_USER $h \
-            "$LOGCMD | $GREPCMD" 2> /dev/null | \
-            stdbuf -o0 awk -v host=$short -v header=$HEADER '/^==>/{size=split($2,splitted,"/");filename=splitted[size] ;next} !/^==>/{ if(header == 0) {print $0} else {print host,filename,$0} }' | \
-            grep -F '' --line-buffered  &
+        $SUDO ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -l $SSH_USER $h \
+            "$LOGCMD" 2> /dev/null | \
+            stdbuf -o0 awk -v host=$short -v header=$HEADER \
+            '/^==>/ {
+                size=split($2,splitted,"/");
+                filename=splitted[size];
+                next
+            }
+            !/^==>/ {
+                if(header == 0) {
+                    print $0
+                } else {
+                    print host,filename,$0
+                }
+            }' | grep -F '' --line-buffered  &
     done | process_output
 
     wait
-    cleanup
 }
 
-function process_output
-{
+function process_output {
     # stdout piped, do not color
-    [[ -p /dev/stdout ]] && NOCOLOR=1
-
-    if [[ $NOCOLOR -eq 0 ]]; then
-        if [[ -n $SORT_OPT ]]; then
-            oslog | sort $SORT_OPT
-        else
-            oslog
-        fi
-    else
-        # trick to avoid buffering output instead of using 'cat'
-        while IFS= read -r line; do
-            echo "$line"
-        done
-    fi
+    [[ -p /dev/stdout ]] && tee || oslog
 }
 
-function sshlog_completion
-{
+function sshlog_completion {
     local cur first
 
     cur=${COMP_WORDS[COMP_CWORD]}
@@ -249,26 +195,12 @@ function main {
             -n)
                 help="NB: nb lines. tail option"
                 export TAILLINES=$1 && shift;;
-            -s)
-                help="Sort opts (cat only)"
-                export SORT_OPT=$1 && shift;;
-            --nocolor|-N)
-                help="no color"
-                export NOCOLOR=1 ;;
             --cat|-c)
                 help="cat instead tail -f"
                 export CAT=1 ;;
-            --grep|-g)
-                help="grep -Pi pattern"
-                export GREP_PATTERN=$1 && shift;;
-            --grepopt|-G)
-                help="grep options, default -Pi"
-                export GREP_OPT=$1
-                [[ ! $GREP_OPT =~ ^\- ]] && echo "grep opt should begin with ^-.." && exit 1
-                shift;;
-            --show|-S)
+            --show|-s)
                 help="display log map"
-                echo $LOG_MAP ; exit ;;
+                echo $LOGMAP ; exit ;;
             --max|-m)
                 help="maximum nb hosts to get log from"
                 export MAX_HOSTS=$1 && shift ;;
@@ -280,7 +212,13 @@ function main {
             --help|-h)
                 help="this help"
                 print_help ;;
-            *) [[ ! $arg =~ ^\-+.* ]] && POSITIONNAL_ARGS+=($arg) || EXTRA_ARGS+=($arg)
+            --)
+                help="pipe all to ssh command (ex: grep)"
+                export SSH_PIPE_COMMAND=($*)
+                break;;
+            *)
+                [[ ! $arg =~ ^\-+.* ]] && POSITIONNAL_ARGS+=($arg)
+
         esac
     done
 
@@ -294,12 +232,10 @@ function main {
         export TAILOPTS="$TAILOPTS -n $TAILLINES"
     fi
 
-    [[ $CAT -eq 0 ]] && SORT_OPT=
-
-    HOST_GROUP=${POSITIONNAL_ARGS[0]}
+    HOST_PATTERN=${POSITIONNAL_ARGS[0]}
     LOG_KEYS=${POSITIONNAL_ARGS[@]:1}
 
-    sshlog "$HOST_GROUP" "${LOG_KEYS[@]}"
+    sshlog "$HOST_PATTERN" "${LOG_KEYS[@]}"
 }
 
 main "$@"
