@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=GPG reload agent
 Comment=Reload gpg agent
-Exec=alacritty -T gpg_reload -e bash -c "echo -n 'Reload GPG Agent\n________________\n\n'; echo RELOADAGENT | gpg-connect-agent && echo gpg_passphrase | gpg --clearsign --pinentry-mode loopback && echo 'Reload OK' || echo 'Reload Not OK'; sleep 1"
+Exec=alacritty -T gpg_reload -e bash -c "export GPG_TTY=$(tty); echo RELOADAGENT | gpg-connect-agent && echo gpg_passphrase | gpg --clearsign"
 Type=Application
 Terminal=false
