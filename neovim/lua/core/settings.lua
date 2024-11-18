@@ -14,7 +14,8 @@ vim.opt.magic = true
 vim.opt.ruler = true
 vim.opt.showmode = true
 vim.opt.showcmd = true
-vim.opt.laststatus = 2
+G.laststatus = 2
+vim.opt.laststatus = G.laststatus
 vim.opt.number = true
 vim.opt.cursorline = true
 vim.opt.cmdheight = 2
@@ -55,7 +56,9 @@ vim.opt.pumheight = 20
 vim.opt.termguicolors = true
 vim.opt.conceallevel = 2
 vim.api.nvim_set_option("clipboard", "unnamedplus")
-vim.opt.timeoutlen = 1000
+G.timeoutlen = 1000
+G.terminal_timeoutlen = 150
+vim.opt.timeoutlen = G.timeoutlen
 vim.opt.ttimeoutlen = 100
 
 if vim.fn.empty(vim.env.THEME) == 0 then

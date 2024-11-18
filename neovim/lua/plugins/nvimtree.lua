@@ -6,6 +6,7 @@ return {
         reload_on_bufenter = true,
         respect_buf_cwd = true,
         view = {
+            centralize_selection = true,
             cursorline = true,
             width = 50,
             side = "left",
@@ -22,8 +23,10 @@ return {
         },
         update_focused_file = {
             enable = true,
-            update_root = true,
-            ignore_list = {},
+            update_root = {
+                enable = false,
+                ignore_list = {},
+            },
         },
         tab = {
             sync = {

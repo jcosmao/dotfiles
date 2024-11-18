@@ -10,34 +10,6 @@ local function get_openstack_query_filter()
     end
 end
 
-vim.api.nvim_create_user_command("Rg",
-    function(opts)
-        local args = opts.args
-        local bang = opts.bang
-        vim.fn['fzf#vim#grep'](
-            'rg --no-ignore --column --no-heading --line-number --color=always ' .. vim.fn.shellescape(args), 1,
-            vim.fn['fzf#vim#with_preview']({
-                options = '--delimiter ":" --exact --nth 4..'
-            }), bang
-        )
-    end,
-    { nargs = '*', bang = true }
-)
-
-vim.api.nvim_create_user_command("RgWithFilePath",
-    function(opts)
-        local args = opts.args
-        local bang = opts.bang
-        vim.fn['fzf#vim#grep'](
-            'rg --no-ignore --column --no-heading --line-number --color=always ' .. vim.fn.shellescape(args), 1,
-            vim.fn['fzf#vim#with_preview']({
-                options = '--exact'
-            }), bang
-        )
-    end,
-    { nargs = '*', bang = true }
-)
-
 local function ctags_cmd(search_str, tag_file)
     local line_number = vim.fn.line('.')
     local filename = vim.fn.expand('%:.')

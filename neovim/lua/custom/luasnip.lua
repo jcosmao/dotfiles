@@ -37,5 +37,3 @@ vim.api.nvim_create_user_command("Snippets",
     end,
     { nargs = '*', bang = true }
 )
-
-

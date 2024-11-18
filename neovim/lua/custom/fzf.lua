@@ -17,6 +17,57 @@ vim.env.FZF_DEFAULT_OPTS = [[
     --margin 1,0
 ]]
 
+local function get_rg_file_list_prefix()
+    local project_root = FindRootDirectory()
+    local file_list = '.*'
+
+    if project_root then
+        local project_file_list = string.format("%s/.project/file_list", project_root)
+        local content = ReadFile(project_file_list)
+        if content then file_list = content[1] end
+    end
+
+    -- ex file_list content to search only on python files:
+    --      rg --files -tpy
+    return string.format([[ %s | tr -s '\n' '\0' | xargs -0 ]], file_list)
+end
+
+
+vim.api.nvim_create_user_command("Rg",
+    function(opts)
+        local args = opts.args
+        local rg_file_list_prefix = get_rg_file_list_prefix()
+        vim.fn['fzf#vim#grep'](
+            string.format(
+                '%s rg --column --no-heading --line-number --color=always %s',
+                rg_file_list_prefix, vim.fn.shellescape(args)
+            ), 1,
+            vim.fn['fzf#vim#with_preview']({
+                options = '--delimiter ":" --exact --nth 4.. --prompt "Rg ❭ "'
+            })
+        )
+    end,
+    { nargs = '*', bang = false }
+)
+
+                -- options = string.format('--prompt "Rg [%s] ❭ " --delimiter ":" --exact --nth 4..', args)
+vim.api.nvim_create_user_command("RgWithFilePath",
+    function(opts)
+        local args = opts.args
+        local rg_file_list_prefix = get_rg_file_list_prefix()
+        vim.fn['fzf#vim#grep'](
+            string.format(
+                '%s rg --column --no-heading --line-number --color=always %s',
+                rg_file_list_prefix, vim.fn.shellescape(args)
+            ), 1,
+            vim.fn['fzf#vim#with_preview']({
+                options = '--exact --prompt "RgWithFilePath ❭ "'
+            })
+        )
+    end,
+    { nargs = '*', bang = false }
+)
+
 function Fzf(search_str, source, options, callback)
     local fzf_run = vim.fn["fzf#run"]
     local fzf_wrap = vim.fn["fzf#wrap"]
@@ -49,7 +100,7 @@ function Fzf(search_str, source, options, callback)
         -- default parsing expect format:
         -- {tag to search}\t{file path}\t{file line}
         local split = vim.split(line, "\t")
-        local match = split[1]
+        -- local match = split[1]
         local file = split[2]
         local line_nb = split[3]
 

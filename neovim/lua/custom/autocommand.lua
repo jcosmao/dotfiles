@@ -163,7 +163,7 @@ vim.api.nvim_create_autocmd("InsertLeave", {
 })
 
 -- python max line len
-vim.api.nvim_create_autocmd({ "InsertEnter" }, {
+vim.api.nvim_create_autocmd({ "BufEnter" }, {
     pattern = "*",
     callback = function()
         AutoColorColumn()
@@ -197,23 +197,40 @@ vim.api.nvim_create_user_command("BackgroundToggle", function()
 end, { nargs = 0 })
 
 
--- timeoutlen is timeout used for leader send key, reduce it in term mode and restore it outside
 vim.api.nvim_create_autocmd("FileType", {
     group = TermGrp,
-    pattern = 'toggleterm',
-    command = [[
-        set laststatus=0 noshowmode noruler timeoutlen=150 |
-        autocmd BufEnter,CursorMoved <buffer> startinsert |
-        autocmd BufLeave <buffer> set laststatus=2 showmode ruler timeoutlen=1000
-    ]],
+    pattern = { 'fzf', 'toggleterm' },
+    callback = function()
+        vim.opt.laststatus = 0
+        vim.opt.showmode = false
+        vim.opt.ruler = false
+        vim.opt.timeoutlen = G.terminal_timeoutlen
+
+        vim.api.nvim_create_autocmd({ "BufEnter", "CursorMoved" }, {
+            buffer = 0, -- Le buffer actuel
+            callback = function()
+                vim.cmd("startinsert")
+            end,
+        })
+
+        vim.api.nvim_create_autocmd("BufLeave", {
+            buffer = 0, -- Le buffer actuel
+            callback = function()
+                vim.opt.laststatus = G.laststatus
+                vim.opt.showmode = true
+                vim.opt.ruler = true
+                vim.opt.timeoutlen = G.timeoutlen
+            end,
+        })
+    end,
 })
 
 vim.api.nvim_create_autocmd("BufEnter", {
     group = TermGrp,
     pattern = '*',
     callback = function()
-        if vim.bo.filetype ~= 'toggleterm' then
-            vim.opt.timeoutlen = 1000
+        if not Contains({ 'toggleterm', 'fzf' }, vim.bo.filetype) then
+            vim.opt.timeoutlen = G.timeoutlen
         end
     end
 })
@@ -234,4 +251,14 @@ vim.api.nvim_create_autocmd('VimEnter', {
         -- force redetect
         vim.cmd("filetype detect")
     end,
+})
+
+vim.api.nvim_create_augroup('nvimtree', { clear = true })
+
+vim.api.nvim_create_autocmd("BufEnter", {
+    group    = 'nvimtree',
+    callback = function()
+        local api = require "nvim-tree.api"
+        api.tree.find_file({ update_root = true, open = false, focus = false, })
+    end
 })

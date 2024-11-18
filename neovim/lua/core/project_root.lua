@@ -9,8 +9,13 @@ local root_cache = {}
 local set_root = function()
     -- Get directory path to start search from
     local path = vim.api.nvim_buf_get_name(0)
-    if path == '' then return end
-    path = vim.fs.dirname(path)
+    if not path then
+        path = vim.loop.cwd()
+    else
+        path = vim.fs.dirname(path)
+    end
+
+    if path == '.' then return end
 
     -- Try cache and resort to searching upward for root directory
     -- PrintTable(root_cache)
@@ -29,20 +34,12 @@ local set_root = function()
 
     -- Set current directory
     vim.fn.chdir(root)
+
+    return root
 end
 
 function FindRootDirectory()
-    local path = vim.api.nvim_buf_get_name(0)
-    if path == '' then return end
-    path = vim.fs.dirname(path)
-
-    set_root()
-
-    if root_cache[path] then
-        return root_cache[path]
-    else
-        return path
-    end
+    return set_root()
 end
 
 local root_augroup = vim.api.nvim_create_augroup('ProjectRoot', {})
@@ -50,13 +47,17 @@ local root_augroup = vim.api.nvim_create_augroup('ProjectRoot', {})
 vim.api.nvim_create_autocmd(
     'BufEnter', {
         group = root_augroup,
-        callback = set_root
+        callback = function()
+            set_root()
+        end
     }
 )
 
 vim.api.nvim_create_autocmd(
     'VimEnter', {
         group = root_augroup,
-        callback = set_root
+        callback = function()
+            set_root()
+        end
     }
 )
