@@ -107,8 +107,14 @@ function sshlog {
     fi
 
     if [[ ${#SSH_PIPE_COMMAND[*]} > 0 ]]; then
-        [[ ${SSH_PIPE_COMMAND[0]} == "grep" ]] && SSH_PIPE_COMMAND[0]="grep --line-buffered"
-        LOGCMD="$LOGCMD | ${SSH_PIPE_COMMAND[*]}"
+        piped_cmd=""
+        for arg in "${SSH_PIPE_COMMAND[@]}"; do
+            [[ "$arg" == grep ]]  && piped_cmd="$piped_cmd grep --line-buffered" && continue
+            which "$arg" &> /dev/null && piped_cmd="$piped_cmd $arg" && continue
+            [[ "$arg" =~ ^\- ]] && piped_cmd="$piped_cmd $arg" && continue
+            piped_cmd="$piped_cmd \"$arg\""
+        done
+        LOGCMD="$LOGCMD | $piped_cmd"
     fi
 
     >&2 echo "│"
@@ -214,7 +220,7 @@ function main {
                 print_help ;;
             --)
                 help="pipe all to ssh command (ex: grep)"
-                export SSH_PIPE_COMMAND=($*)
+                export SSH_PIPE_COMMAND=("$@")
                 break;;
             *)
                 [[ ! $arg =~ ^\-+.* ]] && POSITIONNAL_ARGS+=($arg)

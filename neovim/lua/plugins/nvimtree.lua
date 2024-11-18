@@ -4,6 +4,7 @@ return {
         sort_by = "case_sensitive",
         sync_root_with_cwd = true,
         reload_on_bufenter = true,
+        respect_buf_cwd = true,
         view = {
             cursorline = true,
             width = 50,
