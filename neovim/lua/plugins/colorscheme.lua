@@ -1,4 +1,3 @@
-local vim = V
 local M = {}
 
 function M.lazy_config()

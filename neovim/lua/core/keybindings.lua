@@ -1,5 +1,3 @@
-local vim = V
-
 -- Remap some common typos
 vim.cmd([[
     command! -bang E e<bang>
@@ -55,8 +53,10 @@ vim.keymap.set("n", "<leader><Right>", ":wincmd l<cr>", opts)
 vim.keymap.set("n", "<leader><Left>", ":wincmd h<cr>", opts)
 vim.keymap.set("n", "<leader><leader>", ":noh<cr>", opts)
 vim.keymap.set("n", "<leader><ENTER>", ":ZoomWinTabToggle <cr>", opts)
-vim.keymap.set("n", "<leader>k", ":Trouble diagnostics toggle filter.buf=0 focus=false win.size=35<cr>", opts)
-vim.keymap.set("n", "<leader>l", ":Trouble diagnostics toggle focus=false win.size=35<cr>", opts)
+vim.keymap.set("n", "<leader>K", ":Trouble diagnostics toggle filter.buf=0 focus=false win.size=35<cr>", opts)
+vim.keymap.set("n", "<leader>k", ":Trouble diagnostics toggle focus=false win.size=35<cr>", opts)
+vim.keymap.set("n", "<leader>l", ":BLines! <cr>", opts)
+vim.keymap.set("n", "<leader>L", ":Lines! <cr>", opts)
 vim.keymap.set("n", "<leader>p", "\"0p", opts)
 vim.keymap.set("i", "<C-p>", "<C-r>\"", opts)
 vim.keymap.set("n", "<C-G>", ":ToggleTerm dir=%:p:h <cr>", opts)
@@ -89,7 +89,7 @@ vim.keymap.set('n', '<leader>\\', ':lua GotoCscope(vim.fn.expand("<cword>"))<cr>
 
 -- Terminal
 vim.api.nvim_create_autocmd("TermOpen", {
-    group = TermGrp,
+    group = G.TermGrp,
     pattern = "term://*",
     callback = function()
         local opts = { buffer = 0 }

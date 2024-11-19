@@ -1,5 +1,3 @@
-local vim = V
-
 local custom_osdebug = [[
 import logging
 for app in ["neutron", "neutron_lib", "networking_ovh",

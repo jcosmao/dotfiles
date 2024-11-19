@@ -85,8 +85,10 @@ function pyenv.setup_pyright
     echo '{
         "venvPath": "VENVPATH",
         "venv": "VENV",
-        "reportUnboundVariable": "information",
+        "reportUnboundVariable": "warning",
+        "reportPossiblyUnboundVariable": "information",
         "reportOptionalMemberAccess": "information",
+        "reportAttributeAccessIssue": "information",
         "typeCheckingMode": "standard"
     }' | sed "s,VENVPATH,$VENVPATH," | sed "s,VENV,$VENV," | jq > pyrightconfig.json
 }

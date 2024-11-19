@@ -1,5 +1,3 @@
-local vim = V
-
 -- '--query', get_openstack_query_filter(),
 local function get_openstack_query_filter()
     local current_file = vim.fn.expand('%:p')

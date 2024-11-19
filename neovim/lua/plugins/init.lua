@@ -1,7 +1,5 @@
-local vim = V
-
 function PatchPlugin(patch)
-    local script = V.fn.stdpath("config") .. "/lua/plugins/patch/patch.sh"
+    local script = vim.fn.stdpath("config") .. "/lua/plugins/patch/patch.sh"
     vim.fn.system({ script, patch })
 end
 
@@ -23,7 +21,6 @@ require("lazy").setup({
     require("plugins.startify"),
     require("plugins.nvimtree"),
     require("plugins.lualine"),
-    require("plugins.bufferline"),
     require("plugins.indent_blankline"),
     require("plugins.statuscol"),
     { 'nvim-tree/nvim-web-devicons' },

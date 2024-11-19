@@ -1,5 +1,3 @@
-local vim = V
-
 return {
     'ludovicchabant/vim-gutentags',
     cond = vim.fn.executable('ctags') == 1,

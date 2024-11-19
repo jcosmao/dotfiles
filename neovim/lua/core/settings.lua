@@ -1,5 +1,3 @@
-local vim = V
-
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
@@ -60,6 +58,7 @@ G.timeoutlen = 1000
 G.terminal_timeoutlen = 150
 vim.opt.timeoutlen = G.timeoutlen
 vim.opt.ttimeoutlen = 100
+vim.o.showtabline = 2
 
 if vim.fn.empty(vim.env.THEME) == 0 then
     vim.opt.background = vim.env.THEME

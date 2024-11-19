@@ -1,5 +1,3 @@
-local vim = V
-
 return {
     'akinsho/toggleterm.nvim',
     opts = function()

@@ -1,5 +1,3 @@
-local vim = V
-
 G.fzf_layout = { down = '60%' }
 G.fzf_preview_window = { 'right:+{2}-/2', '?' }
 G.fzf_action = {
@@ -10,7 +8,7 @@ G.fzf_action = {
 vim.env.FZF_DEFAULT_OPTS = [[
     --ansi
     --layout reverse
-    --preview-window right:60%,border-left
+    --preview-window right:60%,border-left:hidden
     --preview 'bat --color=always --style=header,grid --line-range :300 {}'
     --bind ?:toggle-preview,page-up:preview-up,page-down:preview-down,alt-up:page-up,alt-down:page-down,home:preview-top,end:preview-bottom
     --height=70%
@@ -18,7 +16,7 @@ vim.env.FZF_DEFAULT_OPTS = [[
 ]]
 
 local function get_rg_file_list_prefix()
-    local project_root = FindRootDirectory()
+    local project_root = G.project_root
     local file_list = '.*'
 
     if project_root then
@@ -43,14 +41,13 @@ vim.api.nvim_create_user_command("Rg",
                 rg_file_list_prefix, vim.fn.shellescape(args)
             ), 1,
             vim.fn['fzf#vim#with_preview']({
-                options = '--delimiter ":" --exact --nth 4.. --prompt "Rg ❭ "'
+                options = '--preview-window nohidden --delimiter ":" --exact --nth 4.. --prompt "Rg ❭ "'
             })
         )
     end,
     { nargs = '*', bang = false }
 )
 
-                -- options = string.format('--prompt "Rg [%s] ❭ " --delimiter ":" --exact --nth 4..', args)
 vim.api.nvim_create_user_command("RgWithFilePath",
     function(opts)
         local args = opts.args
@@ -61,7 +58,7 @@ vim.api.nvim_create_user_command("RgWithFilePath",
                 rg_file_list_prefix, vim.fn.shellescape(args)
             ), 1,
             vim.fn['fzf#vim#with_preview']({
-                options = '--exact --prompt "RgWithFilePath ❭ "'
+                options = '--preview-window nohidden --exact --prompt "RgWithFilePath ❭ "'
             })
         )
     end,
@@ -78,7 +75,7 @@ function Fzf(search_str, source, options, callback)
         '--nth', '1',
         '--delimiter', '\t',
         '--ansi',
-        '--preview-window', '+{3}-10'
+        '--preview-window', '+{3}-10:nohidden'
     }
 
     local opts = options or default_opts

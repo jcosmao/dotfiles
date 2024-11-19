@@ -1,5 +1,3 @@
-local vim = V
-
 vim.api.nvim_create_augroup('bufcheck', { clear = true })
 
 -- Always quit nvimtree window when leaving tab by switching to previous file.
@@ -198,7 +196,7 @@ end, { nargs = 0 })
 
 
 vim.api.nvim_create_autocmd("FileType", {
-    group = TermGrp,
+    group = G.TermGrp,
     pattern = { 'fzf', 'toggleterm' },
     callback = function()
         vim.opt.laststatus = 0
@@ -226,7 +224,7 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 vim.api.nvim_create_autocmd("BufEnter", {
-    group = TermGrp,
+    group = G.TermGrp,
     pattern = '*',
     callback = function()
         if not Contains({ 'toggleterm', 'fzf' }, vim.bo.filetype) then
@@ -253,12 +251,17 @@ vim.api.nvim_create_autocmd('VimEnter', {
     end,
 })
 
-vim.api.nvim_create_augroup('nvimtree', { clear = true })
+vim.api.nvim_create_augroup('NvimTreeReload', { clear = true })
 
-vim.api.nvim_create_autocmd("BufEnter", {
-    group    = 'nvimtree',
+-- doautocmd User NvimTreeReload
+vim.api.nvim_create_autocmd("User", {
+    group    = "NvimTreeReload",
+    pattern  = "NvimTreeReload",
     callback = function()
-        local api = require "nvim-tree.api"
-        api.tree.find_file({ update_root = true, open = false, focus = false, })
+        local api = require("nvim-tree.api")
+        if api.tree.winid() then
+            api.tree.find_file({ update_root = true, open = false, focus = false, })
+            api.tree.reload()
+        end
     end
 })

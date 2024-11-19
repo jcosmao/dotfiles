@@ -63,22 +63,22 @@ edit_new_pass="true"
 #password_length=12
 
 # Custom Keybindings
+insert_pass="Alt+n"
 autotype="Alt+v"
-type_user="Alt+2"
-type_pass="Alt+3"
-open_url="Alt+4"
 copy_name="Alt+u"
-copy_url="Alt+l"
+type_user="Alt+U"
 copy_pass="Alt+p"
+type_pass="Alt+P"
+copy_url="Alt+l"
+open_url="Alt+L"
 show="Alt+o"
-copy_entry="Alt+2"
-type_entry="Alt+1"
-copy_menu="Alt+c"
+copy_entry="Alt+c"
+type_entry="Alt+C"
+copy_menu="Alt+m"
+type_menu="Alt+M"
 action_menu="Alt+e"
-type_menu="Alt+t"
 help="Alt+h"
 switch="Alt+x"
-insert_pass="Alt+n"
 
 # Change the clipboard backend for rofi-pass, valid backends are:
 # xclip

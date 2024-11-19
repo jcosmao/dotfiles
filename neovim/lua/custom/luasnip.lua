@@ -1,5 +1,3 @@
-local vim = V
-
 vim.api.nvim_create_user_command("Snippets",
     function(opts)
         local fzf_opts = {

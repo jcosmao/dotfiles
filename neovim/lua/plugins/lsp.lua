@@ -1,5 +1,3 @@
-local vim = V
-
 local efm_cfg = require("plugins.efm")
 
 local lsp = {
@@ -7,11 +5,22 @@ local lsp = {
     basedpyright = {},
     jsonls = {},
     yamlls = {},
-    lua_ls = {},
+    lua_ls = {
+        settings = {
+            Lua = {
+                diagnostics = {
+                    globals = { 'vim' }
+                }
+            }
+        }
+    },
     efm = {
         settings = efm_cfg.settings,
         filetypes = vim.tbl_keys(efm_cfg.settings.languages),
-        init_options = { documentFormatting = true },
+        init_options = {
+            documentFormatting = true,
+            documentRangeFormatting = true,
+        },
     },
     terraformls = {
         filetypes = { 'terraform', 'hcl' },
@@ -74,13 +83,13 @@ return {
                     }
                 end
             }
-            require('lspconfig.ui.windows').default_options.border = Border
+            require('lspconfig.ui.windows').default_options.border = G.Border
 
             local float = {
                 focusable = false,
                 style = "minimal",
                 max_width = 100,
-                border = Border,
+                border = G.Border,
                 noautocmd = true,
             }
             vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, float)
@@ -91,7 +100,7 @@ return {
                 'williamboman/mason.nvim',
                 opts = {
                     ui = {
-                        border = Border
+                        border = G.Border
                     }
                 }
             },
@@ -113,7 +122,7 @@ return {
             wrap = true,
             bind = true, -- This is mandatory, otherwise border config won't get registered.
             handler_opts = {
-                border = Border
+                border = G.Border
             },
             padding = ' ',
             transparency = 0,
@@ -134,6 +143,7 @@ return {
             callback = nil,        -- callback called after jumping to a location
             fzf_modifier = ':~:.', -- format FZF entries, see |filename-modifiers|
             fzf_trim = true,       -- trim FZF entries
+            fzf_preview = { 'right:+{2}-/2:nohidden' }
         }
     }
 }

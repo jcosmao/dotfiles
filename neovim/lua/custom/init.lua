@@ -1,5 +1,3 @@
-local vim = V
-
 -- Get the base directory
 local base_dir = vim.fn.stdpath("config") .. "/lua/custom/"
 

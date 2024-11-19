@@ -1,5 +1,3 @@
-local vim = V
-
 local virtual_text_default = {
     format = function(diagnostic)
         local lines = vim.split(diagnostic.message, '\n')
@@ -17,7 +15,7 @@ vim.diagnostic.config({
     float = {
         focusable = true,
         style = "minimal",
-        border = Border,
+        border = G.Border,
         source = "always",
         header = "",
         prefix = "",

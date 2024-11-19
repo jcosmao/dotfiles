@@ -1,5 +1,3 @@
-local vim = V
-
 function HieraEncrypt()
     local git_root = vim.fn.trim(vim.fn.system(
         'git -C ' .. vim.fn.expand('%:h') .. ' rev-parse --show-toplevel 2> /dev/null'
@@ -109,7 +107,7 @@ end
 
 function AutoColorColumn()
     if vim.bo.filetype == "python" then
-        local project_root = FindRootDirectory()
+        local project_root = G.project_root
         local git_root = vim.fn.trim(vim.fn.system(
             string.format('git -C %s rev-parse --show-toplevel 2> /dev/null', vim.fn.expand('%:h'))
         ))

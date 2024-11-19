@@ -1,13 +1,8 @@
-V = vim
-C = V.cmd
-A = V.api
-F = V.fn  -- Vim function
-G = V.g   -- Vim globals
-O = V.opt -- Vim optionals
+G = vim.g   -- Vim globals
 
-Border = "rounded"
+G.Border = "rounded"
 
-SpecialFiltetypes = {
+G.SpecialFiltetypes = {
     'NvimTree', 'NvimTree_*',
     'aerial',
     'startify',
@@ -18,7 +13,7 @@ SpecialFiltetypes = {
     'toggleterm', 'toggleterm*'
 }
 
-TermGrp = V.api.nvim_create_augroup("TermGrp", { clear = true })
+G.TermGrp = vim.api.nvim_create_augroup("TermGrp", { clear = true })
 
 function PrintTable(tbl, indent)
     if not indent then indent = 0 end
@@ -34,9 +29,9 @@ function PrintTable(tbl, indent)
 end
 
 function IsSpecialFiletype()
-    local current_filetype = V.bo.filetype
-    for _, pattern in ipairs(SpecialFiltetypes) do
-        if V.fn.match(current_filetype, pattern) ~= -1 then
+    local current_filetype = vim.bo.filetype
+    for _, pattern in ipairs(G.SpecialFiltetypes) do
+        if vim.fn.match(current_filetype, pattern) ~= -1 then
             return true
         end
     end
@@ -54,33 +49,33 @@ function Contains(tab, val)
 end
 
 function FoldedTextInfo()
-    local fs = string.find(A.nvim_buf_get_lines(0, V.v.foldstart - 1, V.v.foldend, false)[1], '"label":')
+    local fs = string.find(vim.api.nvim_buf_get_lines(0, vim.vim.foldstart - 1, vim.vim.foldend, false)[1], '"label":')
     if fs == nil then
-        return V.fn.foldtext()
+        return vim.fn.foldtext()
     end
     local label = string.match(
-        A.nvim_buf_get_lines(0, V.v.foldstart, V.v.foldstart + 1, false)[1], '"label":\\s+"([^"]+)"'
+        vim.api.nvim_buf_get_lines(0, vim.vim.foldstart, vim.vim.foldstart + 1, false)[1], '"label":\\s+"([^"]+)"'
     )
-    local ft = string.gsub(V.fn.foldtext(), ': .+', label)
+    local ft = string.gsub(vim.fn.foldtext(), ': .+', label)
     return ft
 end
 
 function DebugToggle()
-    if not V.o.verbose then
-        V.o.verbosefile = '/tmp/nvim_debug.log'
-        V.o.verbose = 10
+    if not vim.o.verbose then
+        vim.o.verbosefile = '/tmp/nvim_debug.log'
+        vim.o.verbose = 10
     else
-        V.o.verbose = 0
-        V.o.verbosefile = ''
+        vim.o.verbose = 0
+        vim.o.verbosefile = ''
     end
 end
 
 function LoadVimscript(file)
-    local neovim_root = V.fn.stdpath("config")
+    local neovim_root = vim.fn.stdpath("config")
     local file_path = neovim_root .. "/vim/" .. file
 
-    if V.fn.filereadable(file_path) then
-        V.cmd("source " .. file_path)
+    if vim.fn.filereadable(file_path) then
+        vim.cmd("source " .. file_path)
     end
 end
 
@@ -88,6 +83,19 @@ function FileExists(file)
     local f = io.open(file, "rb")
     if f then f:close() end
     return f ~= nil
+end
+
+
+--- Check if a file or directory exists in this path
+function Exists(file)
+   local ok, err, code = os.rename(file, file)
+   if not ok then
+      if code == 13 then
+         -- Permission denied, but it exists
+         return true
+      end
+   end
+   return ok, err
 end
 
 -- get all lines from a file, returns an empty

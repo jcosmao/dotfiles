@@ -8,10 +8,10 @@ local sh_fmt = {
 }
 
 local sh_lint = {
+    lintSource = 'efm/shellcheck',
     lintCommand = 'shellcheck -f gcc -x -',
     lintStdin = true,
     lintFormats = { '%f:%l:%c: %trror: %m', '%f:%l:%c: %tarning: %m', '%f:%l:%c: %tote: %m' },
-    lintSource = 'shellcheck',
 }
 
 local prettier_fmt = {
@@ -20,7 +20,7 @@ local prettier_fmt = {
 }
 
 local terraform_fmt = {
-    formatCommand = 'tofu fmt -',
+    formatCommand = 'terraform fmt -',
     formatStdin = true
 }
 
@@ -34,16 +34,35 @@ local python_isort = {
 }
 
 local markdown_lint = {
+    lintSource = 'efm/mdl',
     lintCommand = 'mdl ${INPUT}',
     lintStdin = true,
     lintFormats = { '%f:%l: %m' },
-    lintSource = 'mdl',
     rootMarkers = { '.mdlrc' },
 }
 
+local flake8 = {
+    lintSource = 'efm/flake8',
+    lintCommand = 'flake8 -',
+    lintIgnoreExitCode = true,
+    lintStdin = true,
+    lintFormats = { 'stdin:%l:%c: %t%n %m' },
+    rootMarkers = { 'setup.cfg', 'tox.ini', '.flake8' },
+}
+
+local pylint = {
+    lintSource = 'efm/pylint',
+    lintCommand = 'pylint --score=no "${INPUT}"',
+    lintIgnoreExitCode = true,
+    lintStdin = false,
+    lintFormats = { '%.%#:%l:%c: %t%.%#: %m' },
+    rootMarkers = {},
+}
+
 M.settings = {
+    version = 2,
     languages = {
-        python = { python_isort },
+        python = { python_isort, flake8, pylint },
         hcl = { terraform_fmt },
         terraform = { terraform_fmt },
         sh = { sh_fmt, sh_lint },

@@ -1,5 +1,3 @@
-local vim = V
-
 return {
     'mhinz/vim-startify',
     config = function()

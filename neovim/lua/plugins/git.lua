@@ -1,5 +1,3 @@
-local vim = V
-
 return {
     {
         'lewis6991/gitsigns.nvim',
