@@ -14,7 +14,7 @@ return {
             },
         },
         view = {
-            centralize_selection = true,
+            centralize_selection = false,
             cursorline = true,
             width = 50,
             side = "left",

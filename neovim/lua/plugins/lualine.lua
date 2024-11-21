@@ -7,10 +7,10 @@ return {
             component_separators = { left = '', right = '' },
             section_separators = { left = '', right = '' },
             disabled_filetypes = {
-                statusline = G.SpecialFiltetypes,
+                statusline = G.SpecialFiletypes,
                 winbar = {},
             },
-            ignore_focus = G.SpecialFiltetypes,
+            ignore_focus = G.SpecialFiletypes,
             always_divide_middle = true,
             globalstatus = true,
             always_show_tabline = true,

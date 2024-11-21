@@ -5,3 +5,4 @@
 pyrightconfig.json
 pyproject.toml
 .git-hooks/*
+.flake8

@@ -72,6 +72,8 @@ function pyenv.setup_flake
     [[ -z $project_root ]] && project_root=$(utils.find_project_root .git)
     [[ -z $project_root ]] && echo "Project root not found" && return
 
+    [[ -f "$project_root/.flake8" ]] && return
+
     echo "[flake8]"                    > "$project_root/.flake8"
     echo "max-line-length = $line_len" >> "$project_root/.flake8"
 }
@@ -82,14 +84,15 @@ function pyenv.setup_pyright
     VENV=$(basename $VIRTUAL_ENV)
     VENVPATH=$(dirname $VIRTUAL_ENV)
 
+    # "reportUnboundVariable": "warning",
+    # "reportPossiblyUnboundVariable": "information",
+    # "reportOptionalMemberAccess": "information",
+    # "reportAttributeAccessIssue": "information",
+    # "typeCheckingMode": "standard"
+
     echo '{
         "venvPath": "VENVPATH",
-        "venv": "VENV",
-        "reportUnboundVariable": "warning",
-        "reportPossiblyUnboundVariable": "information",
-        "reportOptionalMemberAccess": "information",
-        "reportAttributeAccessIssue": "information",
-        "typeCheckingMode": "standard"
+        "venv": "VENV"
     }' | sed "s,VENVPATH,$VENVPATH," | sed "s,VENV,$VENV," | jq > pyrightconfig.json
 }
 

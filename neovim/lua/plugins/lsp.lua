@@ -2,7 +2,21 @@ local efm_cfg = require("plugins.efm")
 
 local lsp = {
     bashls = {},
-    basedpyright = {},
+    pyright = {
+        settings = {
+            pyright = {
+                analysis = {
+                    diagnosticSeverityOverrides = {
+                        typeCheckingMode = "standard",
+                        reportUnboundVariable = "warning",
+                        reportPossiblyUnboundVariable = "information",
+                        reportOptionalMemberAccess = "information",
+                        reportAttributeAccessIssue = "information",
+                    }
+                }
+            }
+        }
+    },
     jsonls = {},
     yamlls = {},
     lua_ls = {

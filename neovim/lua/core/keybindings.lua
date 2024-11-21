@@ -59,7 +59,7 @@ vim.keymap.set("n", "<leader>l", ":BLines! <cr>", opts)
 vim.keymap.set("n", "<leader>L", ":Lines! <cr>", opts)
 vim.keymap.set("n", "<leader>p", "\"0p", opts)
 vim.keymap.set("i", "<C-p>", "<C-r>\"", opts)
-vim.keymap.set("n", "<C-G>", ":ToggleTerm dir=%:p:h <cr>", opts)
+vim.keymap.set("n", "<C-g>", ":ToggleTerm dir=%:p:h <cr>", opts)
 vim.keymap.set("n", "<leader>?", ":Memo <cr>", opts)
 
 -- Set key mappings using Vimscript commands within Lua

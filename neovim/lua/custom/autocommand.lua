@@ -261,7 +261,7 @@ vim.api.nvim_create_autocmd("User", {
         local api = require("nvim-tree.api")
         if api.tree.winid() then
             api.tree.find_file({ update_root = true, open = false, focus = false, })
-            api.tree.reload()
+            -- api.tree.reload()
         end
     end
 })

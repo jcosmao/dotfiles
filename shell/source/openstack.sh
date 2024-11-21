@@ -18,16 +18,25 @@ function os {
         shift; set -- "baremetal" "${@:1}"
     elif [[ $1 == "sg" ]]; then
         shift; set -- "security group" "${@:1}"
+    elif [[ $1 == "srv" ]]; then
+        shift; set -- "server" "${@:1}"
+        [[ $2 == "show" ]] && PIPE_CMD=openstack.server_show_jq_filter
     fi
 
-    echo "${APPEND_OPTS[@]}" | grep -qw '\-f json' && PIPE_CMD="jq" || PIPE_CMD="tee"
-    echo "$*" | grep -qw "loadbalancer status show" && PIPE_CMD="jq"
+    echo "${APPEND_OPTS[@]}" | grep -qw '\-f json' && PIPE_CMD=${PIPE_CMD:-jq} || PIPE_CMD="tee"
+    echo "$*" | grep -qw "loadbalancer status show" && PIPE_CMD=${PIPE_CMD:-jq}
 
     EXTRA_OPTS=()
     # Require at least 2.24 to get migration id + abort
     [[ "$*" =~ (server migration) ]] && EXTRA_OPTS+=("--os-compute-api-version" "2.24")
 
     openstack "${EXTRA_OPTS[@]}" $* "${APPEND_OPTS[@]}" | $PIPE_CMD
+}
+
+function openstack.server_show_jq_filter
+{
+    # recent version of openstackcli duplicate all entries
+    jq 'with_entries(select(.key | test("^(access_ipv4|access_ipv6|addresses|availability_zone|compute_host|config_drive|created_at|disk_config|fault|flavor|host_status|hypervisor_hostname|id|image|instance_name|key_name|launched_at|locked|name|power_state|project_id|public_v4|public_v6|ramdisk_id|reservation_id|root_device_name|scheduler_hints|security_groups|server_groups|status|tags|task_state|updated_at|user_data|user_id|vm_state|volumes_attached)$") ))'
 }
 
 function openstack.install_completion {

@@ -8,7 +8,7 @@ return {
 
         return {
             size = 20,
-            open_mapping = [[<c-g>]],
+            -- open_mapping = [[<c-g>]],
             insert_mappings = true, -- whether or not the open mapping applies in insert mode
             terminal_mappings = true,
             start_in_insert = true,

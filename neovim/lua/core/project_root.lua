@@ -1,5 +1,5 @@
 -- First get priority, other are fallback if first not found
-local root_patterns = { '.project/', '.git/' }
+local root_patterns = { '.project', '.git' }
 
 -- Cache to use for speed up (at cost of possibly outdated results)
 local root_cache = {}
@@ -54,6 +54,6 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'WinEnter', 'DirChanged' }, {
         if IsSpecialFiletype() then return end
 
         G.project_root = set_root()
-        vim.cmd("doautocmd User NvimTreeReload")
+        vim.cmd("silent! execute ':doautocmd User NvimTreeReload'")
     end
 })

@@ -2,7 +2,7 @@
 Version=44.10.1.31028
 Name=Webex
 Comment=Webex
-Exec=/opt/Webex/bin/CiscoCollabHost %U
+Exec=systemctl --user restart webex
 Icon=/home/jcosmao/.local/share/WebexLauncher/sparklogosmall.png
 Terminal=false
 Type=Application
