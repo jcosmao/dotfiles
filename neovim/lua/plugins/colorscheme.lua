@@ -37,6 +37,9 @@ function M.lazy_config()
                     aqua = { '#51986d', '165' },
                     blue = { '#09859c', '24' },
                     purple = { '#af528c', '96' },
+                    bg_diff_green = { '#d4e1ae', '1' },
+                    bg_diff_red = { '#ebc1ac', '2' },
+                    bg_diff_blue = { '#cae6e6', '3' },
                 }
             end
         },
@@ -116,11 +119,6 @@ function M.setColorscheme()
         colors.search = '#FF8700'
         colors.bg = colors.bg0
 
-        G.terminal_color_0 = colors.bg5
-        G.terminal_color_7 = colors.fg0
-        G.terminal_color_8 = colors.bg5
-        G.terminal_color_15 = colors.fg0
-
         vim.api.nvim_set_hl(0, "NvimTreeFolderIcon", { fg = '#6c85c0' })
         vim.api.nvim_set_hl(0, 'DiffText', { bg = '#f0e5ec', fg = colors.none })
         vim.api.nvim_set_hl(0, 'FoldColumn', { fg = colors.grey0 })
@@ -148,7 +146,6 @@ function M.setColorscheme()
 end
 
 function M.highlight_override()
-
     vim.api.nvim_set_hl(0, 'Search', { fg = G.colors.search, bg = 'NONE', bold = true })
     vim.api.nvim_set_hl(0, 'CurSearch', { fg = G.colors.bg, bg = G.colors.search, bold = true })
     vim.api.nvim_set_hl(0, 'IncSearch', { fg = G.colors.bg, bg = G.colors.search, bold = true })
@@ -161,7 +158,7 @@ function M.highlight_override()
 
     G.fzf_colors = {
         ['bg+'] = { 'bg', 'CursorLine', 'CursorColumn' },
-        bg      = { 'bg', 'Normal' },
+        bg      = { 'bg', G.colors.bg },
         border  = { 'fg', 'NonText' },
         spinner = { 'fg', 'Yellow' },
         fg      = { 'fg', 'Normal' },

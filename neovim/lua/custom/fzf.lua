@@ -15,6 +15,16 @@ vim.env.FZF_DEFAULT_OPTS = [[
     --margin 1,0
 ]]
 
+-- '--query', FZFQueryFilterTests(),
+function FZFQueryFilterTests()
+    local current_file = vim.fn.expand('%:p')
+    if current_file:match('/tests/') then
+        return '/tests/ '
+    else
+        return '!/tests/ '
+    end
+end
+
 local function get_rg_file_list_prefix()
     local project_root = G.project_root
     local file_list = '.*'
@@ -30,7 +40,6 @@ local function get_rg_file_list_prefix()
     return string.format([[ %s | tr -s '\n' '\0' | xargs -0 ]], file_list)
 end
 
-
 vim.api.nvim_create_user_command("Rg",
     function(opts)
         local args = opts.args
@@ -41,7 +50,14 @@ vim.api.nvim_create_user_command("Rg",
                 rg_file_list_prefix, vim.fn.shellescape(args)
             ), 1,
             vim.fn['fzf#vim#with_preview']({
-                options = '--preview-window nohidden --delimiter ":" --exact --nth 4.. --prompt "Rg ❭ "'
+                options = {
+                    '--preview-window', 'nohidden',
+                    '--delimiter', ':',
+                    '--exact',
+                    '--nth',  '4..',
+                    '--ansi',
+                    '--prompt', 'Rg ❭ ',
+                }
             })
         )
     end,
@@ -58,7 +74,13 @@ vim.api.nvim_create_user_command("RgWithFilePath",
                 rg_file_list_prefix, vim.fn.shellescape(args)
             ), 1,
             vim.fn['fzf#vim#with_preview']({
-                options = '--preview-window nohidden --exact --prompt "RgWithFilePath ❭ "'
+                options = {
+                    '--preview-window', 'nohidden',
+                    '--exact',
+                    '--ansi',
+                    '--prompt', 'RgWithFilePath ❭ ',
+                    '--query', FZFQueryFilterTests(),
+                }
             })
         )
     end,

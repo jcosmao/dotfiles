@@ -25,9 +25,9 @@ function tf
     mkdir -p $state_dir
 
     if [[ $1 =~ (apply) ]]; then
+        unset TF_COMMAND
 
         if [[ -f $state_dir/args ]]; then
-            unset TF_COMMAND
             eval $(cat $state_dir/args) 2> /dev/null
         fi
 

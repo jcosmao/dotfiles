@@ -1,13 +1,3 @@
--- '--query', get_openstack_query_filter(),
-local function get_openstack_query_filter()
-    local current_file = vim.fn.expand('%:p')
-    if current_file:match('/tests/') then
-        return '/tests/ '
-    else
-        return '!/tests/ '
-    end
-end
-
 local function ctags_cmd(search_str, tag_file)
     local line_number = vim.fn.line('.')
     local filename = vim.fn.expand('%:.')
@@ -80,7 +70,7 @@ function FZFLuaCscope(search_str, mode, tag_file)
     search_str = search_str or ".*"
     local fzf_opts = {
         '--prompt', string.format("Cscope [%s] ❭ ", search_str),
-        '--query', get_openstack_query_filter(),
+        '--query', FZFQueryFilterTests(),
         '-1', '-0', '+i',
         '--exact',
         '--with-nth', '2,4',

@@ -70,7 +70,9 @@ vim.api.nvim_create_autocmd({ "OptionSet" }, {
 vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter", "TabEnter", "BufWritePost" }, {
     pattern = "*",
     callback = function()
-        SetGitRepo()
+        if not IsSpecialFiletype() then
+            SetGitRepo()
+        end
     end
 })
 
@@ -78,7 +80,7 @@ vim.api.nvim_create_user_command("F", function()
     DisplayFilePath()
 end, { nargs = 0 })
 
-vim.api.nvim_create_user_command("M", function()
+vim.api.nvim_create_user_command("Memo", function()
     vim.api.nvim_command('tabnew ' .. vim.fn.stdpath("config") .. '/help.md')
 end, { nargs = 0 })
 
@@ -199,25 +201,12 @@ vim.api.nvim_create_autocmd("FileType", {
     group = G.TermGrp,
     pattern = { 'fzf', 'toggleterm' },
     callback = function()
-        vim.opt.laststatus = 0
-        vim.opt.showmode = false
-        vim.opt.ruler = false
         vim.opt.timeoutlen = G.terminal_timeoutlen
 
         vim.api.nvim_create_autocmd({ "BufEnter", "CursorMoved" }, {
             buffer = 0, -- Le buffer actuel
             callback = function()
                 vim.cmd("startinsert")
-            end,
-        })
-
-        vim.api.nvim_create_autocmd("BufLeave", {
-            buffer = 0, -- Le buffer actuel
-            callback = function()
-                vim.opt.laststatus = G.laststatus
-                vim.opt.showmode = true
-                vim.opt.ruler = true
-                vim.opt.timeoutlen = G.timeoutlen
             end,
         })
     end,

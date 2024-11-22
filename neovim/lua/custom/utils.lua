@@ -40,7 +40,7 @@ end
 
 function DisplayFilePath()
     if not IsSpecialFiletype() then
-        print(string.format("File: %s", vim.fn.expand('%:p')))
+        print(string.format(vim.fn.expand('%:p')))
     end
 end
 

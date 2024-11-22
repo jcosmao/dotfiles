@@ -47,8 +47,8 @@ return {
         inactive_sections = {
             lualine_a = {},
             lualine_b = {},
-            lualine_c = { 'filename' },
-            lualine_x = { 'location' },
+            lualine_c = {},
+            lualine_x = {},
             lualine_y = {},
             lualine_z = {}
         },
@@ -85,7 +85,9 @@ return {
                 {
                     function()
                         if G.project_root then
-                            return vim.fs.basename(G.project_root)
+                            return "  " .. vim.fs.basename(G.project_root)
+                        else
+                            return ''
                         end
                     end,
                 }
