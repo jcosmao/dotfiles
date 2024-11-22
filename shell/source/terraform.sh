@@ -95,7 +95,7 @@ alias tfy="tf auto-approve"
 alias tfset=terraform.set_workspace
 alias tfunset=terraform.unset_workspace
 alias tg=terragrunt
-alias tfo="tf output --json | jq .all.value"
+alias tfo="tf output --json | jq 'to_entries | del(.[].value.type) | from_entries'"
 
 complete -C $(which terraform) terraform
 complete -C $(which terraform) tf

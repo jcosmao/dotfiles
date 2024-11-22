@@ -3,8 +3,6 @@
 # If not running interactively, don't do anything
 [[ -z "$PS1" ]] && return
 
-HISTFILESIZE=20000
-
 source $HOME/.shell/common.sh
 is_already_sourced bashrc && return || SOURCE+=("bashrc")
 
