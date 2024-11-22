@@ -4,6 +4,7 @@ function os {
     JSON=1
     [[ $1 == "--nojson" ]] && JSON=0 && shift
 
+    PIPE_CMD=
     APPEND_OPTS=()
     [[ "$*" =~ ( show| list| create| issue)( |$) && $JSON == 1 ]] && APPEND_OPTS+=("-f" "json")
     [[ "$*" =~ (server list) ]] && APPEND_OPTS+=("-n")
