@@ -14,12 +14,10 @@ vim.cmd([[
 -- Mapping
 local opts = { noremap = true, silent = true }
 
-vim.keymap.set("n", "<leader>V", ":tabedit $MYVIMRC<cr>", opts)
-vim.keymap.set("n", "<leader>VV", ":source $MYVIMRC | echo $MYVIMRC 'reloaded'<cr>", opts)
-vim.keymap.set("n", "<leader><ESC>", ":LineInfosToggle<cr>", opts)
+vim.keymap.set("n", "<leader>v", ":tabedit $MYVIMRC<cr>", opts)
 vim.keymap.set("n", "<F1>", ":NvimTreeFindFileToggle!<cr>", opts)
 vim.keymap.set("n", "<F2>", ":Trouble symbols toggle win.size=50 focus=false<cr>", opts)
-vim.keymap.set("n", "<F3>", ":set paste!<cr>", opts)
+vim.keymap.set("n", "<F3>", ":LineInfosToggle<cr>", opts)
 vim.keymap.set("n", "<F9>", ":BackgroundToggle<cr>", opts)
 vim.keymap.set("n", "<F10>", ":Startify<cr>", opts)
 vim.keymap.set("n", "<F12>", ":MouseToggle<cr>", opts)
@@ -40,13 +38,11 @@ vim.keymap.set("i", "<C-a>", "<C-o>^", opts)
 vim.keymap.set("n", "<C-e>", "$", opts)
 vim.keymap.set("i", "<C-e>", "<C-o>$", opts)
 vim.keymap.set("n", "<C-Right>", "e", opts)
+vim.keymap.set("i", "<C-Right>", "<C-o>e", opts)
 vim.keymap.set("n", "<C-Left>", "b", opts)
-vim.keymap.set("n", "<leader>+", ":vsplit<cr>", opts)
-vim.keymap.set("n", "<leader>=", ":split<cr>", opts)
-vim.keymap.set("n", "<C-S-Up>", ":wincmd k<cr>", opts)
-vim.keymap.set("n", "<C-S-Down>", ":wincmd j<cr>", opts)
-vim.keymap.set("n", "<C-S-Right>", ":wincmd l<cr>", opts)
-vim.keymap.set("n", "<C-S-Left>", ":wincmd h<cr>", opts)
+vim.keymap.set("i", "<C-Left>", "<C-o>b", opts)
+vim.keymap.set("n", "<leader><bar>", ":vsplit<cr>", opts)
+vim.keymap.set("n", "<leader>\\", ":split<cr>", opts)
 vim.keymap.set("n", "<leader><Up>", ":wincmd k<cr>", opts)
 vim.keymap.set("n", "<leader><Down>", ":wincmd j<cr>", opts)
 vim.keymap.set("n", "<leader><Right>", ":wincmd l<cr>", opts)
@@ -64,6 +60,11 @@ vim.keymap.set("n", "<leader>?", ":Memo <cr>", opts)
 
 -- Set key mappings using Vimscript commands within Lua
 -- not working with pure lua...
+
+-- Search occurence in forward mode (# is by default search backward and * is forward)
+vim.cmd([[
+    map <silent> # *
+]])
 
 -- nvim surround
 vim.cmd([[
@@ -84,9 +85,6 @@ vim.keymap.set({ "n", "i" }, "<C-PageUp>", "<C-o>:tabnext<CR>", opts)
 vim.keymap.set({ "n", "i" }, "<S-PageUp>", "<C-o>:tabnext<CR>", opts)
 vim.keymap.set({ "n", "i" }, "<C-t>", "<C-o>:tabnew<CR>", opts)
 
-vim.keymap.set('n', '<leader>]', ':lua GotoCtags(vim.fn.expand("<cword>"))<cr>', opts)
-vim.keymap.set('n', '<leader>\\', ':lua GotoCscope(vim.fn.expand("<cword>"))<cr>', opts)
-
 -- Terminal
 vim.api.nvim_create_autocmd("TermOpen", {
     group = G.TermGrp,
@@ -106,6 +104,11 @@ vim.keymap.set('n', '<leader>,', vim.diagnostic.goto_prev, opts)
 vim.keymap.set('n', '<leader>.', vim.diagnostic.goto_next, opts)
 vim.keymap.set("n", "<leader>j", function() DiagnosticVirtualTextToggle() end)
 vim.keymap.set("n", "<leader>J", function() DiagnosticToggle() end)
+
+-- Ctags / Cscope
+vim.keymap.set('n', '<M-]>', ':lua GotoCtags(vim.fn.expand("<cword>"))<cr>', opts)
+vim.keymap.set('n', '<leader>]', ':lua GotoCtags(vim.fn.expand("<cword>"))<cr>', opts)
+vim.keymap.set('n', '<M-\\>', ':lua GotoCscope(vim.fn.expand("<cword>"))<cr>', opts)
 
 -- LSP
 function LspKeymap()

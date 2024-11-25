@@ -38,8 +38,9 @@ function M.lazy_config()
                     blue = { '#09859c', '24' },
                     purple = { '#af528c', '96' },
                     bg_diff_green = { '#d4e1ae', '1' },
-                    bg_diff_red = { '#ebc1ac', '2' },
-                    bg_diff_blue = { '#cae6e6', '3' },
+                    bg_diff_red = { '#efc9b6', '2' },
+                    bg_diff_blue = { '#d5eef9', '3' },
+                    bg_diff_blue2 = { '#b4e3e7', '4' },
                 }
             end
         },
@@ -125,12 +126,13 @@ function M.setColorscheme()
         vim.api.nvim_set_hl(0, 'MatchParen', { bg = '#dacc94' })
         vim.api.nvim_set_hl(0, "IblScope", { fg = colors.grey0 })
         vim.api.nvim_set_hl(0, "CmpItemAbbrMatch", { fg = colors.orange })
+        vim.api.nvim_set_hl(0, "DiffText", { bg = colors.bg_diff_blue2 })
     else
         vim.cmd('colorscheme catppuccin')
         vim.fn.setenv('BAT_THEME', 'Catppuccin Macchiato')
 
         colors = require('catppuccin.palettes').get_palette()
-        colors.search = '#d8ff00'
+        colors.search = '#cff400'
         colors.none = 'NONE'
         colors.bg = colors.mantle
 
