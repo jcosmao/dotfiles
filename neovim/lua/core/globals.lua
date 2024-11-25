@@ -107,12 +107,12 @@ function IsSpecialFiletype()
 end
 
 function FoldedTextInfo()
-    local fs = string.find(vim.api.nvim_buf_get_lines(0, vim.vim.foldstart - 1, vim.vim.foldend, false)[1], '"label":')
+    local fs = string.find(vim.api.nvim_buf_get_lines(0, vim.v.foldstart - 1, vim.v.foldend, false)[1], '"label":')
     if fs == nil then
         return vim.fn.foldtext()
     end
     local label = string.match(
-        vim.api.nvim_buf_get_lines(0, vim.vim.foldstart, vim.vim.foldstart + 1, false)[1], '"label":\\s+"([^"]+)"'
+        vim.api.nvim_buf_get_lines(0, vim.v.foldstart, vim.v.foldstart + 1, false)[1], '"label":\\s+"([^"]+)"'
     )
     local ft = string.gsub(vim.fn.foldtext(), ': .+', label)
     return ft
