@@ -46,7 +46,7 @@ function FZFLuaCtags(search_str, tag_file)
         '--nth', '2',
         '--delimiter', '\t',
         '--ansi',
-        '--preview-window', '+{3}-10',
+        '--preview-window', 'nohidden:+{3}-10',
         '--preview', 'bat  --color always --italic-text always --style header,grid,numbers --highlight-line {3} {2}'
     }
     Fzf(search_str, ctags_cmd(search_str, tag_file), fzf_opts)
@@ -78,7 +78,7 @@ function FZFLuaCscope(search_str, mode, tag_file)
         '--nth', '1',
         '--delimiter', '\t',
         '--ansi',
-        '--preview-window', '+{3}-10',
+        '--preview-window', 'nohidden:+{3}-10',
         '--preview', 'bat  --color always --italic-text always --style header,grid,numbers --highlight-line {3} {2}'
     }
 
