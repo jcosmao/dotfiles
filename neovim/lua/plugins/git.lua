@@ -64,21 +64,25 @@ return {
     },
     {
         'FabijanZulj/blame.nvim',
-        opts = {
-            date_format = "%d.%m.%Y",
-            virtual_style = "right",
-            merge_consecutive = false,
-            max_summary_width = 30,
-            colors = nil,
-            commit_detail_view = "vsplit",
-            mappings = {
-                commit_info = "i",
-                stack_push = "<TAB>",
-                stack_pop = "<BS>",
-                show_commit = "<CR>",
-                close = { "<esc>", "q" },
+        dependencies = { "load_colorscheme" },
+        config = function()
+            local opts = {
+                date_format = "%d.%m.%Y",
+                virtual_style = "right",
+                merge_consecutive = false,
+                max_summary_width = 30,
+                colors = G.blame_colors,
+                commit_detail_view = "vsplit",
+                mappings = {
+                    commit_info = "i",
+                    stack_push = "<TAB>",
+                    stack_pop = "<BS>",
+                    show_commit = "<CR>",
+                    close = { "<esc>", "q" },
+                }
             }
-        }
+            require("blame").setup(opts)
+        end
     },
     {
         'sindrets/diffview.nvim',

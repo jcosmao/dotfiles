@@ -1,4 +1,4 @@
-local virtual_text_default = {
+G.diagnostics_virtual_text = {
     format = function(diagnostic)
         local lines = vim.split(diagnostic.message, '\n')
         return lines[1]
@@ -29,7 +29,7 @@ vim.diagnostic.config({
 -- :lua vim.diagnostic.config()
 function DiagnosticVirtualTextToggle()
     if not vim.diagnostic.config().virtual_text then
-        vim.diagnostic.config({ virtual_text = virtual_text_default })
+        vim.diagnostic.config({ virtual_text = G.diagnostics_virtual_text })
         vim.notify("diagnostic.virtual_text enabled")
     else
         vim.diagnostic.config({ virtual_text = false })

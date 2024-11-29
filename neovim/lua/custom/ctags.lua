@@ -1,3 +1,13 @@
+local function gutentags_enabled()
+    if vim.b.gutentags_files == nil then
+        vim.cmd('echohl WarningMsg')
+        vim.cmd('echo "Gutentags disabled"')
+        vim.cmd('echohl None')
+        return false
+    end
+    return true
+end
+
 local function ctags_cmd(search_str, tag_file)
     local line_number = vim.fn.line('.')
     local filename = vim.fn.expand('%:.')
@@ -86,7 +96,7 @@ function FZFLuaCscope(search_str, mode, tag_file)
 end
 
 function GotoCtags(tag, ctx_line)
-    if not GutentagsEnabled() then
+    if not gutentags_enabled() then
         return
     end
 
@@ -103,14 +113,14 @@ function GotoCtags(tag, ctx_line)
 end
 
 function GotoCscope(tag, ctx_line)
-    if GutentagsEnabled() then
+    if gutentags_enabled() then
         FZFLuaCscope(tag, 0, vim.b.gutentags_files['cscope'])
     end
 end
 
 vim.api.nvim_create_user_command("FZFCtags",
     function(opts)
-        if GutentagsEnabled() then
+        if gutentags_enabled() then
             FZFLuaCtags(nil, vim.b.gutentags_files['ctags'])
         end
     end,
@@ -122,7 +132,7 @@ vim.api.nvim_create_user_command("FZFCscope",
         local args = vim.split(opts.args, " ")
         local search_str = args[1]
         local mode = args[2]
-        if GutentagsEnabled() then
+        if gutentags_enabled() then
             FZFLuaCscope(search_str, mode, vim.b.gutentags_files['cscope'])
         end
     end,

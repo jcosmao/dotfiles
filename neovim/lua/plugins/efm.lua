@@ -10,7 +10,7 @@ local sh_fmt = {
 local sh_lint = {
     lintSource = 'efm/shellcheck',
     lintCommand = 'shellcheck -f gcc -x -',
-    lintStdin = true,
+    lintStdin = true ,
     lintFormats = { '%f:%l:%c: %trror: %m', '%f:%l:%c: %tarning: %m', '%f:%l:%c: %tote: %m' },
 }
 

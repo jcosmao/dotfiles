@@ -1,3 +1,14 @@
+function DebugToggle()
+    if not vim.o.verbose then
+        vim.o.verbosefile = '/tmp/nvim_debug.log'
+        vim.o.verbose = 10
+        print("Logging in /tmp/nvim_debug.log")
+    else
+        vim.o.verbose = 0
+        vim.o.verbosefile = ''
+    end
+end
+
 function HieraEncrypt()
     local git_root = vim.fn.trim(vim.fn.system(
         'git -C ' .. vim.fn.expand('%:h') .. ' rev-parse --show-toplevel 2> /dev/null'
@@ -24,23 +35,25 @@ function MouseToggle()
     end
 end
 
-vim.g.current_git_repo = ''
 function SetGitRepo()
+    if G.current_git_repo == nil then
+        G.current_git_repo = ""
+    end
+
     local current_file_path = vim.fn.resolve(vim.fn.expand('%:p:h'))
-    local git_repo = vim.fn.system(
-        string.format([[
-            cd "%s"; basename -s .git $(git remote get-url origin 2> /dev/null) 2> /dev/null
-        ]], current_file_path)
-    )
+    local cmd = string.format([[
+        basename -s .git $(git -C %s remote get-url origin 2> /dev/null) 2> /dev/null
+    ]], current_file_path)
+    local git_repo = vim.fn.system(cmd)
     local repo = git_repo:gsub('\n+$', '')
     if repo ~= '' then
-        vim.g.current_git_repo = repo
+        G.current_git_repo = repo
     end
 end
 
-function DisplayFilePath()
+function GetFileFullPath()
     if not IsSpecialFiletype() then
-        print(string.format(vim.fn.expand('%:p')))
+        return vim.fn.expand('%:p')
     end
 end
 
@@ -91,11 +104,20 @@ function DiffToggle()
     end
 end
 
+
+function IsOpenstackProject()
+    local is_openstack = tonumber(vim.fn.system("find . -maxdepth 2 -name .gitreview | wc -l"))
+    if is_openstack > 0 then
+        return true
+    else
+        return false
+    end
+end
+
 function PythonBlack()
     local opts = ""
 
-    local is_openstack = tonumber(vim.fn.system("find . -maxdepth 2 -name .gitreview | wc -l"))
-    if is_openstack > 0 then
+    if IsOpenstackProject() then
         opts = "-l 79"
     end
 
@@ -150,23 +172,11 @@ function BackgroundToggle()
     else
         vim.o.background = "light"
     end
-    local mod = require("plugins.colorscheme")
-    mod.setColorscheme()
 
-    vim.cmd('silent! execute "Lazy reload toggleterm.nvim"')
+    require("plugins.colorscheme").setColorscheme()
 end
 
-function GutentagsEnabled()
-    if vim.b.gutentags_files == nil then
-        vim.cmd('echohl WarningMsg')
-        vim.cmd('echo "Gutentags disabled"')
-        vim.cmd('echohl None')
-        return false
-    end
-    return true
-end
-
-function IBLReload()
-    vim.cmd('silent! execute ":IBLToggle"')
-    vim.cmd('silent! execute ":IBLToggle"')
+function Startify()
+    vim.cmd("Startify")
+    vim.cmd("only")
 end

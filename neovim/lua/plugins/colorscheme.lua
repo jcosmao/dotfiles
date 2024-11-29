@@ -4,7 +4,7 @@ function M.lazy_config()
     return {
         {
             'sainnhe/gruvbox-material',
-            priotity = 100,
+            priotity = 1000,
             config = function()
                 G.gruvbox_material_disable_italic_comment = 0
                 G.gruvbox_material_enable_bold = 1
@@ -22,7 +22,7 @@ function M.lazy_config()
                 G.gruvbox_material_colors_override = {
                     bg0 = { '#f9efd5', '230' },
                     bg1 = { '#f7e2c6', '230' },
-                    bg2 = { '#f5dec2', '230' },
+                    bg2 = { '#f3e2d3', '230' },
                     bg3 = { '#ecd7b1', '230' },
                     bg4 = { '#eed8b7', '223' },
                     bg5 = { '#e6d2b0', '230' },
@@ -39,14 +39,20 @@ function M.lazy_config()
                     purple = { '#af528c', '96' },
                     bg_diff_green = { '#d4e1ae', '1' },
                     bg_diff_red = { '#efc9b6', '2' },
-                    bg_diff_blue = { '#d5eef9', '3' },
-                    bg_diff_blue2 = { '#b4e3e7', '4' },
+                    bg_diff_blue = { '#d5e4f9', '3' },
+                    bg_diff_blue2 = { '#e6f3f9', '4' },
+                    bred = { '#dd8b8b', '88' },
+                    byellow = { '#d3b584', '136' },
+                    bgreen = { '#bec98e', '100' },
+                    bblue = { '#8ecbd6', '24' },
                 }
+
+                M.setColorscheme()
             end
         },
         {
             'catppuccin/nvim',
-            priotity = 100,
+            priotity = 1000,
             main = "catppuccin",
             opts = {
                 flavour = "frappe",             -- latte, frappe, macchiato, mocha
@@ -93,8 +99,20 @@ function M.lazy_config()
             },
         },
         {
+            name = "load_colorscheme",
+            dir = "/dev/null",
+            priority = 1000,
+            dependencies = {
+                'catppuccin/nvim',
+                'sainnhe/gruvbox-material'
+            },
+            config = function()
+                M.setColorscheme()
+            end
+        },
+        {
             'norcalli/nvim-colorizer.lua',
-            priotity = 100,
+            priotity = 1000,
             opts = { 'css', 'javascript', 'vim', 'lua', 'xml' }
         },
     }
@@ -102,6 +120,7 @@ end
 
 function M.setColorscheme()
     local colors = {}
+    local blame_colors = {}
 
     if vim.o.background == 'light' then
         vim.cmd('colorscheme gruvbox-material')
@@ -121,12 +140,15 @@ function M.setColorscheme()
         colors.bg = colors.bg0
 
         vim.api.nvim_set_hl(0, "NvimTreeFolderIcon", { fg = '#6c85c0' })
-        vim.api.nvim_set_hl(0, 'DiffText', { bg = '#f0e5ec', fg = colors.none })
         vim.api.nvim_set_hl(0, 'FoldColumn', { fg = colors.grey0 })
         vim.api.nvim_set_hl(0, 'MatchParen', { bg = '#dacc94' })
         vim.api.nvim_set_hl(0, "IblScope", { fg = colors.grey0 })
         vim.api.nvim_set_hl(0, "CmpItemAbbrMatch", { fg = colors.orange })
         vim.api.nvim_set_hl(0, "DiffText", { bg = colors.bg_diff_blue2 })
+        vim.api.nvim_set_hl(0, 'VirtualTextError', { fg = colors.bred })
+        vim.api.nvim_set_hl(0, 'VirtualTextWarning', { fg = colors.byellow })
+        vim.api.nvim_set_hl(0, 'VirtualTextInfo', { fg = colors.bblue })
+        vim.api.nvim_set_hl(0, 'VirtualTextHint', { fg = colors.bgreen })
     else
         vim.cmd('colorscheme catppuccin')
         vim.fn.setenv('BAT_THEME', 'Catppuccin Macchiato')
@@ -141,10 +163,19 @@ function M.setColorscheme()
         vim.api.nvim_set_hl(0, "Comment", { fg = colors.overlay0 })
     end
 
+    local forbidden = { 'bg.*', 'mantle', 'overlay.*', 'search', 'none', 'surface.*', 'crust', 'base' }
+    for k, v in pairs(colors) do
+        if not Contains(forbidden, k) then
+            table.insert(blame_colors, v)
+        end
+    end
+
+    G.blame_colors = blame_colors
     G.colors = colors
 
     M.highlight_override()
-    IBLReload()
+
+    M.reload_plugins()
 end
 
 function M.highlight_override()
@@ -192,6 +223,13 @@ function M.highlight_override()
             vim.api.nvim_set_hl(0, group, {})
         end
     end
+end
+
+function M.reload_plugins()
+    vim.cmd('silent! execute "Lazy reload toggleterm.nvim"')
+    vim.cmd('silent! execute "Lazy reload indent-blankline.nvim"')
+    vim.cmd('silent! execute "Lazy reload nvim-colorizer.lua"')
+    vim.cmd('silent! execute "ColorizerToggle"')
 end
 
 return M

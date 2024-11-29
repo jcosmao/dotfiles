@@ -2,8 +2,6 @@ G = vim.g -- Vim globals
 
 G.Border = "rounded"
 
-G.TermGrp = vim.api.nvim_create_augroup("TermGrp", { clear = true })
-
 -- Utils functions
 
 function PrintTable(tbl, indent)
@@ -14,14 +12,15 @@ function PrintTable(tbl, indent)
             print(formatting)
             PrintTable(v, indent + 1)
         else
-            print(formatting .. v)
+            print(formatting .. tostring(v))
         end
     end
 end
 
-function Contains(tab, val)
-    for index, value in ipairs(tab) do
-        if value == val then
+function Contains(pattern_table, val)
+    for _, value in ipairs(pattern_table) do
+        local pattern = string.format('^%s$', value)
+        if string.match(val, pattern) then
             return true
         end
     end
@@ -116,14 +115,4 @@ function FoldedTextInfo()
     )
     local ft = string.gsub(vim.fn.foldtext(), ': .+', label)
     return ft
-end
-
-function DebugToggle()
-    if not vim.o.verbose then
-        vim.o.verbosefile = '/tmp/nvim_debug.log'
-        vim.o.verbose = 10
-    else
-        vim.o.verbose = 0
-        vim.o.verbosefile = ''
-    end
 end

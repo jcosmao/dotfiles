@@ -17,6 +17,10 @@ vim.env.FZF_DEFAULT_OPTS = [[
 
 -- '--query', FZFQueryFilterTests(),
 function FZFQueryFilterTests()
+    if not IsOpenstackProject() then
+        return ''
+    end
+
     local current_file = vim.fn.expand('%:p')
     if current_file:match('/tests/') then
         return '/tests/ '
