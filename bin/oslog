@@ -47,7 +47,7 @@ LOG_LEVEL = {
     "inf": 20,
     "debug": 10,
     "dbg": 10,
-    "notset": 100,
+    "notset": 1,
 }
 
 PARSER = argparse.ArgumentParser(
@@ -304,6 +304,7 @@ def parse_line(line):
         return {
             "header": "" if not result.group(1) else result.group(1),
             "text": "" if not result.group(2) else result.group(2),
+            "level": "notset",
             "_type": None,
         }
 

@@ -69,6 +69,12 @@ function tf
     fi
 }
 
+function terraform.state_search
+{
+    pattern=${1:-.*}
+    tf show -json | jq --arg pattern "$pattern" '.values.root_module.resources.[] | select( .address | test($pattern))'
+}
+
 function terraform.set_workspace
 {
     tf_workspace=$1
@@ -96,6 +102,7 @@ alias tfset=terraform.set_workspace
 alias tfunset=terraform.unset_workspace
 alias tg=terragrunt
 alias tfo="tf output --json | jq 'to_entries | del(.[].value.type) | from_entries'"
+alias tfs="terraform.state_search"
 
 complete -C $(which terraform) terraform
 complete -C $(which terraform) tf
