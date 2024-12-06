@@ -144,10 +144,10 @@ vim.cmd([[
 
 -- Diff mode
 function SetupDiffMapping()
-    vim.cmd(':IBLDisable')
-    if vim.fn.winnr() ~= vim.fn.winnr('h') then
-        vim.api.nvim_set_keymap('n', '<<', ':diffput<cr>', opts)
-        vim.api.nvim_set_keymap('n', '>>', ':diffget<cr>', opts)
+    -- check if current window id == win id of left window
+    if vim.fn.winnr() ~= vim.fn.winnr('l') then
+        vim.api.nvim_set_keymap('n', '>>', ':diffput<cr>', opts)
+        vim.api.nvim_set_keymap('n', '<<', ':diffget<cr>', opts)
     else
         vim.api.nvim_set_keymap('n', '<<', ':diffput<cr>', opts)
         vim.api.nvim_set_keymap('n', '>>', ':diffget<cr>', opts)

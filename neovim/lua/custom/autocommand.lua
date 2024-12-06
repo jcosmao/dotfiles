@@ -3,10 +3,6 @@ vim.api.nvim_create_autocmd('VimEnter', {
         -- fix weird issue when vim is launched with file as parameter, ft is not detected
         -- force redetect
         vim.cmd("filetype detect")
-        -- startup in diff mode ?
-        if vim.o.diff then
-            SetupDiffMapping()
-        end
     end,
 })
 
@@ -27,14 +23,6 @@ vim.api.nvim_create_autocmd('BufReadPost', {
     end
 })
 
-vim.api.nvim_create_autocmd({ "OptionSet" }, {
-    pattern = "diff",
-    callback = function()
-        SetupDiffMapping()
-        print("Entered diff mode")
-    end
-})
-
 vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter", "TabEnter", "BufWritePost" }, {
     pattern = "*",
     callback = function()
@@ -48,6 +36,10 @@ vim.api.nvim_create_autocmd({ "BufEnter" }, {
     pattern = "*",
     callback = function()
         AutoColorColumn()
+
+        if vim.o.diff then
+            SetupDiffMapping()
+        end
     end
 })
 
