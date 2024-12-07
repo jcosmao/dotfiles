@@ -100,7 +100,7 @@ function M.lazy_config()
         },
         {
             name = "load_colorscheme",
-            dir = "/dev/null",
+            dir = vim.fn.stdpath("config"),
             priority = 1000,
             dependencies = {
                 'catppuccin/nvim',

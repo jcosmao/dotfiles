@@ -14,6 +14,7 @@ find ~/.mozilla -name prefs.js | while read -r pref; do
 
     mkdir -p $profile/chrome
     cat <<EOF > "$profile/chrome/userChrome.css"
+#main-window[titlepreface*="[Sidebery]"] #TabsToolbar {visibility: collapse !important;}
 #main-window[titlepreface*="[Sidebery]"] #titlebar {visibility: collapse !important;}
 EOF
 done
