@@ -60,6 +60,7 @@ vim.keymap.set({"n", "t"}, "<C-g>", "<Cmd>ToggleTerm dir=%:p:h <cr>", opts)
 vim.keymap.set("n", "<leader>?", ":Memo <cr>", opts)
 vim.keymap.set("n", "u", ":undo <cr>", opts)
 vim.keymap.set("n", "r", ":redo <cr>", opts)
+vim.keymap.set("i", "<S-Tab>", "<C-d>", opts)
 
 -- Set key mappings using Vimscript commands within Lua
 -- not working with pure lua...
