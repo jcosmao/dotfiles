@@ -116,3 +116,21 @@ function FoldedTextInfo()
     local ft = string.gsub(vim.fn.foldtext(), ': .+', label)
     return ft
 end
+
+function GetCurrentDir()
+    -- Get directory path to start search from
+    local path = vim.api.nvim_buf_get_name(0)
+    if not path then
+        path = vim.loop.cwd()
+    else
+        path = vim.fs.dirname(path)
+    end
+
+    if path == '.' then
+        path = vim.trim(vim.fn.system("pwd"))
+    end
+
+    return path
+end
+
+

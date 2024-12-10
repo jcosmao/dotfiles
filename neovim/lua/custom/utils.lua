@@ -104,7 +104,6 @@ function DiffToggle()
     end
 end
 
-
 function IsOpenstackProject()
     local is_openstack = tonumber(vim.fn.system("find . -maxdepth 2 -name .gitreview | wc -l"))
     if is_openstack > 0 then
@@ -129,19 +128,14 @@ end
 
 function AutoColorColumn()
     if vim.bo.filetype == "python" then
-        local project_root = G.project_root
-        local git_root = vim.fn.trim(vim.fn.system(
-            string.format('git -C %s rev-parse --show-toplevel 2> /dev/null', vim.fn.expand('%:h'))
-        ))
-
-        if project_root == "" and git_root == "" then
+        if G.project_root == "" and G.git_root == "" then
             return
         end
 
         local cmd = string.format([[
             grep max-line-length $(find %s %s -maxdepth 1 -name pyproject.toml -o -name tox.ini -o -name .flake8) |
             awk -F= '{print $2}' | tail -1
-        ]], project_root, git_root)
+        ]], G.project_root, G.git_root)
 
         local maxlinelen = vim.fn.trim(vim.fn.system(cmd))
 
@@ -151,7 +145,7 @@ function AutoColorColumn()
         end
 
         -- Force 79 char max for openstack projects
-        if vim.loop.fs_stat(git_root .. '/.gitreview') then
+        if vim.loop.fs_stat(G.git_root .. '/.gitreview') then
             vim.o.colorcolumn = "79"
             return
         end

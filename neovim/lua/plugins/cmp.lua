@@ -54,8 +54,8 @@ return {
                     ['<Tab>'] = function(fallback)
                         if cmp.visible() and cmp.get_selected_entry() then
                             cmp.select_next_item()
-                        elseif luasnip.expand_or_locally_jumpable() then
-                            luasnip.expand_or_jump()
+                        elseif luasnip.locally_jumpable() then
+                            luasnip.jump()
                         elseif cmp.visible() then
                             cmp.select_next_item()
                         else

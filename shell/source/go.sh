@@ -1,8 +1,25 @@
-unset GOROOT
-path.append $HOME/.local/go/bin
-which go &> /dev/null || return
+function go.install
+{(
+    version=$1
+    [[ -z $version ]] && echo "Missing version" && return
 
-path.append $HOME/go/bin
+    set -xe
+    wget "https://go.dev/dl/go${version}.linux-amd64.tar.gz" -O /tmp/go.tar.gz
+    dir="$HOME/.local/download/go.${version}"
+    rm -rf "$dir" && mkdir -p "$dir"
+    tar xzf /tmp/go.tar.gz -C  "$dir"
+    ln -sf "$dir/go" ~/.local/go
+)}
+
+[[ -d "$HOME/.local/go/bin" ]] && \
+    path.append "$HOME/.local/go/bin" && \
+    export GOROOT="$HOME/.local/go"
+
+[[ -d "$HOME/go/bin" ]] && \
+    path.append "$HOME/go/bin" && \
+    export GOPATH="$HOME/go"
+
+which go &> /dev/null || return
 
 function go.test
 {

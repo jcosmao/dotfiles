@@ -5,17 +5,7 @@ local root_patterns = { '.project', '.git' }
 local root_cache = {}
 
 local set_root = function()
-    -- Get directory path to start search from
-    local path = vim.api.nvim_buf_get_name(0)
-    if not path then
-        path = vim.loop.cwd()
-    else
-        path = vim.fs.dirname(path)
-    end
-
-    if path == '.' then
-        path = vim.trim(vim.fn.system("pwd"))
-    end
+    local path = GetCurrentDir()
 
     -- Try cache and resort to searching upward for root directory
     -- PrintTable(root_cache)
@@ -38,12 +28,21 @@ local set_root = function()
     return root
 end
 
+local function get_git_root()
+    local root = vim.fn.trim(vim.fn.system(
+        string.format('git -C %s rev-parse --show-toplevel 2> /dev/null', vim.fn.expand('%:h'))
+    ))
+    return vim.trim(root)
+end
+
+
 local root_augroup = vim.api.nvim_create_augroup('ProjectRoot', {})
 
 vim.api.nvim_create_autocmd('VimEnter', {
     group = root_augroup,
     callback = function()
         G.project_root = set_root()
+        G.git_root = get_git_root()
     end
 })
 
@@ -54,6 +53,7 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'WinEnter', 'DirChanged' }, {
         if IsSpecialFiletype() then return end
 
         G.project_root = set_root()
+        G.git_root = get_git_root()
         vim.cmd("silent! execute ':doautocmd User NvimTreeReload'")
     end
 })

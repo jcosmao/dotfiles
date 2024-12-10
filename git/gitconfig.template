@@ -93,3 +93,4 @@
     root = "rev-parse --show-toplevel"
     ref = "ls-remote --ref"
     log-merge = "!f() { git log --stat $1^..$1; }; f"
+    logtrailer = !git log --format='%h %s %(trailers:key=Issue,valueonly)%-C() %(trailers:key=JIRA,valueonly)%-C() %(trailers:key=Change-Id,valueonly)%-C()'
