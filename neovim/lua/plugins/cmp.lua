@@ -39,8 +39,20 @@ return {
                     })
                 },
                 mapping = {
-                    ['<C-p>'] = cmp.mapping(cmp.mapping.select_prev_item(), { 'i', 'c' }),
-                    ['<C-n>'] = cmp.mapping(cmp.mapping.select_next_item(), { 'i', 'c' }),
+                    ['<Tab>'] = cmp.mapping(function(fallback)
+                        if cmp.visible() then
+                            cmp.select_next_item()
+                        else
+                            fallback()
+                        end
+                    end, { "i", "s" }),
+                    ['<S-Tab>'] = cmp.mapping(function(fallback)
+                        if cmp.visible() then
+                            cmp.select_prev_item()
+                        else
+                            fallback()
+                        end
+                    end, { "i", "s" }),
                     ['<Up>'] = cmp.mapping(cmp.mapping.select_prev_item(), { 'i', 'c' }),
                     ['<Down>'] = cmp.mapping(cmp.mapping.select_next_item(), { 'i', 'c' }),
                     ['<C-Up>'] = cmp.mapping.scroll_docs(-4),
@@ -51,26 +63,20 @@ return {
                         behavior = cmp.ConfirmBehavior.Insert,
                         select = false
                     }),
-                    ['<Tab>'] = function(fallback)
-                        if cmp.visible() and cmp.get_selected_entry() then
-                            cmp.select_next_item()
-                        elseif luasnip.locally_jumpable() then
-                            luasnip.jump()
-                        elseif cmp.visible() then
-                            cmp.select_next_item()
+                    ['<Right>'] = cmp.mapping(function(fallback)
+                        if luasnip.locally_jumpable(1) then
+                            luasnip.jump(1)
                         else
                             fallback()
                         end
-                    end,
-                    ['<S-Tab>'] = function(fallback)
-                        if cmp.visible() and cmp.get_selected_entry() then
-                            cmp.select_prev_item()
-                        elseif luasnip.locally_jumpable(-1) then
+                    end, { "i", "s" }),
+                    ['<Left>'] = cmp.mapping(function(fallback)
+                        if luasnip.locally_jumpable(-1) then
                             luasnip.jump(-1)
                         else
                             fallback()
                         end
-                    end,
+                    end, { "i", "s" }),
                 },
                 sources = {
                     { name = 'nvim_lsp' },
