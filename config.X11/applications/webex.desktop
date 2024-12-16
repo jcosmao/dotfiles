@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=44.10.1.31028
-Name=Webex
+Name=wbex
 Comment=Webex
 Exec=systemctl --user restart webex
 Icon=/home/jcosmao/.local/share/WebexLauncher/sparklogosmall.png

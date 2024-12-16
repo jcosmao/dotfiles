@@ -6,8 +6,6 @@ if [[ $repo == "dotfiles" ]]; then
     echo "[$0] Reset changes on webex.desktop / bashrc"
 
     {
-        git reset ~/.dotfiles/config.X11/applications/webex.desktop
-        git checkout -- ~/.dotfiles/config.X11/applications/webex.desktop
         git reset ~/.dotfiles/shell/bashrc
         git checkout -- ~/.dotfiles/shell/bashrc
     } 2>&1 > /dev/null

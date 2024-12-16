@@ -25,7 +25,7 @@ function os {
     fi
 
     echo "${APPEND_OPTS[@]}" | grep -qw '\-f json' && PIPE_CMD=${PIPE_CMD:-jq} || PIPE_CMD="tee"
-    echo "$*" | grep -qw "loadbalancer status show" && PIPE_CMD=${PIPE_CMD:-jq}
+    echo "$*" | grep -qw "loadbalancer status show" && PIPE_CMD=jq
 
     EXTRA_OPTS=()
     # Require at least 2.24 to get migration id + abort
