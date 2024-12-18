@@ -18,7 +18,7 @@ case "$select" in
         loginctl list-sessions -o json | jq -r .[].session | xargs loginctl terminate-session
         ;;
     suspend)
-        # nmcli radio wifi off && \
+        nmcli radio wifi off && \
         lock && \
         systemctl suspend
         ;;
