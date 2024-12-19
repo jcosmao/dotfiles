@@ -86,12 +86,12 @@ function sshlog {
     # get log files from map[group][key]
     log_files=()
     for key in ${LOG_KEYS[@]}; do
-        found_log=$(echo $LOGMAP | jq --arg group_name "$group_name" ."$group_name" | jq -r 'keys[]' | grep -P "^$key$" || true)
+        found_log=$(echo $LOGMAP | jq .\"${group_name}\" | jq -r 'keys[]' | grep -P "^$key$" || true)
         if  [[ -z $found_log ]]; then
             echo "[$key] does not match any of $(echo $LOGMAP | jq ."$group_name" | jq 'keys[]')"
             exit 1
         fi
-        log_files+=($(echo $LOGMAP | jq -r ."${group_name}"."${found_log}" ))
+        log_files+=($(echo $LOGMAP | jq -r .\"${group_name}\".\"${found_log}\" ))
     done
 
     # build logging command
@@ -114,7 +114,7 @@ function sshlog {
             [[ "$arg" =~ ^\- ]] && piped_cmd="$piped_cmd $arg" && continue
             piped_cmd="$piped_cmd \"$arg\""
         done
-        LOGCMD="$LOGCMD | $piped_cmd"
+        LOGCMD="$LOGCMD | cut -b 1-5000 | $piped_cmd"
     fi
 
     >&2 echo "│"

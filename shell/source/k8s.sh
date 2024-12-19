@@ -217,6 +217,6 @@ complete -F _complete_pod k8s.pod_netns_enter
 if [[ $(basename $SHELL) == zsh ]]; then
     # get zsh complete kubectl
     source <(command kubectl completion zsh)
-    compdef k=kubectl
     compdef kubecolor=kubectl
+    # compdef k=kubectl
 fi

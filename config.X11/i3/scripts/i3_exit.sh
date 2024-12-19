@@ -18,7 +18,14 @@ case "$select" in
         loginctl list-sessions -o json | jq -r .[].session | xargs loginctl terminate-session
         ;;
     suspend)
-        nmcli radio wifi off && \
+        # need root
+        # nmcli radio wifi off && \
+        #
+        # dbus list
+        # busctl introspect org.freedesktop.NetworkManager /org/freedesktop/NetworkManager
+        dbus-send --system --print-reply --dest=org.freedesktop.NetworkManager /org/freedesktop/NetworkManager \
+            org.freedesktop.DBus.Properties.Set string:'org.freedesktop.NetworkManager' string:'WirelessEnabled' variant:boolean:false
+
         lock && \
         systemctl suspend
         ;;
