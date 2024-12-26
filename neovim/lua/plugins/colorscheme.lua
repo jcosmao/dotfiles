@@ -22,7 +22,7 @@ function M.lazy_config()
                 G.gruvbox_material_colors_override = {
                     bg0 = { '#f9efd5', '230' },
                     bg1 = { '#f7e2c6', '230' },
-                    bg2 = { '#f3e2d3', '230' },
+                    bg2 = { '#f3ddc1', '230' },
                     bg3 = { '#ecd7b1', '230' },
                     bg4 = { '#eed8b7', '223' },
                     bg5 = { '#e6d2b0', '230' },

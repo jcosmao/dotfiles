@@ -10,3 +10,5 @@ if [[ $repo == "dotfiles" ]]; then
         git checkout -- ~/.dotfiles/shell/bashrc
     } 2>&1 > /dev/null
 fi
+
+exit 0
