@@ -106,8 +106,8 @@ function sshlog {
         LOGCMD="timeout 600 tail -v $TAILOPTS ${log_files[@]}"
     fi
 
+    piped_cmd=""
     if [[ ${#SSH_PIPE_COMMAND[*]} > 0 ]]; then
-        piped_cmd=""
         for arg in "${SSH_PIPE_COMMAND[@]}"; do
             [[ "$arg" == grep ]]  && piped_cmd="$piped_cmd grep --line-buffered" && continue
             which "$arg" &> /dev/null && piped_cmd="$piped_cmd $arg" && continue
@@ -115,7 +115,10 @@ function sshlog {
             piped_cmd="$piped_cmd \"$arg\""
         done
         LOGCMD="$LOGCMD | cut -b 1-5000 | $piped_cmd"
+    else
+        LOGCMD="$LOGCMD | cut -b 1-5000"
     fi
+
 
     >&2 echo "│"
     >&2 echo "│    Host:   $search_hosts"
