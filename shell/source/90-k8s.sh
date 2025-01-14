@@ -7,11 +7,9 @@ elif [[ -r /etc/rancher/k3s/k3s.yaml ]]; then
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 fi
 
-which kubecolor &> /dev/null && \
-    alias kubectl=kubecolor && \
-    export KUBECOLOR_OBJ_FRESH="2m"
+export KUBECOLOR_OBJ_FRESH="2m"
 
-function k {
+function kub {
     local OPT=()
     local PLUGIN_OPT=()
 
@@ -30,7 +28,12 @@ function k {
         PLUGIN_OPT+=("--dry-run=client")
     fi
 
-    kubectl ${OPT[@]} $* ${PLUGIN_OPT[@]}
+    which kubecolor &> /dev/null
+    if [[ $? -eq 0 ]]; then
+        command kubecolor ${OPT[@]} $* ${PLUGIN_OPT[@]}
+    else
+        command kubectl ${OPT[@]} $* ${PLUGIN_OPT[@]}
+    fi
 }
 
 function argo {
@@ -74,7 +77,7 @@ complete -F _complete_kns knsc
 function k8s.list_containers_by_pod {
     {
         >&2 echo -n "POD\tCONTAINER\tSTATE\tSTARTED\tRESTARTS\tPOD_IP\tNODE\tNODE_IP\n";
-        k get pods -o json | \
+        kub get pods -o json | \
             jq -r --arg RED "$(tput setaf 1)" --arg RES "$(tput sgr0)" --arg GREEN "$(tput setaf 2)" --arg BLUE "$(tput setaf 4)" --arg MAGENTA "$(tput setaf 5)" --arg GREY "$(tput setaf 8)" \
             '.items[] | .metadata.name as $pod_name |  .spec.nodeName as $node | .status.hostIP as $nodeip | .status.podIP as $podip | .status.containerStatuses[] | [
                 $GREEN + $pod_name + $RES,
@@ -97,14 +100,14 @@ function k8s.list_containers_by_pod {
 }
 
 function k8s.list_running_containers_by_pod_with_labels {
-    k get pods \
+    kub get pods \
         --field-selector=status.phase=Running \
         -o="custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,INIT-CONTAINERS:.spec.initContainers[*].name,CONTAINERS:.spec.containers[*].name,LABELS:.metadata.labels" \
         $*
 }
 
 function k8s.get_requests_limits {
-    k get pods \
+    kub get pods \
         -o custom-columns="Name:metadata.name,CPU-request:spec.containers[*].resources.requests.cpu,CPU-limit:spec.containers[*].resources.limits.cpu,MEM-request:spec.containers[*].resources.requests.memory,MEM-limit:spec.containers[*].resources.limit.memory" \
         $*
 }
@@ -115,7 +118,7 @@ function k8s.top_node {
         return
     fi
     node=$1
-    k top pods -A --sort-by cpu --containers=true | \
+    kub top pods -A --sort-by cpu --containers=true | \
         grep --color=never -E $(k get pods -A -o="custom-columns=NAME:.metadata.name" --field-selector=spec.nodeName=${node} --no-headers | paste -d'|' -s)
 }
 
@@ -128,8 +131,8 @@ function k8s.exec {
         k8s.list_containers_by_pod
         return
     fi
-    [[ $type == "cmd" ]] && k exec -t $*
-    [[ $type == "shell" ]] && k exec -it $* -- sh
+    [[ $type == "cmd" ]] && kub exec -t $*
+    [[ $type == "shell" ]] && kub exec -it $* -- sh
 }
 
 function k8s.get_ns_logs {
@@ -137,30 +140,30 @@ function k8s.get_ns_logs {
 }
 
 function k8s.get_port_forwarding {
-    k get svc -o json -A | jq '.items[] | {name:.metadata.name, p:.spec.ports[] } | select( .p.nodePort != null ) | "\(.name): localhost:\(.p.nodePort) -> \(.p.port) -> \(.p.targetPort)"'
+    kub get svc -o json -A | jq '.items[] | {name:.metadata.name, p:.spec.ports[] } | select( .p.nodePort != null ) | "\(.name): localhost:\(.p.nodePort) -> \(.p.port) -> \(.p.targetPort)"'
 }
 
 function k8s.get_all_resources {
     if [[ $1 == all ]]; then
         shift
-        k get deploy,replicaset,statefulset,pod,pvc,cm,secret,svc,$(k api-resources --verbs=list --namespaced -o name | grep -v events | sort | paste -d, -s) $*
+        kub get deploy,replicaset,statefulset,pod,pvc,cm,secret,svc,$(k api-resources --verbs=list --namespaced -o name | grep -v events | sort | paste -d, -s) $*
     else
-        k get deploy,replicaset,statefulset,pod,pvc,cm,secret,svc,$(k api-resources --verbs=list --namespaced -o name | grep ingress | sort | paste -d, -s) $*
+        kub get deploy,replicaset,statefulset,pod,pvc,cm,secret,svc,$(k api-resources --verbs=list --namespaced -o name | grep ingress | sort | paste -d, -s) $*
     fi
 }
 
 function k8s.delete_all_resources {
-    k delete $(k api-resources --verbs=list --namespaced -o name | grep -v events | sort | paste -d, -s) --dry-run=client --all
+    kub delete $(k api-resources --verbs=list --namespaced -o name | grep -v events | sort | paste -d, -s) --dry-run=client --all
     [[ $SHELL =~ zsh ]] && vared -p 'Delete all ? [yes] ' -c response || read -r -p 'Delete all ? [yes] ' response
     if [[ $response = "yes" ]]; then
-        k delete $(k api-resources --verbs=list --namespaced -o name | grep -v events | sort | paste -d, -s) --all --dry-run=none
+        kub delete $(k api-resources --verbs=list --namespaced -o name | grep -v events | sort | paste -d, -s) --all --dry-run=none
     fi
 }
 
 function k8s.get_decrypted_secret {
     secret=$1
     [[ $secret =~ ^secret/ ]] && secret=$(echo $secret | cut -d'/' -f2-)
-    k get secret $secret -o json | jq '.data | map_values(@base64d)'
+    kub get secret $secret -o json | jq '.data | map_values(@base64d)'
 }
 
 function _complete_ksec
@@ -183,15 +186,15 @@ function k8s.pod_netns_enter {
 }
 
 function k8s.get_last_traefik_config {
-    k logs  -l app.kubernetes.io/name=traefik  --tail 10000 --follow=false | grep 'Configuration received:' | sed -e 's/\\//g' -re 's/.*Configuration received: (.*)\".*/\1/'
+    kub logs  -l app.kubernetes.io/name=traefik  --tail 10000 --follow=false | grep 'Configuration received:' | sed -e 's/\\//g' -re 's/.*Configuration received: (.*)\".*/\1/'
 }
 
 # alias k="k8s.kubectl"
 alias kns="k8s.set_shell_namespace"
 alias kunset="k8s.unset_shell_namespace"
 alias knsc="k8s.set_context_namespace"
-alias kgp="k get pods -o wide"
-alias kgps="k get pods -o wide --sort-by=.metadata.creationTimestamp"
+alias kgp="kub get pods -o wide"
+alias kgps="kub get pods -o wide --sort-by=.metadata.creationTimestamp"
 alias kgc="k8s.list_containers_by_pod"
 alias ks="k8s.exec shell"
 alias kx="k8s.exec cmd"
@@ -200,6 +203,7 @@ alias kg="k8s.get_all_resources"
 alias ksec="k8s.get_decrypted_secret"
 alias knet="k8s.pod_netns_enter"
 alias crictl="k3s crictl"
+alias k=kub
 
 function _complete_pod
 {
@@ -218,5 +222,5 @@ if [[ $(basename $SHELL) == zsh ]]; then
     # get zsh complete kubectl
     source <(command kubectl completion zsh)
     compdef kubecolor=kubectl
-    # compdef k=kubectl
+    compdef k=kubectl
 fi
