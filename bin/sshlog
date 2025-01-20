@@ -37,7 +37,7 @@ function cleanup {
     # >&2 echo "│ Cleanup function: ${1:-end}"
     # ps xao user,pid,pgid,sid,user,cmd | grep -P '(sshlog|tail)'
     # Clean ssh subprocess if still there
-    tokill=($($SUDO pgrep --list-full -g $current_pgid -s $current_sid | grep -E "ssh -o" | awk '{print $1}' | xargs))
+    tokill=($($SUDO pgrep --list-full -g $current_pgid -s $current_sid | grep -E "SCRIPT=sshlog" | awk '{print $1}' | xargs))
     if [[ ${#tokill[*]} > 0 ]]; then
         # >&2 echo "│ kill -9 ${tokill[*]}"
         $SUDO kill -9 ${tokill[*]} 2> /dev/null || true
@@ -101,9 +101,9 @@ function sshlog {
            exit 1
         fi
         CMD=$(echo ${log_files[@]} | sed -e 's/^cmd://')
-        LOGCMD="echo '==> $CMD <==' ; timeout 600 $CMD $TAILOPTS"
+        LOGCMD="echo '==> $CMD <==' ; SCRIPT=sshlog timeout 600 $CMD $TAILOPTS"
     else
-        LOGCMD="timeout 600 tail -v $TAILOPTS ${log_files[@]}"
+        LOGCMD="SCRIPT=sshlog timeout 600 tail -v $TAILOPTS ${log_files[@]}"
     fi
 
     piped_cmd=""
@@ -114,9 +114,9 @@ function sshlog {
             [[ "$arg" =~ ^\- ]] && piped_cmd="$piped_cmd $arg" && continue
             piped_cmd="$piped_cmd \"$arg\""
         done
-        LOGCMD="$LOGCMD | cut -b 1-5000 | $piped_cmd"
+        LOGCMD="$LOGCMD | $piped_cmd | stdbuf -o0 cut -b 1-5000"
     else
-        LOGCMD="$LOGCMD | cut -b 1-5000"
+        LOGCMD="$LOGCMD | stdbuf -o0 cut -b 1-5000"
     fi
 
 
@@ -234,7 +234,7 @@ function main {
     if [[ $CAT -eq 1 && -z $TAILLINES ]]; then
         export TAILLINES="+1"
     elif [[ $CAT -eq 0 ]]; then
-        export TAILOPTS="$TAILOPTS -f"
+        export TAILOPTS="$TAILOPTS -n 0 -f"
     fi
 
     if [[ -n $TAILLINES ]]; then
