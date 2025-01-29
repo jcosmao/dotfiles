@@ -31,10 +31,10 @@ end
 
 local function get_rg_file_list_prefix()
     local project_root = G.project_root
-    local file_list = '.*'
+    local file_list = 'rg --files *'
+    local project_file_list = string.format("%s/.project/file_list", project_root)
 
-    if project_root then
-        local project_file_list = string.format("%s/.project/file_list", project_root)
+    if FileExists(project_file_list) then
         local content = ReadFile(project_file_list)
         if content then file_list = content[1] end
     end
