@@ -32,7 +32,7 @@ vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter", "TabEnter", "BufWritePost"
     end
 })
 
-vim.api.nvim_create_autocmd({ "VimEnter", "WinEnter", "BufEnter" }, {
+vim.api.nvim_create_autocmd({ "VimEnter", "WinEnter", "BufEnter", "InsertEnter" }, {
     pattern = "*",
     callback = function()
         AutoColorColumn()

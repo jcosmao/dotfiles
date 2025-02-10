@@ -145,7 +145,7 @@ function AutoColorColumn()
         end
 
         -- Force 79 char max for openstack projects
-        if vim.loop.fs_stat(G.git_root .. '/.gitreview') then
+        if FileExists(G.git_root .. '/.gitreview') then
             vim.o.colorcolumn = "79"
             return
         end
