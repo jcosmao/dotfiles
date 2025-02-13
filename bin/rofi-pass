@@ -452,7 +452,7 @@ mainMenu () {
 		unset selected_password
 
         helper="<small><b>copy user:</b> ${copy_name}   <b>|  type user:</b> ${type_user}  <b>|  copy pass:</b> ${copy_pass}   <b>|  type pass:</b> ${type_pass}
-<b>show:</b>      ${show}        <b>|  menu:</b>      ${action_menu}     <b>|  insert:</b>  ${insert_pass} </small>"
+<b>show:</b>      ${show}        <b>|  menu:</b>      ${action_menu}      <b>|  insert:</b>  ${insert_pass}           <b>|  type otp:  </b> ${type_otp} </small>"
 
 		args=( -dmenu
 			-kb-custom-1 "${autotype}"

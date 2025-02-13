@@ -13,13 +13,9 @@ function is_openstack_repo {
 }
 
 if [[ -n $issue ]]; then
-    if cat $1 | grep -Pq '^(Issue|Ovh-Related-Task): \w+-\d+'; then
+    if cat $1 | grep -Piq '^(Jira|Issue|Ovh-Related-Task): \w+-\d+'; then
         exit 0
     else
-        if is_openstack_repo; then
-            echo -e "\nOvh-Related-Task: $issue" >> $1
-        else
-            echo -e "\nIssue: $issue" >> $1
-        fi
+        echo -e "\nIssue: $issue" >> $1
     fi
 fi

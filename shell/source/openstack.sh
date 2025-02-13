@@ -19,7 +19,7 @@ function os {
         shift; set -- "baremetal" "${@:1}"
     elif [[ $1 == "sg" ]]; then
         shift; set -- "security group" "${@:1}"
-    elif [[ $1 == "srv" ]]; then
+    elif [[ $1 == "srv" || $1 == "s" ]]; then
         shift; set -- "server" "${@:1}"
         [[ $2 == "show" ]] && PIPE_CMD=openstack.server_show_jq_filter
     fi
@@ -37,7 +37,7 @@ function os {
 function openstack.server_show_jq_filter
 {
     # recent version of openstackcli duplicate all entries
-    jq 'with_entries(select(.key | test("^(access_ipv4|access_ipv6|addresses|availability_zone|compute_host|config_drive|created_at|disk_config|fault|flavor|host_status|hypervisor_hostname|id|image|instance_name|key_name|launched_at|locked|name|power_state|project_id|public_v4|public_v6|ramdisk_id|reservation_id|root_device_name|scheduler_hints|security_groups|server_groups|status|tags|task_state|updated_at|user_data|user_id|vm_state|volumes_attached)$") ))'
+    jq 'with_entries(select(.key | test("^(addresses|availability_zone|compute_host|config_drive|created_at|disk_config|fault|flavor|host_status|hypervisor_hostname|id|image|instance_name|key_name|launched_at|locked|name|power_state|project_id|public_v4|public_v6|ramdisk_id|reservation_id|root_device_name|scheduler_hints|security_groups|server_groups|status|tags|task_state|updated_at|user_id|vm_state|volumes_attached)$") ))'
 }
 
 function openstack.install_completion {
