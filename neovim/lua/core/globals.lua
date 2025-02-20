@@ -64,6 +64,7 @@ function LoadVimscript(file)
         vim.cmd("source " .. file_path)
     end
 end
+
 --
 
 local function gen_special_filetypes()
@@ -132,5 +133,3 @@ function GetCurrentDir()
 
     return path
 end
-
-

@@ -174,3 +174,7 @@ function Startify()
     vim.cmd("Startify")
     vim.cmd("only")
 end
+
+function TruncateLspLog()
+    vim.fn.system([[echo "$(tail -2000 ~/.local/state/nvim/lsp.log)" > $HOME/.local/state/nvim/lsp.log]])
+end

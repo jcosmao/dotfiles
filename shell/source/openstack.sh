@@ -100,7 +100,7 @@ function openstack.port_list
     elif [[ $1 =~ ^([0-9a-f]{2}:){5} ]] ; then
         os port list --long --mac-address $1
     else
-        os port list --long --device-id $1
+        os port list --long --device-id $1 || os port show $1
     fi
 }
 

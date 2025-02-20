@@ -211,3 +211,11 @@ vim.api.nvim_create_autocmd('ModeChanged', {
     end
   end
 })
+
+vim.api.nvim_create_autocmd('VimLeave', {
+    callback = function()
+        TruncateLspLog()
+    end,
+})
+
+

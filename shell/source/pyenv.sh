@@ -84,16 +84,15 @@ function pyenv.setup_pyright
     VENV=$(basename $VIRTUAL_ENV)
     VENVPATH=$(dirname $VIRTUAL_ENV)
 
-    # "reportUnboundVariable": "warning",
-    # "reportPossiblyUnboundVariable": "information",
-    # "reportOptionalMemberAccess": "information",
-    # "reportAttributeAccessIssue": "information",
-    # "typeCheckingMode": "standard"
-
     echo '{
         "venvPath": "VENVPATH",
-        "venv": "VENV"
-    }' | sed "s,VENVPATH,$VENVPATH," | sed "s,VENV,$VENV," | jq > pyrightconfig.json
+        "venv": "VENV",
+        "typeCheckingMode": "standard",
+        "reportUnboundVariable": "warning",
+        "reportPossiblyUnboundVariable": "information",
+        "reportOptionalMemberAccess": "information",
+        "reportAttributeAccessIssue": "information"
+    }' | sed "s,VENVPATH,$VENVPATH," | sed "s,VENV,$VENV," | jq > "$(git rev-parse --show-toplevel 2> /dev/null)/pyrightconfig.json"
 }
 
 function pyenv.setup

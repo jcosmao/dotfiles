@@ -5,17 +5,25 @@ local lsp = {
     pyright = {
         settings = {
             pyright = {
+                disableOrganizeImports = true,
+                disableTaggedHints = false,
+            },
+            python = {
                 analysis = {
+                    typeCheckingMode = "basic",
+                    autoSearchPaths = true,
+                    diagnosticMode = "openFilesOnly",
+                    useLibraryCodeForTypes = true,
                     diagnosticSeverityOverrides = {
-                        typeCheckingMode = "standard",
+                        -- https://github.com/microsoft/pyright/blob/main/docs/configuration.md#type-check-diagnostics-settings
                         reportUnboundVariable = "warning",
                         reportPossiblyUnboundVariable = "information",
                         reportOptionalMemberAccess = "information",
                         reportAttributeAccessIssue = "information",
-                    }
-                }
-            }
-        }
+                    },
+                },
+            },
+        },
     },
     jsonls = {},
     yamlls = {},
@@ -57,7 +65,6 @@ local lsp = {
     markdown_oxide = {
         filetypes = { 'markdown' },
     },
-
     -- shfmt = {},
     -- mypy = {},
     -- isort = {},
