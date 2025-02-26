@@ -17,6 +17,10 @@ function append_path () {
     esac
 }
 
+function date_millisecond {
+    echo -n $(( $(date +%s%N) / 1000000 ))
+}
+
 function common.get_sourceable_bash_files_ordered
 {
     # skip /etc/profile
@@ -37,9 +41,14 @@ function is_already_sourced
 
 function common.source
 {
+    start=$(date_millisecond)
+
     for target in $*; do
         is_already_sourced $target && echo "$target already sourced" && continue
         builtin source $target
         SOURCE+=("$target")
     done
+
+    end=$(date_millisecond)
+    [[ -f ~/.zsh_debug ]] && echo "[DEBUG] ($(( end - start )) ms) common.source $*"
 }

@@ -86,11 +86,29 @@ if [[ -d ~/.os_openrc ]]; then
         done
     )}
 
-    for openrc in $(ls ~/.os_openrc | grep -P '.openrc$'); do
-        name=$(echo $openrc | sed -e 's/.openrc$//' | tr '[:upper:]' '[:lower:]')
+    function cr () {
+        cr=$1
+        openstack.unset_env
+        openrc=$(ls ~/.os_openrc | grep -P '.openrc$' | grep -i $cr)
         region=$(echo $openrc | sed -re 's/(.*)__.*/\1/' | tr '[:lower:]' '[:upper:]')
-        alias cr_${name}="openstack.unset_env; source ~/.os_openrc/$openrc; export OS_REGION_NAME=${region}"
-    done
+
+        source ~/.os_openrc/$openrc
+        export OS_REGION_NAME=$region
+    }
+
+    function list_cr () {
+        for openrc in $(ls ~/.os_openrc | grep -P '.openrc$'); do
+            echo $openrc | sed -e 's/.openrc$//' | tr '[:upper:]' '[:lower:]'
+        done
+    }
+
+    function _complete_cr
+    {
+        local word=${COMP_WORDS[1]}
+        COMPREPLY=($(list_cr | grep -Pi "^${word}"))
+    }
+
+    complete -F _complete_cr cr
 fi
 
 function openstack.port_list

@@ -9,7 +9,7 @@ function agent.launch_ssh_agent
     ssh_agent_cmd="ssh-agent -s -t 36000"
     agent_pid=$(pgrep ssh-agent -u $USER -n)
 
-    if [[ -z $agent_pid && -n $SSH_AUTH_SOCK && -S $SSH_AUTH_SOCK  ]]; then
+    if [[ -z $agent_pid && $SSH_TTY && -n $SSH_AUTH_SOCK && -S $SSH_AUTH_SOCK ]]; then
         # SSH agent forwarded, nothing to spawn
         return
     fi
@@ -49,10 +49,14 @@ function agent.launch_ssh_agent
 }
 
 if [[ -z $SSH_TTY ]]; then
-    agent.launch_ssh_agent
     if [[ $SHELL =~ zsh ]]; then
         export PERIOD=120
         autoload -U add-zsh-hook
         add-zsh-hook periodic "agent.launch_ssh_agent"
+
+        # launch ssh-agent at shell startup if it is not running yet, else use async mechanism
+        pgrep ssh-agent &> /dev/null || agent.launch_ssh_agent
+    else
+        agent.launch_ssh_agent
     fi
 fi
