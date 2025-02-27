@@ -1,6 +1,8 @@
 # vim: set ft=sh:
+#
+[[ -f ~/.zsh_debug ]] && export ZSH_DEBUG=1
 
-[[ -f ~/.zsh_debug ]] && zmodload zsh/zprof
+[[ $ZSH_DEBUG -eq 1 ]] && zmodload zsh/zprof
 
 source $HOME/.shell/common.sh
 is_already_sourced zshrc && return || SOURCE+=("zshrc")
@@ -22,4 +24,4 @@ source ~/.zsh/myzsh/plugins/wd/*.zsh
 source ~/.zsh/blox-zsh-theme/blox.zsh
 source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
-[[ -f ~/.zsh_debug ]] && zprof
+[[ $ZSH_DEBUG -eq 1 ]] && zprof

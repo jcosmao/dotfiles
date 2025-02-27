@@ -41,14 +41,12 @@ function is_already_sourced
 
 function common.source
 {
-    start=$(date_millisecond)
-
     for target in $*; do
-        is_already_sourced $target && echo "$target already sourced" && continue
+        is_already_sourced $target && >&2 echo "$target already sourced" && continue
+        [[ $ZSH_DEBUG -eq 1 ]] && start=$(date_millisecond)
         builtin source $target
+        end=$(date_millisecond)
+        [[ $ZSH_DEBUG -eq 1 ]] && >&2 echo "[DEBUG] ($(( end - start )) ms) common.source $target"
         SOURCE+=("$target")
     done
-
-    end=$(date_millisecond)
-    [[ -f ~/.zsh_debug ]] && echo "[DEBUG] ($(( end - start )) ms) common.source $*"
 }

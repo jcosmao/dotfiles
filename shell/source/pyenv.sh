@@ -12,10 +12,10 @@ function pyenv.load
     if [[ -d $PYENV_ROOT ]]; then
         if [[ -f $PYENV_ROOT/bin/pyenv ]]; then
             [[ $PATH =~ .*${PYENV_ROOT}.* ]] || path.prepend $PYENV_ROOT/bin
-            eval "$(pyenv init -)"
+            eval "$(pyenv init - $(basename $SHELL))"
             # https://github.com/pyenv/pyenv-virtualenv/issues/259#issuecomment-1096144748
             eval "$(pyenv virtualenv-init - | sed s/precmd/chpwd/g)"
-            _pyenv_virtualenv_hook
+            # _pyenv_virtualenv_hook
         fi
         export PYENV_VIRTUALENV_DISABLE_PROMPT=1
     else
