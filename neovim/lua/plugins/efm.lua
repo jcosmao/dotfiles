@@ -10,7 +10,7 @@ local sh_fmt = {
 local sh_lint = {
     lintSource = 'efm/shellcheck',
     lintCommand = 'shellcheck -f gcc -x -',
-    lintStdin = true ,
+    lintStdin = true,
     lintFormats = { '%f:%l:%c: %trror: %m', '%f:%l:%c: %tarning: %m', '%f:%l:%c: %tote: %m' },
 }
 
@@ -59,6 +59,12 @@ local pylint = {
     rootMarkers = {},
 }
 
+-- https://github.com/acrn/puppet-fmt
+local puppet_fmt = {
+    formatCommand = 'puppet-fmt -i ${INPUT}',
+    formatStdin = true
+}
+
 M.settings = {
     version = 2,
     languages = {
@@ -69,6 +75,7 @@ M.settings = {
         markdown = { prettier_fmt, markdown_lint },
         json = { prettier_fmt },
         yaml = { prettier_fmt },
+        puppet = { puppet_fmt },
     },
     rootMarkers = { '.git/' },
 }

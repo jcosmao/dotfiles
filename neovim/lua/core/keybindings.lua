@@ -113,7 +113,11 @@ function LspKeymap()
     vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, opts)
     vim.keymap.set('n', '<leader>0', vim.lsp.buf.code_action, opts)
     vim.keymap.set('n', '<leader>9', vim.lsp.codelens.run, opts)
-    vim.keymap.set('n', '<leader>F', function() vim.lsp.buf.format { async = true } end, opts)
+    vim.keymap.set('n', '<leader>F', function()
+        vim.cmd('w!')
+        vim.lsp.buf.format { async = false }
+        vim.cmd('e!')
+    end, opts)
     vim.keymap.set('n', '<leader>u', vim.lsp.buf.declaration, opts)
     vim.keymap.set('n', '<leader>i', vim.lsp.buf.implementation, opts)
 end
