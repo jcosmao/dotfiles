@@ -1,4 +1,5 @@
 export CLIFF_FIT_WIDTH=1
+export OS_COMPUTE_API_MIN_VERSION=${OS_COMPUTE_API_MIN_VERSION:-"2.72"}
 
 function os {
     JSON=1
@@ -29,7 +30,9 @@ function os {
 
     EXTRA_OPTS=()
     # Require at least 2.24 to get migration id + abort
-    [[ "$*" =~ (server migration) ]] && EXTRA_OPTS+=("--os-compute-api-version" "2.24")
+    # Require 2.30 to specify --host
+    # [[ "$*" =~ (server migration) ]] && EXTRA_OPTS+=("--os-compute-api-version" "2.30")
+    EXTRA_OPTS+=("--os-compute-api-version" "$OS_COMPUTE_API_MIN_VERSION")
 
     openstack "${EXTRA_OPTS[@]}" $* "${APPEND_OPTS[@]}" | $PIPE_CMD
 }
@@ -136,39 +139,6 @@ function openstack.get_snat
 }
 
 alias osnat="openstack.get_snat"
-
-function openstack.log_color
-{(
-    cmd=${1:-tail}; shift
-    opts=("$@")
-
-    tail_opts=()
-    os_files=()
-    for f in ${opts[@]}; do
-        if [[ -e $f ]]; then
-            os_files+=($f)
-            shift
-        else
-            if [[ ${#os_files[@]} == 0 ]]; then
-                tail_opts+=($f)
-                shift
-            fi
-        fi
-    done
-
-    if [[ ${#os_files[@]} == 0 ]]; then
-        echo "Need to pass valid files in args..."
-        return 1
-    fi
-
-    os_opts=$*
-
-    [[ $cmd == "less" ]] && cat ${os_files[@]} | ~/.local/bin/oslog $os_opts | less -R
-    [[ $cmd == "tail" ]] && tail ${tail_opts[@]} -F ${os_files[@]} | ~/.local/bin/oslog $os_opts
-)}
-
-alias otail="openstack.log_color tail"
-alias olog="openstack.log_color less"
 
 function openstack.help_stestr
 {
