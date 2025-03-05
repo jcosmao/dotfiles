@@ -16,12 +16,12 @@ tp_fan /proc/acpi/ibm/fan
 $(find /sys/devices -type f -name 'temp*_input' | while read f; do cat $f > /dev/null && echo hwmon $f;done 2> /dev/null)
 
 # level  temp_min   temp_max
-(0,     0,      42)
-(1,     40,     47)
-(2,     45,     52)
-(3,     50,     57)
-(4,     55,     62)
-(5,     60,     77)
+(0,     0,      48)
+(1,     45,     52)
+(2,     48,     55)
+(3,     52,     60)
+(4,     58,     65)
+(5,     62,     77)
 (7,     73,     93)
 (127,   85,     32767)
 " > $CONF

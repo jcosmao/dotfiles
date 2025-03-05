@@ -32,17 +32,17 @@ function agent.launch_ssh_agent
 
     sshadd_out=$(ssh-add -l 2> /dev/null); rc=$?
     sshadd_len=$(echo $sshadd_out | wc -l)
-    lspub_len=$(ls ~/.ssh/*.pub | wc -l)
+    lspub_len=$(ls ~/.ssh/*.pub 2> /dev/null | wc -l)
 
     # no ssh-agent running
     if [[ $rc == 2 ]]; then
         # Try to export ssh-agent env
         (umask 066; eval "$ssh_agent_cmd" >| ~/.ssh-agent)
         eval "$(<~/.ssh-agent)" >/dev/null
-        ssh-add $(ls ~/.ssh/*.pub | sed -re 's/\.pub$//') 2> /dev/null
+        ssh-add $(ls ~/.ssh/*.pub 2> /dev/null | sed -re 's/\.pub$//') 2> /dev/null
     elif [[ $rc == 1 || ($rc == 0 && $sshadd_len < $lspub_len) ]]; then
         # Add default ssh-key to agent cache
-        ssh-add $(ls ~/.ssh/*.pub | sed -re 's/\.pub$//') 2> /dev/null
+        ssh-add $(ls ~/.ssh/*.pub 2> /dev/null | sed -re 's/\.pub$//') 2> /dev/null
     else
         return
     fi
