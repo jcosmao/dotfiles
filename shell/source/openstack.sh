@@ -1,5 +1,4 @@
 export CLIFF_FIT_WIDTH=1
-export OS_COMPUTE_API_MIN_VERSION=${OS_COMPUTE_API_MIN_VERSION:-"2.72"}
 
 function os {
     JSON=1
@@ -32,7 +31,7 @@ function os {
     # Require at least 2.24 to get migration id + abort
     # Require 2.30 to specify --host
     # [[ "$*" =~ (server migration) ]] && EXTRA_OPTS+=("--os-compute-api-version" "2.30")
-    EXTRA_OPTS+=("--os-compute-api-version" "$OS_COMPUTE_API_MIN_VERSION")
+    EXTRA_OPTS+=("--os-compute-api-version" "${OS_COMPUTE_API_MIN_VERSION:-"2.72"}")
 
     openstack "${EXTRA_OPTS[@]}" $* "${APPEND_OPTS[@]}" | $PIPE_CMD
 }
