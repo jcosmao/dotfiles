@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# bluetoothctl devices
+
+MAC=$1
+
+if [[ -z $MAC ]]; then
+    echo "
+    $0 <MAC bluetooth device>
+    "
+    bluetoothctl devices
+fi
+
+bluetoothctl scan on
+bluetoothctl remove "$MAC"
+bluetoothctl trust "$MAC"
+bluetoothctl pair "$MAC"
+bluetoothctl connect "$MAC"

@@ -13,11 +13,67 @@
 	helper = store
 
 [branch]
+    sort = -committerdate
     autosetupmerge = true
     autosetuprebase = always
 
 [diff]
-    ignoreSubmodules = dirty
+    algorithm = histogram
+    colorMoved = plain
+    mnemonicPrefix = true
+    renames = true
+
+[fetch]
+    prune = true
+    pruneTags = true
+    all = true
+
+[pull]
+    rebase = true
+
+[push]
+    default = simple
+    autoSetupRemote = true
+    followTags = true
+
+[merge]
+	# Include summaries of merged commits in newly created merge commit messages
+    log = true
+    conflictstyle = zdiff3
+
+[rebase]
+    autostash = true
+    autoStash = true
+    updateRefs = true
+
+[commit]
+    verbose = true
+
+[apply]
+	# Detect whitespace errors when applying a patch
+    whitespace = fix
+
+[stash]
+    showPatch = true
+
+[help]
+    autocorrect = prompt
+
+[rerere]
+    enabled = true
+    autoupdate = true
+
+[trailer "sign"]
+    key = "Signed-off-by: "
+    command = 'echo "$(git config user.name) <$(git config user.email)>"'
+    ifexists = doNothing
+    ifmissing = doNothing
+
+[column]
+    ui = auto
+
+[tag]
+    sort = version:refname
 
 [color]
     ui = auto
@@ -39,29 +95,6 @@
     changed = green
     untracked = cyan
 
-[push]
-    default = current
-    followTags = false
-
-[merge]
-	# Include summaries of merged commits in newly created merge commit messages
-    log = true
-
-[apply]
-	# Detect whitespace errors when applying a patch
-    whitespace = fix
-
-[stash]
-    showPatch = true
-
-[help]
-    autocorrect = 0
-
-[trailer "sign"]
-    key = "Signed-off-by: "
-    command = 'echo "$(git config user.name) <$(git config user.email)>"'
-    ifexists = doNothing
-    ifmissing = doNothing
 
 [alias]
     aliases = config --get-regexp alias
