@@ -2,6 +2,7 @@
 
 # If not running interactively, don't do anything
 [[ -z "$PS1" ]] && return
+[[ -f "$HOME/.force_zsh" ]] && exec zsh && return
 
 source $HOME/.shell/common.sh
 is_already_sourced bashrc && return || SOURCE+=("bashrc")
