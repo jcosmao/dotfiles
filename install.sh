@@ -21,7 +21,7 @@ function install_neovim
 {
     release=$1
     echo "- Update neovim from $release"
-    wget "https://github.com/neovim/neovim/releases/download/$release/nvim.appimage" -O "$TMPDIR/nvim.appimage" 2> /dev/null ||
+    wget "https://github.com/neovim/neovim/releases/download/$release/nvim-linux-x86_64.appimage" -O "$TMPDIR/nvim.appimage" 2> /dev/null ||
         cp nvim/nvim.appimage "$TMPDIR"
     chmod +x "$TMPDIR/nvim.appimage"
     echo "  - install neovim under ~/.local/bin/nvim"
@@ -242,14 +242,6 @@ function install_fonts
     fi
 }
 
-function install_icons
-{
-    [[ $IS_SSH -eq 1 ]] && return
-    echo "- Install icons"
-    icons_dir="$HOME/.icons"
-    rm -rf "$icons_dir" && ln -sf "$SCRIPTPATH/icons" "$icons_dir"
-}
-
 function install_config
 {
     target=${1:-common}
@@ -276,6 +268,10 @@ function install_config
 
         for app in $(ls $SCRIPTPATH/config.${target}/applications/*.desktop); do
             ln -sf $app "$HOME/.local/share/applications/$(basename $app)"
+        done
+
+        for file in $(ls $SCRIPTPATH/config.${target}/dotfiles); do
+            ln -sf "$SCRIPTPATH/config.${target}/dotfiles/$file" "$HOME/.$file"
         done
     fi
 }
@@ -339,7 +335,6 @@ function main
 
             --ui | -x)
                 help="i3 cfg, icons, fonts"
-                install_icons
                 install_fonts
                 install_config X11
                 ;;
