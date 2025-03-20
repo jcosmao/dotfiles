@@ -2,15 +2,15 @@
 
 URGENT_VALUE=10
 
-state=$(acpi 2> /dev/null | grep Battery)
+state=$(acpi 2> /dev/null | grep Battery | grep -v "rate information unavailable")
 if [[ $? -ne 0 ]]; then
     # No battery
     exit 0
 fi
 
-power=$(echo $state | grep -Po '\d+(?=%)')
-charging_state=$(echo $state | grep -Po '(Charging|Discharging)')
-time_remaining=$(echo $state | grep -Po '[\d:]+(?=:\d+ (until charged|remaining))')
+power=$(echo "$state" | grep -Po '\d+(?=%)')
+charging_state=$(echo "$state" | grep -Po '(Not charging|Charging|Discharging)')
+time_remaining=$(echo "$state" | grep -Po '[\d:]+(?=:\d+ (until charged|remaining))')
 color=''
 
 if [[ "${power}" -gt 87 ]]; then
@@ -36,7 +36,10 @@ if [[ "${charging_state}" = "Discharging" ]]; then
     echo "${icon} ${power}%"
     [[ -n $color ]] && echo $color
 else
-    [[ $power -eq 100 ]] && echo " ${power}%" || \
-        echo " ${power}% |$time_remaining|"
+    [[ "${charging_state}" =~ (Not charging|Full) ]] \
+        && echo " ${power}%" \
+        || echo " ${power}% |$time_remaining|"
     echo " ${power}%"
 fi
+
+exit 0

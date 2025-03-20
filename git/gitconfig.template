@@ -63,12 +63,6 @@
     enabled = true
     autoupdate = true
 
-[trailer "sign"]
-    key = "Signed-off-by: "
-    command = 'echo "$(git config user.name) <$(git config user.email)>"'
-    ifexists = doNothing
-    ifmissing = doNothing
-
 [column]
     ui = auto
 

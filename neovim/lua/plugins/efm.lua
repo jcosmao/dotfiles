@@ -27,8 +27,8 @@ local terraform_fmt = {
 local python_isort = {
     formatCommand = [[
         test -f $(git -C $(dirname ${INPUT}) rev-parse --show-toplevel 2> /dev/null)/.gitreview &&
-        isort --quiet --lines-after-imports 2 -l 79 --profile open_stack - ||
-        isort --quiet -
+        isort --quiet --lines-after-imports 2 -l 79 --profile open_stack ${INPUT} ||
+        isort --quiet ${INPUT}
     ]],
     formatStdin = true,
 }
