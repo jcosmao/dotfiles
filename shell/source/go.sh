@@ -1,3 +1,4 @@
+
 function go.install
 {(
     version=$1
@@ -20,6 +21,9 @@ function go.install
     export GOPATH="$HOME/go"
 
 which go &> /dev/null || return
+
+# do not depends on glibc
+export CGO_ENABLED=0
 
 function go.test
 {
