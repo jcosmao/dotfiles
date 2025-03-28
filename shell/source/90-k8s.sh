@@ -29,7 +29,7 @@ function kub {
     fi
 
     which kubecolor &> /dev/null
-    if [[ $? -eq 0 ]]; then
+    if [[ $? -eq 0 && ! $1 =~ (debug) ]]; then
         command kubecolor ${OPT[@]} $* ${PLUGIN_OPT[@]}
     else
         command kubectl ${OPT[@]} $* ${PLUGIN_OPT[@]}
