@@ -32,6 +32,7 @@ function kub {
     if [[ $? -eq 0 && ! $1 =~ (debug) ]]; then
         command kubecolor ${OPT[@]} $* ${PLUGIN_OPT[@]}
     else
+        [[ $* =~ .*kubecolor-stdin.* ]] && tee && return
         command kubectl ${OPT[@]} $* ${PLUGIN_OPT[@]}
     fi
 }
@@ -76,27 +77,65 @@ complete -F _complete_kns knsc
 
 function k8s.list_containers_by_pod {
     {
-        >&2 echo -n "POD\tCONTAINER\tSTATE\tSTARTED\tRESTARTS\tPOD_IP\tNODE\tNODE_IP\n";
-        kub get pods -o json | \
-            jq -r --arg RED "$(tput setaf 1)" --arg RES "$(tput sgr0)" --arg GREEN "$(tput setaf 2)" --arg BLUE "$(tput setaf 4)" --arg MAGENTA "$(tput setaf 5)" --arg GREY "$(tput setaf 8)" \
-            '.items[] | .metadata.name as $pod_name |  .spec.nodeName as $node | .status.hostIP as $nodeip | .status.podIP as $podip | .status.containerStatuses[] | [
-                $GREEN + $pod_name + $RES,
+        echo -n "${BOLD}NAME\t${BOLD}${WHITE}CONTAINER${NORMAL}\t${BOLD}STATUS\tRESTARTS\tLAST\tAGE\tIP\tNODE\tNODE_IP${NORMAL}\n";
+        {
+            kub get pods -o json | \
+            jq -r --arg RES "$NORMAL" --arg BLUE "$BLUE" --arg current_date "$(date +%s)" \
+            '.items[] | .metadata.name as $pod_name |
+                        .spec.nodeName as $node |
+                        .status.hostIP as $nodeip |
+                        .status.podIP as $podip |
+                        .metadata.creationTimestamp as $pod_created |
+                        .metadata.deletionTimestamp as $pod_deleted |
+                        .status.containerStatuses[] | [
+                "pod/" + $pod_name,
                 $BLUE + .name + $RES,
                 (
-                  if .state.waiting then $RED + (.state.waiting.reason // "Waiting") + $RES
-                  elif (.state.terminated and .state.terminated.reason == "Completed") then $MAGENTA + .state.terminated.reason + $RES
-                  elif .state.terminated then $RED + (.state.terminated.reason // "Terminated") + $RES
-                  elif .state.running then $GREEN + "Running" + $RES
-                  else $MAGENTA + "Unknown" + $RES
-                  end
+                    if $pod_deleted then "Terminating"
+                    elif .state.waiting then (.state.waiting.reason // "Waiting")
+                    elif (.state.terminated and .state.terminated.reason == "Completed") then .state.terminated.reason
+                    elif .state.terminated then (.state.terminated.reason // "Terminated")
+                    elif .state.running then "Running"
+                    else "Unknown"
+                    end
                 ),
-                (.state.terminated.startedAt // .state.running.startedAt | fromdateiso8601 | strftime("%Y-%m-%d %H:%M:%S %Z")),
-                if (.restartCount > 0) then $RED + (.restartCount | tostring) + $RES else $GREEN + (.restartCount | tostring)  + $RES end,
+                (
+                    (.state.terminated.startedAt // .state.running.startedAt) as $last_start |
+                    if $last_start then
+                        ($last_start | fromdateiso8601) as $last_start_epoch |
+                        (($current_date | tonumber) - $last_start_epoch) as $diff_seconds |
+                        if $diff_seconds < 60 then
+                            "\(.restartCount) (" + ($diff_seconds | tostring) + "s ago)"
+                        elif $diff_seconds < 3600 then
+                            "\(.restartCount) (" + ($diff_seconds / 60 | floor | tostring) + "m ago)"
+                        elif $diff_seconds < 86400 then
+                            "\(.restartCount) (" + ($diff_seconds / 3600 | floor | tostring) + "h ago)"
+                        else
+                            "\(.restartCount) (" + ($diff_seconds / 86400 | floor | tostring) + "d ago)"
+                        end
+                    else
+                        "\(.restartCount) (Unknown)"
+                    end
+                ),
+                (
+                    (.state.terminated.startedAt // .state.running.startedAt) as $last_start |
+                    if $last_start then
+                        (($last_start | fromdateiso8601) // ($current_date | tonumber) | strftime("%Y-%m-%d %H:%M:%S %Z"))
+                    else
+                        "Unknown"
+                    end
+                ),
+                (
+                    ($pod_created | fromdateiso8601) as $created_epoch |
+                    (($current_date | tonumber) - $created_epoch) as $created_seconds |
+                    $created_seconds / 86400 | floor | "\(.)d"
+                ),
                 $podip,
-                $GREY + $node + $RES,
-                $GREY + $nodeip  + $RES
+                $node,
+                $nodeip
             ] | @tsv'
-    } | sort -k4 -k5 | column -ts $'\t'
+        } | sort -k7 -k8
+    } | column -ts $'\t' | kub get pods --kubecolor-stdin
 }
 
 function k8s.list_running_containers_by_pod_with_labels {
