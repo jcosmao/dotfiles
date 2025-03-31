@@ -145,6 +145,8 @@ def main(args):
         .decode("utf-8")
         .strip()
     )
+    # clear clipboard
+    subprocess.run("xclip -i /dev/null".split(" "))
 
     search(rofi, user_input, config)
 

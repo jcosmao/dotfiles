@@ -68,6 +68,7 @@ alias osshost="os server list --all --host"
 # octavia
 alias osl="os loadbalancer"
 alias osla="os loadbalancer amphora list --long --loadbalancer"
+alias osdn="os port list --device-owner network:dhcp --long --network"
 alias ostoken="openstack.token"
 alias osunset=openstack.unset_env
 
