@@ -1,10 +1,9 @@
 #!/bin/bash
 
-repo=$(basename -s .git $(git config --get remote.origin.url 2> /dev/null))
+repo=$(git config --get remote.origin.url 2> /dev/null)
 
-if [[ $repo == "dotfiles" ]]; then
-    echo "[$0] Reset changes on webex.desktop / bashrc"
-
+if [[ $repo =~ .*github.com/jcosmao/dotfiles.* ]]; then
+    echo "[$0] Reset changes on files"
     {
         git reset ~/.dotfiles/shell/bashrc
         git checkout -- ~/.dotfiles/shell/bashrc
