@@ -8,32 +8,32 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias c='ccze -A'
 
-# COLORS
-# regular
-export BLACK=$(tput setaf 0)
-export RED=$(tput setaf 1)
-export GREEN=$(tput setaf 2)
-export YELLOW=$(tput setaf 3)
-export BLUE=$(tput setaf 4)
-export MAGENTA=$(tput setaf 5)
-export CYAN=$(tput setaf 6)
-export GREY=$(tput setaf 7)
-export WHITE=$(tput setaf 15)
+# Normal colors
+export BLACK="\e[0;30m"
+export RED="\e[0;31m"
+export GREEN="\e[0;32m"
+export YELLOW="\e[0;33m"
+export BLUE="\e[0;34m"
+export MAGENTA="\e[0;35m"
+export CYAN="\e[0;36m"
+export GREY="\e[0;37m"
+export WHITE="\e[0;37m"
 
-# bright
-export B_BLACK=$(tput setaf 8)
-export B_RED=$(tput setaf 9)
-export B_GREEN=$(tput setaf 10)
-export B_YELLOW=$(tput setaf 11)
-export B_BLUE=$(tput setaf 12)
-export B_MAGENTA=$(tput setaf 13)
-export B_CYAN=$(tput setaf 14)
+# Bright colors
+export B_BLACK="\e[0;90m"
+export B_RED="\e[0;91m"
+export B_GREEN="\e[0;92m"
+export B_YELLOW="\e[0;93m"
+export B_BLUE="\e[0;94m"
+export B_MAGENTA="\e[0;95m"
+export B_CYAN="\e[0;96m"
 
-export NORMAL=$(tput sgr0)          # text reset
-export BOLD=$(tput bold)          # make bold
-export UNDERLINE=$(tput smul)       # underline
-export BLINK=$(tput blink)        # make blink
-export REVERSE=$(tput rev)          # reverse
+export NORMAL="\e[0m"          # text reset
+export BOLD="\e[1m"            # make bold
+export UNDERLINE="\e[4m"       # underline
+export BLINK="\e[5m"           # make blink
+export REVERSE="\e[7m"         # reverse
+
 
 function colors.display_256_colors ()
 {
