@@ -90,6 +90,8 @@ vim.filetype.add({
     inc = "perl",
     conf = "ini",
     tf = "terraform",
+    tftpl = "terraform",
+    tpl = "terraform",
   },
 })
 

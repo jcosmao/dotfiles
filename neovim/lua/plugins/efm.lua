@@ -20,8 +20,8 @@ local prettier_fmt = {
 }
 
 local terraform_fmt = {
-    formatCommand = 'terraform fmt -',
-    formatStdin = true
+    formatCommand = 'terraform fmt ${INPUT}',
+    formatStdin = false
 }
 
 local python_isort = {

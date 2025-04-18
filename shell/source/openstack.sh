@@ -53,7 +53,14 @@ function openstack.unset_env {
 }
 
 function openstack.token {
-    export OSTOKEN=$(os token issue | jq -r .id)
+    cached_catalog=$(openstack catalog list -f json)
+    cached_token=$(openstack token issue -f json)
+    user_id=$(echo $cached_token | jq -r .user_id)
+    cache_file=/dev/shm/os_catalog__${user_id}
+    echo $cached_catalog > $cache_file
+
+    export OS_CACHED_CATALOG=$cache_file
+    export OS_CACHED_TOKEN=$(echo $cached_token | jq -r .id)
 }
 
 alias o="os --nojson"
