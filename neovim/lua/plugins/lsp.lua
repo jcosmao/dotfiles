@@ -75,7 +75,8 @@ local lsp = {
 
 return {
     {
-        'williamboman/mason-lspconfig.nvim',
+        'mason-org/mason-lspconfig.nvim',
+        version = "^1.0.0",
         config = function()
             require("mason-lspconfig").setup({
                 ensure_installed = vim.tbl_keys(lsp),
@@ -119,6 +120,7 @@ return {
         dependencies = {
             {
                 'williamboman/mason.nvim',
+                version = "^1.0.0",
                 opts = {
                     ui = {
                         border = G.Border
