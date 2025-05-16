@@ -22,6 +22,10 @@ function os {
     elif [[ $1 == "srv" || $1 == "s" ]]; then
         shift; set -- "server" "${@:1}"
         [[ $2 == "show" ]] && PIPE_CMD=openstack.server_show_jq_filter
+    elif [[ $1 == "az" ]]; then
+        shift; set -- "availability zone" "${@:1}"
+    elif [[ $1 == "agg" ]]; then
+        shift; set -- "aggregate" "${@:1}"
     fi
 
     echo "${APPEND_OPTS[@]}" | grep -qw '\-f json' && PIPE_CMD=${PIPE_CMD:-jq} || PIPE_CMD="tee"
