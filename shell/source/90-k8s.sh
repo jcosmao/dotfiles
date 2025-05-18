@@ -77,10 +77,10 @@ complete -F _complete_kns knsc
 
 function k8s.list_containers_by_pod {
     {
-        echo -n "${BOLD}NAME\t${BOLD}${WHITE}CONTAINER${NORMAL}\t${BOLD}STATUS\tRESTARTS\tLAST\tAGE\tIP\tNODE\tNODE_IP${NORMAL}\n";
+        echo -n "${BOLD}NAME\tCONTAINER\tSTATUS\tRESTARTS\tLAST\tAGE\tIP\tNODE\tNODE_IP${NORMAL}\n";
         {
             kub get pods -o json | \
-            jq -r --arg RES "$NORMAL" --arg BLUE "$BLUE" --arg current_date "$(date +%s)" \
+            jq -r --arg current_date "$(date +%s)" \
             '.items[] | .metadata.name as $pod_name |
                         .spec.nodeName as $node |
                         .status.hostIP as $nodeip |
@@ -89,7 +89,7 @@ function k8s.list_containers_by_pod {
                         .metadata.deletionTimestamp as $pod_deleted |
                         .status.containerStatuses[] | [
                 "pod/" + $pod_name,
-                $BLUE + .name + $RES,
+                .name,
                 (
                     if $pod_deleted then "Terminating"
                     elif .state.waiting then (.state.waiting.reason // "Waiting")
