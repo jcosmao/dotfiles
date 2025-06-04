@@ -158,7 +158,8 @@ function k8s.top_node {
     fi
     node=$1
     kub top pods -A --sort-by cpu --containers=true | \
-        grep --color=never -E $(k get pods -A -o="custom-columns=NAME:.metadata.name" --field-selector=spec.nodeName=${node} --no-headers | paste -d'|' -s)
+        grep --color=never -E "$(k get pods -A -o='custom-columns=NAME:.metadata.name' --field-selector=spec.nodeName=${node} --no-headers | paste -d'|' -s)|NAMESPACE" | \
+        kub top pods --kubecolor-stdin
 }
 
 
