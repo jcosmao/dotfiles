@@ -9,3 +9,5 @@ setopt hist_ignore_space
 setopt share_history
 
 export PROMPT_EOL_MARK=''
+
+which direnv &> /dev/null && eval "$(direnv hook zsh)"

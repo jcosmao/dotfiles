@@ -23,7 +23,7 @@ function pyenv.load
     fi
 }
 
-[[ -d $PYENV_ROOT ]] && pyenv.load
+#[[ -d $PYENV_ROOT ]] && pyenv.load
 
 function pyenv.help
 {
