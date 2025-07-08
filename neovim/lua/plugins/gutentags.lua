@@ -22,7 +22,7 @@ return {
         vim.g.gutentags_ctags_executable = '~/.local/bin/ctags'
         vim.g.gutentags_ctags_extra_args = { '--fields=+niaSszt', '--python-kinds=-vi', '--tag-relative=yes' }
         vim.g.gutentags_file_list_command = [[
-        /bin/true ; .project/file_list || rg --files -tsh -tperl -tpy -tgo -tcpp -tpuppet *
+        /bin/true ; .project/file_list || rg --files -tsh -tperl -tpy -tgo -tcpp -tpuppet
     ]]
         vim.g.gutentags_scopefile = '.cscope.gutentags'
         vim.g.gutentags_ctags_tagfile = '.ctags.gutentags'

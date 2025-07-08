@@ -176,6 +176,7 @@ vim.api.nvim_create_autocmd("FileType", {
                     context = { only = { 'source.organizeImports' } },
                     apply = true
                 })
+                require('go.format').gofmt()
             end,
         })
     end,
