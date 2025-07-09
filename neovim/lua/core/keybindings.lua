@@ -104,13 +104,24 @@ vim.keymap.set('n', '<M-\\>', ':lua GotoCscope(vim.fn.expand("<cword>"))<cr>', o
 
 -- LSP
 function LspKeymap()
-    local opts = { noremap = true, silent = true }
     -- See `:help vim.lsp.*` for documentation on any of the below functions
     vim.keymap.set('n', '<C-]>', vim.lsp.buf.definition, opts)
     vim.keymap.set('n', '<C-\\>', vim.lsp.buf.references, opts)
-    vim.keymap.set('n', '?', vim.lsp.buf.hover, opts)
+    vim.keymap.set('n', '?', function() return vim.lsp.buf.hover({
+        focusable = false,
+        width = 100,
+        height = 10,
+        max_width = 150,
+        max_height = 100,
+    }) end, opts)
+    vim.keymap.set({ 'n', 'i' }, '<C-k>', function() return vim.lsp.buf.signature_help({
+        focusable = false,
+        width = 100,
+        height = 10,
+        max_width = 150,
+        max_height = 100,
+    }) end , opts)
     vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, opts)
-    vim.keymap.set({ 'n', 'i' }, '<C-k>', function() require('lsp_signature').toggle_float_win() end, opts)
     vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, opts)
     vim.keymap.set('n', '<leader>0', vim.lsp.buf.code_action, opts)
     vim.keymap.set('n', '<leader>9', vim.lsp.codelens.run, opts)

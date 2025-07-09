@@ -59,6 +59,7 @@ G.terminal_timeoutlen = 150
 vim.opt.timeoutlen = G.timeoutlen
 vim.opt.ttimeoutlen = 100
 vim.o.showtabline = 2
+vim.o.winborder = 'rounded'
 
 if vim.fn.empty(vim.env.THEME) == 0 then
     vim.opt.background = vim.env.THEME

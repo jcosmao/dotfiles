@@ -133,7 +133,7 @@ function AutoColorColumn()
         end
 
         local cmd = string.format([[
-            grep max-line-length $(find %s %s -maxdepth 1 -name pyproject.toml -o -name tox.ini -o -name .flake8) |
+            grep -P '(max-line-length|line-length)' $(find %s %s -maxdepth 1 -name pyproject.toml -o -name tox.ini -o -name .flake8) |
             awk -F= '{print $2}' | tail -1
         ]], G.project_root, G.git_root)
 

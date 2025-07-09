@@ -2,6 +2,13 @@ G = vim.g -- Vim globals
 
 G.Border = "rounded"
 
+G.signs = {
+    Error = " ",
+    Warn = " ",
+    Hint = " ",
+    Info = " "
+}
+
 -- Utils functions
 
 function PrintTable(tbl, indent)

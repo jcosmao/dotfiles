@@ -47,7 +47,7 @@ local flake8 = {
     lintIgnoreExitCode = true,
     lintStdin = true,
     lintFormats = { 'stdin:%l:%c: %t%n %m' },
-    rootMarkers = { 'setup.cfg', 'tox.ini', '.flake8' },
+    rootMarkers = { '.flake8' },
 }
 
 local pylint = {

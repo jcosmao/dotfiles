@@ -29,8 +29,16 @@ return {
                         require('luasnip').lsp_expand(args.body)
                     end,
                 },
+                -- window = {
+                --     documentation = cmp.config.window.bordered(),
+                -- },
                 window = {
-                    documentation = cmp.config.window.bordered(),
+                    completion = vim.tbl_extend("force", cmp.config.window.bordered(), {
+                        winhighlight = "NormalFloat:NormalFloat,FloatBorder:FloatBorder,CursorLine:Visual,Search:None",
+                    }),
+                    documentation = vim.tbl_extend("force", cmp.config.window.bordered(), {
+                        winhighlight = "NormalFloat:NormalFloat,FloatBorder:FloatBorder,CursorLine:Visual,Search:None",
+                    }),
                 },
                 formatting = {
                     fields = { "kind", "abbr", "menu" },

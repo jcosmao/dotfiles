@@ -59,9 +59,9 @@ local lsp = {
     eslint = {},
     gopls = {},
     puppet = {},
-    volar = {
-        filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue', 'html' }
-    },
+    -- volar = {
+    --     filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue', 'html' }
+    -- },
     markdown_oxide = {
         filetypes = { 'markdown' },
     },
@@ -72,62 +72,116 @@ local lsp = {
     -- ["pyproject-flake8"] = {},
 }
 
-
 return {
     {
+        "mason-org/mason.nvim",
+        opts = {}
+    },
+    {
         'mason-org/mason-lspconfig.nvim',
-        version = "^1.0.0",
         config = function()
+
+            -- Add the same capabilities to ALL server configurations.
+            -- Refer to :h vim.lsp.config() for more information.
+            vim.lsp.config("*", {
+              capabilities = vim.lsp.protocol.make_client_capabilities()
+            })
+
+            for server, config in pairs(lsp) do
+                vim.lsp.config(server, config)
+            end
+
             require("mason-lspconfig").setup({
                 ensure_installed = vim.tbl_keys(lsp),
                 automatic_installation = true,
             })
 
-            require("mason-lspconfig").setup_handlers {
-                -- This is a default handler that will be called for each installed server (also for new servers that are installed during a session)
-                function(server_name)
-                    local srv = lsp[server_name] or {}
-                    local settings = srv.settings or nil
-                    local filetypes = srv.filetypes or nil
-                    local init_options = srv.init_options or nil
-                    local capabilities = require('cmp_nvim_lsp').default_capabilities()
-                    local lspconfig = require("lspconfig")
-                    lspconfig[server_name].setup {
-                        on_attach = function(_, bufnr)
-                            -- Enable completion triggered by <c-x><c-o>
-                            vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-                            LspKeymap()
-                        end,
-                        capabilities = capabilities,
-                        settings = settings,
-                        filetypes = filetypes,
-                        init_options = init_options,
-                    }
-                end
-            }
-            require('lspconfig.ui.windows').default_options.border = G.Border
+            -- require("mason-lspconfig").setup_handlers {
+            --     -- This is a default handler that will be called for each installed server (also for new servers that are installed during a session)
+            --     function(server_name)
+            --         local srv = lsp[server_name] or {}
+            --         local settings = srv.settings or nil
+            --         local filetypes = srv.filetypes or nil
+            --         local init_options = srv.init_options or nil
+            --         local capabilities = require('cmp_nvim_lsp').default_capabilities()
+            --         local lspconfig = require("lspconfig")
+            --         lspconfig[server_name].setup {
+            --             on_attach = function(_, bufnr)
+            --                 -- Enable completion triggered by <c-x><c-o>
+            --                 vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+            --                 LspKeymap()
+            --             end,
+            --             capabilities = capabilities,
+            --             settings = settings,
+            --             filetypes = filetypes,
+            --             init_options = init_options,
+            --         }
+            --     end
+            -- }
 
-            local float = {
-                focusable = false,
-                style = "minimal",
-                max_width = 100,
-                border = G.Border,
-                noautocmd = true,
+            G.diagnostics_virtual_text = {
+                format = function(diagnostic)
+                    local lines = vim.split(diagnostic.message, '\n')
+                    return lines[1]
+                end,
+                virt_text_pos = 'right_align',
+                suffix = ' ',
+                prefix = "■",
+                spacing = 10,
             }
-            vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, float)
-            -- vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, float)
+
+            function DiagnosticSetupDefaults()
+                vim.diagnostic.config({
+                    severity_sort = true,
+                    underline = false,
+                    update_in_insert = false,
+                    virtual_box = true,
+                    virtual_text = false,
+                    signs = {
+                        text = {
+                            [vim.diagnostic.severity.ERROR] = G.signs.Error,
+                            [vim.diagnostic.severity.WARN] = G.signs.Warn,
+                            [vim.diagnostic.severity.INFO] = G.signs.Info,
+                            [vim.diagnostic.severity.HINT] = G.signs.Hint,
+                        },
+                    },
+                })
+            end
+
+            -- display config
+            -- :lua vim.diagnostic.config()
+            function DiagnosticVirtualTextToggle()
+                if not vim.diagnostic.config().virtual_text then
+                    vim.diagnostic.config({ virtual_text = G.diagnostics_virtual_text })
+                    vim.notify("diagnostic.virtual_text enabled")
+                else
+                    vim.diagnostic.config({ virtual_text = false })
+                    vim.notify("diagnostic.virtual_text disabled")
+                end
+            end
+
+            function DiagnosticToggle()
+                if vim.diagnostic.is_disabled() then
+                    vim.diagnostic.enable()
+                    vim.notify("diagnostic enabled")
+                else
+                    vim.diagnostic.disable()
+                    vim.notify("diagnostic disabled")
+                end
+            end
+
+            vim.api.nvim_create_autocmd("LspAttach", {
+                pattern = "*",
+                callback = function()
+                    LspKeymap()
+                    DiagnosticSetupDefaults()
+                end,
+            })
         end,
+
         dependencies = {
-            {
-                'williamboman/mason.nvim',
-                version = "^1.0.0",
-                opts = {
-                    ui = {
-                        border = G.Border
-                    }
-                }
-            },
-            { 'neovim/nvim-lspconfig' },
+            'mason-org/mason.nvim',
+            'neovim/nvim-lspconfig',
         },
     },
     {
@@ -144,9 +198,6 @@ return {
             doc_lines = 0,
             wrap = true,
             bind = true, -- This is mandatory, otherwise border config won't get registered.
-            handler_opts = {
-                border = G.Border
-            },
             padding = ' ',
             transparency = 0,
             noautocmd = true,
