@@ -170,8 +170,6 @@ function M.setColorscheme()
         end
     end
 
-
-
     G.blame_colors = blame_colors
     G.colors = colors
 

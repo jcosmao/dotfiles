@@ -109,17 +109,9 @@ function LspKeymap()
     vim.keymap.set('n', '<C-\\>', vim.lsp.buf.references, opts)
     vim.keymap.set('n', '?', function() return vim.lsp.buf.hover({
         focusable = false,
-        width = 100,
-        height = 10,
-        max_width = 150,
-        max_height = 100,
     }) end, opts)
     vim.keymap.set({ 'n', 'i' }, '<C-k>', function() return vim.lsp.buf.signature_help({
         focusable = false,
-        width = 100,
-        height = 10,
-        max_width = 150,
-        max_height = 100,
     }) end , opts)
     vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, opts)
     vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, opts)

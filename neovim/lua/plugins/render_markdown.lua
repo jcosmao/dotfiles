@@ -2,6 +2,7 @@ return {
     'MeanderingProgrammer/render-markdown.nvim',
     ft = { "markdown", "norg", "rmd", "org" },
     opts = {
+        enabled = false,
         heading = {
             enabled = true,
             sign = true,
@@ -17,12 +18,12 @@ return {
             border_virtual = true,
             border_prefix = true,
             backgrounds = {
-                'RenderMarkdownH1Bg',
-                'RenderMarkdownH2Bg',
-                'RenderMarkdownH3Bg',
-                'RenderMarkdownH4Bg',
-                'RenderMarkdownH5Bg',
-                'RenderMarkdownH6Bg',
+                -- 'RenderMarkdownH1Bg',
+                -- 'RenderMarkdownH2Bg',
+                -- 'RenderMarkdownH3Bg',
+                -- 'RenderMarkdownH4Bg',
+                -- 'RenderMarkdownH5Bg',
+                -- 'RenderMarkdownH6Bg',
             },
             foregrounds = {
                 'RenderMarkdownH1',
