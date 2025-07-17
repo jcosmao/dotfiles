@@ -84,7 +84,7 @@ return {
             -- Add the same capabilities to ALL server configurations.
             -- Refer to :h vim.lsp.config() for more information.
             vim.lsp.config("*", {
-              capabilities = vim.lsp.protocol.make_client_capabilities()
+                capabilities = vim.lsp.protocol.make_client_capabilities(),
             })
 
             for server, config in pairs(lsp) do
@@ -147,11 +147,22 @@ return {
                 end
             end
 
+            function LspFuzzySetup()
+                local on_attach = function(client, _)
+                    client.request = require('lspfuzzy').wrap_request(client.request)
+                end
+
+                vim.lsp.config('*', {
+                    on_attach = on_attach
+                })
+            end
+
             vim.api.nvim_create_autocmd("LspAttach", {
                 pattern = "*",
                 callback = function()
                     LspKeymap()
                     DiagnosticSetupDefaults()
+                    LspFuzzySetup()
                 end,
             })
         end,

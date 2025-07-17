@@ -54,7 +54,7 @@ clip=primary
 clip_clear=45
 default_user="${ROFI_PASS_DEFAULT_USER-$(whoami)}"
 default_user2=john_doe
-password_length=12
+password_length=32
 fix_layout=false
 
 # default shortcuts

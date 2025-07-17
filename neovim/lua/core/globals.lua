@@ -72,6 +72,11 @@ function LoadVimscript(file)
     end
 end
 
+function IsInteger(str)
+    return not (str == "" or str:find("%D"))  -- str:match("%D") also works
+end
+
+
 --
 
 local function gen_special_filetypes()

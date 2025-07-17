@@ -139,13 +139,13 @@ function AutoColorColumn()
 
         local maxlinelen = vim.fn.trim(vim.fn.system(cmd))
 
-        if maxlinelen ~= "" then
+        if IsInteger(maxlinelen)  then
             vim.o.colorcolumn = maxlinelen
             return
         end
 
         -- Force 79 char max for openstack projects
-        if FileExists(G.git_root .. '/.gitreview') then
+        if G.git_root and FileExists(G.git_root .. '/.gitreview') then
             vim.o.colorcolumn = "79"
             return
         end
