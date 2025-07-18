@@ -147,22 +147,11 @@ return {
                 end
             end
 
-            function LspFuzzySetup()
-                local on_attach = function(client, _)
-                    client.request = require('lspfuzzy').wrap_request(client.request)
-                end
-
-                vim.lsp.config('*', {
-                    on_attach = on_attach
-                })
-            end
-
             vim.api.nvim_create_autocmd("LspAttach", {
                 pattern = "*",
                 callback = function()
                     LspKeymap()
                     DiagnosticSetupDefaults()
-                    LspFuzzySetup()
                 end,
             })
         end,
@@ -196,16 +185,4 @@ return {
             require('lsp_signature').setup(opts)
         end
     },
-    {
-        'ojroques/nvim-lspfuzzy',
-        opts = {
-            methods = 'all',       -- either 'all' or a list of LSP methods (see below)
-            jump_one = true,       -- jump immediately if there is only one location
-            save_last = true,      -- save last location results for the :LspFuzzyLast command
-            callback = nil,        -- callback called after jumping to a location
-            fzf_modifier = ':~:.', -- format FZF entries, see |filename-modifiers|
-            fzf_trim = true,       -- trim FZF entries
-            fzf_preview = { 'right:+{2}-/2:nohidden' }
-        }
-    }
 }
