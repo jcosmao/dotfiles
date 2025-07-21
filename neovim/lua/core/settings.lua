@@ -47,7 +47,6 @@ vim.opt.autowriteall = true
 vim.opt.autochdir = false
 vim.opt.keymodel = "startsel"
 vim.opt.diffopt = vim.opt.diffopt + "vertical"
-vim.opt.conceallevel = 0
 vim.opt.numberwidth = 6
 vim.opt.shortmess = vim.opt.shortmess + "c"
 vim.opt.pumheight = 20
