@@ -186,9 +186,9 @@ function k8s.get_port_forwarding {
 function k8s.get_all_resources {
     if [[ $1 == all ]]; then
         shift
-        kub get deploy,replicaset,statefulset,pod,pvc,cm,secret,svc,$(k api-resources --verbs=list --namespaced -o name | grep -v events | sort | paste -d, -s) $*
+        kub get deploy,replicaset,statefulset,daemonset,pod,pvc,cm,secret,svc,$(k api-resources --verbs=list --namespaced -o name | grep -v events | sort | paste -d, -s) $*
     else
-        kub get deploy,replicaset,statefulset,pod,pvc,cm,secret,svc,$(k api-resources --verbs=list --namespaced -o name | grep ingress | sort | paste -d, -s) $*
+        kub get deploy,replicaset,statefulset,daemonset,pod,pvc,cm,secret,svc,$(k api-resources --verbs=list --namespaced -o name | grep ingress | sort | paste -d, -s) $*
     fi
 }
 

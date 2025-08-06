@@ -122,3 +122,12 @@
     ref = "ls-remote --ref"
     log-merge = "!f() { git log --stat $1^..$1; }; f"
     logtrailer = !git log --format='%h %s %(trailers:key=Issue,valueonly)%-C() %(trailers:key=JIRA,valueonly)%-C() %(trailers:key=Change-Id,valueonly)%-C()'
+    # checkout on existing branch or create new from current
+    co = "!f() { \
+        git fetch origin; \
+        if git show-ref --verify --quiet refs/heads/$1; then \
+            git checkout $1; \
+        else \
+            git checkout -b $1 && git pushdev; \
+        fi; \
+    }; f"
