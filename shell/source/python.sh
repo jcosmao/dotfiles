@@ -24,7 +24,7 @@ function python.setup_flake
     [[ -f "$project_root/.flake8" ]] && return
 
     found_line_len=$(grep -P 'line-length' $(find $project_root -maxdepth 1 -name pyproject.toml -o -name tox.ini) | awk -F= '{print $2}' | tail -1)
-    if [[ -n $found_line_len ]] && line_len=$found_line_len
+    [[ -n $found_line_len ]] && line_len=$found_line_len
 
     echo "[flake8]"                    > "$project_root/.flake8"
     echo "max-line-length = $line_len" >> "$project_root/.flake8"

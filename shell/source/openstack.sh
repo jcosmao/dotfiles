@@ -177,7 +177,20 @@ EOF
 }
 
 function devstack.get_logs {
-    journalctl --no-hostname -o short-iso -u 'devstack@*' $*
+    journalctl --no-hostname -o short-iso -u 'devstack@*' $* | oslog
+}
+
+function devstack.setup_pyright {
+    [[ $USER -ne stack ]] && echo "need to be logged as stack user" && return
+    source /opt/stack/data/venv/bin/activate
+    cd /opt/stack
+    for openstack_repo in $(find . -name requirements.txt -maxdepth 2 2> /dev/null | xargs dirname ); do
+        (
+            cd $openstack_repo
+            python.setup_pyright
+            pip install -e . --config-settings editable_mode=compat
+        )
+    done
 }
 
 alias stacklog="devstack.get_logs"
