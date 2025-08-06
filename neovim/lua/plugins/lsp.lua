@@ -57,7 +57,11 @@ local lsp = {
     },
     ansiblels = {},
     eslint = {},
-    gopls = {},
+    gopls = {
+        enabled = function()
+            return vim.fn.executable('go') == 1
+        end,
+    },
     puppet = {},
     -- volar = {
     --     filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue', 'html' }
@@ -91,8 +95,20 @@ return {
                 vim.lsp.config(server, config)
             end
 
+            local filtered_lsp = vim.tbl_filter(
+                function(server_name)
+                    -- If the server has an "enabled" field and it's a function, call it
+                    if lsp[server_name] and type(lsp[server_name].enabled) == "function" then
+                        return lsp[server_name].enabled()
+                    else
+                        return true
+                    end
+                end,
+                vim.tbl_keys(lsp)
+            )
+
             require("mason-lspconfig").setup({
-                ensure_installed = vim.tbl_keys(lsp),
+                ensure_installed = filtered_lsp,
                 automatic_installation = true,
             })
 
