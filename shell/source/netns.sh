@@ -1,17 +1,27 @@
 netns.enter () {
-    ip netns exec $1 $SHELL
+    name=$1; shift
+    [[ -z $name ]] && echo "Missing netns name" && return
+
+    if [[ $name == "default" ]]; then
+        nsenter -t 1 -n $*
+    else
+        [[ $# -eq 0 ]] && ip netns exec $name $SHELL || ip netns exec $name $*
+    fi
 }
 
 alias nse=netns.enter
+alias ons=netns.enter
 
 function _complete_nse
 {
+    [[ $COMP_CWORD -ne 1 ]] && return
     local word=${COMP_WORDS[1]}
     COMPREPLY=($(compgen -W "$(ip netns list | awk '{print $1}' | xargs)" -- ${word}))
 }
 
 complete -F _complete_nse netns.enter
 complete -F _complete_nse nse
+complete -F _complete_nse ons
 
 netns.current () {
     ip netns identify $$

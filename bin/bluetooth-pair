@@ -2,15 +2,24 @@
 
 # bluetoothctl devices
 
+# root only
+[[ $(id -u) != 0 ]] && echo "Must be root" && exit 1
+
 MAC=$1
 
 if [[ -z $MAC ]]; then
     echo "
     $0 <MAC bluetooth device>
     "
+
     bluetoothctl devices
+    bluetoothctl default-agent
+    bluetoothctl power on
+    bluetoothctl scan on
 fi
 
+bluetoothctl default-agent
+bluetoothctl power on
 bluetoothctl scan on
 bluetoothctl remove "$MAC"
 bluetoothctl trust "$MAC"
