@@ -12,16 +12,13 @@ if [[ -z $MAC ]]; then
     $0 <MAC bluetooth device>
     "
 
-    bluetoothctl devices
     bluetoothctl default-agent
     bluetoothctl power on
-    bluetoothctl scan on
+    bluetoothctl --timeout 5 scan on
+    bluetoothctl devices
 fi
 
-bluetoothctl default-agent
-bluetoothctl power on
-bluetoothctl scan on
-bluetoothctl remove "$MAC"
-bluetoothctl trust "$MAC"
-bluetoothctl pair "$MAC"
-bluetoothctl connect "$MAC"
+# bluetoothctl remove "$MAC"
+bluetoothctl --timeout 2 trust "$MAC"
+bluetoothctl --timeout 2 pair "$MAC"
+bluetoothctl --timeout 2 connect "$MAC"
