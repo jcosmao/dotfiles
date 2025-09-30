@@ -14,43 +14,48 @@ function git.review
     target=$1
     topic=$2
 
+    remote="gerrit"
+    [[ -z $target ]] && target=$(git rev-parse --abbrev-ref HEAD)
+    [[ -n $topic ]] && topic="%topic=${topic}"
+
     if [[ $# -eq 0 ]]; then
-        echo "git.review <target: default(current tracked) OR ex: origin/master> <topic: default(current branch name) OR null>"
+        echo "git.review <target branch: default(current tracked) ex: master> <topic: default(current branch name) OR null>"
         echo "No params provided. use defaults"
     fi
 
-    if [[ -z $target ]]; then
-        target_branch=$(grep defaultbranch= $(git rev-parse --show-toplevel)/.gitreview | cut -d= -f2 2> /dev/null)
-        if [[ -z $target_branch ]]; then
-            target=$(git trackshow)
-            echo "- defaultbranch not found in .gitreview, use current tracked $target"
+    gitreview_file=$(git rev-parse --show-toplevel)/.gitreview
+    if [[ ! -f "$gitreview_file" ]]; then
+        echo ".gitreview not found"
+        return 1
+    fi
+
+    host=$(grep host= "$gitreview_file" | cut -d= -f2)
+    port=$(grep port= "$gitreview_file" | cut -d= -f2)
+    project=$(grep project= "$gitreview_file" | cut -d= -f2)
+
+    # Configure gerrit remote if not exists
+    if ! git remote | grep -q gerrit; then
+        if [[ -n "$host" && -n "$port" && -n "$project" ]]; then
+            git remote add gerrit "ssh://${host}:${port}/${project}"
+            echo "Added gerrit remote: ssh://${host}:${port}/${project}"
+            git fetch gerrit
         else
-            remote=$(git trackshow | cut -d'/' -f1)
-            target="${remote}/${target_branch}"
+            echo "Error: .gitreview file is missing required fields (host, port, project)"
+            return 1
         fi
     fi
 
     # validate remote branch exist
-    validate=$(git branch -r --format='%(refname:strip=2)' | grep -P "^${target}$")
-    remote=$(echo $validate | cut -d/ -f1)
-    branch=$(echo $validate | cut -d/ -f2-)
-    current_branch=$(git symbolic-ref --short HEAD)
-
-    if [[ -z $topic && ! $current_branch = $branch ]]; then
-        topic="%topic=$(git symbolic-ref --short HEAD)"
-    elif [[ -n $topic && ! $topic = null ]]; then
-        topic="%topic=${topic}"
-    else
-        unset topic
+    validate=$(git branch -r --format='%(refname:strip=2)' | grep -P "^${remote}/${target}$")
+    if [[ -z $validate ]]; then
+        echo "${remote}/${target} not found, cannot submit pr"
+        return 1
     fi
 
-    if [[ -n $branch && -n $remote ]]; then
-        echo "CMD: git push $remote HEAD:refs/for/${branch}${topic}"
-        [[ $SHELL =~ zsh ]] && vared -p 'Submit ? [y] ' -c response || read -r -p 'Submit ? [y] ' response
-        if [[ $response = y ]]; then
-            git push $remote HEAD:refs/for/${branch}${topic}
-        fi
-    else
-        echo "Unable to find remote branch (git branch -r): $target"
+    echo "CMD: git push $remote HEAD:refs/for/${target}${topic}"
+    [[ $SHELL =~ zsh ]] && vared -p 'Submit ? [y] ' -c response || read -r -p 'Submit ? [y] ' response
+    if [[ $response = y ]]; then
+        git push $remote HEAD:refs/for/${target}${topic}
     fi
 }
+

@@ -154,9 +154,21 @@ function openstack.get_snat
 
 alias osnat="openstack.get_snat"
 
-function openstack.help_stestr
+function openstack.help
 {
     cat<<EOF
+#
+# Upstream
+#
+
+# create new release note
+apt install python3-reno
+reno new xxx
+
+#
+# stestr
+#
+
 # init test env / launch tests
 tox -e py3
 
@@ -197,6 +209,79 @@ function devstack.setup_pyright {
 }
 
 alias stacklog="devstack.get_logs"
+
+
+function devstack.svc_map {
+    # Map real service names to devstack service names
+    declare -A devstack_service_map=(
+        ["dstat"]="devstack@dstat.service"
+        ["etcd"]="devstack@etcd.service"
+        ["glance-api"]="devstack@g-api.service"
+        ["keystone"]="devstack@keystone.service"
+        ["nova-api-metadata"]="devstack@n-api-meta.service"
+        ["nova-api"]="devstack@n-api.service"
+        ["nova-conductor"]="devstack@n-cond-cell1.service"
+        ["nova-novncproxy"]="devstack@n-novnc-cell1.service"
+        ["nova-scheduler"]="devstack@n-sch.service"
+        ["nova-super-conductor"]="devstack@n-super-cond.service"
+        ["neutron-api"]="devstack@neutron-api.service"
+        ["neutron-periodic-workers"]="devstack@neutron-periodic-workers.service"
+        ["neutron-rpc-server"]="devstack@neutron-rpc-server.service"
+        ["placement-api"]="devstack@placement-api.service"
+        ["neutron-openvswitch-agent"]="devstack@q-agt.service"
+        ["neutron-dhcp-agent"]="devstack@q-dhcp.service"
+        ["neutron-l3-agent"]="devstack@q-l3.service"
+        ["neutron-metadata-agent"]="devstack@q-meta.service"
+    )
+
+    if [[ -n $1 ]]; then
+        echo $devstack_service_map[$1]
+    else
+        echo ${(k)devstack_service_map} | tr -s ' ' '\n'
+    fi
+}
+
+function devstack.systemd {
+    local action=$1
+    local service=$2
+
+    if [[ -z "$(devstack.svc_map $service)" ]]; then
+        echo "Error: Unknown service '$service'. Available services: $(devstack.svc_map)"
+        return 1
+    fi
+
+    if [[ "$action" =~ ^(show|restart|start|stop|status)$ ]]; then
+        sudo systemctl $action $(devstack.svc_map $service)
+    elif [[ $action = kill ]]; then
+        sudo systemctl kill -s 9 $(devstack.svc_map $service)
+    elif [[ $action = guru ]]; then
+        sudo systemctl kill -s USR2 $(devstack.svc_map $service)
+    else
+        echo "Error: Unknown action"
+        return 1
+    fi
+}
+
+function _complete_devstack_service
+{
+    local cur actions
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    actions="show restart start stop status kill guru"
+    services="dstat etcd glance-api keystone nova-api-metadata nova-api nova-conductor nova-novncproxy nova-scheduler nova-super-conductor neutron-api neutron-periodic-workers neutron-rpc-server placement-api neutron-openvswitch-agent neutron-dhcp-agent neutron-l3-agent neutron-metadata-agent"
+
+    if [[ ${COMP_CWORD} -eq 1 ]]; then
+        COMPREPLY=( $(compgen -W "${actions}" -- ${cur}) )
+    elif [[ ${COMP_CWORD} -eq 2 ]]; then
+        COMPREPLY=( $(compgen -W "${services}" -- ${cur}) )
+    fi
+}
+
+alias sysdev=devstack.systemd
+
+complete -F _complete_devstack_service devstack.systemd
+complete -F _complete_devstack_service sysdev
+
 
 function devstack.venv_activate {
     source /opt/stack/data/venv/bin/activate

@@ -150,9 +150,9 @@ function gpg.ssh_forward_get_options
     user_at_host=$1
     key=$2
 
-    if [[ -z $user_at_host && -z $key ]]; then
+    if [[ -z $user_at_host || -z $key ]]; then
         echo "gpg.ssh_forward_get_options <user@host> <gpg key id/mail..>"
-        return
+        return 1
     fi
 
     function init_gpg_remote
