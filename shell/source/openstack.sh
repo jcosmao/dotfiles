@@ -35,7 +35,8 @@ function os {
     # Require at least 2.24 to get migration id + abort
     # Require 2.30 to specify --host
     # [[ "$*" =~ (server migration) ]] && EXTRA_OPTS+=("--os-compute-api-version" "2.30")
-    EXTRA_OPTS+=("--os-compute-api-version" "${OS_COMPUTE_API_MIN_VERSION:-"2.72"}")
+    # EXTRA_OPTS+=("--os-compute-api-version" "${OS_COMPUTE_API_MIN_VERSION:-"2.72"}")
+    [[ -z $OS_COMPUTE_DEFAULT_MICROVERSION ]] && export OS_COMPUTE_DEFAULT_MICROVERSION="2.72"
 
     openstack "${EXTRA_OPTS[@]}" $* "${APPEND_OPTS[@]}" | $PIPE_CMD
 }
@@ -91,10 +92,12 @@ if [[ -d ~/.os_openrc ]]; then
         cd ~/.os_openrc
         for openrc in $(ls | grep -P "^$file$")
         do
+            echo "* found openrc $openrc"
             source $openrc
             name=$(echo $openrc | sed -e 's/openrc\.//')
             openstack catalog list -f json | jq -r '.[] | select(.Name == "nova") | .Endpoints| .[].region' | while read REGION
             do
+                echo "  > add ${REGION}__${name}"
                 ln -sf $openrc ${REGION}__${name}.openrc
             done
         done
@@ -103,7 +106,7 @@ if [[ -d ~/.os_openrc ]]; then
     function cr () {
         cr=$1
         openstack.unset_env
-        openrc=$(ls ~/.os_openrc | grep -P '.openrc$' | grep -i $cr)
+        openrc=$(ls ~/.os_openrc | grep -P '.openrc$' | grep -i $cr | head -1)
         region=$(echo $openrc | sed -re 's/(.*)__.*/\1/' | tr '[:lower:]' '[:upper:]')
 
         source ~/.os_openrc/$openrc
