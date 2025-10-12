@@ -7,6 +7,7 @@ end
 require("plugins.lazy-bootstrap")
 
 require("lazy").setup({
+    concurrency = 5,
     -- automatically check for plugin updates
     checker = { enabled = false },
     install = { colorscheme = { "gruvbox-material" } },
