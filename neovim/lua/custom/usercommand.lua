@@ -43,6 +43,11 @@ vim.api.nvim_create_user_command("DiffToggle", function()
     DiffToggle()
 end, { nargs = 0 })
 
+
+vim.api.nvim_create_user_command("Markdown", function()
+    vim.api.nvim_command("RenderMarkdown")
+end, { nargs = 0 })
+
 vim.api.nvim_create_user_command('DiffOpendev20231', function ()
     vim.cmd('DiffviewOpen opendev/stable/2023.1')
 end, { nargs = 0 })
