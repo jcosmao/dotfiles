@@ -29,11 +29,16 @@ function FZFQueryFilterTests()
     end
 end
 
-local function get_rg_file_list_prefix()
+local function get_rg_file_list_prefix(root)
     local project_root = G.project_root
-    local file_list = 'rg --files'
-    local project_file_list = string.format("%s/.project/file_list", project_root)
+    local file_list = "rg --files"
+    if root then
+        project_root = root
+        relative_root = string.format("realpath -s --relative-to=%s %s", G.project_root, root)
+        file_list = string.format("rg --files $(%s)", relative_root)
+    end
 
+    local project_file_list = string.format("%s/.project/file_list", project_root)
     if FileExists(project_file_list) then
         local content = ReadFile(project_file_list)
         if content then file_list = content[1] end
@@ -47,7 +52,7 @@ end
 vim.api.nvim_create_user_command("Rg",
     function(opts)
         local args = opts.args
-        local rg_file_list_prefix = get_rg_file_list_prefix()
+        local rg_file_list_prefix = get_rg_file_list_prefix(G.git_root)
         vim.fn['fzf#vim#grep'](
             string.format(
                 '%s rg --column --no-heading --line-number --color=always %s',
@@ -82,7 +87,7 @@ vim.api.nvim_create_user_command("RgWithFilePath",
                     '--preview-window', 'nohidden',
                     '--exact',
                     '--ansi',
-                    '--prompt', 'RgWithFilePath ❭ ',
+                    '--prompt', 'find in all project ❭ ',
                     '--query', FZFQueryFilterTests(),
                 }
             })
