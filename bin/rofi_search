@@ -121,19 +121,18 @@ def search(rofi, user_input, config):
             sys.exit(0)
 
     options = [item[0] for item in matched_items]
-    options.append("search other")
-    selected_option = rofi.select("Select an option ", options, search=user_input)
 
-    if selected_option:
-        if selected_option == "search other":
-            search(rofi, "", config)
+    if len(options) == 1:
+        selected_option = options[0]
+    else:
+        selected_option = rofi.select("Select an option ", options, search=user_input)
 
-        for title, url in matched_items:
-            if title == selected_option:
-                subprocess.run(["xdg-open", url])
-                time.sleep(0.3)
-                subprocess.run(["i3-msg", "[urgent=latest] focus"])
-                break
+    for title, url in matched_items:
+        if title == selected_option:
+            subprocess.run(["xdg-open", url])
+            time.sleep(0.3)
+            subprocess.run(["i3-msg", "[urgent=latest] focus"])
+            break
 
 
 def main(args):

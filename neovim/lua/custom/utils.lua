@@ -113,11 +113,13 @@ function IsOpenstackProject()
     end
 end
 
-function PythonBlack()
+function PythonBlack(line_len)
     local opts = ""
 
     if IsOpenstackProject() then
         opts = "-l 79"
+    elseif line_len then
+        opts = string.format("-l %d", line_len)
     end
 
     vim.fn.system("black " .. opts .. " " .. vim.fn.expand("%:p"))
@@ -133,8 +135,8 @@ function AutoColorColumn()
         end
 
         local cmd = string.format([[
-            grep -P '(max-line-length|line-length)' $(find %s %s -maxdepth 1 -name pyproject.toml -o -name tox.ini -o -name .flake8) |
-            awk -F= '{print $2}' | tail -1
+            find %s %s -maxdepth 1 -name pyproject.toml -o -name tox.ini -o -name .flake8 |
+            grep -P '(max-line-length|line-length)' | awk -F= '{print $2}' | tail -1
         ]], G.project_root, G.git_root)
 
         local maxlinelen = vim.fn.trim(vim.fn.system(cmd))
