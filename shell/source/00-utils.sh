@@ -77,6 +77,12 @@ function utils.jqmap2csv
     jq -r '(.[0] | keys_unsorted) as $keys | ([$keys] + map([.[ $keys[] ]])) [] | @csv'
 }
 
+function utils.jqgrep
+{
+    string=$1
+    jq --arg string "$string" '.[] | select(any(.[]; tostring | contains($string)))'
+}
+
 # csv to table display
 function utils.pretty_csv {
     column -t -s, -n "$@" | less -F -S -X -K
@@ -182,6 +188,7 @@ function utils.find_project_root
 alias dotup="utils.dotfiles_update"
 alias zup="utils.zsh_update"
 alias json="utils.json"
+alias jgrep="utils.jqgrep"
 alias ssl_info="utils.ssl_info"
 alias ssl_get="utils.ssl_get"
 alias randpass="utils.randpass"

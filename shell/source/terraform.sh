@@ -71,8 +71,8 @@ function tf
 
 function terraform.state_search
 {
-    pattern=${1:-.*}
-    tf show -json | jq --arg pattern "$pattern" '.values.root_module.resources.[] | select( .address | test($pattern))'
+    pattern=$1
+    tf show -json | jq .values.root_module.resources | utils.jqgrep $pattern
 }
 
 function terraform.set_workspace
