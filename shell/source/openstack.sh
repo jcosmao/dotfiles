@@ -44,7 +44,7 @@ function os {
 function openstack.server_show_jq_filter
 {
     # recent version of openstackcli duplicate all entries
-    jq 'with_entries(select(.key | test("^(addresses|availability_zone|compute_host|config_drive|created_at|disk_config|fault|flavor|host_status|hypervisor_hostname|id|image|instance_name|key_name|launched_at|locked|name|power_state|project_id|public_v4|public_v6|ramdisk_id|reservation_id|root_device_name|scheduler_hints|security_groups|server_groups|status|tags|task_state|updated_at|user_id|vm_state|volumes_attached)$") ))'
+    jq '.flavor = (.flavor.name | tostring) | with_entries(select(.key | test("^(OS-EXT-SRV-ATTR:host|flavor|addresses|availability_zone|compute_host|config_drive|created_at|disk_config|fault|flavor|host_status|hypervisor_hostname|id|image|instance_name|key_name|launched_at|locked|name|power_state|project_id|public_v4|public_v6|ramdisk_id|reservation_id|root_device_name|scheduler_hints|security_groups|server_groups|status|tags|task_state|updated_at|user_id|vm_state|volumes_attached)$") ))'
 }
 
 function openstack.install_completion {
