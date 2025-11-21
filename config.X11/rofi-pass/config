@@ -58,6 +58,7 @@ clip_clear=45
 edit_new_pass="true"
 
 # default_user is also used for password files that have no user field.
+default_user=":filename"
 #default_user="${ROFI_PASS_DEFAULT_USER-$(whoami)}"
 #default_user2=mary_ann
 #password_length=12
