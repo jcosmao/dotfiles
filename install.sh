@@ -110,6 +110,8 @@ function install_shell
     # zsh
     ln -sf "$SCRIPTPATH/shell/zshrc" ~/.zshrc
 
+    ln -sf "$SCRIPTPATH/bin/fzf" ~/.local/bin/fzf
+
     [[ -n $LC_BASTION ]] && bashrc_path=$HOME/.bashrc-$LC_BASTION || bashrc_path=$HOME/.bashrc
     ln -sf "$SCRIPTPATH/shell/bashrc" "$bashrc_path"
 
@@ -321,7 +323,6 @@ function main
                 install_vim_light
                 install_shell
                 install_tmux
-                install_local_bin
                 ;;
 
             --conf | -c)

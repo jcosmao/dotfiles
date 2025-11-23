@@ -1,13 +1,5 @@
 eval $(dircolors -b ~/.dir_colors)
 
-alias ls='ls --color=auto'
-alias dir='dir --color=auto'
-
-alias grep='grep --color=auto'
-alias fgrep='fgrep --color=auto'
-alias egrep='egrep --color=auto'
-alias c='ccze -A'
-
 # Normal colors
 export BLACK="\e[0;30m"
 export RED="\e[0;31m"

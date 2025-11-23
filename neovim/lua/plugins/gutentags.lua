@@ -50,8 +50,8 @@ return {
             '*.pdf', '*.doc', '*.docx', '*.ppt', '*.pptx', '*.xls',
             '*.yml', '*.yaml', '*.json',
         }
-        -- vim.g.gutentags_trace = 1
-        -- vim.g.gutentags_debug = 1
+        vim.g.gutentags_trace = 1
+        vim.g.gutentags_debug = 1
     end,
     build = function()
         PatchPlugin("vim-gutentags.patch")

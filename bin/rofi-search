@@ -1,4 +1,10 @@
 #!/bin/bash -e
 
-. ${PYENV_ROOT:-"$HOME/.pyenv"}/versions/rofi-search/bin/activate
+if [[ ! -f ~/.venvs/rofi_search/bin/activate ]]; then
+    uv venv ~/.venvs/rofi_search
+    . ~/.venvs/rofi_search/bin/activate
+    uv pip install pyyaml pyperclip
+fi
+
+. ~/.venvs/rofi_search/bin/activate
 rofi_search $*
