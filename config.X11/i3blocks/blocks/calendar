@@ -13,7 +13,7 @@ full_date=$(date '+%-Y-%0m-%_d|%a, %0d %b %0H:%0M|%B')
 year_number=${full_date:0:4}
 month_number=${full_date:5:2}
 day_number=${full_date:8:2}
-week_number=$(date '+%U')
+week_number=$(( $(date '+%U') + 1 ))
 
 cal_command() {
     ncal -Shb "$month_number" "$year_number" 2> /dev/null || \
