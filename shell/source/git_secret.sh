@@ -1,4 +1,5 @@
 export GIT_SECRET_ROOT="/dev/shm/secrets"
+[[ ! -e $GIT_SECRET_ROOT ]] && return
 
 function gs
 {

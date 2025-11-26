@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# prompt for GPG passphrase when needed
-export GPG_TTY=$(tty)
-
 function agent.launch_ssh_agent
 {
     # cache key for 10h

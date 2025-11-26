@@ -1,4 +1,3 @@
-
 function go.install
 {(
     version=$1

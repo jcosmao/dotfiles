@@ -59,3 +59,29 @@ function git.review
     fi
 }
 
+function git.switch_remote
+{
+    local remote_name="${1:-origin}"
+    local current_url=$(git remote get-url "$remote_name" 2>/dev/null)
+
+    if [[ -z "$current_url" ]]; then
+        echo "Error: Remote '$remote_name' not found." >&2
+        return 1
+    fi
+
+    if [[ "$current_url" == https* ]]; then
+        local new_url=$(echo "$current_url" | sed 's|https://||; s|\.git$||')
+        new_url="git@$new_url"
+    elif [[ "$current_url" == git@* ]]; then
+        local new_url=$(echo "$current_url" | sed 's|git@|https://|; s|$|.git|')
+    elif [[ "$current_url" == ssh://* ]]; then
+        local new_url=$(echo "$current_url" | sed 's|ssh://git@|https://|; s|\.git$||')
+    else
+        echo "Error: Unsupported remote URL format: $current_url" >&2
+        return 1
+    fi
+
+    git remote set-url "$remote_name" "$new_url"
+    echo "Switched $remote_name from $current_url to $new_url"
+}
+
