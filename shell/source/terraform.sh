@@ -1,5 +1,3 @@
-which terraform &> /dev/null || return
-
 function tf
 {
     OPTS=""

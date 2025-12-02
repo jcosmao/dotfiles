@@ -19,8 +19,6 @@ function go.install
     path.append "$HOME/go/bin" && \
     export GOPATH="$HOME/go"
 
-which go &> /dev/null || return
-
 # do not depends on glibc
 export CGO_ENABLED=0
 export GOFLAGS=-buildvcs=false

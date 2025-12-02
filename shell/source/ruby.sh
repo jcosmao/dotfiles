@@ -1,5 +1,3 @@
-which ruby &> /dev/null || return
-
 mkdir -p $HOME/.gem
 alias gem_install="gem install --user-install"
 

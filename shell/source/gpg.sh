@@ -1,5 +1,3 @@
-[[ ! -e $HOME/.gnupg ]] && return
-
 export GPG_TTY=$(tty)
 
 if [[ -z $SSH_CONNECTION ]]; then

@@ -1,5 +1,3 @@
-which kubectl &> /dev/null || return
-
 # Load default kubeconfig if found
 if [[ -f $HOME/.kube/config ]]; then
     export KUBECONFIG=$HOME/.kube/config

@@ -14,8 +14,4 @@ function fg {
 setopt NO_NOMATCH
 
 source $HOME/.shell/common.sh
-
-# source bash aliases/completion/functions
-[[ -e ~/.bash_aliases ]] && common.source ~/.bash_aliases
-
-common.source $(common.get_sourceable_bash_files_ordered)
+common.source_all

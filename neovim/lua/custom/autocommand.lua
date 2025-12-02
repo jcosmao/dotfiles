@@ -63,7 +63,7 @@ G.TermFiletypes = { 'fzf', 'toggleterm', 'term://*' }
 vim.api.nvim_create_autocmd("Filetype", {
     pattern = G.TermFiletypes,
     callback = function()
-        vim.api.nvim_create_autocmd({ "CursorMoved" }, {
+        vim.api.nvim_create_autocmd({ "CursorMoved", "TermEnter", "BufEnter", "TermOpen" }, {
             buffer = 0, -- Le buffer actuel
             callback = function()
                 vim.cmd("startinsert")

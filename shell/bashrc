@@ -4,19 +4,13 @@
 [[ -z "$PS1" ]] && return
 [[ -f "$HOME/.force_zsh" ]] && exec zsh && return
 
+for f in $(find ~/.shell/ -name '*.bash'); do source $f; done
+
 source $HOME/.shell/common.sh
-is_already_sourced bashrc && return || SOURCE+=("bashrc")
-
-export_shell
-
+common.is_already_sourced bashrc && return || SOURCE+=("bashrc")
+common.export_shell
 [[ ! "$SHELL" =~ bash ]] && return
-
-[[ -f ~/.bash_aliases ]] && common.source ~/.bash_aliases
-
-
-for src in $(common.get_sourceable_bash_files_ordered); do
-    common.source "$src"
-done
+common.source_all
 
 # Set prompt
 if [[ $(basename ${BASH_SOURCE[0]}) == ".bashrc" ]]; then

@@ -5,9 +5,8 @@
 [[ $ZSH_DEBUG -eq 1 ]] && zmodload zsh/zprof
 
 source $HOME/.shell/common.sh
-is_already_sourced zshrc && return || SOURCE+=("zshrc")
-
-export_shell
+common.is_already_sourced zshrc && return || SOURCE+=("zshrc")
+common.export_shell
 
 [[ ! "$SHELL" =~ zsh ]] && return
 
