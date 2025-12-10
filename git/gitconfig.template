@@ -99,6 +99,7 @@
     st = status --short
     ca = commit -a --amend --reuse-message=HEAD
     checkout = checkout -B
+    unstage = restore --staged
     # show current tracking remote/branch
     trackshow = !git rev-parse --abbrev-ref --symbolic-full-name @{u}
     # set track to remote/branch
