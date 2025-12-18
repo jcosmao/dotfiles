@@ -127,12 +127,6 @@ vim.api.nvim_create_autocmd("BufEnter", {
 -- Filetypes
 --
 
--- start git messages in insert mode
-vim.api.nvim_create_autocmd('FileType', {
-    pattern = 'git*',
-    command = 'startinsert | 1'
-})
-
 vim.api.nvim_create_autocmd({ "FileType" }, {
     pattern = { "puppet" },
     callback = function()

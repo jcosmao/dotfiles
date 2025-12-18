@@ -119,7 +119,7 @@ function utils.jqmap2csv
 function utils.jqgrep
 {
     string=$1
-    jq --arg string "$string" '.[] | [select(any(.[]; tostring | contains($string)))]'
+    jq --arg string "$string" '[.[] | select(any(.[]; tostring | contains($string)))]'
 }
 
 # csv to table display
