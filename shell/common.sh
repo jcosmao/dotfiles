@@ -16,10 +16,9 @@ function _get_sourceable_bash_files_ordered
 {
     # skip /etc/profile
     # [[ ! $(hostname -s) =~ ^laptop ]] && echo /etc/profile
-    find ~/.bash_custom/ ~/.shell/source ~/.shell/completions -type f -follow  2> /dev/null | while read file;do
+    find ~/.bash_aliases ~/.bash_custom/ ~/.shell/source ~/.shell/completions -type f -follow  2> /dev/null | while read file;do
         echo "$(basename "$file") $file"
     done | sort -n | awk '{print $2}'
-    echo ~/.bash_aliases
 }
 
 function common.is_already_sourced () {
