@@ -61,7 +61,7 @@ local pylint = {
 
 -- https://github.com/acrn/puppet-fmt
 local puppet_fmt = {
-    formatCommand = 'puppet-fmt --strict --verbose -i ${INPUT}',
+    formatCommand = 'puppet-fmt --verbose -i ${INPUT}',
     formatStdin = true
 }
 
