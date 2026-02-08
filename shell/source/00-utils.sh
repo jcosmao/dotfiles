@@ -224,6 +224,14 @@ function utils.find_project_root
     done
 )}
 
+function utils.docker_ps
+{
+    docker ps --format '{{ .ID }}' | while read id; do
+        networks=$(docker inspect "$id" | jq -r '.[0].NetworkSettings.Networks | to_entries[] | select(.value.IPAddress != "") | {name: .key, ip_address: .value.IPAddress}' | jq -s '.')
+        docker ps --filter "id=$id" --format '{"id":"{{ .ID }}", "name":"{{ .Names }}", "state":"{{ .State }}", "status": "{{ .Status }}", "image": "{{ .Image }}", "created_at": "{{ .CreatedAt }}", "networks": '"$networks"'}' | jq '.'
+    done | jq -s '.'
+}
+
 alias dotup="utils.dotfiles_update"
 alias zup="utils.zsh_update"
 alias json="utils.json"
@@ -236,3 +244,4 @@ alias passgen="utils.randpass"
 alias passgen64="utils.randpass_b64"
 alias uuid="utils.uuid"
 alias wg-toggle="utils.wireguard_toggle"
+alias dps="utils.docker_ps"
