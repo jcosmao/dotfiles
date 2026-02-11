@@ -81,7 +81,8 @@ map <silent> <leader><F1> :set number \| :set signcolumn=auto <cr>
 map <silent> <F1> :call ToggleNetrw()<CR>
 map <silent> <F4> :set number! <cr>
 map <silent> <F10> :set paste! <cr>
-map <silent> <F12> :call custom#ToggleMouse() <cr>
+map <silent> <F12> :call ToggleMouse()<CR>
+inoremap <silent> <F12> <Esc>:call ToggleMouse()<CR>a
 map <silent> <C-a> ^
 map <silent> <C-e> $
 map <silent> <C-Right> e
