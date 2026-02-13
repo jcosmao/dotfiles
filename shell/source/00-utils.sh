@@ -197,17 +197,13 @@ function ssh-rdp.help
 
 function utils.wireguard_toggle
 {
+    conf=${1:-wg1}
+
     iface=$(ip --json link show | jq -r '.[] | select(.ifname | test("^wg")) | .ifname')
     if [[ -n $iface ]]; then
         wg-quick down $iface
     else
-        broadcast=$(ip --json a show  | jq -r '.[] | select(.operstate == "UP") | .addr_info.[0].broadcast' | head -1)
-        if [[ $broadcast == 192.168.1.255 ]]; then
-            # Do not route 192.168.1.0/24 in tunnel
-            wg-quick up wg1
-        else
-            wg-quick up wg0
-        fi
+        wg-quick up $conf
     fi
 }
 
