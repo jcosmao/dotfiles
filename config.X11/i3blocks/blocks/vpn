@@ -1,18 +1,25 @@
 #!/bin/bash
 
 label=''
-color_up='#9ec600'
+color_up='#FF7961'
 color_down='#676767'
 
-echo $label
-echo $label
-
-function wireguard_count {
-    ip --json link show | jq -r '.[] | select(.ifname | test("^wg")).ifname' | wc -l
+function wireguard_iface {
+    ip --json link show | jq -r '.[] | select(.ifname | test("^wg")).ifname' | head -1
 }
 
-if [[ -f /var/run/vpnc.pid || -n $(pidof nm-vpnc-service) || $(wireguard_count) > 0 ]]; then
+function protonvpn_iface {
+    ip --json link show | jq -r '.[] | select(.ifname | test("^proton")).ifname' | head -1
+}
+
+if [[ -f /var/run/vpnc.pid || -n $(pidof nm-vpnc-service) || -n $(wireguard_iface) || -n $(protonvpn_iface) ]]; then
+    [[ -n $(wireguard_iface) ]] && iface=$(wireguard_iface)
+    [[ -n $(protonvpn_iface) ]] && iface=$(protonvpn_iface)
+    echo "$label  $iface"
+    echo $label
     echo $color_up
 else
+    echo $label
+    echo $label
     echo $color_down
 fi
