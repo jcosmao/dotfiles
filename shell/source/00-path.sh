@@ -24,6 +24,6 @@ function path.remove
 }
 
 
-for p in /bin /usr/bin /usr/sbin /snap/bin /usr/local/bin $HOME/.local/bin; do
+for p in /bin /usr/bin /usr/sbin /snap/bin /usr/local/bin $HOME/bin $HOME/.local/bin; do
     path.prepend $p
 done
