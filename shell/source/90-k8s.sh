@@ -170,11 +170,12 @@ function k8s.exec {
         return
     fi
     [[ $type == "cmd" ]] && kub exec -t $*
-    [[ $type == "shell" ]] && kub exec -it $* -- sh
+    [[ $type == "shell" ]] && kub exec -it $* -- bash 2>/dev/null || kub exec -it $* -- sh
 }
 
 function k8s.get_ns_logs {
-    command stern -n $KUBENS --field-selector metadata.namespace=$KUBENS $*
+    local pods=($(printf '%s\n' "$@" | sed 's|^pod/||'))
+    command stern -n ${KUBENS:-default} --field-selector metadata.namespace=${KUBENS:-default} "${pods[@]}"
 }
 
 function k8s.get_port_forwarding {
@@ -254,12 +255,14 @@ complete -F _complete_pod kx
 complete -F _complete_pod k8s.exec
 complete -F _complete_pod knet
 complete -F _complete_pod k8s.pod_netns_enter
+complete -F _complete_pod klog
+complete -F _complete_pod k8s.get_ns_logs
 
 
-# if [[ $(basename $SHELL) == zsh ]]; then
-#     # get zsh complete kubectl
-#     source <(command kubectl completion zsh)
-#     compdef kubecolor=kubectl
-#     compdef k=kubectl
-#     compdef k=kub
-# fi
+if [[ $(basename $SHELL) == zsh ]]; then
+    # get zsh complete kubectl
+    source <(command kubectl completion zsh)
+    compdef kubecolor=kubectl
+    compdef k=kubectl
+    # compdef k=kub
+fi
