@@ -264,5 +264,5 @@ if [[ $(basename $SHELL) == zsh ]]; then
     source <(command kubectl completion zsh)
     compdef kubecolor=kubectl
     compdef k=kubectl
-    # compdef k=kub
+    compdef kub=kubectl
 fi

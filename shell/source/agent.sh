@@ -1,9 +1,14 @@
 #!/bin/bash
 
+[[ ! -d $HOME/.ssh ]] && return
+
 function agent.launch_ssh_agent
 {
-    # cache key for 10h
-    ssh_agent_cmd="ssh-agent -s -t 36000"
+    AGENT_CACHE="${HOME}/.ssh/agent.conf"
+    mkdir -p $(dirname $AGENT_CACHE)
+    touch $AGENT_CACHE
+
+    ssh_agent_cmd="ssh-agent -s -t ${SSH_AGENT_CACHE_SECONDS:-36000}"
     agent_pid=$(pgrep ssh-agent -u $USER -n)
 
     if [[ -z $agent_pid && $SSH_TTY && -n $SSH_AUTH_SOCK && -S $SSH_AUTH_SOCK ]]; then
@@ -19,7 +24,7 @@ function agent.launch_ssh_agent
         fi
     fi
 
-    eval "$(cat ~/.ssh-agent 2> /dev/null)" >/dev/null
+    eval "$(cat $AGENT_CACHE 2> /dev/null)" >/dev/null
     if [[ -n $SSH_AGENT_PID ]]; then
         cmd=$(ps --no-headers -o cmd "$SSH_AGENT_PID")
         if [[ $ssh_agent_cmd != "$cmd" ]]; then
@@ -34,8 +39,8 @@ function agent.launch_ssh_agent
     # no ssh-agent running
     if [[ $rc == 2 ]]; then
         # Try to export ssh-agent env
-        (umask 066; eval "$ssh_agent_cmd" >| ~/.ssh-agent)
-        eval "$(<~/.ssh-agent)" >/dev/null
+        (umask 066; eval "$ssh_agent_cmd" >| $AGENT_CACHE)
+        eval "$(< $AGENT_CACHE)" >/dev/null
         ssh-add $(ls ~/.ssh/*.pub 2> /dev/null | sed -re 's/\.pub$//') 2> /dev/null
     elif [[ $rc == 1 || ($rc == 0 && $sshadd_len < $lspub_len) ]]; then
         # Add default ssh-key to agent cache

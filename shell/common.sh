@@ -1,6 +1,7 @@
 #!/bin/bash
 
 mkdir -p $HOME/{.history,.bash_custom}
+[[ -f $HOME/conf ]] && source $HOME/.bash_custom/conf
 
 [[ -z $SOURCE ]] && export SOURCE=()
 
