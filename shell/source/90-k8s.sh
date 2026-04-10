@@ -85,7 +85,7 @@ function k8s.list_containers_by_pod {
                         .status.podIP as $podip |
                         .metadata.creationTimestamp as $pod_created |
                         .metadata.deletionTimestamp as $pod_deleted |
-                        .status.containerStatuses[] | [
+                        ((.status.initContainerStatuses // []) + (.status.containerStatuses // []))[] | [
                 "pod/" + $pod_name,
                 .name,
                 (

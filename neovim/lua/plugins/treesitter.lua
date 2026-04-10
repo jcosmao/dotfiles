@@ -25,6 +25,7 @@ return {
                     "json",
                     "yaml",
                     "markdown",
+                    "markdown_inline",
                     "make",
                     "cmake",
                     "toml",
