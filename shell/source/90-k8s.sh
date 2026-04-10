@@ -75,7 +75,7 @@ complete -F _complete_kns knsc
 
 function k8s.list_containers_by_pod {
     {
-        echo -n "${BOLD}NAME\tCONTAINER\tSTATUS\tRESTARTS\tLAST\tAGE\tIP\tNODE\tNODE_IP${NORMAL}\n";
+        echo -n "${BOLD}NAME\tCONTAINER\tINIT\tSTATUS\tRESTARTS\tLAST\tAGE\tIP\tNODE\tNODE_IP${NORMAL}\n";
         {
             kub get pods -o json | \
             jq -r --arg current_date "$(date +%s)" \
@@ -85,9 +85,10 @@ function k8s.list_containers_by_pod {
                         .status.podIP as $podip |
                         .metadata.creationTimestamp as $pod_created |
                         .metadata.deletionTimestamp as $pod_deleted |
-                        ((.status.initContainerStatuses // []) + (.status.containerStatuses // []))[] | [
+                        ((.status.initContainerStatuses // [] | map(. + {_init: "Yes"})) + (.status.containerStatuses // [] | map(. + {_init: "No"})))[] | [
                 "pod/" + $pod_name,
                 .name,
+                ._init,
                 (
                     if $pod_deleted then "Terminating"
                     elif .state.waiting then (.state.waiting.reason // "Waiting")
@@ -118,21 +119,31 @@ function k8s.list_containers_by_pod {
                 (
                     (.state.terminated.startedAt // .state.running.startedAt) as $last_start |
                     if $last_start then
-                        (($last_start | fromdateiso8601) // ($current_date | tonumber) | strftime("%Y-%m-%d %H:%M:%S %Z"))
+                        ($last_start | fromdateiso8601) as $last_start_epoch |
+                        (($current_date | tonumber) - $last_start_epoch) as $diff |
+                        if $diff < 600 then "\($diff)s"
+                        elif $diff < 7200 then "\($diff / 60 | floor)m"
+                        elif $diff < 86400 then "\($diff / 3600 | floor)h"
+                        else "\($diff / 86400 | floor)d"
+                        end
                     else
                         "Unknown"
                     end
                 ),
                 (
                     ($pod_created | fromdateiso8601) as $created_epoch |
-                    (($current_date | tonumber) - $created_epoch) as $created_seconds |
-                    $created_seconds / 86400 | floor | "\(.)d"
+                    (($current_date | tonumber) - $created_epoch) as $diff |
+                    if $diff < 600 then "\($diff)s"
+                    elif $diff < 7200 then "\($diff / 60 | floor)m"
+                    elif $diff < 86400 then "\($diff / 3600 | floor)h"
+                    else "\($diff / 86400 | floor)d"
+                    end
                 ),
                 $podip,
                 $node,
                 $nodeip
             ] | @tsv'
-        } | sort -k7 -k8
+        } | sort -k1
     } | column -ts $'\t' | kub get pods --kubecolor-stdin
 }
 
