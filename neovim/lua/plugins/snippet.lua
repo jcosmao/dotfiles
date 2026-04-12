@@ -60,6 +60,9 @@ __import__('logging').getLogger().error(
                     ls.snippet("loginfo", fmt([[l.Info("{}", "{}", {})]], { ls.insert_node(1), ls.insert_node(2), ls.insert_node(3) })),
                     ls.snippet("logwarn", fmt([[l.Warn("{}", "{}", {})]], { ls.insert_node(1), ls.insert_node(2), ls.insert_node(3) })),
                     ls.snippet("logerr", fmt([[l.Error("{}", "{}", {})]], { ls.insert_node(1), ls.insert_node(2), ls.insert_node(3) })),
+                },
+                markdown = {
+                    ls.snippet("box", { ls.text_node("- [ ] "), ls.insert_node(1, "text") })
                 }
             }
 

@@ -51,7 +51,7 @@ vim.opt.numberwidth = 6
 vim.opt.shortmess = vim.opt.shortmess + "c"
 vim.opt.pumheight = 20
 vim.opt.termguicolors = true
-vim.opt.conceallevel = 2
+vim.opt.conceallevel = 0
 vim.api.nvim_set_option("clipboard", "unnamedplus")
 G.timeoutlen = 1000
 G.terminal_timeoutlen = 150
