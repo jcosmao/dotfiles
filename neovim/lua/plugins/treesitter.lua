@@ -1,3 +1,32 @@
+local tmpl_filetypes = { "gotmpl", "gohtmltmpl", "gotexttmpl" }
+vim.treesitter.language.register("gotmpl", { "gohtmltmpl", "gotexttmpl" })
+
+vim.treesitter.query.add_directive("inject-go-tmpl!", function(_, _, bufnr, _, metadata)
+  local ft = vim.bo[bufnr].filetype
+  if not vim.tbl_contains(tmpl_filetypes, ft) then return end
+
+  local fname = vim.fs.basename(vim.api.nvim_buf_get_name(bufnr))
+  local ext = fname:match(".*%.(%a+)%.%a+$") or fname:match(".*%.(%a+)$")
+  if not ext or ext == ft then return end
+
+  -- ext → vim filetype (uses settings.lua rules + nvim defaults), then → treesitter parser
+  local lang = vim.filetype.match({ filename = "x." .. ext }) or ext
+  metadata["injection.language"] = vim.treesitter.language.get_lang(lang) or lang
+end, {})
+
+-- Authoritatively replace gotmpl injections so go.nvim's blanket html+javascript
+-- injections (which use ;; extends) don't merge in.
+vim.treesitter.query.set("gotmpl", "injections", [[
+((text) @injection.content
+  (#inject-go-tmpl!)
+  (#set! injection.combined))
+
+((comment) @injection.content
+  (#set! injection.language "comment"))
+]])
+
+
+
 return {
     {
         'nvim-treesitter/nvim-treesitter',
@@ -9,6 +38,7 @@ return {
                 ensure_installed = {
                     "bash",
                     "go",
+                    "gotmpl",
                     "gomod",
                     "c",
                     "cpp",

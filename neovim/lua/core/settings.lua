@@ -81,18 +81,42 @@ if vim.fn.has('python3') == 0 then
     vim.cmd('echohl None')
 end
 
+local function helm_chart(path)
+    local chart = vim.fs.find("Chart.yaml", {
+        path = path,
+        upward = true,
+        stop = vim.loop.os_homedir(),
+    })[1]
+
+    if chart then
+        return true
+    end
+
+    return false
+end
+
 vim.filetype.add({
-  -- Detect and assign filetype based on the extension of the filename
-  extension = {
-    lib = "sh",
-    source = "sh",
-    pp = "puppet",
-    inc = "perl",
-    conf = "ini",
-    tf = "terraform",
-    tftpl = "hcl",
-    tpl = "hcl",
-  },
+    -- Detect and assign filetype based on the extension of the filename
+    extension = {
+        lib = "sh",
+        source = "sh",
+        pp = "puppet",
+        inc = "perl",
+        conf = "ini",
+        tf = "terraform",
+        tftpl = "hcl",
+        tpl = "hcl",
+        tmpl = "gotmpl",
+    },
+    pattern = {
+        [".*/chart/templates/.*"] = function(path, _)
+            if not helm_chart(path) then
+                return
+            elseif path:match("%.ya?ml$") then
+                return "gotmpl"
+            end
+        end,
+    },
 })
 
 -- fold column

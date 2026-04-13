@@ -22,6 +22,7 @@ function go.install
 # do not depends on glibc
 export CGO_ENABLED=0
 export GOFLAGS=-buildvcs=false
+export GOTMPDIR=$HOME/go/tmp
 
 function go.test
 {

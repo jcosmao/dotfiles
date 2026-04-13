@@ -1,5 +1,19 @@
 local efm_cfg = require("plugins.efm")
 
+-- FIXME
+-- compat: vim.lsp.codelens.enable was added in nvim 0.12; shim for 0.11
+if not vim.lsp.codelens.enable then
+    vim.lsp.codelens.enable = function(enable, opts)
+        opts = opts or {}
+        if enable ~= false then
+            vim.lsp.codelens.refresh({ bufnr = opts.bufnr })
+        elseif opts.bufnr then
+            vim.lsp.codelens.clear(nil, opts.bufnr)
+        end
+    end
+end
+
+
 local lsp = {
     bashls = {},
     pyright = {
