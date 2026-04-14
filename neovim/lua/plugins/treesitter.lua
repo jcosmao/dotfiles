@@ -1,3 +1,43 @@
+local install_parser = {
+    "bash",
+    "go",
+    "gotmpl",
+    "gomod",
+    "gowork",
+    "c",
+    "cpp",
+    "python",
+    "rust",
+    "ruby",
+    "perl",
+    "vim",
+    "html",
+    "http",
+    "css",
+    "javascript",
+    "lua",
+    "json",
+    "yaml",
+    "markdown",
+    "markdown_inline",
+    "make",
+    "cmake",
+    "toml",
+    "regex",
+    "rst",
+    "diff",
+    "dockerfile",
+    "terraform",
+    "hcl",
+    "ini",
+    "comment",
+    "vimdoc",
+}
+
+
+-- Go template: inject language for syntax hilight
+-- if file is named  file.ext.template_extension then inject filetype ext
+-- if file is named  file.ext and is a go template (filetype foced) then inject filetype ext
 local tmpl_filetypes = { "gotmpl", "gohtmltmpl", "gotexttmpl" }
 vim.treesitter.language.register("gotmpl", { "gohtmltmpl", "gotexttmpl" })
 
@@ -34,63 +74,27 @@ return {
         cond = vim.fn.executable('gcc') == 1,
         config = function()
             require("nvim-treesitter.install").prefer_git = true
-            require('nvim-treesitter.configs').setup({
-                ensure_installed = {
-                    "bash",
-                    "go",
-                    "gotmpl",
-                    "gomod",
-                    "c",
-                    "cpp",
-                    "python",
-                    "rust",
-                    "ruby",
-                    "perl",
-                    "vim",
-                    "html",
-                    "http",
-                    "css",
-                    "javascript",
-                    "lua",
-                    "json",
-                    "yaml",
-                    "markdown",
-                    "markdown_inline",
-                    "make",
-                    "cmake",
-                    "toml",
-                    "regex",
-                    "rst",
-                    "diff",
-                    "dockerfile",
-                    "terraform",
-                    "hcl",
-                    "ini",
-                    "comment",
-                    "vimdoc",
-                },
-                -- one of "all", "maintained" (parsers with maintainers), or a list of languages
-                ignore_install = {},
-                highlight = {
-                    enable = true,                 -- false will disable the whole extension
-                    disable = G.SpecialFiletypes, -- list of language that will be disabled
-                    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-                    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-                    -- Using this option may slow down your editor, and you may see some duplicate highlights.
-                    -- Instead of true it can also be a list of languages
-                    additional_vim_regex_highlighting = false,
-                },
-                indent = { enable = true },
-                incremental_selection = {
-                    enable = true,
-                    keymaps = {
-                        init_selection = '<CR>',
-                        scope_incremental = '<CR>',
-                        node_incremental = '<TAB>',
-                        node_decremental = '<S-TAB>',
-                    },
-                },
+        end,
+        init = function()
+            vim.api.nvim_create_autocmd('FileType', {
+                callback = function()
+                    if IsSpecialFiletype() then
+                        return
+                    end
+                    -- Enable treesitter highlighting and disable regex syntax
+                    pcall(vim.treesitter.start)
+                    -- Enable treesitter-based indentation
+                    vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+                end,
             })
+
+            local alreadyInstalled = require('nvim-treesitter.config').get_installed()
+            local parsersToInstall = vim.iter(install_parser)
+                :filter(function(parser)
+                    return not vim.tbl_contains(alreadyInstalled, parser)
+                end)
+                :totable()
+            require('nvim-treesitter').install(parsersToInstall)
         end,
     }
 }

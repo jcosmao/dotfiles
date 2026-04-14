@@ -67,8 +67,8 @@ else
 end
 
 -- Set python path if pyenv is installed
-if vim.fn.filereadable(vim.fn.expand('~') .. '/.pyenv/versions/nvim/bin/python') then
-    vim.g.nvim_python_path = vim.fn.expand('~') .. '/.pyenv/versions/nvim/bin'
+if vim.fn.filereadable(vim.fn.expand('~') .. '/.venvs/nvim/bin/python') then
+    vim.g.nvim_python_path = vim.fn.expand('~') .. '/.venvs/nvim/bin'
     vim.g.python3_host_prog = vim.g.nvim_python_path .. '/python'
     vim.env.PATH = vim.g.nvim_python_path .. ':' .. vim.env.PATH
 end

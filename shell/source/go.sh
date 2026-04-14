@@ -23,8 +23,9 @@ function go.install
 export CGO_ENABLED=0
 export GOFLAGS=-buildvcs=false
 export GOTMPDIR=$HOME/go/tmp
+mkdir -p $GOTMPDIR
 
-function go.test
+function go.testify
 {
     func=${1:-.*}
     if [[ $func == *'/'* ]]; then

@@ -45,12 +45,12 @@ function install_vim_requirements
         install_neovim 'stable'
     fi
 
-    install_local_bin
 
     rm -rf ~/.ctags.d && ln -sf "$SCRIPTPATH/ctags/ctags.d" ~/.ctags.d
 
-    if ! source ~/.pyenv/versions/nvim/bin/activate; then
-        echo "Unable to load 'nvim' pyenv virtualenv. run pyenv.install; pyenv virtualenv nvim"
+    echo "  ❭ nvim virtualenv"
+    if ! source ~/.venvs/nvim/bin/activate; then
+        echo "Unable to load 'nvim' virtualenv. uv venv ~/.venvs/nvim"
         exit 1
     fi
 
@@ -58,28 +58,13 @@ function install_vim_requirements
     pip_installed=$(echo "$pip_freeze" | grep -P "(^$(echo ${pip_require[@]} | sed -e 's/ /|^/g'))" | wc -l)
 
     if [[ ${#pip_require[@]} -ne $pip_installed ]]; then
-        pip install --upgrade pip setuptools
-        pip install --upgrade "${pip_require[@]}"
+        uv pip install --upgrade pip setuptools
+        uv pip install --upgrade "${pip_require[@]}"
     fi
 
-    source "$SCRIPTPATH/shell/source/nvm.sh"
-    nodejs.load
-    which npm 2> /dev/null
-    [[ $? -ne 0 ]] && echo "Node JS not available; run nodejs.install" && exit 1
-
-    if [[ $(lsb_release -rs) == "18.04" ]]; then
-        # npm tree-sitter deps (>0.19 require glibc > ubuntu18)
-        nvm install 16.17.0
-        nvm use 16.17.0
-        nvm alias default v16.17.0
-        npm install --location=global tree-sitter@0.19 tree-sitter-cli@0.19.0
-    else
-        npm install --global tree-sitter tree-sitter-cli
-    fi
-
-    # Path used in vim config
-    ln -sf "$(which npm)" "$HOME/.local/bin/npm"
-    ln -sf "$(which node)" "$HOME/.local/bin/node"
+    echo "  ❭ treesitter"
+    which tree-sitter &> /dev/null
+    [[ $? -ne 0 ]] && echo "Need to install tree-sitter-cli: cargo install tree-sitter-cli" && exit 1
 }
 
 function install_vim_config
@@ -87,7 +72,7 @@ function install_vim_config
     echo "- Install neovim"
 
     rm -rf ~/.config/nvim && ln -sf "$SCRIPTPATH/neovim" ~/.config/nvim
-    "$HOME/.local/bin/.nvim/usr/bin/nvim" --headless +PlugClean! +PlugInstall +PlugUpdate! +qall 2> /dev/null
+    "$HOME/.local/bin/.nvim/usr/bin/nvim" --headless +qall 2> /dev/null
 }
 
 function install_vim_light
@@ -246,36 +231,60 @@ function install_fonts
 
 function install_config
 {
-    target=${1:-common}
-    echo "- Install .config from config.${target}"
-    mkdir -p "$HOME/.config.${target}.backup"
+    echo "- Install .config"
 
-    for cfg in $(ls "config.${target}"); do
+    for cfg in $(ls "config"); do
         # to replace only a single file in a subdir,
         # handle renamed file path with '\' instead of '/''
         targetcfg=$(echo "$cfg" | sed -e 's/\\/\//g')
         if [[ ! -L "$HOME/.config/$targetcfg" ]]; then
-            mv "$HOME/.config/$targetcfg" "$HOME/.config.${target}.backup/$cfg.$(date '+%s')" 2> /dev/null
+            mv "$HOME/.config/$targetcfg" "$HOME/.config.backup/$cfg.$(date '+%s')" 2> /dev/null
         fi
-        rm -f "$HOME/.config/$targetcfg" 2> /dev/null && ln -sf "$SCRIPTPATH/config.${target}/$cfg" "$HOME/.config/$targetcfg"
+        rm -f "$HOME/.config/$targetcfg" 2> /dev/null && ln -sf "$SCRIPTPATH/config/$cfg" "$HOME/.config/$targetcfg"
     done
 
-    if [[ $target = X11 ]]; then
-        # build i3 config
-        if which i3 &> /dev/null; then
-            echo "  ❭ build i3 conf"
-            "$HOME/.config/i3/i3_build_conf.sh" > /dev/null
-            ln -sf "$HOME/.config/i3/scripts/i3lock_blur.sh" "$HOME/.local/bin/lockscreen"
+}
+
+function install_x_conf
+{
+    echo "- Install X .config"
+
+    for cfg in $(ls "X/config"); do
+        # to replace only a single file in a subdir,
+        # handle renamed file path with '\' instead of '/''
+        targetcfg=$(echo "$cfg" | sed -e 's/\\/\//g')
+        if [[ ! -L "$HOME/.config/$targetcfg" ]]; then
+            mv "$HOME/.config/$targetcfg" "$HOME/.config.backup/$cfg.$(date '+%s')" 2> /dev/null
         fi
+        rm -f "$HOME/.config/$targetcfg" 2> /dev/null && ln -sf "$SCRIPTPATH/X/config/$cfg" "$HOME/.config/$targetcfg"
+    done
 
-        for app in $(ls $SCRIPTPATH/config.${target}/applications/*.desktop); do
-            ln -sf $app "$HOME/.local/share/applications/$(basename $app)"
-        done
+    # install local bin
+    for f in X/bin/*; do
+        bin=$(basename "$f")
+        [[ $bin = "README.md" ]] && continue
+        # check ldd
+        echo "  ❭ $bin"
+        if [[ $(ldd "X/bin/$bin" 2>&1 | grep -c 'not found') -eq 0 ]]; then
+            bin_name=$(echo "$bin" | cut -d. -f1)
+            ln -sf "$SCRIPTPATH/X/bin/$bin" "$HOME/.local/bin/$bin_name"
+        fi
+    done
 
-        for file in $(ls $SCRIPTPATH/config.${target}/dotfiles); do
-            ln -sf "$SCRIPTPATH/config.${target}/dotfiles/$file" "$HOME/.$file"
-        done
+    # build i3 config
+    if which i3 &> /dev/null; then
+        echo "  ❭ build i3 conf"
+        "$HOME/.config/i3/i3_build_conf.sh" > /dev/null
+        ln -sf "$HOME/.config/i3/scripts/i3lock_blur.sh" "$HOME/.local/bin/lockscreen"
     fi
+
+    for app in $(ls $SCRIPTPATH/X/config/applications/*.desktop); do
+        ln -sf $app "$HOME/.local/share/applications/$(basename $app)"
+    done
+
+    for file in $(ls $SCRIPTPATH/X/config/dotfiles); do
+        ln -sf "$SCRIPTPATH/X/config/dotfiles/$file" "$HOME/.$file"
+    done
 }
 
 function uninstall
@@ -337,7 +346,7 @@ function main
             --ui | -x)
                 help="i3 cfg, icons, fonts"
                 install_fonts
-                install_config X11
+                install_x_conf
                 ;;
 
             --nvim | --neovim | -v)
@@ -346,6 +355,7 @@ function main
                     release=$1 && shift &&
                     install_neovim "$release"
                 install_vim_requirements
+                install_local_bin
                 install_vim_config
                 ;;
 

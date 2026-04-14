@@ -44,7 +44,7 @@ function common.source
 function common.source_all
 {
     for src in $(_get_sourceable_bash_files_ordered); do
-        [[ $(basename $src) = "go.sh" ]] && ! which go &> /dev/null && continue
+        [[ $(basename $src) = "go.sh" ]] && [[ ! -d $HOME/go ]] && continue
         [[ $(basename $src) = "rust.sh" ]] && [[ ! -d $HOME/.cargo ]] && continue
         [[ $(basename $src) = "terraform.sh" ]] && ! which terraform &> /dev/null && continue
         [[ $(basename $src) = "openstack.sh" ]] && ! which openstack &> /dev/null && continue
