@@ -11,17 +11,16 @@ export RIPGREP_CONFIG_PATH=$HOME/.config/ripgreprc
 if [[ -f $HOME/.local/bin/nvim ]]; then
     alias lvim="THEME=light nvim"
     alias dvim="THEME=dark nvim"
-    alias vim="lvim"
     alias vimdiff="vim -d"
 fi
 
 # fucking keyboard
-alias vi=vim
 alias vun=vim
 alias bim=vim
 alias gti=git
 alias grpe=grep
 
+alias vi=vim
 alias ls='ls --color=auto'
 alias dir='dir --color=auto'
 alias grep='grep --color=auto'
