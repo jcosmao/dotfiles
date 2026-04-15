@@ -111,12 +111,18 @@ function M.lazy_config()
             end
         },
         {
-            'norcalli/nvim-colorizer.lua',
+            'catgoose/nvim-colorizer.lua',
             priotity = 1000,
-            opts = { 'css', 'javascript', 'vim', 'lua', 'xml' }
+            opts = {
+                parsers = {
+                  names = {
+                    enable = false,
+                  },
+                }
+            }
         },
     }
-end
+    end
 
 function M.setColorscheme()
     local colors = {}

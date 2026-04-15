@@ -2,7 +2,13 @@ return {
     'MeanderingProgrammer/render-markdown.nvim',
     ft = { "markdown", "norg", "rmd", "org" },
     opts = {
-        enabled = false,
+        enabled = true,
+        -- This function takes the buffer number as an input
+        -- If it returns true, the plugin will NOT attach to that buffer
+        ignore = function(buf)
+            local buftype = vim.api.nvim_get_option_value('buftype', { buf = buf })
+            return buftype == 'nofile'
+        end,
         heading = {
             enabled = true,
             sign = true,
