@@ -3,13 +3,26 @@
 
 import json
 import os
+import re
 import subprocess
 import sys
 
 iface_type = os.environ.get('BLOCK_INSTANCE', 'ethernet')
 label = ''
 color_up = '#B8A391'
+color_up_vpn = '#FF7961'
 color_down = '#676767'
+
+VPN_RE = re.compile(r'^(wg|proton|gp)')
+
+
+def _get_vpn_ifaces(ifaces):
+    result = []
+    for iface in ifaces:
+        name = iface['ifname']
+        if VPN_RE.match(name):
+            result.append(iface)
+    return result
 
 
 def _get_first_ifname(ifaces, iface_type=iface_type):
@@ -41,6 +54,21 @@ if __name__ == "__main__":
     )
     json_str = output.decode('utf8')
     ifaces = json.loads(json_str)
+
+    if iface_type == 'vpn':
+        parts = []
+        print(_get_vpn_ifaces(ifaces))
+        for iface in _get_vpn_ifaces(ifaces):
+            try:
+                ip = iface['addr_info'][0]['local']
+                parts.append('{} {}'.format(iface['ifname'], ip))
+            except (KeyError, IndexError):
+                parts.append(iface['ifname'])
+        if parts:
+            print('{} {}'.format(label, ' | '.join(parts)))
+            print(label)
+            print(color_up_vpn)
+        sys.exit(0)
 
     first = _get_first_ifname(ifaces, iface_type)
 

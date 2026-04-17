@@ -1,25 +1,33 @@
 #!/bin/bash
 
-label=''
+label=' '
 color_up='#FF7961'
 color_down='#676767'
 
-function wireguard_iface {
-    ip --json link show | jq -r '.[] | select(.ifname | test("^wg")).ifname' | head -1
+function iface_by_regex {
+    ip --json link show | jq -r --arg re "$1" '.[] | select(.ifname | test($re)).ifname' | head -1
 }
 
-function protonvpn_iface {
-    ip --json link show | jq -r '.[] | select(.ifname | test("^proton")).ifname' | head -1
+function vpnc_iface {
+    if [[ -f /var/run/vpnc.pid || -n $(pidof nm-vpnc-service) ]]; then
+        iface_by_regex '^(tun|cisco)'
+    fi
 }
 
-if [[ -f /var/run/vpnc.pid || -n $(pidof nm-vpnc-service) || -n $(wireguard_iface) || -n $(protonvpn_iface) ]]; then
-    [[ -n $(wireguard_iface) ]] && iface=$(wireguard_iface)
-    [[ -n $(protonvpn_iface) ]] && iface=$(protonvpn_iface)
-    echo "$label  $iface"
-    echo $label
-    echo $color_up
-else
-    echo $label
-    echo $label
-    echo $color_down
+names=()
+for entry in "wg:$(iface_by_regex '^wg')" \
+             "proton:$(iface_by_regex '^proton')" \
+             "gp:$(iface_by_regex '^gp')" \
+             "vpnc:$(vpnc_iface)"; do
+    iface=${entry#*:}
+    [[ -z $iface ]] && continue
+    names+=("${entry%%:*}")
+done
+
+if (( ${#names[@]} == 0 )); then
+    exit 0
 fi
+
+echo "$label ${names[*]}"
+echo "$label"
+echo "$color_up"
