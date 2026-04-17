@@ -153,6 +153,20 @@ function install_git {
         read -p "Git Email: " mail
     fi
 
+    user_branch=$(echo "$user" | tr -s ' ' '.' | tr -s [:upper:] [:lower:])
+    sed -i "s/__USERNAME_BRANCH__/$user_branch/g" ~/.git/gitconfig
+
+    if gpg -K "$user <$mail>" &> /dev/null; then
+        git config --global commit.gpgsign true
+        echo
+        echo "  * gpg signing enabled."
+        echo
+        echo "    Default sign key will be used, to select a subkey: "
+        echo "      ❭ git config --global user.signingkey SUBKEYID!"
+        echo "      ❭ gpg --keyid-format long -K | grep '\[.*S.*\]'"
+        echo
+    fi
+
     sed -i "s/__USERNAME__/$user/g" ~/.git/gitconfig
     sed -i "s/__MAIL__/$mail/g" ~/.git/gitconfig
 }
