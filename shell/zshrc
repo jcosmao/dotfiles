@@ -1,0 +1,28 @@
+# vim: set ft=sh:
+#
+[[ -f ~/.zsh_debug ]] && export ZSH_DEBUG=1
+
+[[ $ZSH_DEBUG -eq 1 ]] && zmodload zsh/zprof
+
+source $HOME/.shell/common.sh
+common.is_already_sourced zshrc && return || SOURCE+=("zshrc")
+common.export_shell
+
+[[ ! "$SHELL" =~ zsh ]] && return
+
+if [[ ! -d ~/.zsh ]]; then
+    mkdir ~/.zsh
+    git clone https://github.com/jcosmao/myzsh.git ~/.zsh/myzsh
+    git clone https://github.com/jcosmao/blox-zsh-theme.git ~/.zsh/blox-zsh-theme
+    git clone https://github.com/jcosmao/zsh-syntax-highlighting.git ~/.zsh/zsh-syntax-highlighting
+fi
+
+fpath=(~/.zsh/myzsh/lib ~/.zsh/myzsh/plugins/wd ~/.zsh/zsh-syntax-highlighting ~/.shell/completions $fpath)
+
+for l in ~/.zsh/myzsh/lib/*; do [[ -f $l ]] && source "$l"; done
+for f in ~/.shell/**/*.zsh; do [[ -f $f ]] && source "$f"; done
+source ~/.zsh/myzsh/plugins/wd/*.zsh
+source ~/.zsh/blox-zsh-theme/blox.zsh
+source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+[[ $ZSH_DEBUG -eq 1 ]] && zprof

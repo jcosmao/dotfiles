@@ -1,0 +1,7 @@
+git/gitconfig
+neovim/.plug/
+neovim/lazy-lock.json
+vim/autoload/plug.vim.old
+*.zwc
+.uuid
+.netrwhist

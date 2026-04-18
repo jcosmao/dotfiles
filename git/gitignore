@@ -1,0 +1,12 @@
+*.gutentags
+*.gutentags.*
+.project/
+.python-version
+pyrightconfig.json
+pyproject.toml
+.git-hooks/*
+.flake8
+.envrc
+uv.lock
+poetry.lock
+.tox/*

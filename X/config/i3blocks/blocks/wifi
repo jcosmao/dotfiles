@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import json
+import subprocess
+import sys
+
+label = ' '
+color_good = '#c0ff80'
+color_medium = '#fffc80'
+color_low = '#ffdf80'
+color_bad = '#ff9980'
+color_down = '#676767'
+
+
+if __name__ == "__main__":
+    output = subprocess.check_output(
+        "ip -br -j addr show",
+        shell=True
+    )
+    json_str = output.decode('utf8')
+    ifaces = json.loads(json_str)
+
+    first = None
+    for iface in ifaces:
+        if iface['ifname'].startswith('wl'):
+            first = iface
+
+    if not first:
+        sys.exit(0)
+
+    if first['operstate'] == 'DOWN':
+        print(label)
+        print(label)
+        print(color_down)
+        sys.exit(0)
+
+    output = subprocess.check_output(
+        'iwconfig {} | grep -Po \'(?<=ESSID:")[^"]*\''.format(first['ifname']),
+        shell=True
+    )
+    apname = output.decode('utf8').strip()
+
+    output = subprocess.check_output(
+        'iwconfig {} | grep -Po "(?<=Link Quality=)\d+"'.format(first['ifname']),
+        shell=True
+    )
+    link_quality = output.decode('utf8').strip()
+    power = int(link_quality) * 100 / 70
+
+    if power >= 80:
+        color = color_good
+    elif power >= 60:
+        color = color_medium
+    elif power >= 40:
+        color = color_low
+    else:
+        color = color_bad
+
+    print('{} {} |{}%|'.format(label, apname, int(power)))
+    print(label)
+    print(color)

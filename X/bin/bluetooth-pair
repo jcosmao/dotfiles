@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# bluetoothctl devices
+
+# root only
+[[ $(id -u) != 0 ]] && echo "Must be root" && exit 1
+
+MAC=$1
+
+if [[ -z $MAC ]]; then
+    echo "
+    $0 <MAC bluetooth device>
+    "
+
+    bluetoothctl default-agent
+    bluetoothctl power on
+    bluetoothctl --timeout 5 scan on
+    bluetoothctl devices
+fi
+
+# bluetoothctl remove "$MAC"
+bluetoothctl --timeout 2 trust "$MAC"
+bluetoothctl --timeout 2 pair "$MAC"
+bluetoothctl --timeout 2 connect "$MAC"

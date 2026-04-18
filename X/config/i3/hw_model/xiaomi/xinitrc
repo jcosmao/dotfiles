@@ -1,0 +1,3 @@
+xrdb .Xresources
+eval `ssh-agent -s`
+exec dbus-launch i3

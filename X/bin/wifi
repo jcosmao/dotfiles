@@ -1,0 +1,149 @@
+#!/bin/bash
+wifi_iface=$( nmcli -f DEVICE,TYPE dev  | grep wifi | awk '{print $1}' )
+
+function wifi_state ()
+{
+    state="$1"
+
+    if [[ $state == 'on' || $state == 'off' ]]; then
+        nmcli radio wifi $state
+    else
+        error "Unknow state: $state"
+    fi
+}
+
+function wifi_list ()
+{
+    echo "* Available ssid"
+    echo -e "-----------------------------------------------------------------------------\n"
+    nmcli dev wifi list
+
+    echo -e "\n* Created connection"
+    echo -e "-----------------------------------------------------------------------------\n"
+    nmcli con
+
+    return
+}
+
+function _ssid_exist ()
+{
+    ssid="$1"
+    nmcli -t --field ssid dev wifi list | grep -Pq "^$ssid$"
+    return $?
+}
+
+function _con_exist ()
+{
+    name="$1"
+    nmcli -t --field name con | grep -Pq "^$name$"
+    return $?
+}
+
+
+function _wifi_security ()
+{
+    ssid="$1"
+
+    while read wifi; do
+        name=$(echo $wifi | cut -d: -f1)
+        security=$(echo $wifi | cut -d: -f2)
+        if [[ "$name" == "$ssid" ]];then
+            [[ $security =~ WPA ]] && echo 'wpa' && return
+            [[ $security =~ WEP ]] && echo 'wep' && return
+            [[ $security == '' ]] && echo 'none' && return
+        fi
+    done < <( nmcli -t --field ssid,security dev wifi list )
+
+    # not found
+    error "security $security not known type"
+}
+
+function wifi_add ()
+{
+    ssid="$1"
+    name="$2"
+    [[ -z $name ]] && name=$ssid
+
+    _ssid_exist "$ssid"
+    [[ $? -ne 0 ]] && error "Unable to find ssid $ssid"
+
+    security=$(_wifi_security "$ssid")
+
+    echo "- Create new connection $name to ssid: $ssid"
+    ret=$( nmcli con add con-name "$name" ifname $wifi_iface type wifi ssid "$ssid" )
+    if [[ $? -ne 0 ]]; then
+        echo "Fail to add connection: $name | ssid: $ssid : $ret"
+        nmcli con delete "$name" 2> /dev/null
+        return 1
+    fi
+
+    if [[ $security != 'none' ]]; then
+        read -p "Password: " pass
+        nmcli con modify "$name" wifi-sec.key-mgmt wpa-psk
+        nmcli con modify "$name" wifi-sec.psk "$pass"
+    fi
+
+    echo "- Connection added"
+}
+
+function wifi_connect ()
+{
+    name="$1"
+    _con_exist "$name"
+    [[ $? -ne 0 ]] && error "Unable to find connection $name"
+
+    nmcli con up $name
+}
+
+function error
+{
+    error="$@"
+    echo "[ERROR] $error"
+    exit 1
+}
+
+function print_help ()
+{
+    echo "
+    nmcli wrapper
+
+    $(basename $0) [--list|--add|--name|--connect|--state]
+
+        --list          list available ssid
+        --add SSID      add wifi connexion
+        --name NAME     use with --add to save connection as alias NAME
+        --connect       connect to SSID/NAME
+        --state on|off  turn wifi on/off
+
+    Ex:
+        $(basename $0) --add bbox-1234 --name Home
+        $(basename $0) --name Home --connect
+        $(basename $0) --add bbox-1234 --name Home --connect
+    "
+    exit
+}
+
+function main ()
+{
+    [[ $# -eq 0 ]] && print_help
+
+    while [[ $# -ne 0 ]]; do
+        arg="$1"; shift
+        case "$arg" in
+            --list)     wifi_list ;;
+            --state)    state="$1"; shift ;;
+            --add)      ssid="$1"; shift ;;
+            --name)     name="$1"; shift ;;
+            --connect)  connect=1 ;;
+            --help)     print_help ;;
+            * )         [[ $arg =~ ^\-+.* ]] && print_help "$arg unknown" ;;
+        esac
+    done
+
+    [[ -n $state ]] && wifi_state $state
+    [[ -n $ssid ]] && wifi_add "$ssid" "$name"
+    [[ -z $name ]] && name="$ssid"
+    [[ $connect -eq 1 && -n $name ]] && wifi_connect "$name"
+}
+
+main "$@"

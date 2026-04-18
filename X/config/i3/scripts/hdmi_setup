@@ -1,0 +1,128 @@
+#!/bin/bash
+#
+
+primary=$(xrandr --current | grep primary | awk  '{print $1}')
+hdmi_output="HDMI2"
+
+function get_state
+{
+    state=$(xrandr --listactivemonitors | tail -n +2)
+    nb_screen=$(echo "$state" | wc -l)
+
+    if [[ $nb_screen -eq 1 ]]; then
+        if echo "$state" | grep -q $primary; then
+            echo hdmi_off
+        else
+            echo hdmi_only
+        fi
+    elif [[ $nb_screen -eq 2 ]]; then
+        if echo "$state" | grep -Pq "\+0\+0\s+$hdmi_output"; then
+            echo hdmi_mirror
+        else
+            echo hdmi_right
+        fi
+    fi
+}
+
+function hdmi_switch_mode
+{
+    state=$(get_state)
+    [[ $state == "hdmi_mirror" ]] && hdmi_right && exit
+    [[ $state == "hdmi_right" ]] && hdmi_only && exit
+    [[ $state == "hdmi_only" ]] && hdmi_mirror && exit
+}
+
+function hdmi_toggle
+{
+    state=$(get_state)
+    [[ $state == "hdmi_off" ]] && hdmi_mirror && exit
+    [[ $state != "hdmi_off" ]] && hdmi_off && exit
+}
+
+function hdmi_mirror
+{
+    primary_on
+    xrandr --output $hdmi_output --auto --same-as $primary
+    sound_to_hdmi
+}
+
+function hdmi_right
+{
+    primary_on
+    xrandr --output $hdmi_output --auto --right-of $primary
+    sound_to_hdmi
+}
+
+function hdmi_only
+{
+    hdmi_mirror
+    primary_off
+    sound_to_hdmi
+}
+
+function hdmi_off
+{
+    primary_on
+    xrandr --output $hdmi_output --off
+    reset_sound
+}
+
+function primary_off
+{
+    xrandr --output $primary --off
+}
+
+function primary_on
+{
+    xrandr --output $primary --auto
+}
+
+function sound_to_hdmi
+{
+    hdmi_sound_card=$(pacmd list-cards | grep 'output:' | grep $hdmi_output | head -1 | awk  '{print $1}')
+    pactl set-card-profile 0 $hdmi_sound_card
+    pulseaudio --kill
+}
+
+function reset_sound
+{
+    pactl set-card-profile 0 output:analog-stereo
+    pulseaudio --kill
+}
+
+function print_help ()
+{
+    [[ $# -ne 0 ]] && echo "[HELP ] $*"
+
+    echo "
+    $0 [--toggle|--switch_mode|--mirror|--right|--hdmi_only]
+
+    # Require:
+     - xrandr
+     - pulseaudio
+     - configure hdmi output name (xrandr -q)
+    "
+
+    exit
+}
+
+function main ()
+{
+    [[ $# -eq 0 ]] && print_help
+
+    while [[ $# -ne 0 ]]; do
+        arg="$1"; shift
+        case "$arg" in
+            --toggle) hdmi_toggle ;;
+            --switch_mode) hdmi_switch_mode ;;
+            --off)       hdmi_off ;;
+            --mirror)    hdmi_mirror ;;
+            --right)     hdmi_right ;;
+            --hdmi_only) hdmi_only;;
+            --help)      print_help ;;
+            * ) [[ $arg =~ \-+.* ]] && print_help "$arg unknown"
+        esac
+    done
+}
+
+main "$@"
