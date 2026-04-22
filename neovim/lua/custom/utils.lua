@@ -113,13 +113,13 @@ function IsOpenstackProject()
     end
 end
 
-function PythonBlack(line_len)
+function PythonBlack(max_line_len)
     local opts = ""
 
-    if IsOpenstackProject() then
+    if max_line_len then
+        opts = string.format("-l %d", max_line_len)
+    elseif IsOpenstackProject() then
         opts = "-l 79"
-    elseif line_len then
-        opts = string.format("-l %d", line_len)
     end
 
     vim.fn.system("black " .. opts .. " " .. vim.fn.expand("%:p"))

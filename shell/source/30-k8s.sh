@@ -5,6 +5,18 @@ elif [[ -r /etc/rancher/k3s/k3s.yaml ]]; then
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 fi
 
+# Dependency checks
+command -v kubectl >/dev/null 2>&1 || { echo "Error: kubectl is required but not found" >&2; return 1; }
+command -v jq >/dev/null 2>&1 || { echo "Error: jq is required but not found" >&2; return 1; }
+
+# Cache api-resources (reset with: unset K8S_API_RESOURCES)
+function _k8s-api-resources() {
+    if [[ -z ${K8S_API_RESOURCES+x} ]]; then
+        K8S_API_RESOURCES=$(kubectl api-resources --verbs=list --namespaced -o name 2>/dev/null | grep -v events | sort | paste -d, -s)
+    fi
+    echo "$K8S_API_RESOURCES"
+}
+
 export KUBECOLOR_OBJ_FRESH="2m"
 
 function kub {
@@ -21,12 +33,12 @@ function kub {
     elif [[ $1 == g ]]; then
         shift; set -- "get" "${@:1}"
         PLUGIN_OPT+=("-o" "yaml")
-    elif [[ $1 == delete && ! $* =~ \-\-dry-run ]]; then
-        # append dry-run. need to pass --dry-run=none to force
+    elif [[ $1 == delete && ! $* =~ (\-\-dry-run|\-\-force) ]]; then
+        # append dry-run. need to pass --dry-run=none or --force to bypass
         PLUGIN_OPT+=("--dry-run=client")
     fi
 
-    which kubecolor &> /dev/null
+    command -v kubecolor &> /dev/null
     if [[ $? -eq 0 && ! $1 =~ (debug) ]]; then
         command kubecolor ${OPT[@]} $* ${PLUGIN_OPT[@]}
     else
@@ -44,18 +56,28 @@ function argo {
 
 function k8s.current_namespace {
     if [[ -n $KUBENS ]]; then
-        echo $KUBENS
+        echo "$KUBENS"
     else
-        command kubectl config view --minify -o jsonpath='{..namespace}'
+        local ns
+        ns=$(command kubectl config view --minify -o jsonpath='{..namespace}' 2>/dev/null)
+        if [[ -n $ns ]]; then
+            echo "$ns"
+        fi
     fi
 }
 
 function k8s.set_context_namespace {
-    command kubectl config set-context --current --namespace $1 2> /dev/null
+    command kubectl config set-context --current --namespace "$1"
 }
 
 function k8s.set_shell_namespace {
-    export KUBENS=$1
+    local ns=$1
+    [[ -z $ns ]] && echo "Error: namespace required" >&2 && return 1
+    if ! command kubectl get namespace "$ns" >/dev/null 2>&1; then
+        echo "Error: namespace '$ns' does not exist" >&2
+        return 1
+    fi
+    export KUBENS=$ns
 }
 
 function k8s.unset_shell_namespace {
@@ -147,13 +169,6 @@ function k8s.list_containers_by_pod {
     } | column -ts $'\t' | kub get pods --kubecolor-stdin
 }
 
-function k8s.list_running_containers_by_pod_with_labels {
-    kub get pods \
-        --field-selector=status.phase=Running \
-        -o="custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,INIT-CONTAINERS:.spec.initContainers[*].name,CONTAINERS:.spec.containers[*].name,LABELS:.metadata.labels" \
-        $*
-}
-
 function k8s.get_requests_limits {
     kub get pods \
         -o custom-columns="Name:metadata.name,CPU-request:spec.containers[*].resources.requests.cpu,CPU-limit:spec.containers[*].resources.limits.cpu,MEM-request:spec.containers[*].resources.requests.memory,MEM-limit:spec.containers[*].resources.limit.memory" \
@@ -194,19 +209,30 @@ function k8s.get_port_forwarding {
 }
 
 function k8s.get_all_resources {
+    local all_resources
+    all_resources=$(_k8s-api-resources)
     if [[ $1 == all ]]; then
         shift
-        kub get deploy,replicaset,statefulset,daemonset,pod,pvc,cm,secret,svc,$(k api-resources --verbs=list --namespaced -o name | grep -v events | sort | paste -d, -s) $*
+        kub get deploy,replicaset,statefulset,daemonset,pod,pvc,cm,secret,svc,${all_resources//,/,} $*
     else
-        kub get deploy,replicaset,statefulset,daemonset,pod,pvc,cm,secret,svc,$(k api-resources --verbs=list --namespaced -o name | grep ingress | sort | paste -d, -s) $*
+        local ingress_resources
+        ingress_resources=$(echo "$all_resources" | grep ingress | sort | paste -d, -s)
+        kub get deploy,replicaset,statefulset,daemonset,pod,pvc,cm,secret,svc,${ingress_resources//,/,} $*
     fi
 }
 
 function k8s.delete_all_resources {
-    kub delete $(k api-resources --verbs=list --namespaced -o name | grep -v events | sort | paste -d, -s) --dry-run=client --all
-    [[ $SHELL =~ zsh ]] && vared -p 'Delete all ? [yes] ' -c response || read -r -p 'Delete all ? [yes] ' response
+    local resources
+    resources=$(_k8s-api-resources)
+    [[ -z $resources ]] && echo "Error: no resources to delete" >&2 && return 1
+    kub delete $resources --dry-run=client --all
+    if [[ $(basename "$SHELL") == zsh ]]; then
+        vared -p 'Delete all ? [yes] ' -c response
+    else
+        read -r -p 'Delete all ? [yes] ' response
+    fi
     if [[ $response = "yes" ]]; then
-        kub delete $(k api-resources --verbs=list --namespaced -o name | grep -v events | sort | paste -d, -s) --all --dry-run=none
+        kub delete $resources --all --dry-run=none
     fi
 }
 
@@ -216,6 +242,37 @@ function k8s.get_decrypted_secret {
     kub get secret $secret -o json | jq '.data | map_values(@base64d)'
 }
 
+function k8s.edit_secret {
+    local secret=$1
+    [[ $secret =~ ^secret/ ]] && secret=$(echo "$secret" | cut -d'/' -f2-)
+    local key=$2
+    [[ -z $secret ]] && echo "Error: secret name required" >&2 && return 1
+    [[ -z $key ]] && echo "Error: key required" >&2 && return 1
+
+    local tmpfile
+    tmpfile=$(mktemp -p /dev/shm 2>/dev/null || mktemp)
+
+    # Extract just the decoded value of the single key
+    kub get secret "$secret" -o json | jq -r ".data[\"$key\"] | @base64d" > "$tmpfile"
+
+    ${EDITOR:-vi} "$tmpfile"
+    local exit_code=$?
+    [[ $exit_code -ne 0 ]] && rm -f "$tmpfile" && return $exit_code
+
+    local new_value
+    new_value=$(cat "$tmpfile")
+    kub get secret "$secret" -o json | jq --arg k "$key" --arg v "$new_value" '{
+        apiVersion: "v1",
+        kind: "Secret",
+        metadata: .metadata,
+        type: .type,
+        data: (.data | .[$k] = ($v | @base64))
+    }' | kub apply -f -
+
+    rm -f "$tmpfile"
+    return $exit_code
+}
+
 function _complete_ksec
 {
     local word=${COMP_WORDS[1]}
@@ -223,16 +280,24 @@ function _complete_ksec
 }
 complete -F _complete_ksec ksec
 complete -F _complete_ksec k8s.get_decrypted_secret
+complete -F _complete_ksec ksed
+complete -F _complete_ksec k8s.edit_secret
 
 function k8s.pod_netns_enter {
-    pod=$1
-    [[ -z $pod ]] && echo "Missing pod" && return 1
-    [[ $pod =~ ^pod/ ]] && pod=$(echo $pod | cut -d'/' -f2-)
+    local pod=$1
+    [[ -z $pod ]] && echo "Error: pod required" >&2 && return 1
+    command -v crictl >/dev/null 2>&1 || { echo "Error: crictl not found" >&2; return 1; }
+    [[ $pod =~ ^pod/ ]] && pod=$(echo "$pod" | cut -d'/' -f2-)
 
-    pod_id=$(crictl ps -o json | jq -r --arg pod $pod '.containers.[] | select(.labels."io.kubernetes.pod.name" == $pod) | .podSandboxId' | uniq)
-    netns=$(basename $(crictl inspectp $pod_id | jq -r '.info.runtimeSpec.linux.namespaces[] | select(.type=="network") | .path'))
+    local pod_id
+    pod_id=$(crictl ps -o json 2>/dev/null | jq -r --arg pod "$pod" '.containers.[] | select(.labels."io.kubernetes.pod.name" == $pod) | .podSandboxId' | uniq)
+    [[ -z $pod_id ]] && echo "Error: pod '$pod' not found" >&2 && return 1
 
-    netns.enter $netns
+    local netns
+    netns=$(basename $(crictl inspectp "$pod_id" 2>/dev/null | jq -r '.info.runtimeSpec.linux.namespaces[] | select(.type=="network") | .path'))
+    [[ -z $netns ]] && echo "Error: network namespace not found for pod '$pod'" >&2 && return 1
+
+    netns.enter "$netns"
 }
 
 function k8s.get_last_traefik_config {
@@ -251,6 +316,7 @@ alias kx="k8s.exec cmd"
 alias klog="k8s.get_ns_logs"
 alias kg="k8s.get_all_resources"
 alias ksec="k8s.get_decrypted_secret"
+alias ksed="k8s.edit_secret"
 alias knet="k8s.pod_netns_enter"
 alias crictl="k3s crictl"
 alias k=kub

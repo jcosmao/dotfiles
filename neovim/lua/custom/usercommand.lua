@@ -32,9 +32,9 @@ vim.api.nvim_create_user_command("LineInfosToggle", function()
 end, { nargs = 0 })
 
 vim.api.nvim_create_user_command("Black", function(opts)
-    -- opts.args contains the arguments passed to the command
-    PythonBlack(opts.args)
-end, { nargs = '?' })
+    local line_len = opts.fargs and #opts.fargs > 0 and tonumber(opts.fargs[1]) or nil
+    PythonBlack(line_len)
+end, { nargs = '?', complete = 'file' })
 
 vim.api.nvim_create_user_command("BackgroundToggle", function()
     BackgroundToggle()
