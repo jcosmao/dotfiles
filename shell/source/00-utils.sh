@@ -123,10 +123,19 @@ function utils.jqmap2csv
     jq -r '(.[0] | keys_unsorted) as $keys | ([$keys] + map([.[ $keys[] ]])) [] | @csv'
 }
 
-function utils.jqgrep
-{
-    re=$1
-    jq --arg re "$re" '[.[] | select(any(.[]; tostring | test($re)))]'
+function utils.jqgrep () {
+    local invert=false flags="" OPTIND=1 opt
+    while getopts "vi" opt; do
+        case $opt in
+            v) invert=true ;;
+            i) flags="i" ;;
+            *) return 2 ;;
+        esac
+    done
+    shift $((OPTIND - 1))
+    local re=$1
+    jq --arg re "$re" --arg flags "$flags" --argjson invert "$invert" \
+       '[.[] | select(any(.[]; tostring | test($re; $flags)) != $invert)]'
 }
 
 # csv to table display
