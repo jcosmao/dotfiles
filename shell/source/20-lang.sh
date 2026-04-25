@@ -149,3 +149,23 @@ function python.setup_pyright
         "reportAttributeAccessIssue": "information"
     }' | sed "s,VENVPATH,$VENVPATH," | sed "s,VENV,$VENV," | jq > "$(git rev-parse --show-toplevel 2> /dev/null)/pyrightconfig.json"
 }
+
+function python.auto_venv() {
+    local git_root
+    git_root=$(git rev-parse --show-toplevel 2>/dev/null) || return
+
+    local venv_path=""
+    # .venv dans le repo
+    if [[ -d "$git_root/.venv" ]]; then
+        venv_path="$git_root/.venv"
+    # ~/.venvs/<nom-du-repo>
+    elif [[ -d "$HOME/.venvs/$(basename "$git_root")" ]]; then
+        venv_path="$HOME/.venvs/$(basename "$git_root")"
+    fi
+
+    if [[ -n "$venv_path" && "$VIRTUAL_ENV" != "$venv_path" ]]; then
+        source "$venv_path/bin/activate"
+    fi
+}
+
+[[ $SHELL =~ zsh ]] && add-zsh-hook chpwd python.auto_venv

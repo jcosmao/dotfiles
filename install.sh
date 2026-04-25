@@ -135,6 +135,7 @@ function install_git {
     log "Configuring Git..."
     local user=$(git config --get user.name || echo "${GIT_USER:-}")
     local mail=$(git config --get user.email || echo "${GIT_MAIL:-}")
+    local signingkey=$(git config --get user.signingkey || echo "")
 
     safe_link "$SCRIPTPATH/git" ~/.git
     cp ~/.git/gitconfig.template ~/.git/gitconfig
@@ -157,10 +158,14 @@ function install_git {
         echo
         echo "  * gpg signing enabled."
         echo
-        echo "    Default sign key will be used, to select a subkey: "
+        echo "    To select a specific signing key: "
         echo "      ❭ git config --global user.signingkey SUBKEYID!"
         echo "      ❭ gpg --keyid-format long -K | grep '\[.*S.*\]'"
         echo
+    fi
+
+    if [[ -n "$signingkey" ]]; then
+        git config --global user.signingkey "$signingkey"
     fi
 }
 

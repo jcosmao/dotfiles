@@ -14,7 +14,7 @@ BLOX_SEG__UPPER_RIGHT=(terraform virtualenv python_version git_repo_name)
 BLOX_SEG__LOWER_LEFT=(bgjobs symbol)
 BLOX_SEG__LOWER_RIGHT=()
 
-BLOX_BLOCK__SYMBOL_SYMBOL="❭"
+BLOX_BLOCK__SYMBOL_SYMBOL="❯"
 BLOX_CONF__ONELINE=false
 BLOX_CONF__UNIFIED_PROMPT=false
 BLOX_CONF__PROMPT_PREFIX="\n"
