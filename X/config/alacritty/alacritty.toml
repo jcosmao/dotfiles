@@ -48,6 +48,11 @@ key = "V"
 mods = "Control|Shift"
 
 [[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\n"
+
+[[keyboard.bindings]]
 action = "Copy"
 key = "C"
 mods = "Control|Shift"
