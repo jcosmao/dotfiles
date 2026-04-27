@@ -38,6 +38,7 @@ require("lazy").setup({
         -- Utils
         { 'junegunn/fzf' },
         { 'junegunn/fzf.vim' },
+        { 'ojroques/nvim-lspfuzzy' },
         {
             'windwp/nvim-autopairs',
             event = "InsertEnter",

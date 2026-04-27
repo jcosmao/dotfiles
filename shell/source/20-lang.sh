@@ -168,4 +168,7 @@ function python.auto_venv() {
     fi
 }
 
-[[ $SHELL =~ zsh ]] && add-zsh-hook chpwd python.auto_venv
+if [[ $SHELL =~ zsh ]]; then
+    autoload -U add-zsh-hook
+    add-zsh-hook chpwd python.auto_venv
+fi
