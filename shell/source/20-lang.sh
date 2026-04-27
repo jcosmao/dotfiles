@@ -150,6 +150,25 @@ function python.setup_pyright
     }' | sed "s,VENVPATH,$VENVPATH," | sed "s,VENV,$VENV," | jq > "$(git rev-parse --show-toplevel 2> /dev/null)/pyrightconfig.json"
 }
 
+function venv
+{
+    if [[ $# -eq 0 ]]; then
+        echo "Usage: venv <environment_name>"
+        echo "Available environments in ~/.venvs:"
+        ls -1 ~/.venvs
+        return 1
+    fi
+    source "$HOME/.venvs/$1/bin/activate"
+}
+
+_venv_completion() {
+    local cur
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    COMPREPLY=($(compgen -W "$(ls -1 ~/.venvs 2>/dev/null)" -- "$cur"))
+}
+
+complete -F _venv_completion venv
+
 function python.auto_venv() {
     local git_root
     git_root=$(git rev-parse --show-toplevel 2>/dev/null) || return
@@ -168,4 +187,7 @@ function python.auto_venv() {
     fi
 }
 
-[[ $SHELL =~ zsh ]] && add-zsh-hook chpwd python.auto_venv
+if [[ $SHELL =~ zsh ]]; then
+    autoload -U add-zsh-hook
+    add-zsh-hook chpwd python.auto_venv
+fi

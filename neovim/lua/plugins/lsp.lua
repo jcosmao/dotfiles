@@ -165,9 +165,11 @@ return {
 
             vim.api.nvim_create_autocmd("LspAttach", {
                 pattern = "*",
-                callback = function()
+                callback = function(args)
+                    local client = vim.lsp.get_client_by_id(args.data.client_id)
                     LspKeymap()
                     DiagnosticSetupDefaults()
+                    SetupLspFuzzy(client)
                 end,
             })
         end,
@@ -175,7 +177,34 @@ return {
         dependencies = {
             'mason-org/mason.nvim',
             'neovim/nvim-lspconfig',
+            'ojroques/nvim-lspfuzzy',
         },
+    },
+    {
+        'ojroques/nvim-lspfuzzy',
+        build = function()
+            PatchPlugin("nvim-lspfuzzy.patch")
+        end,
+        opts = {
+            methods = {
+                "textDocument/declaration",
+                "textDocument/definition",
+                "textDocument/implementation",
+                "textDocument/references",
+                "textDocument/typeDefinition",
+            },
+            fzf_preview = {'right:+{2}-/2:nohidden'},
+        },
+        config = function(_, opts)
+            require('lspfuzzy').setup(opts)
+
+            function SetupLspFuzzy(client)
+                if not client then
+                    return
+                end
+                client.request = require('lspfuzzy').wrap_request(client.request)
+            end
+        end,
     },
     {
         'onsails/lspkind-nvim',

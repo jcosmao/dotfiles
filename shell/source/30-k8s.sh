@@ -12,7 +12,7 @@ command -v jq >/dev/null 2>&1 || { echo "Error: jq is required but not found" >&
 # Cache api-resources (reset with: unset K8S_API_RESOURCES)
 function _k8s-api-resources() {
     if [[ -z ${K8S_API_RESOURCES+x} ]]; then
-        K8S_API_RESOURCES=$(kubectl api-resources --verbs=list --namespaced -o name 2>/dev/null | grep -v events | sort | paste -d, -s)
+        K8S_API_RESOURCES=$(kubectl api-resources --verbs=list -o name 2>/dev/null | grep -v events | sort | paste -d, -s)
     fi
     echo "$K8S_API_RESOURCES"
 }
@@ -201,24 +201,39 @@ function k8s.exec {
 
 function k8s.get_ns_logs {
     local pods=($(printf '%s\n' "$@" | sed 's|^pod/||'))
-    command stern -n ${KUBENS:-default} --field-selector metadata.namespace=${KUBENS:-default} "${pods[@]}"
-}
-
-function k8s.get_port_forwarding {
-    kub get svc -o json -A | jq '.items[] | {name:.metadata.name, p:.spec.ports[] } | select( .p.nodePort != null ) | "\(.name): localhost:\(.p.nodePort) -> \(.p.port) -> \(.p.targetPort)"'
+    command stern -n ${KUBENS:-default} --field-selector metadata.namespace=${KUBENS:-default} -s 1m "${pods[@]}"
 }
 
 function k8s.get_all_resources {
     local all_resources
-    all_resources=$(_k8s-api-resources)
-    if [[ $1 == all ]]; then
-        shift
-        kub get deploy,replicaset,statefulset,daemonset,pod,pvc,cm,secret,svc,${all_resources//,/,} $*
+    local filter=""
+    local opts=()
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            all) filter="all"
+                 shift ;;
+            -*)  opts+=("$1")
+                 shift ;;
+            *)   if [[ -z "$filter" ]]; then
+                    filter="$1"
+                    shift
+                else
+                    opts+=("$1")
+                    shift
+                fi ;;
+        esac
+    done
+
+    if [[ "$filter" == "all" ]]; then
+        all_resources=$(kubectl api-resources --verbs=list -o name 2>/dev/null | grep -v events | sort | paste -d, -s)
+    elif [[ -n "$filter" ]]; then
+        all_resources=$(kubectl api-resources --verbs=list -o name 2>/dev/null | grep -v events | grep -E "$filter" | sort | paste -d, -s)
     else
-        local ingress_resources
-        ingress_resources=$(echo "$all_resources" | grep ingress | sort | paste -d, -s)
-        kub get deploy,replicaset,statefulset,daemonset,pod,pvc,cm,secret,svc,${ingress_resources//,/,} $*
+        all_resources=$(kubectl api-resources --verbs=list --namespaced=true -o name 2>/dev/null | grep -v events | sort | paste -d, -s)
     fi
+
+    kub get ${all_resources} ${opts[@]}
 }
 
 function k8s.delete_all_resources {

@@ -118,7 +118,7 @@ function install_local_bin {
         # Verify if binary is compatible with architecture (ldd)
         if [[ $(ldd "$f" 2>&1 | grep -c 'not found') -eq 0 ]]; then
             log "  install $bin_file"
-            safe_link "$SCRIPTPATH/$f" "$HOME/.local/bin/${bin_file%.*}"
+            safe_link "$SCRIPTPATH/$f" "$HOME/.local/bin/${bin_file%%.*}"
             [[ "$bin_file" == "bat" ]] && bat cache --build &> /dev/null || true
         fi
     done
