@@ -126,17 +126,10 @@ function LspKeymap()
     vim.keymap.set('n', '<leader>i', vim.lsp.buf.implementation, opts)
 end
 
-function SetupScrollKeybinding()
-    local cinnamon = require('cinnamon')
-    local keymap = {
-        ["<M-Up>"]   = function() cinnamon.scroll("<C-U>zz") end,
-        ["<M-Down>"] = function() cinnamon.scroll("<C-D>zz") end,
-    }
-    local modes = { 'n', 'v', 'x' }
-    for key, func in pairs(keymap) do
-        vim.keymap.set(modes, key, func)
-    end
-end
+-- Scroll up/down by 10 lines with M-Up/M-Down (Alt+Up/Down)
+-- Using 10<C-U> and 10<C-D> to scroll by 10 lines, then zz to center
+vim.keymap.set({ 'n', 'v', 'x' }, "<M-Up>", "30<C-U>zz", opts)
+vim.keymap.set({ 'n', 'v', 'x' }, "<M-Down>", "30<C-D>zz", opts)
 
 -- scroll
 vim.cmd([[

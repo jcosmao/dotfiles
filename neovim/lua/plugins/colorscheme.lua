@@ -163,7 +163,7 @@ function M.setColorscheme()
         vim.api.nvim_set_hl(0, 'RenderMarkdownH4', { fg = colors.orange })
         vim.api.nvim_set_hl(0, 'RenderMarkdownH5', { fg = colors.yellow })
         vim.api.nvim_set_hl(0, 'RenderMarkdownH6', { fg = colors.aqua })
-        vim.api.nvim_set_hl(0, 'RenderMarkdownCode', { bg = colors.bg0 })
+        vim.api.nvim_set_hl(0, 'RenderMarkdownCode', { bg = colors.bg1 })
         vim.api.nvim_set_hl(0, 'RenderMarkdownCodeBorder', { fg = colors.bg5 })
         vim.api.nvim_set_hl(0, 'RenderMarkdownLink', { fg = colors.blue, underline = true })
     else

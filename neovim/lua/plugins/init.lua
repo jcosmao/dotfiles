@@ -33,7 +33,7 @@ require("lazy").setup({
         require("plugins.statuscol"),
         { 'nvim-tree/nvim-web-devicons' },
         { 'troydm/zoomwintab.vim' },
-        require('plugins.scrolling'),
+        -- require('plugins.scrolling'),
 
         -- Utils
         { 'junegunn/fzf' },

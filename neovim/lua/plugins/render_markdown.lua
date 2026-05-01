@@ -9,6 +9,7 @@ return {
             local buftype = vim.api.nvim_get_option_value('buftype', { buf = buf })
             return buftype == 'nofile'
         end,
+        completions = { lsp = { enabled = true } },
         heading = {
             enabled = true,
             sign = true,
@@ -43,9 +44,9 @@ return {
             position = 'left',
             right_pad = 20,
             language_name = true,
-            width = 'full',
-            border = 'thick',
-            left_margin = 2,
+            width = 'block',
+            border = 'thin',
+            left_margin = 1,
             left_pad = 2,
             right_margin = 20,
             hl = 'RenderMarkdownCode',

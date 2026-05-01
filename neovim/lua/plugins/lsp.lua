@@ -182,9 +182,6 @@ return {
     },
     {
         'ojroques/nvim-lspfuzzy',
-        build = function()
-            PatchPlugin("nvim-lspfuzzy.patch")
-        end,
         opts = {
             methods = {
                 "textDocument/declaration",

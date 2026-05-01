@@ -17,11 +17,11 @@ function go.install
 )}
 
 [[ -d "$HOME/.local/go/bin" ]] && \
-    path.append "$HOME/.local/go/bin" && \
+    path.prepend "$HOME/.local/go/bin" && \
     export GOROOT="$HOME/.local/go"
 
 [[ -d "$HOME/go/bin" ]] && \
-    path.append "$HOME/go/bin" && \
+    path.prepend "$HOME/go/bin" && \
     export GOPATH="$HOME/go"
 
 # do not depends on glibc
