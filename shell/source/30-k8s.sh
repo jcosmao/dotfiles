@@ -236,21 +236,6 @@ function k8s.get_all_resources {
     kub get ${all_resources} ${opts[@]}
 }
 
-function k8s.delete_all_resources {
-    local resources
-    resources=$(_k8s-api-resources)
-    [[ -z $resources ]] && echo "Error: no resources to delete" >&2 && return 1
-    kub delete $resources --dry-run=client --all
-    if [[ $(basename "$SHELL") == zsh ]]; then
-        vared -p 'Delete all ? [yes] ' -c response
-    else
-        read -r -p 'Delete all ? [yes] ' response
-    fi
-    if [[ $response = "yes" ]]; then
-        kub delete $resources --all --dry-run=none
-    fi
-}
-
 function k8s.get_decrypted_secret {
     secret=$1
     [[ $secret =~ ^secret/ ]] && secret=$(echo $secret | cut -d'/' -f2-)

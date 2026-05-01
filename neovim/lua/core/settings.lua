@@ -109,7 +109,7 @@ vim.filetype.add({
         tmpl = "gotmpl",
     },
     pattern = {
-        [".*/chart/templates/.*"] = function(path, _)
+        [".*/templates/.*"] = function(path, _)
             if not helm_chart(path) then
                 return
             elseif path:match("%.ya?ml$") then
