@@ -23,7 +23,7 @@ function kub {
     local OPT=()
     local PLUGIN_OPT=()
 
-    current_namespace=$(k8s.current_namespace)
+    current_namespace=$(k.current_namespace)
     [[ -n $current_namespace && ! $* =~ '-n ' ]] && OPT+=("-n" $current_namespace)
 
     if [[ $1 =~ ^(d|desc)$ ]]; then
@@ -49,39 +49,31 @@ function kub {
 
 function argo {
     local OPT=()
-    current_namespace=$(k8s.current_namespace)
+    current_namespace=$(k.current_namespace)
     [[ -n $current_namespace && ! $* =~ '-n ' ]] && OPT+=("-n" $current_namespace)
     command argo ${OPT[@]} $*
 }
 
-function k8s.current_namespace {
+function k.current_namespace {
     if [[ -n $KUBENS ]]; then
         echo "$KUBENS"
     else
-        local ns
-        ns=$(command kubectl config view --minify -o jsonpath='{..namespace}' 2>/dev/null)
-        if [[ -n $ns ]]; then
-            echo "$ns"
-        fi
+        command kubectl config view --minify -o jsonpath='{..namespace}' 2>/dev/null
     fi
 }
 
-function k8s.set_context_namespace {
+function k.set_context_namespace {
     command kubectl config set-context --current --namespace "$1"
 }
 
-function k8s.set_shell_namespace {
+function k.set_shell_namespace {
     local ns=$1
-    [[ -z $ns ]] && echo "Error: namespace required" >&2 && return 1
+    [[ -z $ns ]] && unset KUBENS && return
     if ! command kubectl get namespace "$ns" >/dev/null 2>&1; then
         echo "Error: namespace '$ns' does not exist" >&2
         return 1
     fi
     export KUBENS=$ns
-}
-
-function k8s.unset_shell_namespace {
-    unset KUBENS
 }
 
 function _complete_kns
@@ -90,12 +82,12 @@ function _complete_kns
     COMPREPLY=($(compgen -W "$(command kubectl get namespaces -o json 2> /dev/null | jq -r .items.[].metadata.name | xargs)" -- ${word}))
 }
 
-complete -F _complete_kns k8s.set_shell_namespace
+complete -F _complete_kns k.set_shell_namespace
 complete -F _complete_kns kns
-complete -F _complete_kns k8s.set_context_namespace
+complete -F _complete_kns k.set_context_namespace
 complete -F _complete_kns knsc
 
-function k8s.list_containers_by_pod {
+function k.list_containers_by_pod {
     {
         echo -n "${BOLD}NAME\tCONTAINER\tINIT\tSTATUS\tRESTARTS\tLAST\tAGE\tIP\tNODE\tNODE_IP${NORMAL}\n";
         {
@@ -169,13 +161,43 @@ function k8s.list_containers_by_pod {
     } | column -ts $'\t' | kub get pods --kubecolor-stdin
 }
 
-function k8s.get_requests_limits {
+function k.limits {
     kub get pods \
         -o custom-columns="Name:metadata.name,CPU-request:spec.containers[*].resources.requests.cpu,CPU-limit:spec.containers[*].resources.limits.cpu,MEM-request:spec.containers[*].resources.requests.memory,MEM-limit:spec.containers[*].resources.limit.memory" \
-        $*
+        $* | kub top pods --kubecolor-stdin
 }
 
-function k8s.top_node {
+function k.top {
+    {
+        local usage_data=$(kub top pods --containers | tail -n +2)
+        [[ $? -ne 0 ]] && undef usage_data
+        echo "POD CONTAINER CPU-requests CPU-limits CPU-usage MEM-requests MEM-limits MEM-usage"
+        kub get pods -o json | jq -r '.items[] | .metadata.name as $pod |
+        .spec.containers[] | {
+            pod: $pod,
+            container: .name,
+            cpu_req: (.resources.requests.cpu // "-"),
+            cpu_lim: (.resources.limits.cpu // "-"),
+            mem_req: (.resources.requests.memory // "-"),
+            mem_lim: (.resources.limits.memory // "-")
+        } | [.pod, .container, .cpu_req, .cpu_lim, .mem_req, .mem_lim] | @tsv' | \
+        while read pod container cpu_req cpu_lim mem_req mem_lim; do
+            if [[ -n $usage_data ]]; then
+                cpu_usage=$(echo "$usage_data" | awk -v p="$pod" -v c="$container" '$1 == p && $2 == c {print $3}')
+                mem_usage=$(echo "$usage_data" | awk -v p="$pod" -v c="$container" '$1 == p && $2 == c {print $4}')
+            fi
+            echo "$pod $container $cpu_req $cpu_lim ${cpu_usage:-N/A} $mem_req $mem_lim ${mem_usage:-N/A}"
+        done
+    } | column -t | kub top pods --kubecolor-stdin
+}
+
+function k.mem_use {
+    pod=$1
+    [[ $# == 0 ]] && return
+    kub exec -t $pod -- sh -c 'echo "scale=2; $(cat /sys/fs/cgroup/memory.current 2>/dev/null || cat /sys/fs/cgroup/memory/memory.usage_in_bytes 2>/dev/null)/1024/1024" | bc'
+}
+
+function k.top_node {
     if [[ $# == 0 ]]; then
         echo "missing param: <node>"
         return
@@ -186,25 +208,29 @@ function k8s.top_node {
         kub top pods --kubecolor-stdin
 }
 
-
-function k8s.exec {
+function k.exec {
     type=$1; shift
     if [[ $# == 0 ]]; then
         echo "<pod> -c <container: default to first>"
         echo
-        k8s.list_containers_by_pod
+        k.list_containers_by_pod
         return
     fi
-    [[ $type == "cmd" ]] && kub exec -t $*
-    [[ $type == "shell" ]] && kub exec -it $* -- bash 2>/dev/null || kub exec -it $* -- sh
+    if [[ $type == "cmd" ]]; then
+        kub exec -t $*
+        return
+    elif [[ $type == "shell" ]]; then
+        kub exec -it $* -- bash 2>/dev/null || sh
+    fi
 }
 
-function k8s.get_ns_logs {
+function k.get_ns_logs {
     local pods=($(printf '%s\n' "$@" | sed 's|^pod/||'))
-    command stern -n ${KUBENS:-default} --field-selector metadata.namespace=${KUBENS:-default} -s 1m "${pods[@]}"
+    local ns=$(k.current_namespace)
+    command stern -n ${ns:-default} --field-selector metadata.namespace=${ns:-default} -s 1m "${pods[@]}"
 }
 
-function k8s.get_all_resources {
+function k.get_all_resources {
     local all_resources
     local filter=""
     local opts=()
@@ -236,13 +262,13 @@ function k8s.get_all_resources {
     kub get ${all_resources} ${opts[@]}
 }
 
-function k8s.get_decrypted_secret {
+function k.get_decrypted_secret {
     secret=$1
     [[ $secret =~ ^secret/ ]] && secret=$(echo $secret | cut -d'/' -f2-)
     kub get secret $secret -o json | jq '.data | map_values(@base64d)'
 }
 
-function k8s.edit_secret {
+function k.edit_secret {
     local secret=$1
     [[ $secret =~ ^secret/ ]] && secret=$(echo "$secret" | cut -d'/' -f2-)
     local key=$2
@@ -279,11 +305,11 @@ function _complete_ksec
     COMPREPLY=($(compgen -W "$(k get secrets -o json | jq -r .items.[].metadata.name | xargs)" -- ${word}))
 }
 complete -F _complete_ksec ksec
-complete -F _complete_ksec k8s.get_decrypted_secret
+complete -F _complete_ksec k.get_decrypted_secret
 complete -F _complete_ksec ksed
-complete -F _complete_ksec k8s.edit_secret
+complete -F _complete_ksec k.edit_secret
 
-function k8s.pod_netns_enter {
+function k.pod_netns_enter {
     local pod=$1
     [[ -z $pod ]] && echo "Error: pod required" >&2 && return 1
     command -v crictl >/dev/null 2>&1 || { echo "Error: crictl not found" >&2; return 1; }
@@ -300,24 +326,23 @@ function k8s.pod_netns_enter {
     netns.enter "$netns"
 }
 
-function k8s.get_last_traefik_config {
+function k.get_last_traefik_config {
     kub logs  -l app.kubernetes.io/name=traefik  --tail 10000 --follow=false | grep 'Configuration received:' | sed -e 's/\\//g' -re 's/.*Configuration received: (.*)\".*/\1/'
 }
 
-# alias k="k8s.kubectl"
-alias kns="k8s.set_shell_namespace"
-alias kunset="k8s.unset_shell_namespace"
-alias knsc="k8s.set_context_namespace"
+# alias k="k.kubectl"
+alias kns="k.set_shell_namespace"
+alias knsc="k.set_context_namespace"
 alias kgp="kub get pods -o wide"
 alias kgps="kub get pods -o wide --sort-by=.metadata.creationTimestamp"
-alias kgc="k8s.list_containers_by_pod"
-alias ks="k8s.exec shell"
-alias kx="k8s.exec cmd"
-alias klog="k8s.get_ns_logs"
-alias kg="k8s.get_all_resources"
-alias ksec="k8s.get_decrypted_secret"
-alias ksed="k8s.edit_secret"
-alias knet="k8s.pod_netns_enter"
+alias kgc="k.list_containers_by_pod"
+alias ks="k.exec shell"
+alias kx="k.exec cmd"
+alias klog="k.get_ns_logs"
+alias kg="k.get_all_resources"
+alias ksec="k.get_decrypted_secret"
+alias ksed="k.edit_secret"
+alias knet="k.pod_netns_enter"
 alias crictl="k3s crictl"
 alias k=kub
 
@@ -329,11 +354,12 @@ function _complete_pod
 
 complete -F _complete_pod ks
 complete -F _complete_pod kx
-complete -F _complete_pod k8s.exec
+complete -F _complete_pod k.exec
 complete -F _complete_pod knet
-complete -F _complete_pod k8s.pod_netns_enter
+complete -F _complete_pod k.pod_netns_enter
 complete -F _complete_pod klog
-complete -F _complete_pod k8s.get_ns_logs
+complete -F _complete_pod k.get_ns_logs
+complete -F _complete_pod k.mem_use
 
 
 if [[ $(basename $SHELL) == zsh ]]; then
