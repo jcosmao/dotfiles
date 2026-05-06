@@ -9,22 +9,25 @@ function agent.launch_ssh_agent
 {
     [[ $SSH_TTY && -n $SSH_AUTH_SOCK && -S $SSH_AUTH_SOCK ]] && return
 
-    lifetime=${SSH_AGENT_CACHE_SECONDS:-36000}
+    local lifetime=${SSH_AGENT_CACHE_SECONDS:-36000}
+    local agent_env="${HOME}/.ssh/.agent.${lifetime}.env"
 
-    AGENT_CACHE="${HOME}/.ssh/agent.${lifetime}.cache"
+    if [[ -f $agent_env ]]; then
+        [[ -z $SSH_AUTH_SOCK ]] && . $agent_env >/dev/null 2>&1
 
-    if [[ -f $AGENT_CACHE ]]; then
-        eval "$( < $AGENT_CACHE)" >/dev/null 2>&1
-        cache_age=$(( $(date +%s) - $(stat -c %Y "$AGENT_CACHE") ))
-        [[ $cache_age -lt $lifetime && -n $SSH_AGENT_PID ]] && \
-            kill -0 "$SSH_AGENT_PID" 2>/dev/null && return
-    else
-        pkill ssh-agent -u $USER 2>/dev/null
+        local expected=$(ls ~/.ssh/*.pub 2>/dev/null | wc -l)
+        keys=$(ssh-add -l 2> /dev/null); has_keys_rc=$?
+        local loaded=$(echo $keys | wc -l)
+        [[ $has_keys_rc -eq 0 && $loaded = $expected && -d /proc/$SSH_AGENT_PID ]] && return
     fi
 
-    [[ -n $SSH_AGENT_PID ]] && kill $SSH_AGENT_PID 2>/dev/null
-    (umask 066; ssh-agent -s -t $lifetime >| $AGENT_CACHE)
-    eval "$( < $AGENT_CACHE)" >/dev/null
+    pgrep -f "ssh-agent -s -t $lifetime" -u $USER &>/dev/null
+    if [[ $? -ne 0 || ! -d /proc/$SSH_AGENT_PID ]]; then
+        pkill -f 'ssh-agent -s -t' -u $USER 2>/dev/null
+        rm -f ~/.ssh/.agent.*.env 2>/dev/null
+        echo Starting new ssh agent...
+        eval $(umask 066; ssh-agent -s -t $lifetime | tee -a $agent_env)
+    fi
     ssh-add $(ls ~/.ssh/*.pub 2>/dev/null | sed -re 's/\.pub$//') 2>/dev/null
 }
 

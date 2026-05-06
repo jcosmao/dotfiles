@@ -105,7 +105,6 @@ vim.filetype.add({
         conf = "ini",
         tf = "terraform",
         tftpl = "hcl",
-        tpl = "hcl",
         tmpl = "gotmpl",
     },
     pattern = {
