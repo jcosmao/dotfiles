@@ -13,7 +13,7 @@ function agent.launch_ssh_agent
     local agent_env="${HOME}/.ssh/.agent.${lifetime}.env"
 
     if [[ -f $agent_env ]]; then
-        [[ -z $SSH_AUTH_SOCK ]] && . $agent_env >/dev/null 2>&1
+        [[ -z $SSH_AUTH_SOCK || ! -d /proc/${SSH_AGENT_PID:-undefined} ]] && . $agent_env >/dev/null 2>&1
 
         local expected=$(ls ~/.ssh/*.pub 2>/dev/null | wc -l)
         keys=$(ssh-add -l 2> /dev/null); has_keys_rc=$?
@@ -22,7 +22,7 @@ function agent.launch_ssh_agent
     fi
 
     pgrep -f "ssh-agent -s -t $lifetime" -u $USER &>/dev/null
-    if [[ $? -ne 0 || ! -d /proc/$SSH_AGENT_PID ]]; then
+    if [[ $? -ne 0 || -z $SSH_AGENT_PID || ! -d /proc/$SSH_AGENT_PID ]]; then
         pkill -f 'ssh-agent -s -t' -u $USER 2>/dev/null
         rm -f ~/.ssh/.agent.*.env 2>/dev/null
         echo Starting new ssh agent...

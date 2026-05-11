@@ -219,7 +219,7 @@ function k.exec {
         kub exec -t $*
         return
     elif [[ $type == "shell" ]]; then
-        kub exec -it $* -- sh -c "bash 2>/dev/null || sh"
+        kub exec -it $* -- sh -c "bash || sh"
     fi
 }
 
