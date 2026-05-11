@@ -191,9 +191,34 @@ function k.top {
 }
 
 function k.mem_use {
-    pod=$1
+    local pod=$1
     [[ $# == 0 ]] && return
-    kub exec -t $pod -- sh -c 'echo $(echo "scale=2; $(cat /sys/fs/cgroup/memory.current 2>/dev/null || cat /sys/fs/cgroup/memory/memory.usage_in_bytes 2>/dev/null)/1024/1024" | bc) M'
+
+    kub exec -t "$pod" -- sh -c '
+        if [ -f /sys/fs/cgroup/memory.current ]; then
+            ver=v2
+            u=$(cat /sys/fs/cgroup/memory.current)
+            l=$(cat /sys/fs/cgroup/memory.max)
+            ev=$(cat /sys/fs/cgroup/memory.events)
+        else
+            ver=v1
+            u=$(cat /sys/fs/cgroup/memory/memory.usage_in_bytes)
+            l=$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)
+            [ "$l" -ge 9223372036854771712 ] 2>/dev/null && l=max
+            ev="failcnt $(cat /sys/fs/cgroup/memory/memory.failcnt)
+$(cat /sys/fs/cgroup/memory/memory.oom_control)"
+        fi
+
+        echo "cgroup: $ver"
+
+        awk -v u="$u" -v l="$l" "BEGIN{
+            printf \"usage: %.2f MiB\n\", u/1024/1024
+            if (l==\"max\") print \"limit: unlimited\"
+            else printf \"limit: %.2f MiB  (%.1f%%)\n\", l/1024/1024, u*100/l
+        }"
+        echo "--- memory events ---"
+        echo "$ev"
+    '
 }
 
 function k.top_node {
@@ -346,14 +371,9 @@ complete -F _complete_pod k.get_ns_logs
 complete -F _complete_pod k.mem_use
 
 
-if [[ $(basename $SHELL) == zsh ]]; then
-    _k8s_load_completions() {
-        [[ -n $K8S_COMPLETIONS_LOADED ]] && return
-        source <(command kubectl completion zsh 2>/dev/null)
-        compdef kubecolor=kubectl 2>/dev/null
-        compdef k=kubectl 2>/dev/null
-        compdef kub=kubectl 2>/dev/null
-        export K8S_COMPLETIONS_LOADED=1
-    }
-    add-zsh-hook precmd _k8s_load_completions 2>/dev/null
+if [[ $SHELL =~ zsh ]]; then
+    source <(command kubectl completion zsh 2>/dev/null)
+    compdef kubecolor=kubectl 2>/dev/null
+    compdef k=kubectl 2>/dev/null
+    compdef kub=kubectl 2>/dev/null
 fi

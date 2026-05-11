@@ -47,8 +47,9 @@ _direnv_restore_env() {
 }
 
 _direnv_chpwd() {
-    # Skip during completion
-    [[ -n $compstate ]] && return
+    # Skip during completion or non-interactive shells
+    [[ ! -o interactive ]] && return
+    [[ -v compstate ]] && return
     
     local old_zenv=$_direnv_loaded
     local new_zenv
