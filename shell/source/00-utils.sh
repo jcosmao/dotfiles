@@ -32,6 +32,7 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
+command -v plik &> /dev/null && alias plik='echo n | command plik'
 
 function ww {
     res=$(whence "$1")
