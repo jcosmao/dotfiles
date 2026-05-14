@@ -38,20 +38,23 @@ local install_parser = {
 -- Go template: inject language for syntax hilight
 -- if file is named  file.ext.template_extension then inject filetype ext
 -- if file is named  file.ext and is a go template (filetype foced) then inject filetype ext
-local tmpl_filetypes = { "gotmpl", "gohtmltmpl", "gotexttmpl" }
+local tmpl_filetypes = { "gotmpl", "gohtmltmpl", "gotexttmpl", "tpl", "tmpl" }
 vim.treesitter.language.register("gotmpl", { "gohtmltmpl", "gotexttmpl" })
 
 vim.treesitter.query.add_directive("inject-go-tmpl!", function(_, _, bufnr, _, metadata)
-  local ft = vim.bo[bufnr].filetype
-  if not vim.tbl_contains(tmpl_filetypes, ft) then return end
+    local ft = vim.bo[bufnr].filetype
+    if not vim.tbl_contains(tmpl_filetypes, ft) then return end
 
-  local fname = vim.fs.basename(vim.api.nvim_buf_get_name(bufnr))
-  local ext = fname:match(".*%.(%a+)%.%a+$") or fname:match(".*%.(%a+)$")
-  if not ext or ext == ft then return end
+    local fname = vim.fs.basename(vim.api.nvim_buf_get_name(bufnr))
+    local ext = fname:match(".*%.(%a+)%.%a+$") or fname:match(".*%.(%a+)$")
+    if not ext then return end
+    -- extesion is a template, do not inject anything
+    if vim.tbl_contains(tmpl_filetypes, ext) then return end
 
-  -- ext → vim filetype (uses settings.lua rules + nvim defaults), then → treesitter parser
-  local lang = vim.filetype.match({ filename = "x." .. ext }) or ext
-  metadata["injection.language"] = vim.treesitter.language.get_lang(lang) or lang
+    -- ext → vim filetype (uses settings.lua rules + nvim defaults), then → treesitter parser
+    local lang = vim.filetype.match({ filename = "x." .. ext }) or ext
+    print("[inject-go-tmpl] lang =", lang)
+    metadata["injection.language"] = vim.treesitter.language.get_lang(lang) or lang
 end, {})
 
 -- Authoritatively replace gotmpl injections so go.nvim's blanket html+javascript

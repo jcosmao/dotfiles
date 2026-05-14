@@ -106,6 +106,7 @@ vim.filetype.add({
         tf = "terraform",
         tftpl = "hcl",
         tmpl = "gotmpl",
+        tpl = "gotmpl",
     },
     pattern = {
         [".*/templates/.*"] = function(path, _)
