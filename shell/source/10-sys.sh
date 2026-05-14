@@ -87,3 +87,22 @@ netns.docker_mount () {(
     ln -sfT /proc/$pid/ns/net /var/run/netns/$name
     netns.enter $name
 )}
+
+sys.chroot () {
+    local target="${1:?Usage: chroot_dir <directory>}"
+
+    [ -d "$target" ] || { echo "Error: $target is not a directory"; return 1; }
+
+    # Mount essential filesystems
+    mount --bind /dev  "$target/dev"  || return 1
+    mount --bind /proc "$target/proc" || return 1
+    mount --bind /sys  "$target/sys"  || return 1
+    mount --bind /run  "$target/run"  || { mount -t tmpfs tmpfs "$target/run"; } || return 1
+
+    echo "Chrooting into: $target (type 'exit' to leave)"
+    chroot "$target" /bin/bash
+
+    # Cleanup
+    umount -R "$target" 2>/dev/null
+    echo "Unmounted: $target"
+}

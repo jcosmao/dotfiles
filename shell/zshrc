@@ -21,6 +21,8 @@ fpath=(~/.zsh/myzsh/lib ~/.zsh/myzsh/plugins/wd ~/.zsh/zsh-syntax-highlighting ~
 
 for l in ~/.zsh/myzsh/lib/*; do [[ -f $l ]] && source "$l"; done
 for f in ~/.shell/**/*.zsh; do [[ -f $f ]] && source "$f"; done
+common.source_all
+
 source ~/.zsh/myzsh/plugins/wd/*.zsh
 source ~/.zsh/blox-zsh-theme/blox.zsh
 source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

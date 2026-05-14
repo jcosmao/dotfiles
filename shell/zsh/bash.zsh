@@ -12,6 +12,3 @@ function fg {
 
 # allow regex
 setopt NO_NOMATCH
-
-source $HOME/.shell/common.sh
-common.source_all

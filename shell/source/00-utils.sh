@@ -9,7 +9,7 @@ export XDG_CONFIG_HOME=$HOME/.config
 export RIPGREP_CONFIG_PATH=$HOME/.config/ripgreprc
 
 # disable ctrl-s fwd-search
-bindkey -r "^S"
+bindkey -r "^S" 2> /dev/null
 # disable ctrl-s terminal freeze
 stty -ixon
 

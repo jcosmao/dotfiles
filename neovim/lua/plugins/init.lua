@@ -44,7 +44,6 @@ require("lazy").setup({
             config = true
         },
         { 'tpope/vim-sensible' },
-        { 'tpope/vim-commentary' },
         { 'lambdalisue/vim-suda' },
         {
             "kylechui/nvim-surround",

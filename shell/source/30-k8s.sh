@@ -1,15 +1,40 @@
-# Load default kubeconfig if found
-if [[ -f $HOME/.kube/config ]]; then
-    export KUBECONFIG=$HOME/.kube/config
-elif [[ -r /etc/rancher/k3s/k3s.yaml ]]; then
-    export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-fi
-
 # Dependency checks
 command -v kubectl >/dev/null 2>&1 || { echo "Error: kubectl is required but not found" >&2; return 1; }
 command -v jq >/dev/null 2>&1 || { echo "Error: jq is required but not found" >&2; return 1; }
 
 export KUBECOLOR_OBJ_FRESH="2m"
+export KUBECONFIG_DIR="${KUBECONFIG_DIR:-$HOME/.kube/config.d}"
+
+function k.set_cluster_config {
+    cluster=$1
+
+    if [[ -z $cluster ]]; then
+        # Load default kubeconfig if found
+        if [[ -f $HOME/.kube/config ]]; then
+            export KUBECONFIG=$HOME/.kube/config
+        elif [[ -r /etc/rancher/k3s/k3s.yaml ]]; then
+            export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+        fi
+        return
+    fi
+
+    config=$KUBECONFIG_DIR/$cluster
+    if [[ -f $config ]]; then
+        export KUBECONFIG=$config
+    fi
+}
+
+k.set_cluster_config
+alias kcl=k.set_cluster_config
+
+function _complete_set_cluster_config
+{
+    local word=${COMP_WORDS[1]}
+    COMPREPLY=($(compgen -W "$(ls $KUBECONFIG_DIR 2> /dev/null | xargs)" -- ${word}))
+}
+
+complete -F _complete_set_cluster_config k.set_cluster_config
+complete -F _complete_set_cluster_config kcl
 
 function kub {
     local OPT=()

@@ -3,11 +3,5 @@ max-log-requests: 999
 timestamps: short
 qps: 10
 burst: 20
-
-# Green, Yellow, Blue, Magenta, Cyan, White
-pod-colors: "32,33,34,35,36,37"
-# Colors with underline (4)
-# If empty, the pod colors will be used as container colors
-container-colors: "32;4,33;4,34;4,35;4,36;4,37;4"
 diff-container: true
-highlight: "[error]"
+highlight: \[error\]

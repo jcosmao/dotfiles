@@ -3,16 +3,17 @@ autoload -U add-zsh-hook
 _direnv_loaded=""
 
 # Find the nearest .zenv file in current or parent directories
-_direnv_find_zenv() {
+_direnv_find_all_zenv() {
     local dir=$PWD
-    while [[ -n $dir ]]; do
-        if [[ -f $dir/.zenv ]]; then
-            echo "$dir/.zenv"
-            return 0
+    local -a zenv_files
+    while [[ -n "$dir" ]]; do
+        if [[ -f "$dir/.zenv" ]]; then
+            zenv_files+=("$dir/.zenv")
         fi
         dir=${dir%/*}
     done
-    return 1
+    # Return in reverse order (root first, then children)
+    print -l -- "${(@Oa)zenv_files}"
 }
 
 _direnv_save_env() {
@@ -34,7 +35,7 @@ _direnv_restore_env() {
             unset "$var"
         fi
     done
-    
+
     # Unset variables that were added
     local current_var
     for current_var in $(printenv | cut -d= -f1); do
@@ -42,34 +43,44 @@ _direnv_restore_env() {
             unset "$current_var"
         fi
     done
-    
+
     unset _direnv_saved
+}
+
+_direnv_load_zenv() {
+    local -a new_zenvs
+    new_zenvs=($(_direnv_find_all_zenv))
+    local new_zenv_str="${(j: :)new_zenvs}"
+
+    local old_zenv=$_direnv_loaded
+
+    # If the .zenv list changed, unload old and load new
+    if [[ "$old_zenv" != "$new_zenv_str" ]]; then
+        if [[ -n "$old_zenv" ]]; then
+            _direnv_restore_env
+        fi
+
+        if [[ -n "$new_zenv_str" ]]; then
+            _direnv_save_env
+            for zenv_file in "${new_zenvs[@]}"; do
+                source "$zenv_file"
+            done
+        fi
+
+        _direnv_loaded="$new_zenv_str"
+    fi
 }
 
 _direnv_chpwd() {
     # Skip during completion or non-interactive shells
     [[ ! -o interactive ]] && return
     [[ -v compstate ]] && return
-    
-    local old_zenv=$_direnv_loaded
-    local new_zenv
-    
-    new_zenv=$(_direnv_find_zenv)
-    
-    # If the .zenv changed, unload old and load new
-    if [[ "$old_zenv" != "$new_zenv" ]]; then
-        if [[ -n "$old_zenv" ]]; then
-            _direnv_restore_env
-        fi
-        
-        if [[ -n "$new_zenv" ]]; then
-            _direnv_save_env
-            source "$new_zenv"
-        fi
-        
-        _direnv_loaded="$new_zenv"
-    fi
+
+    _direnv_load_zenv
 }
+
+# Load .zenv files on shell startup
+_direnv_load_zenv
 
 # Only add hook if not already added
 if [[ -z "${chpwd_functions[(r)_direnv_chpwd]}" ]]; then
