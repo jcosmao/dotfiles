@@ -293,10 +293,10 @@ function k.get_decrypted_secret {
 
 function k.edit {
     local resource=$1 key=$2
-    [[ -z $resource || -z $key ]] && { echo "Error: resource and key required" >&2; return 1 }
+    [[ -z $resource || -z $key ]] && { echo "Error: resource and key required" >&2; return 1; }
 
     local rtype=${resource%/*} rname=${resource#*/} tmpfile
-    [[ $resource != */* ]] && { rtype=secret; rname=$resource }
+    [[ $resource != */* ]] && { rtype=secret; rname=$resource; }
 
     tmpfile=$(mktemp -p /dev/shm 2>/dev/null || mktemp).${key}
 
@@ -305,7 +305,7 @@ function k.edit {
     ' > "$tmpfile"
 
     old_sha=$(sha1sum $tmpfile)
-    ${EDITOR:-vi} "$tmpfile" || { rm -f "$tmpfile"; return $? }
+    ${EDITOR:-vi} "$tmpfile" || { rm -f "$tmpfile"; return $?; }
     new_sha=$(sha1sum $tmpfile)
 
     local new_value=$(<"$tmpfile")
