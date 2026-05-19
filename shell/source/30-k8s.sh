@@ -280,9 +280,16 @@ function k.get_ns_logs {
 }
 
 function k.get_all_resources {
-    local all_resources
-    all_resources=$(kubectl api-resources --verbs=list --namespaced=true -o name 2>/dev/null | grep -v events | sort | paste -d, -s)
-    kub get ${all_resources} $*
+    exclude_regex='^(events|endpoints)$'
+    all_resources=$(kubectl api-resources --verbs=list --namespaced=true -o name 2>/dev/null | grep -Pv "$exclude_regex" | paste -sd,)
+    if [[ $# -eq 0 ]]; then
+        {
+            echo NAME AGE
+            kub get ${all_resources} --no-headers --show-kind $* 2>/dev/null | awk '{print $1, $NF}' | sort
+        } | column -t | kub get --kubecolor-stdin
+    else
+        kub get ${all_resources} --no-headers --show-kind $* 2>/dev/null
+    fi
 }
 
 function k.get_decrypted_secret {
