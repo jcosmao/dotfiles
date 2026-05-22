@@ -37,6 +37,13 @@ complete -F _complete_set_cluster_config k.set_cluster_config
 complete -F _complete_set_cluster_config kcl
 
 function kub {
+
+    # needed for k / kub complete working
+    if [[ $1 == __complete ]]; then
+        command kubectl "$@"
+        return
+    fi
+
     local OPT=()
     local PLUGIN_OPT=()
 
@@ -247,12 +254,8 @@ $(cat /sys/fs/cgroup/memory/memory.oom_control)"
 }
 
 function k.top_node {
-    if [[ $# == 0 ]]; then
-        echo "missing param: <node>"
-        return
-    fi
     node=$1
-    kub top pods -A --sort-by cpu --containers=true | \
+    kub top pods -A --sort-by memory --containers=true | \
         grep --color=never -E "$(k get pods -A -o='custom-columns=NAME:.metadata.name' --field-selector=spec.nodeName=${node} --no-headers | paste -d'|' -s)|NAMESPACE" | \
         kub top pods --kubecolor-stdin
 }
@@ -280,16 +283,9 @@ function k.get_ns_logs {
 }
 
 function k.get_all_resources {
-    exclude_regex='^(events|endpoints)$'
+    exclude_regex='^(events|events.events.k8s.io|endpoints|helmcharts.helm.cattle.io|addons.k3s.cattle.io|serviceaccount|roles.rbac.authorization.k8s.io|rolebindings.rbac.authorization.k8s.io|pods.metrics.k8s.io)$'
     all_resources=$(kubectl api-resources --verbs=list --namespaced=true -o name 2>/dev/null | grep -Pv "$exclude_regex" | paste -sd,)
-    if [[ $# -eq 0 ]]; then
-        {
-            echo NAME AGE
-            kub get ${all_resources} --no-headers --show-kind $* 2>/dev/null | awk '{print $1, $NF}' | sort
-        } | column -t | kub get --kubecolor-stdin
-    else
-        kub get ${all_resources} --no-headers --show-kind $* 2>/dev/null
-    fi
+    kub get ${all_resources} --show-kind $*
 }
 
 function k.get_decrypted_secret {
@@ -347,8 +343,6 @@ function _complete_ksec
 }
 complete -F _complete_ksec ksec
 complete -F _complete_ksec k.get_decrypted_secret
-complete -F _complete_ksec ksed
-complete -F _complete_ksec k.edit_secret
 
 function k.pod_netns_enter {
     local pod=$1
@@ -382,7 +376,6 @@ alias kx="k.exec cmd"
 alias klog="k.get_ns_logs"
 alias kg="k.get_all_resources"
 alias ksec="k.get_decrypted_secret"
-alias ksed="k.edit_secret"
 alias knet="k.pod_netns_enter"
 alias crictl="k3s crictl"
 alias k=kub
@@ -403,9 +396,7 @@ complete -F _complete_pod k.get_ns_logs
 complete -F _complete_pod k.mem_use
 
 
-if [[ $SHELL =~ zsh ]]; then
+if [[ -n $ZSH_VERSION ]]; then
     source <(command kubectl completion zsh 2>/dev/null)
-    compdef kubecolor=kubectl 2>/dev/null
-    compdef k=kubectl 2>/dev/null
-    compdef kub=kubectl 2>/dev/null
+    compdef _kubectl kubectl kub kubecolor
 fi
