@@ -1,4 +1,5 @@
 export CLIFF_FIT_WIDTH=1
+unalias os 2> /dev/null
 
 function os {
     JSON=1

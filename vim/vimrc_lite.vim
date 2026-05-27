@@ -140,8 +140,8 @@ map <silent> <leader>p "0p
 " Move to start/end of line (like Ctrl+A / Ctrl+E in bash)
 map <silent> <C-a> ^
 map <silent> <C-e> $
-imap <silent> <C-a> <C-o>^
-imap <silent> <C-e> <C-o>$
+imap <silent> <C-a> <Home>
+imap <silent> <C-e> <End>
 
 " Word navigation (like Alt+Left/Right)
 map <silent> <C-Right> e
@@ -173,21 +173,21 @@ inoremap <silent> <Esc>[1;5B <C-o>:+2 <cr>
 
 " Home / End - various terminal modes
 noremap <silent> <Esc>[H ^
-inoremap <silent> <Esc>[H <C-o>^
+inoremap <silent> <Esc>[H <Home>
 noremap <silent> <Esc>[F $
-inoremap <silent> <Esc>[F <C-o>$
+inoremap <silent> <Esc>[F <End>
 noremap <silent> <Esc>OH ^
-inoremap <silent> <Esc>OH <C-o>^
+inoremap <silent> <Esc>OH <Home>
 noremap <silent> <Esc>OF $
-inoremap <silent> <Esc>OF <C-o>$
+inoremap <silent> <Esc>OF <End>
 
 " Fix arrow keys in insert mode
-inoremap <silent> <Esc>OA <C-o>k
-inoremap <silent> <Esc>OB <C-o>j
-inoremap <silent> <Esc>OC <C-o>l
-inoremap <silent> <Esc>OD <C-o>h
-inoremap <silent> <Esc>OH <C-o>^
-inoremap <silent> <Esc>OF <C-o>$
+inoremap <silent> <Esc>OA <Up>
+inoremap <silent> <Esc>OB <Down>
+inoremap <silent> <Esc>OC <Right>
+inoremap <silent> <Esc>OD <Left>
+inoremap <silent> <Esc>OH <Home>
+inoremap <silent> <Esc>OF <End>
 
 " https://vim.fandom.com/wiki/Fix_arrow_keys_that_display_A_B_C_D_on_remote_shell
 map <silent> <leader><ESC>OA :wincmd k<cr>
