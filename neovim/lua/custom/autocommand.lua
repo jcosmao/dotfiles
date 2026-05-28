@@ -217,21 +217,6 @@ vim.api.nvim_create_autocmd('VimLeave', {
     end,
 })
 
--- markdown box
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "markdown",
-  callback = function()
-    vim.keymap.set("i", "<CR>", function()
-      local line = vim.fn.getline(".")
-      if line:match("^%s*%- %[.%] ") then
-        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>o- [ ] ", true, true, true), "n", true)
-      else
-        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<CR>", true, true, true), "n", true)
-      end
-    end, { buffer = true, silent = true })
-  end,
-})
-
 local function toggle_checkbox()
   local line = vim.fn.getline(".")
   local new_line

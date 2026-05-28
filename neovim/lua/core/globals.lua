@@ -130,6 +130,15 @@ function FoldedTextInfo()
     return ft
 end
 
+-- Whether `path` (file or dir) lives inside a helm chart (Chart.yaml upward).
+function IsHelmChart(path)
+    return vim.fs.find("Chart.yaml", {
+        path = path,
+        upward = true,
+        stop = vim.loop.os_homedir(),
+    })[1] ~= nil
+end
+
 function GetCurrentDir()
     -- Get directory path to start search from
     local path = vim.api.nvim_buf_get_name(0)
