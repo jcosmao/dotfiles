@@ -1,3 +1,6 @@
+command -v tofu &> /dev/null && alias terraform=tofu
+command -v terraform &> /dev/null || return 1
+
 function tf
 {
     OPTS=""
