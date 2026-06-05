@@ -1,24 +1,210 @@
 #!/bin/bash
+#
+# bluetooth-pair — small bluetoothctl helper
+#
+#   bluetooth-pair list|ls               list known devices + their state
+#   bluetooth-pair scan [seconds]        scan for nearby devices (default 8s)
+#   bluetooth-pair info       <target>   device details
+#   bluetooth-pair connect    <target>   connect
+#   bluetooth-pair disconnect <target>   disconnect
+#   bluetooth-pair pair       <target>   pair (trust + pair + connect)
+#   bluetooth-pair remove     <target>   forget / remove
+#   bluetooth-pair trust      <target>   allow auto-reconnect
+#   bluetooth-pair untrust    <target>   stop auto-reconnect
+#   bluetooth-pair block      <target>   forbid any connection
+#   bluetooth-pair unblock    <target>   lift the block
+#
+# <target> = a MAC address (AA:BB:CC:DD:EE:FF) or part of a name (e.g. "speaker").
+#
+# Shell completion: add to your ~/.zshrc / ~/.bashrc:
+#     source <(bluetooth-pair --complete)
 
-# bluetoothctl devices
+set -uo pipefail
 
-# root only
-[[ $(id -u) != 0 ]] && echo "Must be root" && exit 1
+PROG=${0##*/}
 
-MAC=$1
-
-if [[ -z $MAC ]]; then
-    echo "
-    $0 <MAC bluetooth device>
-    "
-
-    bluetoothctl default-agent
-    bluetoothctl power on
-    bluetoothctl --timeout 5 scan on
-    bluetoothctl devices
+# ----------------------------------------------------------------------------
+# colors (only when writing to a terminal)
+# ----------------------------------------------------------------------------
+if [[ -t 1 ]]; then
+    C_RESET=$'\e[0m'; C_DIM=$'\e[2m'; C_BOLD=$'\e[1m'
+    C_GREEN=$'\e[32m'; C_RED=$'\e[31m'; C_YELLOW=$'\e[33m'; C_BLUE=$'\e[34m'
+else
+    C_RESET=''; C_DIM=''; C_BOLD=''; C_GREEN=''; C_RED=''; C_YELLOW=''; C_BLUE=''
 fi
 
-# bluetoothctl remove "$MAC"
-bluetoothctl --timeout 2 trust "$MAC"
-bluetoothctl --timeout 2 pair "$MAC"
-bluetoothctl --timeout 2 connect "$MAC"
+die()  { echo "${C_RED}error:${C_RESET} $*" >&2; exit 1; }
+need() { command -v "$1" >/dev/null 2>&1 || die "command '$1' not found"; }
+
+need bluetoothctl
+
+# root required — except for the harmless paths (help + completion, the latter
+# being invoked without sudo by the shell).
+case ${1:-} in
+    --complete|complete|__complete_devices|''|-h|--help|help) ;;
+    *) [[ $(id -u) == 0 ]] || die "must be run as root:  sudo $PROG $*" ;;
+esac
+
+# ----------------------------------------------------------------------------
+# helpers
+# ----------------------------------------------------------------------------
+is_mac() { [[ $1 =~ ^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$ ]]; }
+
+# "Device AA:BB:.. Device name" -> "AA:BB:..\tDevice name"
+list_devices() {
+    bluetoothctl devices 2>/dev/null \
+        | sed -n 's/^Device \([0-9A-Fa-f:]\{17\}\) \(.*\)$/\1\t\2/p'
+}
+
+# read a field from `bluetoothctl info <mac>` (e.g. get_field MAC Connected)
+get_field() {
+    bluetoothctl info "$1" 2>/dev/null \
+        | sed -n "s/^[[:space:]]*$2: \(.*\)$/\1/p" | head -n1
+}
+
+# resolve a target (MAC or part of a name) to a single MAC, or error out
+resolve() {
+    local target=$1
+    [[ -n $target ]] || die "no target given. '$PROG list' to see devices."
+
+    if is_mac "$target"; then
+        printf '%s\n' "${target^^}"
+        return 0
+    fi
+
+    # case-insensitive substring match on the name
+    local matches mac name
+    matches=$(
+        while IFS=$'\t' read -r mac name; do
+            shopt -s nocasematch
+            [[ $name == *"$target"* ]] && printf '%s\t%s\n' "$mac" "$name"
+            shopt -u nocasematch
+        done < <(list_devices)
+    )
+
+    local n; n=$(grep -c . <<<"$matches")
+    (( n == 0 )) && die "no device matches \"$target\"."
+    if (( n > 1 )); then
+        echo "${C_YELLOW}several devices match \"$target\":${C_RESET}" >&2
+        echo "$matches" | sed 's/^/  /' >&2
+        die "be more specific with the name or the MAC address."
+    fi
+    cut -f1 <<<"$matches"
+}
+
+# print a colored yes/no, padded to a VISIBLE width (ANSI codes don't count
+# towards the width, unlike a plain printf %-Ns)
+pcell() {
+    local v=$1 w=$2 txt col pad
+    case ${v,,} in
+        yes) txt=yes; col=$C_GREEN ;;
+        no)  txt=no;  col=$C_DIM   ;;
+        *)   txt='?'; col=$C_DIM   ;;
+    esac
+    pad=$(( w - ${#txt} )); (( pad < 0 )) && pad=0
+    printf '%s%s%s%*s' "$col" "$txt" "$C_RESET" "$pad" ''
+}
+
+# ----------------------------------------------------------------------------
+# commands
+# ----------------------------------------------------------------------------
+cmd_list() {
+    local rows=0 mac name conn trust block pair
+    printf '%s%-24s %-17s %-8s %-7s %-7s %-6s%s\n' \
+        "$C_BOLD" "NAME" "MAC" "CONNECT" "TRUST" "BLOCK" "PAIRED" "$C_RESET"
+    while IFS=$'\t' read -r mac name; do
+        [[ -n $mac ]] || continue
+        conn=$(get_field "$mac" Connected)
+        trust=$(get_field "$mac" Trusted)
+        block=$(get_field "$mac" Blocked)
+        pair=$(get_field "$mac" Paired)
+        printf '%-24.24s ' "$name"
+        printf '%s%-17s%s ' "$C_BLUE" "$mac" "$C_RESET"
+        pcell "$conn"  8; printf ' '
+        pcell "$trust" 7; printf ' '
+        pcell "$block" 7; printf ' '
+        pcell "$pair"  6; printf '\n'
+        ((rows++))
+    done < <(list_devices)
+    (( rows == 0 )) && echo "${C_DIM}(no known device — run '$PROG scan')${C_RESET}"
+}
+
+cmd_scan() {
+    local secs=${1:-8}
+    [[ $secs =~ ^[0-9]+$ ]] || die "invalid duration: \"$secs\""
+    bluetoothctl power on >/dev/null 2>&1
+    echo "${C_DIM}scanning for ${secs}s…${C_RESET}"
+    bluetoothctl --timeout "$secs" scan on >/dev/null 2>&1
+    echo
+    cmd_list
+}
+
+cmd_info() {
+    local mac; mac=$(resolve "${1:-}") || exit 1
+    bluetoothctl info "$mac"
+}
+
+# simple action: connect/disconnect/remove/trust/untrust/block/unblock/pair
+cmd_action() {
+    local action=$1 mac
+    mac=$(resolve "${2:-}") || exit 1
+    local name; name=$(list_devices | awk -F'\t' -v m="$mac" 'toupper($1)==m{print $2}')
+    name=${name:-$mac}
+
+    case $action in
+        pair)
+            echo "${C_DIM}pairing \"$name\" ($mac)…${C_RESET}"
+            bluetoothctl power on >/dev/null 2>&1
+            bluetoothctl --timeout 5  trust   "$mac"
+            bluetoothctl --timeout 10 pair    "$mac"
+            bluetoothctl --timeout 10 connect "$mac"
+            ;;
+        connect|disconnect|trust|untrust|block|unblock|remove)
+            echo "${C_DIM}${action} \"$name\" ($mac)…${C_RESET}"
+            bluetoothctl "$action" "$mac"
+            ;;
+        *) die "unknown action: $action" ;;
+    esac
+}
+
+usage() {
+    # header comment block (after the shebang), '#' stripped
+    awk 'NR>1 && /^#/ {sub(/^#[[:space:]]?/,""); print; next} NR>1 {exit}' "$0"
+}
+
+# emit the completion script to source:  source <(bluetooth-pair --complete)
+emit_completion() {
+    cat <<'EOF'
+_complete_bluetooth_pair() {
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    local subcmds="list ls scan info connect disconnect pair remove trust untrust block unblock help"
+    if [[ $COMP_CWORD -eq 1 ]]; then
+        COMPREPLY=($(compgen -W "$subcmds" -- "$cur"))
+        return
+    fi
+    case "${COMP_WORDS[1]}" in
+        info|connect|disconnect|pair|remove|trust|untrust|block|unblock)
+            [[ $COMP_CWORD -eq 2 ]] || return
+            COMPREPLY=($(compgen -W "$(bluetooth-pair __complete_devices)" -- "$cur"))
+            ;;
+    esac
+}
+complete -F _complete_bluetooth_pair bluetooth-pair
+EOF
+}
+
+# ----------------------------------------------------------------------------
+# dispatch
+# ----------------------------------------------------------------------------
+case ${1:-} in
+    list|ls)          cmd_list ;;
+    scan)             cmd_scan "${2:-}" ;;
+    info)             cmd_info "${2:-}" ;;
+    connect|disconnect|pair|remove|trust|untrust|block|unblock)
+                      cmd_action "$1" "${2:-}" ;;
+    --complete|complete) emit_completion ;;
+    # internal: candidates for completion (MAC + first word of the name)
+    __complete_devices)  list_devices | awk -F'\t' '{print $1; split($2,a," "); print a[1]}' ;;
+    ''|-h|--help|help) usage ;;
+    *)                die "unknown command: \"$1\". '$PROG --help' for help." ;;
+esac
