@@ -284,7 +284,15 @@ function k.get_ns_logs {
 
 function k.get_all_resources {
     exclude_regex='^(events|events.events.k8s.io|endpoints|helmcharts.helm.cattle.io|addons.k3s.cattle.io|serviceaccount|roles.rbac.authorization.k8s.io|rolebindings.rbac.authorization.k8s.io|pods.metrics.k8s.io)$'
-    all_resources=$(kubectl api-resources --verbs=list --namespaced=true -o name 2>/dev/null | grep -Pv "$exclude_regex" | paste -sd,)
+    local ns=$(k.current_namespace)
+    local nsopt=()
+    [[ -n $ns ]] && nsopt=(-n "$ns")
+    # keep only resources user can list (drops Forbidden noise), parallel check
+    all_resources=$(kubectl api-resources --verbs=list --namespaced=true -o name 2>/dev/null \
+        | grep -Pv "$exclude_regex" \
+        | xargs -P 16 -I{} sh -c "kubectl auth can-i list {} ${nsopt[*]} >/dev/null 2>&1 && echo {}" \
+        | paste -sd,)
+    [[ -z $all_resources ]] && { echo "no listable resources" >&2; return 1; }
     kub get ${all_resources} --show-kind $*
 }
 

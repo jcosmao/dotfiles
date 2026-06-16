@@ -17,7 +17,7 @@ if [[ ! -d ~/.zsh ]]; then
     git clone https://github.com/jcosmao/zsh-syntax-highlighting.git ~/.zsh/zsh-syntax-highlighting
 fi
 
-fpath=(~/.zsh/myzsh/lib ~/.zsh/myzsh/plugins/wd ~/.zsh/zsh-syntax-highlighting ~/.shell/completions $fpath)
+fpath=(~/.zsh/myzsh/lib ~/.zsh/myzsh/plugins/wd ~/.zsh/zsh-syntax-highlighting ~/.shell/completions ~/.local/share/zsh/site-functions $fpath)
 
 for l in ~/.zsh/myzsh/lib/*; do [[ -f $l ]] && source "$l"; done
 for f in ~/.shell/**/*.zsh; do [[ -f $f ]] && source "$f"; done
