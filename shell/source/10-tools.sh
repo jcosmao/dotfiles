@@ -1,6 +1,6 @@
 # Tools setup: gpg, git, FZF, tmux completions, XDG utils
 
-command -v bluetoothctl &> /dev/null && source <(sudo bluetooth-pair --complete)
+command -v bluetoothctl &> /dev/null && source <(bluetooth-pair --complete)
 
 # ========================================
 # git
