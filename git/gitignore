@@ -10,3 +10,4 @@ pyproject.toml
 uv.lock
 poetry.lock
 .tox/*
+.claude/
