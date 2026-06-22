@@ -112,14 +112,25 @@ function utils.uuid ()
     grep -Po '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 }
 
-# useful to parse docker json logs for ex:  docker logs bla | jqlines
-function utils.jqlines
+# useful to parse docker json logs for ex:  docker logs bla | jqlog
+# also handles stern headers ("<pod> <container> <msg>"): strips the header and
+# injects stern_pod / stern_container keys into the parsed json.
+# use stern --color never (and a plain template) so the header is not ANSI-wrapped.
+function utils.jqlog
 {
-    jq -Rr '. as $line | (fromjson?) // $line'
+    jq -Rr '
+        . as $line
+        | (capture("^(?<pod>\\S+) (?<container>\\S+) (?<rest>.*)$") // null) as $h
+        | (if $h then $h.rest | fromjson? // null else null end) as $j
+        | if ($j | type) == "object"
+          then $j + {stern_pod: $h.pod, stern_container: $h.container}
+          else (fromjson? // $line)
+          end
+    '
 }
 
-# same as jqlines, but interpret \n \t to display properly json value like long stacktrace
-function utils.jqlines_format
+# same as jqlog, but interpret \n \t to display properly json value like long stacktrace
+function utils.jqlog_format
 {
     jq -CRr '. as $line | (fromjson?) // $line' | sed -e 's/\\n/\n/g' -e 's/\\t/    /g'
 }
