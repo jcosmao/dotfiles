@@ -32,6 +32,7 @@ It support log files:
 
 import sys
 import re
+import json
 import argparse
 
 
@@ -135,14 +136,55 @@ def colored_level(level):
         return green(level)
     elif level in ["WARNING", "WRN", "WARN", "???"]:
         return yellow(level)
-    elif level in ["CRITICAL", "ERROR", "ERR", "EMER"]:
+    elif level in ["CRITICAL", "ERROR", "ERR", "EMER", "FATAL", "PANIC"]:
         return red(level)
     else:
         return white(level)
 
 
+LEVEL_KEYS = {"level", "lvl", "levelname", "severity", "log.level", "loglevel"}
+TIME_KEYS = {"time", "timestamp", "ts", "@timestamp", "asctime", "datetime"}
+MSG_KEYS = {"msg", "message", "text"}
+
+
+def json_pop(data, names, used):
+    "Return value for first key (case-insensitive) in names, mark it used"
+    for k in data.keys():
+        if k.lower() in names:
+            used.add(k)
+            return data[k]
+    return None
+
+
+def json_fmt(value):
+    "Render a json value as compact text"
+    if isinstance(value, (dict, list)):
+        return json.dumps(value, ensure_ascii=False)
+    return str(value)
+
+
 def parse_line(line):
     "Parse line and return dict of each elements"
+
+    # JSON logs (APIs, traefik, structured loggers). Optionally prefixed by a
+    # stern header "<pod> <container> {json}".
+    brace = line.find("{")
+    if brace != -1:
+        try:
+            data = json.loads(line[brace:])
+        except ValueError:
+            data = None
+        if isinstance(data, dict):
+            used = set()
+            level = json_pop(data, LEVEL_KEYS, used)
+            return {
+                "header": line[:brace],
+                "data": data,
+                "used": used,
+                "level": str(level) if level is not None else "notset",
+                "_type": "json",
+            }
+
     # Line example : Openstack
     # 2014-08-14 18:43:58.950 4092 INFO neutron.plugins.openvswitch.agent.ovs_neutron_agent [-]
     regex = (
@@ -335,6 +377,28 @@ def colorize(line):
             colored_text,
         )
 
+    elif line.get("_type") == "json":
+        data = line["data"]
+        used = line.get("used", set())
+        time_val = json_pop(data, TIME_KEYS, used)
+        msg = json_pop(data, MSG_KEYS, used)
+
+        parts = []
+        if line["header"]:
+            parts.append(magenta(line["header"].rstrip()))
+        if time_val is not None:
+            parts.append(grey(str(time_val)))
+        parts.append(colored_level(line["level"]))
+        if msg not in (None, ""):
+            parts.append(white(str(msg)))
+
+        out = " ".join(parts)
+        for k, v in data.items():
+            if k in used:
+                continue
+            out = "%s %s%s" % (out, blue("%s=" % k), white(json_fmt(v)))
+        return out
+
     elif line.get("_type") == "ovs":
         return "%s%s %s %s %s %s %s" % (
             magenta(line["header"]),
@@ -433,24 +497,95 @@ def line_is_filtered(line):
     return False
 
 
+def json_prefix_index(text):
+    "Index of the first { or [ if only an optional stern header precedes it, else None"
+    first = text.split("\n", 1)[0]
+    # allow an optional "<pod> <container> " header (two whitespace tokens)
+    m = re.match(r"^((?:\S+ \S+ )?)\s*([\{\[])", first)
+    return None if m is None else m.start(2)
+
+
+def json_depth(text):
+    "Net bracket depth, ignoring braces inside json strings"
+    depth = 0
+    in_str = False
+    esc = False
+    for c in text:
+        if esc:
+            esc = False
+        elif c == "\\" and in_str:
+            esc = True
+        elif c == '"':
+            in_str = not in_str
+        elif not in_str:
+            if c in "{[":
+                depth += 1
+            elif c in "}]":
+                depth -= 1
+    return depth
+
+
+def logical_lines():
+    """Yield logical log lines, collapsing pretty/multiline json (and json arrays)
+    into one compact line each so parse_line can handle them. Plain text passes
+    through untouched, line by line."""
+    buf = ""
+    while True:
+        try:
+            raw = sys.stdin.readline()
+        except KeyboardInterrupt:
+            return
+
+        if not raw:
+            # EOF: flush whatever is left as plain text
+            for leftover in buf.splitlines():
+                if leftover:
+                    yield leftover
+            return
+
+        if not buf:
+            # not buffering: only enter json mode if the line starts a json block
+            if json_prefix_index(raw) is None:
+                yield raw.rstrip("\n")
+                continue
+            buf = raw
+        else:
+            buf += raw
+
+        idx = json_prefix_index(buf)
+        header = buf[:idx].strip()
+        body = buf[idx:]
+
+        if json_depth(body) > 0:
+            continue  # incomplete json object/array, keep buffering
+
+        try:
+            data = json.loads(body)
+        except ValueError:
+            # balanced brackets but not valid json -> treat buffered as text
+            for txt in buf.splitlines():
+                if txt:
+                    yield txt
+            buf = ""
+            continue
+
+        prefix = (header + " ") if header else ""
+        items = data if isinstance(data, list) else [data]
+        for item in items:
+            yield prefix + json.dumps(item, ensure_ascii=False)
+        buf = ""
+
+
 if __name__ == "__main__":
     if not check_args():
         sys.exit(1)
 
-    while 1:
-        try:
-            line = sys.stdin.readline()
-        except KeyboardInterrupt:
-            break
-
-        if not line:
-            break
-
+    for line in logical_lines():
         try:
             # get parsed line
-            parsed_line = parse_line(line.rstrip("\n"))
+            parsed_line = parse_line(line)
         except Exception:
-            parsed_line = {"header": "", "text": line.rstrip("\n"), "_type": None}
+            parsed_line = {"header": "", "text": line, "_type": None}
 
         # Skip line if filtred (never skip line without log level)
         if line_is_filtered(parsed_line):

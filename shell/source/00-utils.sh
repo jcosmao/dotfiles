@@ -116,15 +116,33 @@ function utils.uuid ()
 # also handles stern headers ("<pod> <container> <msg>"): strips the header and
 # injects stern_pod / stern_container keys into the parsed json.
 # use stern --color never (and a plain template) so the header is not ANSI-wrapped.
+# -c : emit one compact json object per line (NDJSON) so it pipes into jgrep -c | oslog.
 function utils.jqlog
 {
-    jq -Rr '
+    local compact="" OPTIND=1 opt
+    while getopts "c" opt; do
+        case $opt in
+            c) compact="-c" ;;
+            *) return 2 ;;
+        esac
+    done
+    shift $((OPTIND - 1))
+    # stern prefixes each line with "<pod> <container> [timestamp] " before the
+    # json. Strip everything up to the first '{' so the json parses, and inject
+    # stern_pod / stern_container. --unbuffered so matches appear live (klog -f).
+    jq --unbuffered $compact -Rr '
         . as $line
-        | (capture("^(?<pod>\\S+) (?<container>\\S+) (?<rest>.*)$") // null) as $h
-        | (if $h then $h.rest | fromjson? // null else null end) as $j
-        | if ($j | type) == "object"
-          then $j + {stern_pod: $h.pod, stern_container: $h.container}
-          else (fromjson? // $line)
+        | ($line | fromjson? // null) as $direct
+        | if ($direct | type) == "object" then $direct
+          else
+            ( (capture("^(?<pod>\\S+) (?<container>\\S+) (?<rest>.*)$") // null) as $h
+              | (if $h and ($h.rest | test("\\{"))
+                 then ($h.rest | sub("^[^{]*"; "") | fromjson? // null)
+                 else null end) as $j
+              | if ($j | type) == "object"
+                then $j + {stern_pod: $h.pod, stern_container: $h.container}
+                else $line
+                end )
           end
     '
 }
@@ -140,19 +158,33 @@ function utils.jqmap2csv
     jq -r '(.[0] | keys_unsorted) as $keys | ([$keys] + map([.[ $keys[] ]])) [] | @csv'
 }
 
+# grep-like filter over a json stream. REGEX matches the whole serialized object
+# (like grep over the log line), using jq's test() = Oniguruma (ERE + PCRE
+# features: \d, {n,m}, lookahead, alternation, ...).
+#   -v  invert match        -i  case-insensitive
+#   -c  compact NDJSON out   -E/-P  accepted (no-op; regex is always on)
 function utils.jqgrep () {
-    local invert=false flags="" OPTIND=1 opt
-    while getopts "vi" opt; do
+    local invert=false flags="" compact=false OPTIND=1 opt
+    while getopts "vicEP" opt; do
         case $opt in
             v) invert=true ;;
             i) flags="i" ;;
+            c) compact=true ;;
+            E|P) ;;  # grep muscle-memory: Oniguruma already covers ERE and PCRE
             *) return 2 ;;
         esac
     done
     shift $((OPTIND - 1))
     local re=$1
-    jq --arg re "$re" --arg flags "$flags" --argjson invert "$invert" \
-       '[.[] | select(any(.[]; tostring | test($re; $flags)) != $invert)]'
+    # Stream (NO -s slurp): -s would block until EOF and show nothing while
+    # tailing a live stream (klog -f). Per input value: iterate if it's an array
+    # (a slurped/pretty array), else test the object directly. --unbuffered so
+    # matches appear live. Default pretty (jq colors on a TTY); -c => NDJSON.
+    local compact_flag=""
+    $compact && compact_flag="-c"
+    jq --unbuffered $compact_flag --arg re "$re" --arg flags "$flags" --argjson invert "$invert" \
+       '(if type == "array" then .[] else . end)
+          | select((tostring | test($re; $flags)) != $invert)'
 }
 
 # csv to table display
@@ -265,6 +297,7 @@ alias dotup="utils.dotfiles_update"
 alias zup="utils.zsh_update"
 alias json="utils.json"
 alias jgrep="utils.jqgrep"
+alias jlog="utils.jqlog"
 alias ssl_info="utils.ssl_info"
 alias ssl_get="utils.ssl_get"
 alias randpass="utils.randpass"
