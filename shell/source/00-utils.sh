@@ -1,3 +1,6 @@
+export LANG=en_US.UTF-8
+export LC_CTYPE=en_US.UTF-8
+
 export JQ_COLORS="0;90:1;31:1;36:1;33:1;32:1;35:1;35:2;34"
 
 export TERM=xterm-256color
