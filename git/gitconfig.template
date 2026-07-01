@@ -131,3 +131,19 @@
             git checkout -b $1 && git pushdev; \
         fi; \
     }; f"
+    rmbranch = "!f() { \
+            b=\"${1:-$(git symbolic-ref --short HEAD)}\"; \
+            up=$(git rev-parse --abbrev-ref \"$b@{upstream}\" 2>/dev/null); \
+            echo; \
+            echo \"  Branches to delete:\"; \
+            echo \"    local   $b\"; \
+            [ -n \"$up\" ] && echo \"    remote  ${up%%/*} → ${up#*/}\" || echo \"    remote  (none — no upstream)\"; \
+            echo; \
+            printf \"  Proceed? [y/N] \"; \
+            read ans; \
+            case \"$ans\" in [yY]|[yY][eE][sS]) ;; *) echo \"  aborted\"; echo; return 1;; esac; \
+            echo; \
+            git branch -D \"$b\"; \
+            [ -n \"$up\" ] && git push \"${up%%/*}\" --delete \"${up#*/}\"; \
+            echo; \
+    }; f"

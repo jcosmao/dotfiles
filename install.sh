@@ -150,7 +150,8 @@ function install_git {
     sed -i "s/__USERNAME__/$user/g" ~/.git/gitconfig
     sed -i "s/__MAIL__/$mail/g" ~/.git/gitconfig
 
-    user_branch=$(echo "$user" | sed 's/\(.\)\S* \(.\).*/\L\1\2/')
+    # dev branches use login truncated to 8 chars: dev/<login8>/<branch>
+    user_branch=$(echo "${USER}" | cut -c1-8)
     sed -i "s/__USERNAME_BRANCH__/$user_branch/g" ~/.git/gitconfig
 
     if gpg -K "$user <$mail>" &> /dev/null; then
