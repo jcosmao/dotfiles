@@ -279,7 +279,7 @@ function k.exec {
 function k.get_ns_logs {
     local pods=($(printf '%s\n' "$@" | sed 's|^pod/||'))
     local ns=$(k.current_namespace)
-    command stern -n ${ns:-default} --field-selector metadata.namespace=${ns:-default} -s 1m "${pods[@]}"
+    command stern -n ${ns:-default} --color always --field-selector metadata.namespace=${ns:-default} -s 1m "${pods[@]}"
 }
 
 function k.get_all_resources {
