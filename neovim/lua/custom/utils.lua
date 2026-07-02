@@ -14,8 +14,16 @@ function HieraEncrypt()
         'git -C ' .. vim.fn.expand('%:h') .. ' rev-parse --show-toplevel 2> /dev/null'
     ))
 
-    if vim.loop.fs_stat(git_root .. '/ovh-hiera-encrypt') then
-        local encrypt_cmd = string.format("%s/ovh-hiera-encrypt -f %s", git_root,
+    local script
+    for _, candidate in ipairs({ git_root .. '/ovh-hiera-encrypt', git_root .. '/scripts/ovh-hiera-encrypt' }) do
+        if vim.loop.fs_stat(candidate) then
+            script = candidate
+            break
+        end
+    end
+
+    if script then
+        local encrypt_cmd = string.format("%s -f %s", script,
             vim.fn.shellescape(vim.fn.expand("%:p")))
         local message = vim.fn.system(encrypt_cmd)
 
