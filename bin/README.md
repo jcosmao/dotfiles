@@ -5,6 +5,6 @@ fd          https://github.com/sharkdp/fd/releases/latest
 ctgags      6.2.1 static compiled from https://github.com/universal-ctags/ctags.git
 fzf         https://github.com/junegunn/fzf/releases/download/v0.55.0/fzf-0.55.0-linux_amd64.tar.gz
 rofi        ubuntu 22.04
-stern       (not tracked in git, too big) https://github.com/stern/stern/releases/latest
-plik        (not tracked in git, too big) https://github.com/root-gg/plik/releases/latest
-jq          https://github.com/jqlang/jq/releases/tag/jq-1.7
+stern       (not tracked in git, too big) -> ./download.sh
+plik        (not tracked in git, too big) -> ./download.sh
+jq          (not tracked in git)          -> ./download.sh

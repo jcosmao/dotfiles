@@ -8,3 +8,4 @@ vim/autoload/plug.vim.old
 .aider*
 bin/stern
 bin/plik
+bin/jq
