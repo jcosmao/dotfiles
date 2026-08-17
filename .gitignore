@@ -9,3 +9,7 @@ vim/autoload/plug.vim.old
 bin/stern
 bin/plik
 bin/jq
+bin/rg
+bin/fzf
+bin/fd
+bin/bat
