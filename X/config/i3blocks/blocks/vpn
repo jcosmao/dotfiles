@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+import subprocess
+import json
+import re
+
+label = ' '
+color_up = '#FF7961'
+color_down = '#676767'
+
+
+def iface_by_regex(regex):
+    cmd = ["ip", "--json", "link", "show"]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    try:
+        links = json.loads(result.stdout)
+        for link in links:
+            if regex.match(link["ifname"]):
+                return link["ifname"]
+    except Exception:
+        pass
+    return None
+
+
+names = []
+for pattern, desc in [
+    (re.compile(r'^wg'), "wg"),
+    (re.compile(r'^proton'), "pr"),
+    (re.compile(r'^gp'), "gp")
+]:
+    iface = iface_by_regex(pattern)
+    if iface:
+        names.append(desc)
+
+if not names:
+    exit(0)
+
+print(f"{label} {' | '.join(names)}")
+print(f"{label}")
+print(f"{color_up}")

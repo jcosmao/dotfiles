@@ -1,0 +1,13 @@
+#!/bin/bash
+
+repo=$(git config --get remote.origin.url 2> /dev/null)
+
+if [[ $repo =~ .*github.com/jcosmao/dotfiles.* ]]; then
+    echo "[$0] Reset changes on files"
+    {
+        git reset ~/.dotfiles/shell/bashrc
+        git checkout -- ~/.dotfiles/shell/bashrc
+    } 2>&1 > /dev/null
+fi
+
+exit 0

@@ -1,0 +1,7 @@
+tail: 10
+max-log-requests: 999
+timestamps: short
+qps: 10
+burst: 20
+diff-container: true
+highlight: \[error\]

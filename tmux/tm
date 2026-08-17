@@ -1,0 +1,198 @@
+#!/usr/bin/env bash
+#
+# tmux wrapper - help manage sessions in multi user env
+#
+DEBUG=0
+
+function _debug ()
+{
+    if [[ $DEBUG == 1 ]]; then
+        echo "[DEBUG] $*"
+    fi
+}
+
+function tmux_conf ()
+{
+    # Check if user config file exits
+    if [[ -e "$HOME/.tmux.conf" ]]; then
+        tmux_conf="$HOME/.tmux.conf"
+    else
+        tmux_conf='/etc/tmux/tmux.conf'
+    fi
+
+    echo $tmux_conf
+}
+
+function tmux_ls ()
+{
+    $tmux_cmd ls -F "#{session_name}" 2> /dev/null
+    return 0
+}
+
+function tmux_attach_or_new ()
+{
+    session_name=$1
+
+    # set terminal title
+    echo -ne "\033]0;$session_name\007"
+
+    if [[ $( tmux_ls | grep -Ec "^$session_name$") == 1 ]]; then
+        my_session=$(tmux display-message -p '#S' 2> /dev/null)
+        if [[ -n $TMUX ]]; then
+            _debug "$tmux_cmd switch-client -t $session_name"
+            $tmux_cmd switch-client -t $session_name
+        else
+            _debug "$tmux_cmd attach-session -t $session_name"
+            $tmux_cmd attach-session -t "$session_name"
+        fi
+    else
+        _debug "$tmux_cmd new -s $session_name -d"
+        $tmux_cmd new -s "$session_name" -d
+        [[ $? -ne 0 ]] && echo "Unable to create session $session_name" && return
+
+        tmux_attach_or_new $session_name
+    fi
+}
+
+function tmux_exec ()
+{
+    session=$1; shift
+    cmd="$*"
+
+    current_host=$(hostname -s)
+
+    [[ $( tmux_ls | grep -Ec "^$session$" ) -eq 0 ]] && echo "No tmux session $session" && exit 1
+    session_id=$( $tmux_cmd ls -F "#{session_name}:#{session_id}" | grep -P "^$session:" | cut -d: -f2)
+
+    echo "Exec '$cmd' on all windows for tmux session '$session' id = $session_id"
+    read -r -p "Sure ? [y/N] " response
+    response=${response,,}    # tolower
+
+    if [[ $response =~ ^(yes|y)$ ]]; then
+        for window_id in $( $tmux_cmd list-windows -F "#{window_id}" -t "$session" ); do
+            _debug "send-keys -t ${session_id}:${window_id} '${cmd}'"
+            $tmux_cmd send-keys -t "${session_id}:${window_id}" "[[ \$(hostname -s) != $current_host ]] && ( $cmd )" C-m
+        done
+    fi
+}
+
+function tmux_kill ()
+{
+    if [[ "$1" == "all" ]]; then
+        _debug "$tmux_cmd kill-server"
+        $tmux_cmd kill-server
+    else
+        _debug "$tmux_cmd kill-session -t $1"
+        $tmux_cmd kill-session -t "$1"
+    fi
+}
+
+function dump() {
+    local d=$'\t'
+    $tmux_cmd list-windows -a -F "#S${d}#W${d}#{pane_current_path}"
+}
+
+function save() {
+    dump > ~/.tmux-session
+}
+
+function terminal_size() {
+    stty size 2>/dev/null | awk '{ printf "-x%d -y%d", $2, $1 }'
+}
+
+function session_exists() {
+    $tmux_cmd has-session -t "$1" 2>/dev/null
+}
+
+function add_window() {
+    $tmux_cmd new-window -d -t "$1:" -n "$2" -c "$3"
+}
+
+function new_session() {
+    cd "$3" && $tmux_cmd new-session -d -s "$1" -n "$2" $4
+}
+
+function restore() {
+    $tmux_cmd start-server
+    local count=0
+    local dimensions="$(terminal_size)"
+
+    while IFS=$'\t' read session_name window_name dir; do
+        if [[ -d "$dir" && $window_name != "log" && $window_name != "man" ]]; then
+            if session_exists "$session_name"; then
+                add_window "$session_name" "$window_name" "$dir"
+            else
+                new_session "$session_name" "$window_name" "$dir" "$dimensions"
+                count=$(( count + 1 ))
+            fi
+        fi
+    done < ~/.tmux-session
+
+    echo "restored $count sessions"
+}
+
+function print_help ()
+{
+    bin=$(basename "$0")
+
+    [[ $# -ne 0 ]] && echo -e "\nERROR: $@\n"
+
+    echo "
+    Tmux wrapper
+    config file: $(tmux_conf)
+    search conf in:
+      - $HOME/.tmux.conf
+      - /etc/tmux/tmux.conf
+
+    $bin [--exec <cmd>|--kill] <session_name|regex>
+
+     options:
+        --exec <cmd>                exec cmd on all session windows
+        --kill <session_name|all>   kill session
+        --save                      save sessions layout in ~/.tmux-session
+        --restore                   restore sessions from ~/.tmux-session
+        --help                      this help
+
+     Ex: $bin                           > list opened sessions
+         $bin plop                      > create/attach session plop
+         $bin --exec 'ls -l' plop       > exec cmd on all windows in session 'plop'"
+
+    exit
+}
+
+function main ()
+{
+    export tmux_cmd="$(which tmux) -2 -L $USER -f $(tmux_conf)"
+
+    [[ $# -eq 0 ]] && tmux_ls && exit
+
+     while [[ $# -ne 0 ]]; do
+        arg="$1"; shift
+        case "$arg" in
+            --exec ) cmd="$1"; shift ;;
+            --kill ) kill=1;;
+            --save ) save ; exit ;;
+            --restore ) restore ; exit ;;
+            --debug ) export DEBUG=1 ;;
+            --help ) print_help ;;
+            * ) [[ $arg =~ ^--+.* ]] && print_help "$arg unknown"
+                if [[ -z $session ]]; then
+                    session="$arg"
+                else
+                    print_help "session name already set ($session)"
+                fi
+        esac
+    done
+
+    [[ ! -n $session ]] && print_help "Missing session_name"
+
+    if [[ -n $cmd ]]; then
+        tmux_exec "$session" "$cmd"
+    elif [[ $kill -eq 1 ]]; then
+        tmux_kill "$session"
+    else
+        tmux_attach_or_new "$session"
+    fi
+}
+
+main "$@"

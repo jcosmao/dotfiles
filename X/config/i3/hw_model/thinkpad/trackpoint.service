@@ -1,0 +1,12 @@
+[Unit]
+Description=Set trackpoint sensitivity
+After=lightdm.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c "echo -n 200 > /sys/devices/platform/i8042/serio1/sensitivity"
+# ExecStart=/bin/bash -c "xinput set-prop 'TPPS/2 Synaptics TrackPoint' 'libinput Accel Speed' -0.7"
+
+[Install]
+WantedBy=multi-user.target
+
