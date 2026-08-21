@@ -20,16 +20,16 @@ function M.lazy_config()
                 G.gruvbox_material_diagnostic_virtual_text = 'colored'
                 G.gruvbox_material_dim_inactive_windows = 0
                 G.gruvbox_material_colors_override = {
-                    bg0 = { '#f9efd5', '230' },
-                    bg1 = { '#f7e2c6', '230' },
-                    bg2 = { '#f3ddc1', '230' },
-                    bg3 = { '#ecd7b1', '230' },
-                    bg4 = { '#eed8b7', '223' },
-                    bg5 = { '#e6d2b0', '230' },
-                    bg_statusline1 = { '#f5e6ca', '230' },
-                    bg_statusline2 = { '#f3dfc7', '230' },
-                    bg_statusline3 = { '#eed6b7', '230' },
-                    bg_dim = { '#f3e5c7', '229' },
+                    bg0 = { '#faf5e9', '230' },
+                    bg1 = { '#f5efe0', '230' },
+                    bg2 = { '#f1ead9', '230' },
+                    bg3 = { '#eae2cf', '230' },
+                    bg4 = { '#ece5d4', '223' },
+                    bg5 = { '#e4dcc8', '230' },
+                    bg_statusline1 = { '#ece4d2', '230' },
+                    bg_statusline2 = { '#e6dcc6', '230' },
+                    bg_statusline3 = { '#ddd2b8', '230' },
+                    bg_dim = { '#f3ede0', '229' },
                     red = { '#b20007', '88' },
                     orange = { '#ce4200', '130' },
                     yellow = { '#c88214', '136' },
@@ -148,6 +148,15 @@ function M.setColorscheme()
         vim.api.nvim_set_hl(0, "NvimTreeFolderIcon", { fg = '#6c85c0' })
         vim.api.nvim_set_hl(0, 'FoldColumn', { fg = colors.grey0 })
         vim.api.nvim_set_hl(0, 'MatchParen', { bg = '#dacc94' })
+        vim.api.nvim_set_hl(0, 'ColorColumn', { bg = '#ecdfc8' })
+        vim.api.nvim_set_hl(0, 'Pmenu', { fg = colors.fg1, bg = '#eae1cb' })
+        vim.api.nvim_set_hl(0, 'PmenuSbar', { bg = '#eae1cb' })
+        vim.api.nvim_set_hl(0, 'PmenuThumb', { bg = colors.grey1 })
+        vim.api.nvim_set_hl(0, 'PmenuKind', { fg = colors.green, bg = '#eae1cb' })
+        vim.api.nvim_set_hl(0, 'PmenuExtra', { fg = colors.grey2, bg = '#eae1cb' })
+        vim.api.nvim_set_hl(0, 'TabLine', { fg = colors.grey2, bg = '#e6dcc6' })
+        vim.api.nvim_set_hl(0, 'TabLineFill', { fg = colors.grey2, bg = '#ece4d2' })
+        vim.api.nvim_set_hl(0, 'TabLineSel', { fg = colors.bg0, bg = colors.grey2 })
         vim.api.nvim_set_hl(0, "IblScope", { fg = colors.grey0 })
         vim.api.nvim_set_hl(0, "CmpItemAbbrMatch", { fg = colors.orange })
         vim.api.nvim_set_hl(0, "DiffText", { bg = colors.bg_diff_blue2 })
