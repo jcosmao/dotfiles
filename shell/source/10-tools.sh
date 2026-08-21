@@ -130,7 +130,7 @@ if [[ -z $SSH_CONNECTION ]]; then
     fi
 
     ! grep -q default-cache-ttl ~/.gnupg/gpg-agent.conf && \
-        echo "default-cache-ttl 3600" >> ~/.gnupg/gpg-agent.conf
+        echo "default-cache-ttl 36000" >> ~/.gnupg/gpg-agent.conf
 else
     mkdir -p ~/.gnupg
     echo no-autostart > ~/.gnupg/gpg-agent.conf

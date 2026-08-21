@@ -13,6 +13,7 @@ function go.install
     dir="$HOME/.local/download/go.${version}"
     rm -rf "$dir" && mkdir -p "$dir"
     tar xzf /tmp/go.tar.gz -C  "$dir"
+    rm -f ~/.local/go
     ln -sf "$dir/go" ~/.local/go
 )}
 
