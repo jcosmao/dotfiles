@@ -2,6 +2,7 @@
 
 import argparse
 import glob
+import html
 import logging
 import os
 import re
@@ -24,6 +25,10 @@ BOOKMARK_PREFIX = r"^b(?::\s*|\s+)(.*)$"
 
 class Rofi:
     def select(self, prompt, options, search):
+        """Returns (selected_option, returncode).
+
+        returncode 10 = kb-custom-1 (Alt+c) pressed.
+        """
         rofi_process = subprocess.Popen(
             [
                 "rofi",
@@ -34,22 +39,26 @@ class Rofi:
                 "-i",
                 "-l",
                 str(len(options)),
+                "-kb-custom-1",
+                "Alt+c",
                 "-mesg",
-                f"<small><b>string:</b> {search}</small>",
+                f"<small><b>string:</b> {search}   "
+                f"<i>(Alt+c: clear selection)</i></small>",
                 "-theme-str",
-                f'entry {{placeholder: "{prompt}";}}',
+                f'entry {{placeholder: "{prompt}";}} window {{width: 900px;}}',
             ],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             text=True,
         )
-        rofi_process.stdin.write("\n".join(options) + "\n")
-        rofi_process.stdin.close()
-        selected_option = rofi_process.stdout.read().strip()
-        return selected_option
+        stdout, _ = rofi_process.communicate("\n".join(options) + "\n")
+        return stdout.strip(), rofi_process.returncode
 
-    def prompt(self, prompt, options, filter_text=""):
-        """Prompt with fuzzy-searchable options. Free text input allowed."""
+    def prompt(self, prompt, options, filter_text="", mesg=""):
+        """Prompt with fuzzy-searchable options. Free text input allowed.
+
+        Returns (user_input, returncode). returncode 10 = kb-custom-1 (Alt+c).
+        """
         command = [
             "rofi",
             "-dmenu",
@@ -62,22 +71,24 @@ class Rofi:
             "-sorting-method",
             "fzf",
             "-l",
-            "15",
+            "10",
+            "-kb-custom-1",
+            "Alt+c",
             "-theme-str",
-            f'entry {{placeholder: "{prompt}";}}',
+            f'entry {{placeholder: "{prompt}";}} window {{width: 900px;}}',
         ]
         if filter_text:
             command += ["-filter", filter_text]
+        if mesg:
+            command += ["-mesg", mesg]
         rofi_process = subprocess.Popen(
             command,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             text=True,
         )
-        rofi_process.stdin.write("\n".join(options) + "\n")
-        rofi_process.stdin.close()
-        user_input = rofi_process.stdout.read().strip()
-        return user_input
+        stdout, _ = rofi_process.communicate("\n".join(options) + "\n")
+        return stdout.strip(), rofi_process.returncode
 
 
 def load_config(file_path):
@@ -162,6 +173,47 @@ def get_matches(user_input, config):
     return matched_items
 
 
+def get_keywords(config):
+    """Extract [(keyword, description)] from config regexes.
+
+    Keywords are prefixes like 'jira:' or 'go/', description comes from
+    the entry's first item title ('$1' parts stripped).
+    """
+    keywords = [("b:", "firefox bookmarks")]
+    for entry in config:
+        pattern = entry["match"]
+        desc = re.sub(r"[:\s]*\$\d+.*$", "", entry["items"][0]["title"])
+        m = re.match(r"\^(?:\(\?:)?([a-z0-9|._-]+)\)?\(\?::", pattern)
+        if m:
+            keywords.append((f"{m.group(1).split('|')[0]}:", desc))
+            continue
+        m = re.match(r"\^([a-z0-9-]+/)\(", pattern)
+        if m:
+            keywords.append((m.group(1), desc))
+    return keywords
+
+
+def keywords_helper(config):
+    keywords = [
+        (kw, desc[:18] + "…" if len(desc) > 19 else desc)
+        for kw, desc in get_keywords(config)
+    ]
+    width = max(len(f"{kw} {desc}") for kw, desc in keywords) + 2
+
+    def cell(kw, desc):
+        pad = " " * (width - len(f"{kw} {desc}"))
+        return f"<b>{html.escape(kw)}</b> {html.escape(desc)}{pad}"
+
+    lines = []
+    for i in range(0, len(keywords), 3):
+        group = keywords[i : i + 3]
+        lines.append("".join(cell(kw, desc) for kw, desc in group).rstrip())
+
+    lines[-1] += f"{' ' * 3}<i>Alt+c: clear</i>"
+    body = "\n".join(lines)
+    return f"<tt><span size='10000'>{body.strip()}</span></tt>"
+
+
 def get_firefox_bookmarks():
     """Return [(title, url)] from firefox places.sqlite (most recent profile)."""
     places_files = glob.glob(os.path.expanduser("~/.mozilla/firefox/*/places.sqlite"))
@@ -181,9 +233,10 @@ def get_firefox_bookmarks():
             conn = sqlite3.connect(db_copy)
             rows = conn.execute(
                 """
-                SELECT b.title, p.url
+                SELECT f.title, b.title, p.url
                 FROM moz_bookmarks b
                 JOIN moz_places p ON b.fk = p.id
+                LEFT JOIN moz_bookmarks f ON b.parent = f.id
                 WHERE b.type = 1 AND p.url LIKE 'http%'
                 ORDER BY b.dateAdded DESC
                 """
@@ -194,11 +247,13 @@ def get_firefox_bookmarks():
             return []
 
     seen = set()
-    for title, url in rows:
+    for folder, title, url in rows:
         if url in seen:
             continue
         seen.add(url)
-        bookmarks.append((title or url, url))
+        title = title or url
+        display = f"{folder}/{title}" if folder else title
+        bookmarks.append((display, url))
     return bookmarks
 
 
@@ -207,8 +262,8 @@ def bookmark_search(rofi, query):
     if not bookmarks:
         return
 
-    display_map = {f"{title}  ·  {url}": url for title, url in bookmarks}
-    selected = rofi.prompt("bookmarks", list(display_map), filter_text=query)
+    display_map = {display: url for display, url in bookmarks}
+    selected, _ = rofi.prompt("bookmarks", list(display_map), filter_text=query)
     if selected in display_map:
         save_history("b:")
         open_url(display_map[selected])
@@ -218,6 +273,11 @@ def open_url(url):
     subprocess.run(["xdg-open", url])
     time.sleep(0.3)
     subprocess.run(["i3-msg", "[urgent=latest] focus"])
+
+
+def clear_selection():
+    for selection in ("primary", "clipboard"):
+        subprocess.run(["xclip", "-i", "/dev/null", "-selection", selection])
 
 
 def read_primary_selection():
@@ -253,7 +313,12 @@ def search(rofi, user_input, config, keep_history=True):
     if len(options) == 1:
         selected_option = options[0]
     else:
-        selected_option = rofi.select("Select an option ", options, search=user_input)
+        selected_option, returncode = rofi.select(
+            "Select an option ", options, search=user_input
+        )
+        if returncode == 10:
+            clear_selection()
+            return "clear"
 
     for title, url in matched_items:
         if title == selected_option:
@@ -268,19 +333,26 @@ def main(args):
     config = load_config(args.config)
 
     clipboard = read_primary_selection()
-    history = load_history()
 
-    options = []
-    # only propose clipboard content if it matches a config entry
+    # selection matching a config entry: straight to the match menu,
+    # without saving this one-shot value (uuid, hostname, ...) in history
     if clipboard and get_matches(clipboard, config):
-        options.append(clipboard)
-    options.extend(h for h in history if h != clipboard)
+        # Alt+c in the menu clears the selection and falls back to the prompt
+        if search(rofi, clipboard, config, keep_history=False) != "clear":
+            return
 
-    user_input = rofi.prompt("search", options)
+    mesg = keywords_helper(config)
+    while True:
+        user_input, returncode = rofi.prompt("search", load_history(), mesg=mesg)
+        if returncode == 10:
+            clear_selection()
+            clipboard = ""
+            continue
+        break
+
     if not user_input:
         sys.exit(0)
 
-    # clipboard one-shot values (uuids, hostnames, ...) would pollute history
     search(rofi, user_input, config, keep_history=(user_input != clipboard))
 
 
