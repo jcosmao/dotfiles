@@ -1,29 +1,39 @@
 #!/usr/bin/env python
 
 import argparse
+import glob
 import logging
 import os
 import re
+import shutil
+import sqlite3
 import subprocess
 import sys
+import tempfile
 import time
+import urllib.parse
 
-import pyperclip
 import yaml
 
 LOG = logging.getLogger()
 
+HISTORY_FILE = os.path.expanduser("~/.cache/rofi_search_history")
+HISTORY_MAX = 50
+BOOKMARK_PREFIX = r"^b(?::\s*|\s+)(.*)$"
+
 
 class Rofi:
-    def __init__(self):
-        prompt = ""
-        self.rofi_command = f"rofi -dmenu -markup -p {prompt}"
-
     def select(self, prompt, options, search):
-        command = f"{self.rofi_command} -l {str(len(options))}"
         rofi_process = subprocess.Popen(
-            command.split(" ")
-            + [
+            [
+                "rofi",
+                "-dmenu",
+                "-p",
+                "",
+                "-markup",
+                "-i",
+                "-l",
+                str(len(options)),
                 "-mesg",
                 f"<small><b>string:</b> {search}</small>",
                 "-theme-str",
@@ -38,24 +48,36 @@ class Rofi:
         selected_option = rofi_process.stdout.read().strip()
         return selected_option
 
-    def text_entry(self, prompt="", default_text=""):
-        command = f"{self.rofi_command} -l 0"
+    def prompt(self, prompt, options, filter_text=""):
+        """Prompt with fuzzy-searchable options. Free text input allowed."""
+        command = [
+            "rofi",
+            "-dmenu",
+            "-p",
+            "",
+            "-i",
+            "-matching",
+            "fuzzy",
+            "-sort",
+            "-sorting-method",
+            "fzf",
+            "-l",
+            "15",
+            "-theme-str",
+            f'entry {{placeholder: "{prompt}";}}',
+        ]
+        if filter_text:
+            command += ["-filter", filter_text]
         rofi_process = subprocess.Popen(
-            command.split(" ") + ["-theme-str", f'entry {{placeholder: "{prompt}";}}'],
+            command,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             text=True,
         )
-        rofi_process.stdin.write(f"{default_text}\n")
+        rofi_process.stdin.write("\n".join(options) + "\n")
         rofi_process.stdin.close()
         user_input = rofi_process.stdout.read().strip()
         return user_input
-
-    def error(self, msg):
-        command = f"rofi -e {msg}"
-        rofi_process = subprocess.Popen(
-            command.split(" "), stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True
-        )
 
 
 def load_config(file_path):
@@ -81,8 +103,28 @@ def load_config(file_path):
         return []
 
 
+def load_history():
+    try:
+        with open(HISTORY_FILE, "r") as file:
+            return [line.strip() for line in file if line.strip()]
+    except FileNotFoundError:
+        return []
+
+
+def save_history(entry):
+    entry = entry.strip()
+    if not entry:
+        return
+    history = [h for h in load_history() if h != entry]
+    history.insert(0, entry)
+    os.makedirs(os.path.dirname(HISTORY_FILE), exist_ok=True)
+    with open(HISTORY_FILE, "w") as file:
+        file.write("\n".join(history[:HISTORY_MAX]) + "\n")
+
+
 def get_matches(user_input, config):
     matched_items = []
+    seen = set()
     for entry in config:
         try:
             match = re.match(entry["match"], user_input)
@@ -92,33 +134,119 @@ def get_matches(user_input, config):
 
         if match:
             for item in entry["items"]:
-                title = item["title"]
-                url = item["url"]
                 title = re.sub(
-                    r"\$(\d+)", lambda m: match.group(int(m.group(1))), title
+                    r"\$(\d+)",
+                    lambda m: match.group(int(m.group(1))),
+                    item["title"],
                 )
-                url = re.sub(r"\$(\d+)", lambda m: match.group(int(m.group(1))), url)
+                if re.fullmatch(r"\$\d+", item["url"]):
+                    # url template is the capture itself (e.g. 'Open url'):
+                    # keep it raw, encoding would break it
+                    url = match.group(int(item["url"][1:]))
+                else:
+                    # url-encode captured groups so queries with spaces/special
+                    # chars stay valid in the target url
+                    url = re.sub(
+                        r"\$(\d+)",
+                        lambda m: urllib.parse.quote(
+                            match.group(int(m.group(1))), safe=""
+                        ),
+                        item["url"],
+                    )
+                # several config entries can produce the same item: dedupe
+                if (title, url) in seen:
+                    continue
+                seen.add((title, url))
                 matched_items.append((title, url))
 
     return matched_items
 
 
-def search(rofi, user_input, config):
+def get_firefox_bookmarks():
+    """Return [(title, url)] from firefox places.sqlite (most recent profile)."""
+    places_files = glob.glob(os.path.expanduser("~/.mozilla/firefox/*/places.sqlite"))
+    if not places_files:
+        return []
+    places = max(places_files, key=os.path.getmtime)
+
+    bookmarks = []
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # work on a copy: firefox keeps the db locked while running
+        db_copy = os.path.join(tmpdir, "places.sqlite")
+        shutil.copy(places, db_copy)
+        wal = f"{places}-wal"
+        if os.path.exists(wal):
+            shutil.copy(wal, f"{db_copy}-wal")
+        try:
+            conn = sqlite3.connect(db_copy)
+            rows = conn.execute(
+                """
+                SELECT b.title, p.url
+                FROM moz_bookmarks b
+                JOIN moz_places p ON b.fk = p.id
+                WHERE b.type = 1 AND p.url LIKE 'http%'
+                ORDER BY b.dateAdded DESC
+                """
+            ).fetchall()
+            conn.close()
+        except sqlite3.Error:
+            LOG.exception("fail to read firefox bookmarks")
+            return []
+
+    seen = set()
+    for title, url in rows:
+        if url in seen:
+            continue
+        seen.add(url)
+        bookmarks.append((title or url, url))
+    return bookmarks
+
+
+def bookmark_search(rofi, query):
+    bookmarks = get_firefox_bookmarks()
+    if not bookmarks:
+        return
+
+    display_map = {f"{title}  ·  {url}": url for title, url in bookmarks}
+    selected = rofi.prompt("bookmarks", list(display_map), filter_text=query)
+    if selected in display_map:
+        save_history("b:")
+        open_url(display_map[selected])
+
+
+def open_url(url):
+    subprocess.run(["xdg-open", url])
+    time.sleep(0.3)
+    subprocess.run(["i3-msg", "[urgent=latest] focus"])
+
+
+def read_primary_selection():
+    try:
+        return (
+            subprocess.check_output(
+                ["xclip", "-out", "-selection", "primary"],
+                stderr=subprocess.DEVNULL,
+            )
+            .decode("utf-8")
+            .strip()
+        )
+    except subprocess.CalledProcessError:
+        return ""
+
+
+def search(rofi, user_input, config, keep_history=True):
+    bookmark = re.match(BOOKMARK_PREFIX, user_input)
+    if bookmark:
+        bookmark_search(rofi, bookmark.group(1))
+        return
+
     matched_items = get_matches(user_input, config)
     if not matched_items:
-        user_input = rofi.text_entry("anything you want")
-        if not user_input:
-            sys.exit(0)
-
-        matched_items = get_matches(user_input, config)
-        if not matched_items:
-            # Fallback on google search
-            subprocess.run(
-                ["xdg-open", f"https://www.google.com/search?q={user_input}"]
-            )
-            time.sleep(0.3)
-            subprocess.run(["i3-msg", "[urgent=latest] focus"])
-            sys.exit(0)
+        # Fallback on google search
+        if keep_history:
+            save_history(user_input)
+        open_url(f"https://www.google.com/search?q={urllib.parse.quote(user_input)}")
+        return
 
     options = [item[0] for item in matched_items]
 
@@ -129,9 +257,9 @@ def search(rofi, user_input, config):
 
     for title, url in matched_items:
         if title == selected_option:
-            subprocess.run(["xdg-open", url])
-            time.sleep(0.3)
-            subprocess.run(["i3-msg", "[urgent=latest] focus"])
+            if keep_history:
+                save_history(user_input)
+            open_url(url)
             break
 
 
@@ -139,15 +267,21 @@ def main(args):
     rofi = Rofi()
     config = load_config(args.config)
 
-    user_input = (
-        subprocess.check_output("xclip -out -selection".split(" "))
-        .decode("utf-8")
-        .strip()
-    )
-    # clear clipboard
-    subprocess.run("xclip -i /dev/null".split(" "))
+    clipboard = read_primary_selection()
+    history = load_history()
 
-    search(rofi, user_input, config)
+    options = []
+    # only propose clipboard content if it matches a config entry
+    if clipboard and get_matches(clipboard, config):
+        options.append(clipboard)
+    options.extend(h for h in history if h != clipboard)
+
+    user_input = rofi.prompt("search", options)
+    if not user_input:
+        sys.exit(0)
+
+    # clipboard one-shot values (uuids, hostnames, ...) would pollute history
+    search(rofi, user_input, config, keep_history=(user_input != clipboard))
 
 
 def parse_args():

@@ -3,7 +3,7 @@
 if [[ ! -f ~/.venvs/rofi_search/bin/activate ]]; then
     uv venv ~/.venvs/rofi_search
     . ~/.venvs/rofi_search/bin/activate
-    uv pip install pyyaml pyperclip
+    uv pip install pyyaml
 fi
 
 . ~/.venvs/rofi_search/bin/activate
