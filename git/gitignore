@@ -13,3 +13,4 @@ poetry.lock
 **/.claude/
 docs/superpowers/
 **/__pycache__/
+.zenv
