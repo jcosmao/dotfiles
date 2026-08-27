@@ -9,7 +9,7 @@ i3_dir=$( dirname "${BASH_SOURCE[0]}" )
 i3_config_base="$i3_dir/base.config"
 hw_name=$(cat /sys/devices/virtual/dmi/id/product_name)
 i3_family_config="${i3_dir}/hw_model/$hw_name.hw.config"
-layout=$(autorandr --detected 2>&1 | head -1 2> /dev/null)
+layout=$(autorandr --detected 2> /dev/null | head -1)
 
 screen_laptop=$(xrandr | grep " connected" | awk '{print $1}' | grep -P '^eDP')
 screen_hdmi_1=$(xrandr | grep " connected" | awk '{print $1}' | grep -P '^HDMI' | head -n 1)
@@ -27,8 +27,12 @@ cat "$i3_config_base" \
     "$i3_layout_config" > ${i3_dir}/config 2> /dev/null
 
 min_version=4.22
+# on reload, the running i3 keeps executing: check its version, not the on-disk
+# binary (they differ mid-upgrade). Fall back to the binary if i3 is not running.
+current_version=$(i3-msg -t get_version 2> /dev/null | grep -oP '"human_readable":"\K[^ "]+')
+[[ -z "$current_version" || "$action" == "restart" ]] && current_version=$(i3 -v | sed -re 's/i3 version ([^ ]+).*/\1/')
 # return 0 if current version is >= min_version
-(echo $min_version; echo $(i3 -v | sed -re 's/i3 version ([^ ]+).*/\1/')) | sort -CV
+(echo $min_version; echo $current_version) | sort -CV
 [[ $? == 0 ]] && sed -i 's/#i3-min-version-check# //' ${i3_dir}/config
 
 sed -ri "s/<LAYOUT_NAME>/$layout/g" ${i3_dir}/config

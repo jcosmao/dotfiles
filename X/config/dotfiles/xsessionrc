@@ -1,0 +1,5 @@
+# Sourced by /etc/X11/Xsession at login (before window manager starts).
+# Explicit cursor size: without it libXcursor/winit/GTK derive the size from
+# the virtual screen dimensions, which gives a giant cursor on multi-head.
+export XCURSOR_SIZE=32
+export XCURSOR_THEME=DMZ-White

@@ -189,8 +189,13 @@ function install_config {
 function install_x_conf {
     log "Installing X11 / i3 environment..."
     for cfg in $(ls "X/config"); do
+        [[ "$cfg" == "dotfiles" ]] && continue
         local target=$(echo "$cfg" | sed 's/\\/\//g')
         safe_link "$SCRIPTPATH/X/config/$cfg" "$HOME/.config/$target"
+    done
+    # X/config/dotfiles/* are home dotfiles: Xresources -> ~/.Xresources, ...
+    for f in X/config/dotfiles/*; do
+        safe_link "$SCRIPTPATH/$f" "$HOME/.$(basename "$f")"
     done
     for f in X/bin/*; do
         [[ $(basename "$f") == "README.md" ]] && continue
