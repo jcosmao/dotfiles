@@ -21,6 +21,8 @@ LOG = logging.getLogger()
 HISTORY_FILE = os.path.expanduser("~/.cache/rofi_search_history")
 HISTORY_MAX = 50
 BOOKMARK_PREFIX = r"^b(?::\s*|\s+)(.*)$"
+FIREFOX_HISTORY_PREFIX = r"^h(?::\s*|\s+)(.*)$"
+FIREFOX_HISTORY_MAX = 5000
 
 
 class Rofi:
@@ -179,7 +181,7 @@ def get_keywords(config):
     Keywords are prefixes like 'jira:' or 'go/', description comes from
     the entry's first item title ('$1' parts stripped).
     """
-    keywords = [("b:", "firefox bookmarks")]
+    keywords = [("b:", "firefox bookmarks"), ("h:", "firefox history")]
     for entry in config:
         pattern = entry["match"]
         desc = re.sub(r"[:\s]*\$\d+.*$", "", entry["items"][0]["title"])
@@ -214,16 +216,17 @@ def keywords_helper(config):
     return f"<tt><span size='10000'>{body.strip()}</span></tt>"
 
 
-def get_firefox_bookmarks():
-    """Return [(title, url)] from firefox places.sqlite (most recent profile)."""
+def query_firefox_places(sql):
+    """Run sql against firefox places.sqlite (most recent profile).
+
+    Works on a copy: firefox keeps the db locked while running.
+    """
     places_files = glob.glob(os.path.expanduser("~/.mozilla/firefox/*/places.sqlite"))
     if not places_files:
         return []
     places = max(places_files, key=os.path.getmtime)
 
-    bookmarks = []
     with tempfile.TemporaryDirectory() as tmpdir:
-        # work on a copy: firefox keeps the db locked while running
         db_copy = os.path.join(tmpdir, "places.sqlite")
         shutil.copy(places, db_copy)
         wal = f"{places}-wal"
@@ -231,21 +234,28 @@ def get_firefox_bookmarks():
             shutil.copy(wal, f"{db_copy}-wal")
         try:
             conn = sqlite3.connect(db_copy)
-            rows = conn.execute(
-                """
-                SELECT f.title, b.title, p.url
-                FROM moz_bookmarks b
-                JOIN moz_places p ON b.fk = p.id
-                LEFT JOIN moz_bookmarks f ON b.parent = f.id
-                WHERE b.type = 1 AND p.url LIKE 'http%'
-                ORDER BY b.dateAdded DESC
-                """
-            ).fetchall()
+            rows = conn.execute(sql).fetchall()
             conn.close()
+            return rows
         except sqlite3.Error:
-            LOG.exception("fail to read firefox bookmarks")
+            LOG.exception("fail to read firefox places.sqlite")
             return []
 
+
+def get_firefox_bookmarks():
+    """Return [(title, url)] from firefox bookmarks."""
+    rows = query_firefox_places(
+        """
+        SELECT f.title, b.title, p.url
+        FROM moz_bookmarks b
+        JOIN moz_places p ON b.fk = p.id
+        LEFT JOIN moz_bookmarks f ON b.parent = f.id
+        WHERE b.type = 1 AND p.url LIKE 'http%'
+        ORDER BY b.dateAdded DESC
+        """
+    )
+
+    bookmarks = []
     seen = set()
     for folder, title, url in rows:
         if url in seen:
@@ -257,16 +267,40 @@ def get_firefox_bookmarks():
     return bookmarks
 
 
-def bookmark_search(rofi, query):
-    bookmarks = get_firefox_bookmarks()
-    if not bookmarks:
+def get_firefox_history():
+    """Return [(title, url)] from firefox history, most recent first."""
+    rows = query_firefox_places(
+        f"""
+        SELECT p.title, p.url
+        FROM moz_places p
+        WHERE p.url LIKE 'http%' AND p.last_visit_date IS NOT NULL
+        ORDER BY p.last_visit_date DESC
+        LIMIT {FIREFOX_HISTORY_MAX}
+        """
+    )
+
+    history = []
+    seen = set()
+    for title, url in rows:
+        if url in seen:
+            continue
+        seen.add(url)
+        title = title or url
+        history.append((f"{title}  ({url})", url))
+    return history
+
+
+def firefox_search(rofi, query, entries, prompt, history_key):
+    """Fuzzy-pick (display, url) entry in rofi, open it."""
+    if not entries:
         return
 
-    display_map = {display: url for display, url in bookmarks}
-    selected, _ = rofi.prompt("bookmarks", list(display_map), filter_text=query)
+    display_map = {display: url for display, url in entries}
+    selected, _ = rofi.prompt(prompt, list(display_map), filter_text=query)
     if selected in display_map:
-        save_history("b:")
+        save_history(history_key)
         open_url(display_map[selected])
+        return "opened"
 
 
 def open_url(url):
@@ -297,8 +331,15 @@ def read_primary_selection():
 def search(rofi, user_input, config, keep_history=True):
     bookmark = re.match(BOOKMARK_PREFIX, user_input)
     if bookmark:
-        bookmark_search(rofi, bookmark.group(1))
-        return
+        return firefox_search(
+            rofi, bookmark.group(1), get_firefox_bookmarks(), "bookmarks", "b:"
+        )
+
+    firefox_history = re.match(FIREFOX_HISTORY_PREFIX, user_input)
+    if firefox_history:
+        return firefox_search(
+            rofi, firefox_history.group(1), get_firefox_history(), "history", "h:"
+        )
 
     matched_items = get_matches(user_input, config)
     if not matched_items:
@@ -306,7 +347,7 @@ def search(rofi, user_input, config, keep_history=True):
         if keep_history:
             save_history(user_input)
         open_url(f"https://www.google.com/search?q={urllib.parse.quote(user_input)}")
-        return
+        return "opened"
 
     options = [item[0] for item in matched_items]
 
@@ -325,7 +366,7 @@ def search(rofi, user_input, config, keep_history=True):
             if keep_history:
                 save_history(user_input)
             open_url(url)
-            break
+            return "opened"
 
 
 def main(args):
@@ -338,7 +379,11 @@ def main(args):
     # without saving this one-shot value (uuid, hostname, ...) in history
     if clipboard and get_matches(clipboard, config):
         # Alt+c in the menu clears the selection and falls back to the prompt
-        if search(rofi, clipboard, config, keep_history=False) != "clear":
+        result = search(rofi, clipboard, config, keep_history=False)
+        if result != "clear":
+            if result == "opened":
+                # selection consumed: clear it so next run starts fresh
+                clear_selection()
             return
 
     mesg = keywords_helper(config)
