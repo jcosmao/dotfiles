@@ -194,7 +194,7 @@ function k.list_containers_by_pod {
 
 function k.limits {
     kub get pods \
-        -o custom-columns="Name:metadata.name,CPU-request:spec.containers[*].resources.requests.cpu,CPU-limit:spec.containers[*].resources.limits.cpu,MEM-request:spec.containers[*].resources.requests.memory,MEM-limit:spec.containers[*].resources.limit.memory" \
+        -o custom-columns="Name:metadata.name,CPU-request:spec.containers[*].resources.requests.cpu,CPU-limit:spec.containers[*].resources.limits.cpu,MEM-request:spec.containers[*].resources.requests.memory,MEM-limit:spec.containers[*].resources.limits.memory" \
         $* | kub top pods --kubecolor-stdin
 }
 
