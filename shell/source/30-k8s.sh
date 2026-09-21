@@ -277,9 +277,14 @@ function k.exec {
 }
 
 function k.get_ns_logs {
-    local pods=($(printf '%s\n' "$@" | sed 's|^pod/||'))
+    local args=($(printf '%s\n' "$@" | sed 's|^pod/||'))
     local ns=$(k.current_namespace)
-    command stern -n ${ns:-default} --color always --field-selector metadata.namespace=${ns:-default} --tail 100 "${pods[@]}"
+    # --tail caps output even when --since is given, so drop it if user asked for a time window
+    local tail=(--tail 100)
+    for a in "${args[@]}"; do
+        [[ $a == -s* || $a == --since* ]] && tail=()
+    done
+    command stern -n ${ns:-default} --color always --field-selector metadata.namespace=${ns:-default} "${tail[@]}" "${args[@]}"
 }
 
 function k.get_all_resources {
