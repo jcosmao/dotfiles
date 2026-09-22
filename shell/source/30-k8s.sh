@@ -276,15 +276,33 @@ function k.exec {
     fi
 }
 
+# usage: klog [stern args] [-- jlog args]
+# pipes through jlog when available (e.g. klog mypod --since 10m -- -f 'level>=warn')
 function k.get_ns_logs {
-    local args=($(printf '%s\n' "$@" | sed 's|^pod/||'))
+    local -a args=() jargs=()
+    local a in_jlog=0
+    for a in "$@"; do
+        if (( in_jlog )); then
+            jargs+=("$a")
+        elif [[ $a == "--" ]]; then
+            in_jlog=1
+        else
+            args+=("${a#pod/}")
+        fi
+    done
     local ns=$(k.current_namespace)
     # --tail caps output even when --since is given, so drop it if user asked for a time window
-    local tail=(--tail 100)
+    local -a tail=(--tail 100)
     for a in "${args[@]}"; do
         [[ $a == -s* || $a == --since* ]] && tail=()
     done
-    command stern -n ${ns:-default} --color always --field-selector metadata.namespace=${ns:-default} "${tail[@]}" "${args[@]}"
+    local -a stern_cmd=(command stern -n ${ns:-default} --color always --field-selector metadata.namespace=${ns:-default} "${tail[@]}" "${args[@]}")
+    if command -v jlog >/dev/null 2>&1; then
+        "${stern_cmd[@]}" | jlog "${jargs[@]}"
+    else
+        (( ${#jargs[@]} )) && echo "klog: jlog not found, ignoring: ${jargs[*]}" >&2
+        "${stern_cmd[@]}"
+    fi
 }
 
 function k.get_all_resources {
