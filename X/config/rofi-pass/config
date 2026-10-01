@@ -22,7 +22,7 @@ AUTOTYPE_field='autotype'
 delay=2
 
 # rofi-pass needs to close itself before it can type passwords. Set delay here.
-wait=0.2
+wait=0.5
 
 # delay between keypresses when typing (in ms)
 type_delay=12
@@ -91,3 +91,13 @@ switch="Alt+x"
 # xdotool
 # wtype
 #backend=xdotool
+
+# Override xdotool backend: --clearmodifiers re-presses held modifiers at the
+# end (xdotool 3.2016 bug) -> Alt ($mod in i3) stays stuck and breaks i3.
+# Force-release modifiers before/after typing instead.
+_do_type_xdotool() {
+	local mods="Alt_L Alt_R Shift_L Shift_R Control_L Control_R Super_L Super_R"
+	xdotool keyup $mods
+	xdotool type --delay "${type_delay}" --file -
+	xdotool keyup $mods
+}
