@@ -114,8 +114,10 @@
     pushr = "!f() { target=${1:-$(git trackshow)}; shift; r=${target%/*}; rb=${target##*/}; b=$(git symbolic-ref --short HEAD); git push --set-upstream $r $b:$rb $*; }; f"
     # push to current branch to remote/dev/name/branch
     pushdev = "!f() { echo $1 | grep -Eq '^[a-z0-9]+$' && rm=$1 && shift; b=$(git symbolic-ref --short HEAD); git push --set-upstream ${rm:-origin} $b:dev/__USERNAME_BRANCH__/$b $*; }; f"
-    # create branch with random 5-char name, optional prefix: git randbr [prefix]
-    randbr = "!f() { git checkout -b ${1:+$1-}$(tr -dc a-z0-9 < /dev/urandom | head -c 5); }; f"
+    # create branch with random 5-char name, optional prefix: git br-rand [prefix]
+    br-rand = "!f() { git checkout -b ${1:+$1-}$(tr -dc a-z0-9 < /dev/urandom | head -c 5); }; f"
+    # delete branch local + remote: git br-del <branch> [remote]
+    br-del = "!f() { b=${1:?branch required}; rm=${2:-origin}; git branch -D $b; git push $rm --delete $b; }; f"
     pick = cherry-pick -s -x --allow-empty
     retag = "!r() { git tag -d $1 && git push origin :refs/tags/$0 && git tag $1; }; r"
     # Remove branches that have already been merged:with
