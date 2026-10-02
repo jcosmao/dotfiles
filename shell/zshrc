@@ -27,4 +27,7 @@ source ~/.zsh/myzsh/plugins/wd/*.zsh
 source ~/.zsh/blox-zsh-theme/blox.zsh
 source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
+# time command format
+export TIMEFMT=$'real\t%E\nuser\t%U\nsys\t%S\nmem\t%MkB'
+
 [[ $ZSH_DEBUG -eq 1 ]] && zprof
