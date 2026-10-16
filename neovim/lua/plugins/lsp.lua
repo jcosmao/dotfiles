@@ -154,11 +154,11 @@ return {
             end
 
             function DiagnosticToggle()
-                if vim.diagnostic.is_disabled() then
+                if not vim.diagnostic.is_enabled() then
                     vim.diagnostic.enable()
                     vim.notify("diagnostic enabled")
                 else
-                    vim.diagnostic.disable()
+                    vim.diagnostic.enable(false)
                     vim.notify("diagnostic disabled")
                 end
             end

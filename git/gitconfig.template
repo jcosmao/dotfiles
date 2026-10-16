@@ -156,3 +156,5 @@
             [ -n \"$up\" ] && git push \"${up%%/*}\" --delete \"${up#*/}\"; \
             echo; \
     }; f"
+    # checkout remote dev branch: git codev plop [remote] -> local plop tracking remote/dev/__USERNAME_BRANCH__/plop
+    codev = "!f() { b=${1:?branch required}; rm=${2:-origin}; git fetch $rm dev/__USERNAME_BRANCH__/$b && if git show-ref --verify --quiet refs/heads/$b; then git checkout $b; else git checkout -b $b --track $rm/dev/__USERNAME_BRANCH__/$b; fi; }; f"

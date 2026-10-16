@@ -9,7 +9,7 @@ function __get_host_color
 
 # Layout
 BLOX_SEG__UPPER_LEFT=(time netns docker openstack kube host cwd git exec_time)
-BLOX_CONF__RESPONSIVE_UPPER_LEFT=(cwd)
+BLOX_CONF__RESPONSIVE_UPPER_LEFT=(openstack cwd)
 BLOX_SEG__UPPER_RIGHT=(terraform virtualenv python_version git_repo_name)
 BLOX_SEG__LOWER_LEFT=(bgjobs symbol)
 BLOX_SEG__LOWER_RIGHT=()
