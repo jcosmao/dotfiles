@@ -19,7 +19,7 @@ _direnv_find_all_zenv() {
 _direnv_save_env() {
     typeset -gA _direnv_saved
     local var
-    for var in $(printenv | cut -d= -f1); do
+    for var in ${(f)"$(export +)"}; do
         _direnv_saved[$var]="${(P)var}"
     done
 }
@@ -38,7 +38,7 @@ _direnv_restore_env() {
 
     # Unset variables that were added
     local current_var
-    for current_var in $(printenv | cut -d= -f1); do
+    for current_var in ${(f)"$(export +)"}; do
         if [[ -z "${_direnv_saved[$current_var]+x}" ]]; then
             unset "$current_var"
         fi

@@ -19,3 +19,6 @@ if [[ $(basename ${BASH_SOURCE[0]}) == ".bashrc" ]]; then
     PS1='# '
     PROMPT_COMMAND=prompt.display
 fi
+
+# cloudinfra stern aliases, from the arsenal checkout
+if [ -r "${TF_ARSENAL_ROOT}/.paas-sdev/tooling/cloudinfra-aliases.sh" ]; then . "${TF_ARSENAL_ROOT}/.paas-sdev/tooling/cloudinfra-aliases.sh"; fi
