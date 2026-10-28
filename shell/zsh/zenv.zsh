@@ -20,6 +20,8 @@ _direnv_save_env() {
     typeset -gA _direnv_saved
     local var
     for var in ${(f)"$(export +)"}; do
+        # Arrays (e.g. SOURCE) can't be restored with export name=value
+        [[ ${(Pt)var} == (array|association)* ]] && continue
         _direnv_saved[$var]="${(P)var}"
     done
 }
@@ -39,6 +41,7 @@ _direnv_restore_env() {
     # Unset variables that were added
     local current_var
     for current_var in ${(f)"$(export +)"}; do
+        [[ ${(Pt)current_var} == (array|association)* ]] && continue
         if [[ -z "${_direnv_saved[$current_var]+x}" ]]; then
             unset "$current_var"
         fi

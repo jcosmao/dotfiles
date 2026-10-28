@@ -29,7 +29,7 @@ function go.install
 export CGO_ENABLED=0
 export GOFLAGS=-buildvcs=false
 export GOTMPDIR=$HOME/go/tmp
-mkdir -p $GOTMPDIR
+[[ -d $GOTMPDIR ]] || mkdir -p $GOTMPDIR
 
 function go.testify
 {
@@ -57,7 +57,7 @@ export CARGO_TARGET_DIR=$HOME/.cache/cargo-target
 # ========================================
 # Ruby
 # ========================================
-mkdir -p $HOME/.gem
+[[ -d $HOME/.gem ]] || mkdir -p $HOME/.gem
 alias gem_install="gem install --user-install"
 
 # gem install bundler
@@ -67,7 +67,11 @@ export GEM_HOME=$HOME/.gem
 
 # Cache lookup - only check once per shell session
 if [[ -z $GEM_PATH_CACHED && -d $HOME/.gem/ruby ]]; then
-    v=$(ls $HOME/.gem/ruby/ | sort -rn | head -1)
+    if [[ -n $ZSH_VERSION ]]; then
+        eval 'v=($HOME/.gem/ruby/*(N/nOn)); v=${v[1]:t}'
+    else
+        v=$(ls $HOME/.gem/ruby/ | sort -rn | head -1)
+    fi
     GEM_PATH="$HOME/.gem/ruby/${v}/bin"
     [[ -d $GEM_PATH ]] && path.append $GEM_PATH
     export GEM_PATH_CACHED=1

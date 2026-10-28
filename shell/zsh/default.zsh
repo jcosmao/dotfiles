@@ -10,4 +10,5 @@ setopt share_history
 
 export PROMPT_EOL_MARK=''
 
-which direnv &> /dev/null && eval "$(direnv hook zsh)"
+# hook output is static per direnv version: cached, no fork at startup
+common.cache_cmd_output ~/.cache/shell/direnv_hook.zsh direnv direnv hook zsh && source ~/.cache/shell/direnv_hook.zsh

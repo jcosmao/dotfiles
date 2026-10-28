@@ -84,6 +84,7 @@ function install_shell {
     safe_link "$SCRIPTPATH/shell/dir_colors" ~/.dir_colors
     mkdir -p ~/.bash_custom
     safe_link "$SCRIPTPATH/shell/zshrc" ~/.zshrc
+    safe_link "$SCRIPTPATH/shell/zshenv" ~/.zshenv
     safe_link "$SCRIPTPATH/bin/fzf" ~/.local/bin/fzf
 
     local bashrc_path=$HOME/.bashrc

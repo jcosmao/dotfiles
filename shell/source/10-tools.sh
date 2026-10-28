@@ -1,6 +1,7 @@
 # Tools setup: gpg, git, FZF, tmux completions, XDG utils
 
-command -v bluetoothctl &> /dev/null && source <(bluetooth-pair --complete)
+command -v bluetoothctl &> /dev/null && common.cache_cmd_output ~/.cache/shell/bluetooth-pair.bash bluetooth-pair bluetooth-pair --complete && \
+    source ~/.cache/shell/bluetooth-pair.bash
 
 # ========================================
 # git
@@ -120,17 +121,19 @@ function git.switch_remote {
 # ========================================
 # GPG
 # ========================================
-export GPG_TTY=$(tty)
+export GPG_TTY=${TTY:-$(tty)}
 
 if [[ -z $SSH_CONNECTION ]]; then
+    _gpg_agent_conf=""
+    [[ -f ~/.gnupg/gpg-agent.conf ]] && _gpg_agent_conf=$(<~/.gnupg/gpg-agent.conf)
     # ncurses gpg prompt
-    if which pinentry-curses 2>&1 > /dev/null && \
-        ! grep -q pinentry-program ~/.gnupg/gpg-agent.conf; then
-        echo "pinentry-program $(which pinentry-curses)" >> ~/.gnupg/gpg-agent.conf
+    if [[ $_gpg_agent_conf != *pinentry-program* ]] && command -v pinentry-curses &> /dev/null; then
+        echo "pinentry-program $(command -v pinentry-curses)" >> ~/.gnupg/gpg-agent.conf
     fi
 
-    ! grep -q default-cache-ttl ~/.gnupg/gpg-agent.conf && \
+    [[ $_gpg_agent_conf != *default-cache-ttl* ]] && \
         echo "default-cache-ttl 36000" >> ~/.gnupg/gpg-agent.conf
+    unset _gpg_agent_conf
 else
     mkdir -p ~/.gnupg
     echo no-autostart > ~/.gnupg/gpg-agent.conf

@@ -1,10 +1,10 @@
 function __get_host_color
 {
-  HOST_COLOR_ARRAY=(10 11 12 14 39 45 69 99 123 135 159 161 202 208 219)
-  fixed_nb=$(awk '{print $1}' <(md5sum <(hostname)) | sed -re 's/[^0-9]//g' | cut -c 1-10)
-  array_size=${#HOST_COLOR_ARRAY[@]}
-  color_index=$(((fixed_nb%array_size) + 1))  # Index start at 1 in zsh
-  echo ${HOST_COLOR_ARRAY[$color_index]}
+  # deterministic color from hostname, pure zsh (no fork)
+  local -a colors=(10 11 12 14 39 45 69 99 123 135 159 161 202 208 219)
+  local c hash=0
+  for c in ${(s::)HOST}; do (( hash = (hash * 31 + #c) % 1000003 )); done
+  echo ${colors[$(( hash % $#colors + 1 ))]}
 }
 
 # Layout

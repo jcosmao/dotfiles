@@ -11,6 +11,10 @@ hw_name=$(cat /sys/devices/virtual/dmi/id/product_name)
 i3_family_config="${i3_dir}/hw_model/$hw_name.hw.config"
 layout=$(autorandr --detected 2> /dev/null | head -1)
 
+# apply screen layout synchronously before reload: i3 must see the outputs
+# active, otherwise workspace moves to the external screen fail (race with exec_always)
+[[ -n "$layout" ]] && autorandr --skip-options gamma --force "$layout"
+
 screen_laptop=$(xrandr | grep " connected" | awk '{print $1}' | grep -P '^eDP')
 screen_hdmi_1=$(xrandr | grep " connected" | awk '{print $1}' | grep -P '^HDMI' | head -n 1)
 screen_hdmi_2=$(xrandr | grep " connected" | awk '{print $1}' | grep -P '^HDMI' | head -n 2 | tail -1)

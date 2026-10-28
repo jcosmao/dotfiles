@@ -428,6 +428,7 @@ complete -F _complete_pod k.mem_use
 
 
 if [[ -n $ZSH_VERSION ]]; then
-    source <(command kubectl completion zsh 2>/dev/null)
+    # cached in fpath, loaded on first completion
+    common.cache_cmd_output ~/.cache/shell/completions/_kubectl kubectl command kubectl completion zsh && autoload -Uz _kubectl
     compdef _kubectl kubectl kub kubecolor
 fi

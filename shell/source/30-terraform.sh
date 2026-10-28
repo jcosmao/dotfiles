@@ -105,10 +105,13 @@ alias tg=terragrunt
 alias tfo="tf output --json | jq 'to_entries | del(.[].value.type) | from_entries'"
 alias tfs="terraform.state_search"
 
-complete -C $(which terraform) terraform
-complete -C $(which terraform) tf
-complete -C $(which terraform) tfy
-complete -C $(which terraform) terragrunt
-complete -C $(which terraform) tg
+# binary path, ignoring the terraform=tofu alias (zsh `which` would return the alias)
+if [[ -n $ZSH_VERSION ]]; then _tf_bin=${commands[terraform]}; else _tf_bin=$(type -P terraform); fi
+complete -C $_tf_bin terraform
+complete -C $_tf_bin tf
+complete -C $_tf_bin tfy
+complete -C $_tf_bin terragrunt
+complete -C $_tf_bin tg
+unset _tf_bin
 complete -F _complete_tf_workspace terraform.set_workspace
 complete -F _complete_tf_workspace tfset

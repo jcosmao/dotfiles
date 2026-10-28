@@ -67,10 +67,19 @@ else
 end
 
 -- Set python path if pyenv is installed
-if vim.fn.filereadable(vim.fn.expand('~') .. '/.venvs/nvim/bin/python') then
+if vim.fn.filereadable(vim.fn.expand('~') .. '/.venvs/nvim/bin/python') == 1 then
     vim.g.nvim_python_path = vim.fn.expand('~') .. '/.venvs/nvim/bin'
     vim.g.python3_host_prog = vim.g.nvim_python_path .. '/python'
     vim.env.PATH = vim.g.nvim_python_path .. ':' .. vim.env.PATH
+end
+
+-- nvm is lazy loaded in shell: expose latest node for node based LSP servers
+if vim.fn.executable('node') == 0 then
+    local nodes = vim.fn.glob(vim.fn.expand('~') .. '/.nvm/versions/node/*/bin', false, true)
+    table.sort(nodes, function(a, b) return vim.version.lt(a:match('/v([%d.]+)/'), b:match('/v([%d.]+)/')) end)
+    if #nodes > 0 then
+        vim.env.PATH = nodes[#nodes] .. ':' .. vim.env.PATH
+    end
 end
 
 vim.g.node_host_prog = vim.fn.expand('~') .. '/.local/bin/npm'

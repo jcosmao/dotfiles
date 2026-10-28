@@ -1,0 +1,4 @@
+# vim: set ft=zsh:
+# Ubuntu /etc/zsh/zshrc runs a full compinit (compaudit + fpath scan) on every start;
+# ~/.zsh/myzsh/lib/completion.zsh does it (cached, -C) itself.
+skip_global_compinit=1
