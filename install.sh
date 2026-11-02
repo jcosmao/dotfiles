@@ -7,6 +7,7 @@ SCRIPTPATH=$(dirname "$SCRIPT")
 IS_SSH=${SSH_TTY:-""}
 TMPDIR=$SCRIPTPATH/tmp
 DOTFILES_DIR="$HOME/.dotfiles"
+export PATH="$HOME/.local/bin:$PATH"
 
 GR=$(tput setaf 2)
 YL=$(tput setaf 3)
@@ -58,6 +59,7 @@ function install_neovim {
 function install_vim_requirements {
     log "Installing Vim requirements (uv + treesitter)..."
     [[ ! -e ~/.local/bin/nvim ]] && install_neovim 'stable'
+    command -v uv &> /dev/null || install_uv
     safe_link "$SCRIPTPATH/ctags/ctags.d" ~/.ctags.d
 
     if [[ ! -d ~/.venvs/nvim ]]; then
@@ -90,6 +92,31 @@ function install_shell {
     local bashrc_path=$HOME/.bashrc
     [[ -n ${LC_BASTION:-""} ]] && bashrc_path=$HOME/.bashrc-$LC_BASTION
     safe_link "$SCRIPTPATH/shell/bashrc" "$bashrc_path"
+
+    # bashrc execs zsh when ~/.force_zsh exists
+    if command -v zsh &> /dev/null; then
+        log "  zsh detected: force zsh as default shell (~/.force_zsh)"
+        touch ~/.force_zsh
+    fi
+}
+
+function install_uv {
+    if command -v uv &> /dev/null; then
+        log "Updating uv..."
+        uv self update &> /dev/null || warn "uv self update failed (not installed via standalone installer?)"
+        return
+    fi
+    log "Installing uv..."
+    curl -LsSf https://astral.sh/uv/install.sh | env UV_NO_MODIFY_PATH=1 UV_INSTALL_DIR="$HOME/.local/bin" sh
+}
+
+function install_restic {
+    log "Installing restic..."
+    local v=$(curl -sI https://github.com/restic/restic/releases/latest | grep -i location | grep -oE "v[0-9.]+" | head -1)
+    [[ -z "$v" ]] && { warn "Unable to fetch restic latest version"; return; }
+    curl -fLo "$TMPDIR/restic.bz2" "https://github.com/restic/restic/releases/download/$v/restic_${v#v}_linux_amd64.bz2"
+    bunzip2 -f "$TMPDIR/restic.bz2"
+    install -m 755 "$TMPDIR/restic" ~/.local/bin/restic
 }
 
 function update_bin_from_deb {
@@ -217,7 +244,7 @@ function print_help {
     echo "Options:"
     local opts=(
         "-m, --minimal#Minimal install: Vim-lite, Shell, .local/bin and Tmux."
-        "-c, --conf#Full CLI install: Shell, Tmux, Git, .local/bin and .config."
+        "-c, --conf#Full CLI install: Shell, Tmux, Git, .local/bin, .config, uv and restic."
         "-n, --nvim [ver]#Neovim + deps. Optional version: stable, nightly, v0.11.x."
         "-x, --ui#GUI environment: i3, fonts, icons and X11 scripts."
         "-u, --updatebin#Downloads latest binaries (ripgrep, fd) from GitHub."
@@ -248,6 +275,8 @@ function main {
                 install_git
                 install_config "common"
                 install_local_bin
+                install_uv
+                install_restic
                 ;;
             --ui | -x)
                 install_fonts
