@@ -7,7 +7,9 @@ SCRIPTPATH=$(dirname "$SCRIPT")
 IS_SSH=${SSH_TTY:-""}
 TMPDIR=$SCRIPTPATH/tmp
 DOTFILES_DIR="$HOME/.dotfiles"
-export PATH="$HOME/.local/bin:$PATH"
+export CARGO_HOME=${CARGO_HOME:-$HOME/.cargo}
+export RUSTUP_HOME=${RUSTUP_HOME:-$HOME/.rustup}
+export PATH="$HOME/.local/bin:$CARGO_HOME/bin:$PATH"
 
 GR=$(tput setaf 2)
 YL=$(tput setaf 3)
@@ -57,7 +59,7 @@ function install_neovim {
 }
 
 function install_vim_requirements {
-    log "Installing Vim requirements (uv + treesitter)..."
+    log "Installing Vim requirements (uv + cargo + tree-sitter-cli)..."
     [[ ! -e ~/.local/bin/nvim ]] && install_neovim 'stable'
     command -v uv &> /dev/null || install_uv
     safe_link "$SCRIPTPATH/ctags/ctags.d" ~/.ctags.d
@@ -68,9 +70,157 @@ function install_vim_requirements {
     source ~/.venvs/nvim/bin/activate
     uv pip install --upgrade pynvim yamllint pyproject-flake8 black
 
-    if ! command -v tree-sitter &> /dev/null; then
-        warn "tree-sitter-cli not detected. Install it with: cargo install tree-sitter-cli"
+    command -v cargo &> /dev/null || install_cargo
+    if command -v tree-sitter &> /dev/null; then
+        log "  $(tree-sitter --version) already installed"
+    elif ! command -v cargo &> /dev/null; then
+        warn "cargo not available: tree-sitter-cli not installed"
+    elif ! command -v cc &> /dev/null; then
+        warn "No C compiler (cc): install build-essential, then: cargo install --locked tree-sitter-cli"
+    else
+        log "  cargo install tree-sitter-cli..."
+        cargo install --locked tree-sitter-cli || warn "tree-sitter-cli install failed"
     fi
+}
+
+function install_cargo {
+    if command -v rustup &> /dev/null; then
+        log "Updating Rust toolchain (rustup)..."
+        rustup update stable &> /dev/null || warn "rustup update failed"
+        return 0
+    fi
+    log "Installing Rust toolchain (rustup + cargo)..."
+    curl -fsSL --proto '=https' --tlsv1.2 --retry 3 --connect-timeout 10 https://sh.rustup.rs |
+        TMPDIR="$TMPDIR" sh -s -- -y --no-modify-path --profile minimal --default-toolchain stable ||
+        warn "rustup install failed"
+}
+
+function install_alacritty {
+    log "Installing Alacritty (cargo)..."
+    command -v cargo &> /dev/null || install_cargo
+    if ! command -v cargo &> /dev/null; then
+        warn "cargo not available: alacritty not installed"; return 0
+    fi
+
+    # build deps (xkbcommon/xcb are dlopen'ed at runtime, no -dev needed)
+    local missing=()
+    command -v cc &> /dev/null || missing+=(build-essential)
+    command -v cmake &> /dev/null || missing+=(cmake)
+    if ! command -v pkg-config &> /dev/null; then
+        missing+=(pkg-config)
+    else
+        local lib
+        for lib in fontconfig:libfontconfig1-dev freetype2:libfreetype6-dev; do
+            pkg-config --exists "${lib%%:*}" || missing+=("${lib#*:}")
+        done
+    fi
+    if [[ ${#missing[@]} -ne 0 ]]; then
+        warn "Missing alacritty build deps: sudo apt install ${missing[*]}"
+        return 0
+    fi
+
+    # no-op if already up to date
+    if cargo install --locked alacritty; then
+        safe_link "$CARGO_HOME/bin/alacritty" ~/.local/bin/alacritty
+    else
+        warn "alacritty install failed"
+    fi
+}
+
+function install_enpass {
+    # Enpass ships 2 builds: apt suite "stable" = Wayland, suite "x11" = X11
+    local variant=${1:-}
+    if [[ -z "$variant" ]]; then
+        if [[ -n "${WAYLAND_DISPLAY:-}" || "${XDG_SESSION_TYPE:-}" == "wayland" ]]; then
+            variant=wayland
+        else
+            variant=x11
+        fi
+    fi
+    local suite
+    case "$variant" in
+        wayland) suite=stable ;;
+        x11) suite=x11 ;;
+        *) warn "Unknown enpass variant: $variant (x11|wayland)"; return 0 ;;
+    esac
+    log "Installing Enpass $variant (.deb, extracted without root)..."
+    local repo="https://apt.enpass.io"
+
+    # latest "enpass" package from the official apt repo index: "<version> <filename> <sha256>"
+    local latest
+    latest=$(curl -fsSL --retry 3 --connect-timeout 10 "$repo/dists/$suite/main/binary-amd64/Packages" |
+        awk -v RS= '/(^|\n)Package: enpass\n/ {
+            for (i = 1; i <= split($0, l, "\n"); i++) {
+                split(l[i], kv, ": ")
+                if (kv[1] == "Version") v = kv[2]
+                if (kv[1] == "Filename") f = kv[2]
+                if (kv[1] == "SHA256") h = kv[2]
+            }
+            print v, f, h
+        }' | sort -V | tail -1) || latest=""
+    local version filename sha256
+    read -r version filename sha256 <<< "$latest"
+    if [[ -z "$filename" || -z "$sha256" ]]; then
+        warn "Unable to fetch enpass package index"; return 0
+    fi
+
+    # no root: extract the .deb in ~/.local/opt/enpass instead of apt install
+    local dest="$HOME/.local/opt/enpass"
+    if [[ "$(cat "$dest/.version" 2>/dev/null)" == "$version $variant" ]]; then
+        log "  enpass $version ($variant) already installed"; return 0
+    fi
+
+    local deb="$TMPDIR/$(basename "$filename")" root="$TMPDIR/enpass-root"
+    if ! curl -fSL --retry 3 --connect-timeout 10 -o "$deb" "$repo/$filename"; then
+        warn "enpass download failed"; return 0
+    fi
+    if ! echo "$sha256  $deb" | sha256sum -c --quiet -; then
+        warn "enpass .deb checksum mismatch"; return 0
+    fi
+
+    rm -rf "$root" && mkdir -p "$root"
+    if command -v dpkg-deb &> /dev/null; then
+        dpkg-deb -x "$deb" "$root"
+    else
+        local data
+        data=$(ar t "$deb" | grep '^data\.tar') &&
+            (cd "$root" && ar x "$deb" "$data" && tar -xf "$data" && rm -f "$data")
+    fi || { warn "enpass .deb extraction failed"; return 0; }
+    [[ -x "$root/opt/enpass/Enpass" ]] || { warn "enpass binary not found in .deb"; return 0; }
+
+    mkdir -p "$(dirname "$dest")"
+    rm -rf "$dest" && mv "$root/opt/enpass" "$dest"
+    echo "$version $variant" > "$dest/.version"
+    safe_link "$dest/Enpass" ~/.local/bin/enpass
+
+    # desktop integration (launcher, icons, enpass:// handlers)
+    local share="$HOME/.local/share"
+    mkdir -p "$share/applications" "$share/icons" "$share/mime/packages"
+    sed "s|/opt/enpass/Enpass|$dest/Enpass|" "$root/usr/share/applications/enpass.desktop" \
+        > "$share/applications/enpass.desktop"
+    cp -r "$root/usr/share/icons/hicolor" "$share/icons/"
+    cp "$root/usr/share/mime/packages/"*.xml "$share/mime/packages/"
+    command -v update-desktop-database &> /dev/null && update-desktop-database "$share/applications" || true
+    command -v update-mime-database &> /dev/null && update-mime-database "$share/mime" &> /dev/null || true
+    command -v gtk-update-icon-cache &> /dev/null && gtk-update-icon-cache -q "$share/icons/hicolor" &> /dev/null || true
+
+    # Wayland build: browser autofill relies on a GNOME Shell extension (user-level install)
+    local ext_uuid="enpass-assistant@enpass.io" ext_src="$root/usr/share/enpass/gnome-extension"
+    local ext_dest="$share/gnome-shell/extensions/$ext_uuid"
+    rm -rf "$ext_dest"
+    if [[ -d "$ext_src" ]] && command -v gnome-shell &> /dev/null; then
+        local major
+        major=$(gnome-shell --version 2>/dev/null | grep -oE '[0-9]+' | head -1)
+        if [[ -n "$major" ]]; then
+            [[ $major -ge 45 ]] && ext_src+=/modern || ext_src+=/legacy
+            mkdir -p "$ext_dest" && cp "$ext_src/"* "$ext_dest/"
+            command -v gnome-extensions &> /dev/null && gnome-extensions enable "$ext_uuid" &> /dev/null ||
+                warn "  GNOME extension installed, enable it after re-login: gnome-extensions enable $ext_uuid"
+        fi
+    fi
+
+    rm -rf "$root" "$deb"
+    log "  enpass $version ($variant) installed in $dest"
 }
 
 function install_vim_light {
@@ -87,7 +237,6 @@ function install_shell {
     mkdir -p ~/.bash_custom
     safe_link "$SCRIPTPATH/shell/zshrc" ~/.zshrc
     safe_link "$SCRIPTPATH/shell/zshenv" ~/.zshenv
-    safe_link "$SCRIPTPATH/bin/fzf" ~/.local/bin/fzf
 
     local bashrc_path=$HOME/.bashrc
     [[ -n ${LC_BASTION:-""} ]] && bashrc_path=$HOME/.bashrc-$LC_BASTION
@@ -107,38 +256,42 @@ function install_uv {
         return
     fi
     log "Installing uv..."
-    curl -LsSf https://astral.sh/uv/install.sh | env UV_NO_MODIFY_PATH=1 UV_INSTALL_DIR="$HOME/.local/bin" sh
+    curl -fLsS --retry 3 --connect-timeout 10 https://astral.sh/uv/install.sh |
+        env TMPDIR="$TMPDIR" UV_NO_MODIFY_PATH=1 UV_INSTALL_DIR="$HOME/.local/bin" sh ||
+        warn "uv install failed"
 }
 
 function install_restic {
     log "Installing restic..."
-    local v=$(curl -sI https://github.com/restic/restic/releases/latest | grep -i location | grep -oE "v[0-9.]+" | head -1)
-    [[ -z "$v" ]] && { warn "Unable to fetch restic latest version"; return; }
-    curl -fLo "$TMPDIR/restic.bz2" "https://github.com/restic/restic/releases/download/$v/restic_${v#v}_linux_amd64.bz2"
-    bunzip2 -f "$TMPDIR/restic.bz2"
-    install -m 755 "$TMPDIR/restic" ~/.local/bin/restic
+    local v
+    v=$(curl -fsSL --retry 3 --connect-timeout 10 -o /dev/null -w '%{url_effective}' \
+        https://github.com/restic/restic/releases/latest) || v=""
+    v=${v##*/}
+    if [[ ! "$v" =~ ^v[0-9] ]]; then
+        warn "Unable to fetch restic latest version"; return 0
+    fi
+    if command -v restic &> /dev/null && [[ "$(restic version 2>/dev/null)" == "restic ${v#v} "* ]]; then
+        log "  restic $v already installed"; return 0
+    fi
+    if curl -fsSL --retry 3 --connect-timeout 10 -o "$TMPDIR/restic.bz2" \
+            "https://github.com/restic/restic/releases/download/$v/restic_${v#v}_linux_amd64.bz2" &&
+        bunzip2 -f "$TMPDIR/restic.bz2" &&
+        install -m 755 "$TMPDIR/restic" ~/.local/bin/restic; then
+        log "  $(restic version)"
+    else
+        warn "restic install failed"
+    fi
 }
 
-function update_bin_from_deb {
-    log "Fetching latest ripgrep and fd binaries..."
-    # Ripgrep
-    local rg_v=$(curl -sI https://github.com/BurntSushi/ripgrep/releases/latest | grep -i location | grep -oE "[0-9.]+" | head -1)
-    curl -fLo "$TMPDIR/rg.deb" "https://github.com/BurntSushi/ripgrep/releases/download/$rg_v/ripgrep_${rg_v}-1_amd64.deb"
-
-    # FD
-    local fd_v=$(curl -sI https://github.com/sharkdp/fd/releases/latest | grep -i location | grep -oE "v[0-9.]+" | head -1)
-    curl -fLo "$TMPDIR/fd.deb" "https://github.com/sharkdp/fd/releases/download/$fd_v/fd_${fd_v#v}_amd64.deb"
-
-    (
-        cd "$TMPDIR"
-        ar x rg.deb && tar xf data.tar.xz && cp usr/bin/rg "$SCRIPTPATH/bin/"
-        rm -rf usr data.tar.xz control.tar.gz debian-binary
-        ar x fd.deb && tar xf data.tar.xz && cp usr/bin/fd "$SCRIPTPATH/bin/"
-    )
-    chmod +x "$SCRIPTPATH/bin/"*
+function update_bin {
+    log "Downloading latest binaries (bin/download.sh)..."
+    "$SCRIPTPATH/bin/download.sh" "$@" || warn "Some binaries failed to download (see above)"
 }
 
 function install_local_bin {
+    # untracked upstream binaries (rg, fzf, fd, bat...): fetch the missing ones
+    update_bin --missing
+
     log "Linking binaries to ~/.local/bin..."
     for f in bin/*; do
         local bin_file=$(basename "$f")
@@ -245,9 +398,10 @@ function print_help {
     local opts=(
         "-m, --minimal#Minimal install: Vim-lite, Shell, .local/bin and Tmux."
         "-c, --conf#Full CLI install: Shell, Tmux, Git, .local/bin, .config, uv and restic."
-        "-n, --nvim [ver]#Neovim + deps. Optional version: stable, nightly, v0.11.x."
-        "-x, --ui#GUI environment: i3, fonts, icons and X11 scripts."
-        "-u, --updatebin#Downloads latest binaries (ripgrep, fd) from GitHub."
+        "-n, --nvim [ver]#Neovim + deps (uv, cargo, tree-sitter-cli). Optional version: stable, nightly, v0.11.x."
+        "-x, --ui#GUI environment: i3, fonts, icons, X11 scripts and alacritty."
+        "-e, --enpass [x11|wayland]#Enpass .deb extracted in ~/.local/opt (no root). Default: current session type."
+        "-u, --updatebin#Download latest binaries (rg, fzf, fd, bat, jq, stern, plik) from GitHub."
         "-d, --uninstall#Clean up all symlinks in your \$HOME."
         "-h, --help#Display this help menu."
     )
@@ -281,6 +435,7 @@ function main {
             --ui | -x)
                 install_fonts
                 install_x_conf
+                install_alacritty
                 ;;
             --nvim | --neovim | -n)
                 local release="stable"
@@ -291,8 +446,16 @@ function main {
                 install_vim_requirements
                 install_local_bin
                 ;;
+            --enpass | -e)
+                local variant=""
+                if [[ ${1:-} =~ ^(x11|wayland)$ ]]; then
+                    variant="$1"; shift
+                fi
+                install_enpass "$variant"
+                ;;
             --updatebin | -u)
-                update_bin_from_deb
+                update_bin
+                install_local_bin
                 ;;
             --uninstall | -d)
                 uninstall
