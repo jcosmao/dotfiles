@@ -17,8 +17,16 @@ if [[ ! -e $module_path || ! -e $patch_path ]]; then
     exit 1
 fi
 
-git -C $module_path apply --abort || true
 git -C $module_path reset --hard
 git -C $module_path clean -fdx
 git -C $module_path config --local commit.gpgsign false
-git -C $module_path apply -3 ${patch_path} && git -C $module_path commit -am "$1"
+# already applied on HEAD -> nothing to do
+git -C $module_path apply -R --check ${patch_path} 2>/dev/null && exit 0
+
+# commit patch so lazy sees clean tree. on failure, revert -> never leave dirty tree
+# (dirty tree blocks lazy update, so build/patch never reruns)
+if ! { git -C $module_path apply -3 ${patch_path} && \
+       git -C $module_path -c core.hooksPath=/dev/null commit --no-gpg-sign -qam "$1"; }; then
+    git -C $module_path reset --hard
+    exit 1
+fi
