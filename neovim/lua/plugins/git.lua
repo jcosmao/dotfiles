@@ -89,6 +89,21 @@ return {
         config = function()
             local actions = require("diffview.actions")
             require("diffview").setup({
+                hooks = {
+                    -- expose the project gutentags files to diffview buffers so GotoCtags/GotoCscope work
+                    diff_buf_read = function(bufnr)
+                        local toplevel, rel = vim.api.nvim_buf_get_name(bufnr):match('^diffview://(.-)/%.git/%x+/(.*)$')
+                        if not toplevel then return end
+                        local root = vim.fs.root(toplevel .. '/' .. rel, '.project')
+                        if not root then return end
+                        vim.b[bufnr].gutentags_files = {
+                            ctags = root .. '/' .. vim.g.gutentags_ctags_tagfile,
+                            cscope = root .. '/' .. vim.g.gutentags_scopefile,
+                        }
+                        vim.keymap.set('n', '<C-]>', function() GotoCtags(vim.fn.expand('<cword>')) end,
+                            { buffer = bufnr, noremap = true, silent = true })
+                    end,
+                },
                 keymaps = {
                     disable_defaults = false, -- Disable the default keymaps
                     view = {

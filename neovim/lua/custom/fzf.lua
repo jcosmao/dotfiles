@@ -153,3 +153,32 @@ function Fzf(search_str, source, options, callback)
         end,
     }))
 end
+
+vim.api.nvim_create_user_command("GitLogDiff",
+    function(opts)
+        local fargs = opts.fargs
+        if fargs[1] and not fargs[1]:match('^%-') and not fargs[1]:find('..', 1, true) then
+            fargs[1] = fargs[1] .. '..HEAD'
+        end
+        local args = vim.tbl_map(vim.fn.shellescape, fargs)
+        vim.fn["fzf#run"](vim.fn["fzf#wrap"]({
+            source = "git log --color=always --date=short --format='%C(yellow)%h%C(reset) %C(green)%ad%C(reset) %s %C(blue)<%an>%C(auto)%d%C(reset)' " .. table.concat(args, ' '),
+            options = {
+                '+s', '--ansi', '--no-multi',
+                '--prompt', 'GitLog ❭ ',
+                '--preview', 'git show --stat --patch --color=always {1}',
+                '--preview-window', 'right:60%:nohidden',
+            },
+            sink = function(line)
+                local sha = line:match('^(%x+)')
+                if sha then vim.cmd('DiffviewOpen ' .. sha .. '^!') end
+            end,
+        }))
+    end,
+    { nargs = '*', complete = function(lead)
+        local prefix = lead:match('^(.*%.%.%.?)') or ''
+        local refs = vim.fn.systemlist({ 'git', 'for-each-ref', '--format=%(refname:short)', 'refs/heads', 'refs/remotes', 'refs/tags' })
+        return vim.tbl_filter(function(r) return vim.startswith(r, lead) end,
+            vim.tbl_map(function(r) return prefix .. r end, refs))
+    end }
+)
