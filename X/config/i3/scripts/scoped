@@ -1,0 +1,16 @@
+#!/bin/sh
+# Run a command in its own transient systemd user scope (under app.slice).
+# Without this, everything i3 spawns lives in the lightdm session-N.scope
+# together with i3, and systemd-oomd (ManagedOOMSwap=kill on -.slice) kills
+# that whole cgroup = the whole X session. In its own scope, only the app dies.
+
+[ $# -eq 0 ] && { echo "usage: $0 cmd [args...]" >&2; exit 1; }
+
+# fallback: no user manager / bus -> run directly
+if [ ! -S "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/bus" ]; then
+    exec "$@"
+fi
+
+name=$(basename "$1" | tr -c 'a-zA-Z0-9_.\n' '_')
+exec systemd-run --user --scope --collect --quiet --slice=app.slice \
+    --unit="app-i3-${name}-$$" -- "$@"
