@@ -93,7 +93,7 @@
 [alias]
     aliases = config --get-regexp alias
     br = branch -vv
-    l = log --stat
+    l = log --stat --format=fuller
     ls = log --stat --show-signature
     lol = log --graph --decorate --pretty=oneline --abbrev-commit
     st = status --short
