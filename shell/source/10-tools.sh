@@ -40,6 +40,30 @@ function git
         return $?
     fi
 
+    # --exclude-path <pattern> | --exclude-path=<pattern>: pathspec ':(exclude)<pattern>'
+    if [[ " $* " = *" --exclude-path"* ]]; then
+        local -a args paths excl
+        local a next=0 sep=0
+        for a in "$@"; do
+            if [[ $next -eq 1 ]]; then
+                excl+=(":(exclude)$a"); next=0
+            elif [[ $a = --exclude-path=* ]]; then
+                excl+=(":(exclude)${a#--exclude-path=}")
+            elif [[ $a = --exclude-path ]]; then
+                next=1
+            elif [[ $sep -eq 1 ]]; then
+                paths+=("$a")
+            elif [[ $a = -- ]]; then
+                sep=1
+            else
+                args+=("$a")
+            fi
+        done
+
+        command git "${args[@]}" -- "${paths[@]}" "${excl[@]}"
+        return $?
+    fi
+
     command git $*
 }
 
