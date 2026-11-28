@@ -14,3 +14,5 @@ poetry.lock
 docs/superpowers/
 **/__pycache__/
 .zenv
+
+**/.claude/settings.local.json

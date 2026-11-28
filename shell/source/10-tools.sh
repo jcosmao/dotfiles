@@ -150,10 +150,17 @@ export GPG_TTY=${TTY:-$(tty)}
 if [[ -z $SSH_CONNECTION ]]; then
     _gpg_agent_conf=""
     [[ -f ~/.gnupg/gpg-agent.conf ]] && _gpg_agent_conf=$(<~/.gnupg/gpg-agent.conf)
-    # ncurses gpg prompt
-    if [[ $_gpg_agent_conf != *pinentry-program* ]] && command -v pinentry-curses &> /dev/null; then
-        echo "pinentry-program $(command -v pinentry-curses)" >> ~/.gnupg/gpg-agent.conf
+    # gpg prompt: GTK when available (falls back to curses itself without $DISPLAY), else curses
+    _pinentry=$(command -v pinentry-gtk || command -v pinentry-curses)
+    if [[ -n $_pinentry ]]; then
+        if [[ $_gpg_agent_conf != *pinentry-program* ]]; then
+            echo "pinentry-program $_pinentry" >> ~/.gnupg/gpg-agent.conf
+        elif [[ $_gpg_agent_conf == *pinentry-curses* && $_pinentry == *pinentry-gtk ]]; then
+            sed -i "s|^pinentry-program .*|pinentry-program $_pinentry|" ~/.gnupg/gpg-agent.conf
+            gpgconf --kill gpg-agent
+        fi
     fi
+    unset _pinentry
 
     [[ $_gpg_agent_conf != *default-cache-ttl* ]] && \
         echo "default-cache-ttl 36000" >> ~/.gnupg/gpg-agent.conf
@@ -225,7 +232,7 @@ function gpg.offline_master_edit
 
     echo "Start edit key id: $keyid"
 
-    echo "pinentry-program $(which pinentry-curses)" > $tmpdir/gpg-agent.conf
+    echo "pinentry-program $(command -v pinentry-gtk || command -v pinentry-curses)" > $tmpdir/gpg-agent.conf
     echo "default-cache-ttl 600" >> $tmpdir/gpg-agent.conf
 
     # Import the private keys
